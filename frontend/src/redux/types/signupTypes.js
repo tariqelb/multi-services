@@ -1,0 +1,5 @@
+// src/redux/types/signupTypes.js
+
+export const SET_SIGNUP_EMAIL = "SET_SIGNUP_EMAIL";
+export const SET_SIGNUP_PASSWORD = "SET_SIGNUP_PASSWORD";
+export const SET_SIGNUP_CONFIRM_PASSWORD = "SET_SIGNUP_CONFIRM_PASSWORD";
