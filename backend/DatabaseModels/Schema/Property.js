@@ -1,8 +1,12 @@
-
 import mongoose from "mongoose";
 
 const propertySchema = new mongoose.Schema(
     {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
         role: {
             type: String,
             enum: ["Owner", "Real Estate Agent", "Agency"],
@@ -32,6 +36,16 @@ const propertySchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
+        },
+        description: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+        status: {
+            type: String,
+            enum: ["Available", "Rented", "Sold", "Inactive"],
+            default: "Available",
         },
         listingType: {
             type: String,
@@ -116,6 +130,8 @@ const propertySchema = new mongoose.Schema(
     }
 );
 
-const Property = mongoose.model("Property", propertySchema);
+const Property =
+    mongoose.models.Property ||
+    mongoose.model("Property", propertySchema);
 
 export default Property;

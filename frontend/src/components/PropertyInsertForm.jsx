@@ -23,6 +23,7 @@ import PropertyInsertFormOwnerInfo from './PropertyInsertFormOwnerInfo';
 import PropertyInsertFormDetails from './PropertyInsertFormDetails';
 import PropertyInsertFormImages from './PropertyInsertFormImages';
 import PropertyInsertFormPublish from './PropertyInsertFormPublish';
+import PropertyInsertFormDescription from "./PropertyInsertFormDescription"
 
 // Section header
 const SectionHeader = ({ icon, title, subtitle, number }) => (
@@ -462,7 +463,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
     };
 
     return (
-        <div className="flex bg-sky-100/70 m-9 border-[1px] rounded-[15px]">
+        <div className="flex bg-gray-100/70 m-9 border-[1px] border-gray-200 rounded-[15px]">
             <Box
                 sx={{
                     width: '100%',
@@ -571,7 +572,14 @@ export default function PropertyInsertForm({ onAddProperty }) {
                         SectionPaper={SectionPaper}
                         SectionHeader={SectionHeader}
                     />
-
+                    <PropertyInsertFormDescription
+                        formData={formData}
+                        errors={errors}
+                        handleChange={handleChange}
+                        fieldSx={fieldSx}
+                        SectionPaper={SectionPaper}
+                        SectionHeader={SectionHeader}
+                    />
                     <PropertyInsertFormImages
                         formData={formData}
                         fileInputRef={fileInputRef}

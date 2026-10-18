@@ -35,7 +35,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setAct
       component="aside" 
       sx={{
         width: 260,
-        bgcolor: '#1e3a8a',
+        bgcolor: '#243e94',
         color: '#ffffff',
         display: { xs: sidebarOpen ? 'block' : 'none', md: 'flex' },
         flexDirection: 'column',

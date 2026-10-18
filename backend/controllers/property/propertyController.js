@@ -1,4 +1,5 @@
 import Property from "../../DatabaseModels/Schema/Property.js";
+import mongoose from "mongoose";
 import fs from "node:fs/promises";
 
 const removeUploadedFiles = async (files = []) => {
@@ -22,14 +23,16 @@ const removeUploadedFiles = async (files = []) => {
 export const createProperty = async (req, res) => {
     const uploadedFiles = req.files || [];
 
-    // Diagnostic logs: inspect what reached the controller.
     console.log("\n========== PROPERTY UPLOAD DEBUG ==========");
     console.log(
         "[Backend] Content-Type:",
         req.headers["content-type"]
     );
     console.log("[Backend] Request body:", req.body);
-    console.log("[Backend] Number of uploaded files:", uploadedFiles.length);
+    console.log(
+        "[Backend] Number of uploaded files:",
+        uploadedFiles.length
+    );
     console.log(
         "[Backend] Uploaded files:",
         uploadedFiles.map((file) => ({
@@ -44,6 +47,16 @@ export const createProperty = async (req, res) => {
     console.log("===========================================\n");
 
     try {
+        const userId = req.user?.userId;
+
+
+        if (!userId || !mongoose.isValidObjectId(userId)) {
+            await removeUploadedFiles(uploadedFiles);
+
+            return res.status(401).json({
+                message: "Authenticated user ID is missing or invalid.",
+            });
+        }
         const {
             role,
             firstName,
@@ -51,6 +64,7 @@ export const createProperty = async (req, res) => {
             email,
             phone,
             title,
+            description,
             listingType,
             propertyType,
             city,
@@ -66,6 +80,7 @@ export const createProperty = async (req, res) => {
             syndicateFees,
         } = req.body;
 
+        // Validate required fields.
         const requiredFields = {
             firstName,
             lastName,
@@ -96,6 +111,24 @@ export const createProperty = async (req, res) => {
             });
         }
 
+        // Validate description.
+        const propertyDescription =
+            typeof description === "string"
+                ? description.trim()
+                : "";
+
+        if (
+            description !== undefined &&
+            typeof description !== "string"
+        ) {
+            await removeUploadedFiles(uploadedFiles);
+
+            return res.status(400).json({
+                message: "Description must be a string.",
+            });
+        }
+
+        // Validate numeric fields.
         const numericFields = {
             price,
             surface,
@@ -116,6 +149,7 @@ export const createProperty = async (req, res) => {
                     });
                 }
 
+                numericFields[field] = 0;
                 continue;
             }
 
@@ -140,6 +174,7 @@ export const createProperty = async (req, res) => {
             });
         }
 
+        // Validate map URL.
         if (mapLink) {
             try {
                 const parsedUrl = new URL(mapLink);
@@ -156,6 +191,7 @@ export const createProperty = async (req, res) => {
             }
         }
 
+        // Prepare uploaded images.
         const images = uploadedFiles.map((file) => ({
             filename: file.filename,
             path: `/uploads/properties/${file.filename}`,
@@ -163,13 +199,17 @@ export const createProperty = async (req, res) => {
 
         console.log("[Backend] Images being saved:", images);
 
+        // Create property.
         const property = await Property.create({
+            userId,
             role,
             firstName,
             lastName,
             email,
             phone,
             title,
+            description: propertyDescription,
+            status: "Available",
             listingType,
             propertyType,
             city,
@@ -178,16 +218,19 @@ export const createProperty = async (req, res) => {
             mapLink,
             price: numericFields.price,
             surface: numericFields.surface,
-            rooms: numericFields.rooms ?? 0,
-            salons: numericFields.salons ?? 0,
-            bathrooms: numericFields.bathrooms ?? 0,
-            floor: numericFields.floor ?? 0,
-            syndicateFees: numericFields.syndicateFees ?? 0,
+            rooms: numericFields.rooms,
+            salons: numericFields.salons,
+            bathrooms: numericFields.bathrooms,
+            floor: numericFields.floor,
+            syndicateFees: numericFields.syndicateFees,
             images,
         });
 
         console.log("[Backend] Property saved:", property._id);
-        console.log("[Backend] Saved image count:", property.images.length);
+        console.log(
+            "[Backend] Saved image count:",
+            property.images.length
+        );
 
         return res.status(201).json({
             message: "Property created successfully.",

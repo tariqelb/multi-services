@@ -100,24 +100,25 @@ export const login = async (req, res) => {
             });
         }
 
-        console.log(email, password)
+        console.log("1", email, password, "[", email.trim().toLowerCase(), "]")
+        console.log("2", email, password)
         const user = await User.findOne({
             email: email.trim().toLowerCase(),
         }).select("+password");
 
-        console.log(email, password)
+        console.log("3", email, password)
         if (!user) {
             return res.status(401).json({
                 message: "Invalid email or password",
             });
         }
-        console.log(email, password)
+        console.log("4",email, password)
 
         const isPasswordValid = await bcrypt.compare(
             password,
             user.password
         );
-        console.log(email, password)
+        console.log(email, password, "is pass valid : [" , isPasswordValid, "]")
 
         if (!isPasswordValid) {
             return res.status(401).json({

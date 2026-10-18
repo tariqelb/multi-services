@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, CardActionArea } from '@mui/material';
 import CategoryCard from './CategoryCard';
 
-export default function RealEstateOption() {
+export default function RealEstateOption({ onSelectCategory, listRef }) {
   const categories = [
     { title: 'Apartment', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500' },
     { title: 'House', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=500' },
@@ -14,6 +14,19 @@ export default function RealEstateOption() {
     { title: 'Land', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=500' },
     { title: 'Warehouse', image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=500' },
   ];
+
+  const handleCategoryClick = (title) => {
+    // 1. Update category filter
+    onSelectCategory?.(title);
+
+    // 2. Scroll smoothly to the property list section
+    if (listRef?.current) {
+      listRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
 
   return (
     <Box sx={{ px: { xs: 2, md: 6 }, py: 4 }}>
@@ -37,14 +50,18 @@ export default function RealEstateOption() {
         }}
       >
         {categories.map((cat, index) => (
-          // You can customize the size right here from the parent component:
-          <CategoryCard 
+          <Box 
             key={index} 
-            title={cat.title} 
-            image={cat.image} 
-            width="420px" 
-            height="190px" 
-          />
+            onClick={() => handleCategoryClick(cat.title)}
+            sx={{ cursor: 'pointer', borderRadius: '12px', overflow: 'hidden' }}
+          >
+            <CategoryCard 
+              title={cat.title} 
+              image={cat.image} 
+              width="420px" 
+              height="190px" 
+            />
+          </Box>
         ))}
       </Box>
     </Box>
