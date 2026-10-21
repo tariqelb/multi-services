@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const propertySchema = new mongoose.Schema(
@@ -112,6 +113,27 @@ const propertySchema = new mongoose.Schema(
             min: 0,
             default: 0,
         },
+
+        // Rental and agreement details
+        rentWithContract: {
+            type: Boolean,
+            default: false,
+        },
+        mortgageAgreement: {
+            type: Boolean,
+            default: false,
+        },
+        deposit: {
+            type: Number,
+            min: 0,
+            default: 0,
+        },
+        mediatorFee: {
+            type: Number,
+            min: 0,
+            default: 0,
+        },
+
         images: [
             {
                 filename: {

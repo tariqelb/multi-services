@@ -20,35 +20,12 @@ const removeUploadedFiles = async (files = []) => {
     );
 };
 
+
 export const createProperty = async (req, res) => {
     const uploadedFiles = req.files || [];
 
-    console.log("\n========== PROPERTY UPLOAD DEBUG ==========");
-    console.log(
-        "[Backend] Content-Type:",
-        req.headers["content-type"]
-    );
-    console.log("[Backend] Request body:", req.body);
-    console.log(
-        "[Backend] Number of uploaded files:",
-        uploadedFiles.length
-    );
-    console.log(
-        "[Backend] Uploaded files:",
-        uploadedFiles.map((file) => ({
-            fieldname: file.fieldname,
-            originalname: file.originalname,
-            mimetype: file.mimetype,
-            size: file.size,
-            filename: file.filename,
-            path: file.path,
-        }))
-    );
-    console.log("===========================================\n");
-
     try {
         const userId = req.user?.userId;
-
 
         if (!userId || !mongoose.isValidObjectId(userId)) {
             await removeUploadedFiles(uploadedFiles);
@@ -57,6 +34,7 @@ export const createProperty = async (req, res) => {
                 message: "Authenticated user ID is missing or invalid.",
             });
         }
+
         const {
             role,
             firstName,
@@ -78,6 +56,12 @@ export const createProperty = async (req, res) => {
             bathrooms,
             floor,
             syndicateFees,
+
+            // New fields
+            rentWithContract,
+            mortgageAgreement,
+            deposit,
+            mediatorFee,
         } = req.body;
 
         // Validate required fields.
@@ -137,6 +121,8 @@ export const createProperty = async (req, res) => {
             bathrooms,
             floor,
             syndicateFees,
+            deposit,
+            mediatorFee,
         };
 
         for (const [field, value] of Object.entries(numericFields)) {
@@ -174,6 +160,43 @@ export const createProperty = async (req, res) => {
             });
         }
 
+        // Validate boolean fields.
+        const parseBoolean = (value, field) => {
+            if (
+                value === undefined ||
+                value === null ||
+                value === ""
+            ) {
+                return false;
+            }
+
+            if (value === true || value === "true") return true;
+            if (value === false || value === "false") return false;
+
+            throw new Error(`${field} must be true or false.`);
+        };
+
+        let parsedRentWithContract;
+        let parsedMortgageAgreement;
+
+        try {
+            parsedRentWithContract = parseBoolean(
+                rentWithContract,
+                "rentWithContract"
+            );
+
+            parsedMortgageAgreement = parseBoolean(
+                mortgageAgreement,
+                "mortgageAgreement"
+            );
+        } catch (error) {
+            await removeUploadedFiles(uploadedFiles);
+
+            return res.status(400).json({
+                message: error.message,
+            });
+        }
+
         // Validate map URL.
         if (mapLink) {
             try {
@@ -197,8 +220,6 @@ export const createProperty = async (req, res) => {
             path: `/uploads/properties/${file.filename}`,
         }));
 
-        console.log("[Backend] Images being saved:", images);
-
         // Create property.
         const property = await Property.create({
             userId,
@@ -216,6 +237,7 @@ export const createProperty = async (req, res) => {
             neighborhood,
             fullAddress,
             mapLink,
+
             price: numericFields.price,
             surface: numericFields.surface,
             rooms: numericFields.rooms,
@@ -223,14 +245,15 @@ export const createProperty = async (req, res) => {
             bathrooms: numericFields.bathrooms,
             floor: numericFields.floor,
             syndicateFees: numericFields.syndicateFees,
+
+            // New fields
+            rentWithContract: parsedRentWithContract,
+            mortgageAgreement: parsedMortgageAgreement,
+            deposit: numericFields.deposit,
+            mediatorFee: numericFields.mediatorFee,
+
             images,
         });
-
-        console.log("[Backend] Property saved:", property._id);
-        console.log(
-            "[Backend] Saved image count:",
-            property.images.length
-        );
 
         return res.status(201).json({
             message: "Property created successfully.",

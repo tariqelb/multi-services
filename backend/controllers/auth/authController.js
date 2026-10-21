@@ -118,8 +118,7 @@ export const login = async (req, res) => {
             password,
             user.password
         );
-        console.log(email, password, "is pass valid : [" , isPasswordValid, "]")
-
+        console.log(email, password, user.password, "is pass valid : [" , isPasswordValid, "]")
         if (!isPasswordValid) {
             return res.status(401).json({
                 message: "Invalid email or password",

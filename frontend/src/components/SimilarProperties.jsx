@@ -7,18 +7,18 @@ import {
 } from "@mui/material";
 
 import PropertyCard from "./PropertyCard";
+import getImageUrl from "../utils/getImageUrl";
+// const API_URL = "http://localhost:3000";
 
-const API_URL = "http://localhost:3000";
+// function getImageUrl(image) {
+//     const path = typeof image === "string" ? image : image?.path;
 
-function getImageUrl(image) {
-    const path = typeof image === "string" ? image : image?.path;
+//     if (!path) return "";
 
-    if (!path) return "";
+//     if (/^https?:\/\//i.test(path)) return path;
 
-    if (/^https?:\/\//i.test(path)) return path;
-
-    return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
-}
+//     return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
+// }
 
 export default function SimilarProperties({
     properties = [],

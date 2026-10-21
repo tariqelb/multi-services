@@ -244,7 +244,6 @@ export async function updateMyPassword(req, res) {
             currentPassword,
             user.password
         );
-
         if (!isPasswordValid) {
             return res.status(400).json({
                 message: "Current password is incorrect.",

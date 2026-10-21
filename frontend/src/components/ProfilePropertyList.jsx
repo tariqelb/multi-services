@@ -29,16 +29,18 @@ export default function ProfilePropertyList({
     const itemsPerPage = 5;
 
     // Fetch properties from the backend.
+    // Fetch properties published by the logged-in user from the backend.
     useEffect(() => {
         let cancelled = false;
 
-        const fetchProperties = async () => {
+        const fetchUserProperties = async () => {
             setLoading(true);
             setError(null);
 
             try {
+                // Updated endpoint to fetch only the logged-in user's properties
                 const response = await axiosInstance.get(
-                    "/property/getlist"
+                    "/property/user-listings"
                 );
 
                 const data = response.data;
@@ -58,7 +60,7 @@ export default function ProfilePropertyList({
                     setError(
                         err.response?.data?.message ||
                         err.message ||
-                        "Failed to fetch properties"
+                        "Failed to fetch your properties"
                     );
                 }
             } finally {
@@ -68,7 +70,7 @@ export default function ProfilePropertyList({
             }
         };
 
-        fetchProperties();
+        fetchUserProperties();
 
         return () => {
             cancelled = true;

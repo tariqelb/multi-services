@@ -17,10 +17,21 @@ import {
     CircularProgress,
 } from "@mui/material";
 import { LocationOn, Visibility, Delete, Edit } from "@mui/icons-material";
-
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
+import getImageUrl from "../utils/getImageUrl";
 
-const API_URL = "http://localhost:3000";
+// const API_URL = "http://localhost:3000";
+
+// function getImageUrl(image) {
+//     const path = typeof image === "string" ? image : image?.path;
+
+//     if (!path) return "";
+//     if (/^https?:\/\//i.test(path)) return path;
+
+//     return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
+// }
+
 
 /**
  * Update property status API helper
@@ -33,15 +44,6 @@ export const updatePropertyStatus = async (id, status) => {
 };
 
 const STATUS_OPTIONS = ["Available", "Rented", "Sold", "Inactive"];
-
-function getImageUrl(image) {
-    const path = typeof image === "string" ? image : image?.path;
-
-    if (!path) return "";
-    if (/^https?:\/\//i.test(path)) return path;
-
-    return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
-}
 
 function getStatusStyles(status) {
     const normalizedStatus = String(status || "Available").toLowerCase();
@@ -96,6 +98,7 @@ export default function UserProfileCard({
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [anchorElStatus, setAnchorElStatus] = useState(null);
     const [updatingStatus, setUpdatingStatus] = useState(false);
+    const navigate = useNavigate();
 
     const {
         title = "Property Title",
@@ -184,13 +187,15 @@ export default function UserProfileCard({
                 }}
             >
                 {/* Image Thumbnail */}
+                {/* Image Thumbnail */}
                 <Box
                     sx={{
                         width: { xs: "100%", sm: 300 },
-                        height: { xs: 180, sm: "auto" },
-                        minHeight: { sm: 260 },
-                        flexShrink: 0,
+                        height: { xs: 200, sm: 260 },
+                        flex: { xs: "0 0 200px", sm: "0 0 300px" },
+                        minWidth: 0,
                         position: "relative",
+                        overflow: "hidden",
                         bgcolor: "#e2e8f0",
                     }}
                 >
@@ -199,9 +204,11 @@ export default function UserProfileCard({
                         image={fullImageUrl}
                         alt={title}
                         sx={{
+                            display: "block",
                             width: "100%",
                             height: "100%",
                             objectFit: "cover",
+                            objectPosition: "center",
                         }}
                     />
                 </Box>
@@ -436,7 +443,19 @@ export default function UserProfileCard({
                                 variant="outlined"
                                 size="small"
                                 startIcon={<Visibility />}
-                                onClick={() => onViewDetails?.(property)}
+                                // onClick={() => onViewDetails?.(property)}
+                                onClick={() => {
+                                    const propertyId = property._id || property.id;
+
+                                    if (!propertyId) {
+                                        console.error("Property ID is missing:", property);
+                                        return;
+                                    }
+
+                                    navigate(`/property/${propertyId}`, {
+                                        state: { property },
+                                    });
+                                }}
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,

@@ -102,7 +102,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                 </button>
 
                 <Link to="/" className="flex items-center space-x-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-lg font-bold text-white shadow-sm">
+                    <div className="flex h-9 w-9 items-center justify-center bg-[#14539a] rounded-lg text-lg font-bold text-white shadow-sm">
                         M
                     </div>
 
@@ -138,10 +138,10 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                             <img
                                 src={avatar}
                                 alt={`${displayName}'s profile`}
-                                className="h-9 w-9 rounded-full object-cover"
+                                className="h-9 w-9 rounded-full object-cover "
                             />
                         ) : (
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 bg-[#0d3562] text-sm font-semibold text-indigo-700">
                                 {initials}
                             </div>
                         )}

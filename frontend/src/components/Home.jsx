@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import TopBar from './TopBar';
 import Sidebar from './Sidebar';
 import MiddleContent from './MiddleContent';
+import PublishFab from './PublishFab'; // Import the floating button
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,7 +15,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 font-sans text-gray-800">
+    <div className="min-h-screen flex flex-col bg-gray-50 font-sans text-gray-800 relative">
       {/* 1. Navigator Top Bar Component */}
       <TopBar 
         sidebarOpen={sidebarOpen} 
@@ -36,6 +37,9 @@ export default function Home() {
           activeNav={activeNav} 
         />
       </div>
+
+      {/* 4. Floating Publish Button */}
+      {/* <PublishFab /> */}
     </div>
   );
 }

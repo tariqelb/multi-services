@@ -7,6 +7,13 @@ import { getProperties } from "../../controllers/property/getProperties.js";
 import { getPropertyById } from "../../controllers/property/getPropertyById.js";
 import { deleteProperty } from "../../controllers/property/deletePropertyController.js";
 import { editPropertyStatus } from "../../controllers/property/editPropertyStatusController.js";
+import {
+    saveProperty,
+    unsaveProperty,
+    getSavedProperties,
+} from "../../controllers/property/savedPropertyController.js";
+
+import { getUserProperties } from "./../../controllers/property/getUserProperties.js"
 
 const router = express.Router();
 
@@ -48,10 +55,13 @@ router.post(
 
 );
 
+router.get("/saved", authMiddleware, getSavedProperties);
 router.get("/getlist", getProperties);
-router.get("/:id", getPropertyById);
+router.get('/user-listings', authMiddleware, getUserProperties);
 router.delete("/deleteProperty/:id", authMiddleware, deleteProperty);
 router.patch("/editstatus/:id", authMiddleware, editPropertyStatus);
-
+router.get("/:id", getPropertyById);
+router.post("/save/:propertyId", authMiddleware, saveProperty);
+router.delete("/unsave/:propertyId", authMiddleware, unsaveProperty);
 
 export default router;

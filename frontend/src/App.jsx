@@ -12,12 +12,19 @@ import { useDispatch } from "react-redux";
 import axiosInstance from "./api/axiosInstance";
 import Login from "./components/Login";
 import NotFound from "./pages/NotFound";
-import Profile from "./components/Profile";
+import ProfileLayout from "./components/Profile";
 import Properties from "./components/Properties";
 import TopBar from "./components/TopBar";
 import Sidebar from "./components/Sidebar";
 import MiddleContent from "./components/MiddleContent";
+import PropertyDetailsPage from "./components/PropertyDetailsPage"
+import ProfileOverview from "./components/ProfileOverview"
+// import ProfilePropertyDetailsView from "./components/ProfilePropertyDetailsView"
+import PublishPropertyPage from "./components/PublishPropertyPage"
+import ProfilePropertyList from "./components/ProfilePropertyList"
+import ProfilePropertyDetails from "./components/ProfilePropertyDetails"
 import { Box } from "@mui/material";
+import SavedPropertiesList from "./components/SavedPropertyList";
 
 async function requireAuth() {
     try {
@@ -98,8 +105,34 @@ const router = createBrowserRouter([
                 element: <Properties />,
             },
             {
+                path: "/mypublication",
+                element: <ProfilePropertyList />,
+            },
+            {
+                path: "/properties/publish",
+                element: <PublishPropertyPage />,
+            },
+            {
+                path: "/properties/:id",
+                element: <PropertyDetailsPage />,
+            },
+            {
+                path: "/property/:id",
+                element: <ProfilePropertyDetails />,
+            },
+            {
+                path: "/saved",
+                element: <SavedPropertiesList />,
+            },
+            {
                 path: "/profile",
-                element: <Profile />,
+                element: <ProfileLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <ProfileOverview />,
+                    }
+                ],
             },
         ],
     },
@@ -108,7 +141,6 @@ const router = createBrowserRouter([
         element: <NotFound />,
     },
 ]);
-
 export default function App() {
     return <RouterProvider router={router} />;
 }

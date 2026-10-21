@@ -16,35 +16,49 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useNavigate } from 'react-router-dom';
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setActiveNav }) {
   const navigate = useNavigate();
 
   const navigationItems = [
-    { name: 'Home', icon: HomeIcon, path: '/' },
-    { name: 'Search', icon: SearchIcon, path: '/' },
-    { name: 'Saved', icon: BookmarkIcon, path: '/' },
-    { name: 'Messages', icon: MessageIcon, path: '/' },
-    { name: 'Notifications', icon: NotificationsIcon, path: '/' },
-    { name: 'Profile', icon: PersonIcon, path: '/profile' },
-    { name: 'Settings', icon: SettingsIcon, path: '/' },
+      { name: "Home", icon: HomeIcon, path: "/" },
+      // { name: "Search", icon: SearchIcon, path: "/properties" },
+      { name: "Publish", icon: CloudUploadIcon, path: "/properties/publish" },
+      { name: "My Publication", icon: LibraryBooksIcon, path: "/mypublication" },
+      { name: "Saved", icon: BookmarkIcon, path: "/saved" },
+      { name: "Messages", icon: MessageIcon, path: "/" },
+      // { name: "Notifications", icon: NotificationsIcon, path: "/" },
+      { name: "Profile", icon: PersonIcon, path: "/profile" },
+      { name: "Settings", icon: SettingsIcon, path: "/" },
   ];
-
   return (
     <Box 
       component="aside" 
       sx={{
-        width: 260,
-        bgcolor: '#243e94',
-        color: '#ffffff',
-        display: { xs: sidebarOpen ? 'block' : 'none', md: 'flex' },
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: 'calc(100vh - 4rem)',
-        position: 'sticky',
-        top: '4rem',
-        zIndex: 20,
-        boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
+          width: "260px",
+          minWidth: "260px",
+          maxWidth: "260px",
+          flex: "0 0 260px",
+          flexShrink: 0,
+
+          bgcolor: "#0d3562",
+          color: "#ffffff",
+          display: {
+              xs: sidebarOpen ? "flex" : "none",
+              md: "flex",
+          },
+          flexDirection: "column",
+          justifyContent: "space-between",
+
+          height: "calc(100vh - 4rem)",
+          position: "sticky",
+          top: "4rem",
+          zIndex: 20,
+          boxShadow: "2px 0 5px rgba(0,0,0,0.1)",
+          boxSizing: "border-box",
+          overflow: "hidden",
       }}
     >
       <Box sx={{ overflowY: 'auto', py: 2 }}>
@@ -62,9 +76,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setAct
                   }}
                   sx={{
                     borderRadius: '12px',
-                    bgcolor: isActive ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                    bgcolor: isActive ? '#0284c7' : 'transparent',
                     '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.1)',
+                      bgcolor: '#14539a',
                     },
                     py: 1.5,
                   }}
