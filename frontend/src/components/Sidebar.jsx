@@ -18,6 +18,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useNavigate } from 'react-router-dom';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import HomeWorkIcon from "@mui/icons-material/HomeWork";
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setActiveNav }) {
   const navigate = useNavigate();
@@ -25,11 +26,13 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setAct
   const navigationItems = [
       { name: "Home", icon: HomeIcon, path: "/" },
       // { name: "Search", icon: SearchIcon, path: "/properties" },
+      { name: "Properties", icon: HomeWorkIcon, path: "/properties" },
       { name: "Publish", icon: CloudUploadIcon, path: "/properties/publish" },
       { name: "My Publication", icon: LibraryBooksIcon, path: "/mypublication" },
       { name: "Saved", icon: BookmarkIcon, path: "/saved" },
-      { name: "Messages", icon: MessageIcon, path: "/" },
-      // { name: "Notifications", icon: NotificationsIcon, path: "/" },
+      { name: "Alert", icon: BookmarkIcon, path: "/alert" },
+      // { name: "Messages", icon: MessageIcon, path: "/" },
+      { name: "Notifications", icon: NotificationsIcon, path: "/" },
       { name: "Profile", icon: PersonIcon, path: "/profile" },
       { name: "Settings", icon: SettingsIcon, path: "/" },
   ];

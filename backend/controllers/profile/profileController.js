@@ -1,5 +1,28 @@
-import bcrypt from "bcryptjs";
+
 import User from "../../DatabaseModels/Schema/User.js";
+import bcrypt from "bcryptjs";
+
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+
+function getImageSizeFromDataUrl(value) {
+    const match = value.match(
+        /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]*={0,2})$/
+    );
+
+    if (!match) {
+        return null;
+    }
+
+    const base64 = match[2];
+
+    if (!base64 || base64.length % 4 !== 0) {
+        return null;
+    }
+
+    return {
+        size: Buffer.from(base64, "base64").length,
+    };
+}
 
 export async function updateMyProfile(req, res) {
     try {
@@ -18,6 +41,7 @@ export async function updateMyProfile(req, res) {
             "phoneNumber",
             "address",
             "bio",
+            "profileImage",
         ];
 
         const updates = {};
@@ -35,17 +59,44 @@ export async function updateMyProfile(req, res) {
                 });
             }
 
+            // Validate profile images separately.
+            if (field === "profileImage") {
+                if (value === "") {
+                    updates.profileImage = "";
+                    continue;
+                }
+
+                const image = getImageSizeFromDataUrl(value);
+
+                if (!image) {
+                    return res.status(400).json({
+                        message:
+                            "Profile image must be a valid JPEG, PNG, or WEBP Base64 image.",
+                    });
+                }
+
+                if (image.size > MAX_IMAGE_SIZE) {
+                    return res.status(400).json({
+                        message: "Profile image cannot exceed 2 MB.",
+                    });
+                }
+
+                updates.profileImage = value;
+                continue;
+            }
+
             const cleanValue =
                 field === "email"
                     ? value.trim().toLowerCase()
                     : value.trim();
 
-            if (field === "firstName" || field === "lastName") {
-                if (cleanValue.length < 2 || cleanValue.length > 50) {
-                    return res.status(400).json({
-                        message: `${field} must contain 2–50 characters.`,
-                    });
-                }
+            if (
+                (field === "firstName" || field === "lastName") &&
+                (cleanValue.length < 2 || cleanValue.length > 50)
+            ) {
+                return res.status(400).json({
+                    message: `${field} must contain 2–50 characters.`,
+                });
             }
 
             if (field === "email") {

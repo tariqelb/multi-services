@@ -1,3 +1,4 @@
+
 import axiosInstance from "../api/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,17 +16,24 @@ import {
 
 export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const [profileOpen, setProfileOpen] = useState(false);
-    const profileRef = useRef(null);
+    const [avatarError, setAvatarError] = useState(false);
 
+    const profileRef = useRef(null);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Get the real authenticated user from authReducer.
-    const user = useSelector((state) => state.auth.user);
+    // Get the authenticated user and latest profile from Redux.
+    const user = useSelector((state) => state.auth?.user);
+    const profileState = useSelector((state) => state.profile);
 
-    console.log("is user exist : ", user)
-    const firstName = user?.firstName?.trim() || "";
-    const lastName = user?.lastName?.trim() || "";
+    // Support profile data stored directly or inside profileState.user.
+    const profile = profileState?.user || profileState;
+
+    const firstName =
+        profile?.firstName || user?.firstName || "";
+
+    const lastName =
+        profile?.lastName || user?.lastName || "";
 
     const displayName =
         [firstName, lastName].filter(Boolean).join(" ") ||
@@ -36,15 +44,28 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const initials =
         [firstName, lastName]
             .filter(Boolean)
-            .map((name) => name.charAt(0))
+            .map((name) => name.trim().charAt(0))
             .join("")
             .toUpperCase() ||
         displayName.charAt(0).toUpperCase();
 
-    const email = user?.email || "";
+    const email = profile?.email || user?.email || "";
     const role = user?.role || "Member";
-    const avatar = user?.avatar || user?.profilePicture || "";
 
+    // The backend saves the image as profileImage.
+    const avatar =
+        profile?.profileImage ||
+        user?.profileImage ||
+        user?.avatar ||
+        user?.profilePicture ||
+        "";
+
+    // Reset the fallback when the image changes.
+    useEffect(() => {
+        setAvatarError(false);
+    }, [avatar]);
+
+    // Close the profile menu when clicking outside or pressing Escape.
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -65,22 +86,25 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         document.addEventListener("keydown", handleEscape);
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
             document.removeEventListener("keydown", handleEscape);
         };
     }, []);
 
-      const handleLogout = async () => {
-          try {
-              await axiosInstance.post("/auth/logout");
-          } catch (error) {
-              console.error("Logout request failed:", error);
-          } finally {
-              dispatch({ type: "LOGOUT" });
-              setProfileOpen(false);
-              navigate("/login", { replace: true });
-          }
-      };
+    const handleLogout = async () => {
+        try {
+            await axiosInstance.post("/auth/logout");
+        } catch (error) {
+            console.error("Logout request failed:", error);
+        } finally {
+            dispatch({ type: "LOGOUT" });
+            setProfileOpen(false);
+            navigate("/login", { replace: true });
+        }
+    };
 
     const menuItems = [
         { label: "My Profile", path: "/profile", icon: UserRound },
@@ -94,15 +118,23 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             <div className="flex items-center space-x-3">
                 <button
                     type="button"
-                    onClick={() => setSidebarOpen((open) => !open)}
-                    aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+                    onClick={() =>
+                        setSidebarOpen((open) => !open)
+                    }
+                    aria-label={
+                        sidebarOpen ? "Close sidebar" : "Open sidebar"
+                    }
                     className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 md:hidden"
                 >
-                    {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                    {sidebarOpen ? (
+                        <X size={20} />
+                    ) : (
+                        <Menu size={20} />
+                    )}
                 </button>
 
                 <Link to="/" className="flex items-center space-x-3">
-                    <div className="flex h-9 w-9 items-center justify-center bg-[#14539a] rounded-lg text-lg font-bold text-white shadow-sm">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#14539a] text-lg font-bold text-white shadow-sm">
                         M
                     </div>
 
@@ -129,19 +161,22 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                 >
                     <button
                         type="button"
-                        onClick={() => setProfileOpen((open) => !open)}
+                        onClick={() =>
+                            setProfileOpen((open) => !open)
+                        }
                         aria-expanded={profileOpen}
                         aria-haspopup="menu"
                         className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-gray-100 sm:gap-3"
                     >
-                        {avatar ? (
+                        {avatar && !avatarError ? (
                             <img
                                 src={avatar}
                                 alt={`${displayName}'s profile`}
-                                className="h-9 w-9 rounded-full object-cover "
+                                className="h-9 w-9 rounded-full object-cover"
+                                onError={() => setAvatarError(true)}
                             />
                         ) : (
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 bg-[#0d3562] text-sm font-semibold text-indigo-700">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0d3562] text-sm font-semibold text-white">
                                 {initials}
                             </div>
                         )}
@@ -150,7 +185,9 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                             <p className="max-w-36 truncate text-sm font-semibold text-gray-800">
                                 {displayName}
                             </p>
-                            <p className="text-xs text-gray-500">{role}</p>
+                            <p className="text-xs text-gray-500">
+                                {role}
+                            </p>
                         </div>
 
                         <ChevronDown
@@ -176,18 +213,22 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                             </div>
 
                             <div className="py-2">
-                                {menuItems.map(({ label, path, icon: Icon }) => (
-                                    <Link
-                                        key={path}
-                                        to={path}
-                                        role="menuitem"
-                                        onClick={() => setProfileOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-indigo-600"
-                                    >
-                                        <Icon size={18} />
-                                        {label}
-                                    </Link>
-                                ))}
+                                {menuItems.map(
+                                    ({ label, path, icon: Icon }) => (
+                                        <Link
+                                            key={path}
+                                            to={path}
+                                            role="menuitem"
+                                            onClick={() =>
+                                                setProfileOpen(false)
+                                            }
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-indigo-600"
+                                        >
+                                            <Icon size={18} />
+                                            {label}
+                                        </Link>
+                                    )
+                                )}
                             </div>
 
                             <div className="border-t border-gray-100 pt-2">

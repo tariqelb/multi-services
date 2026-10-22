@@ -25,6 +25,7 @@ import ProfilePropertyList from "./components/ProfilePropertyList"
 import ProfilePropertyDetails from "./components/ProfilePropertyDetails"
 import { Box } from "@mui/material";
 import SavedPropertiesList from "./components/SavedPropertyList";
+import PropertyAlert from "./components/PropertyAlert";
 
 async function requireAuth() {
     try {
@@ -123,6 +124,10 @@ const router = createBrowserRouter([
             {
                 path: "/saved",
                 element: <SavedPropertiesList />,
+            },
+            {
+                path: "/alert",
+                element: <PropertyAlert />,
             },
             {
                 path: "/profile",
