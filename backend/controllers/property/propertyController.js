@@ -1,6 +1,7 @@
 import Property from "../../DatabaseModels/Schema/Property.js";
 import mongoose from "mongoose";
 import fs from "node:fs/promises";
+import notifyMatchingPropertyAlerts from "./propertyAlertNotificationService.js";
 
 const removeUploadedFiles = async (files = []) => {
     await Promise.all(
@@ -26,6 +27,12 @@ export const createProperty = async (req, res) => {
 
     try {
         const userId = req.user?.userId;
+
+console.log("\n========== CREATE PROPERTY DEBUG ==========");
+console.log("[CreateProperty] Controller entered");
+console.log("[CreateProperty] User ID:", req.user?.userId);
+console.log("[CreateProperty] Uploaded files:", uploadedFiles.length);
+console.log("[CreateProperty] Request body:", req.body);
 
         if (!userId || !mongoose.isValidObjectId(userId)) {
             await removeUploadedFiles(uploadedFiles);
@@ -221,6 +228,9 @@ export const createProperty = async (req, res) => {
         }));
 
         // Create property.
+        console.log("[CreateProperty] Validation passed");
+        console.log("[CreateProperty] Preparing to save property...");
+        // Create property.
         const property = await Property.create({
             userId,
             role,
@@ -246,7 +256,6 @@ export const createProperty = async (req, res) => {
             floor: numericFields.floor,
             syndicateFees: numericFields.syndicateFees,
 
-            // New fields
             rentWithContract: parsedRentWithContract,
             mortgageAgreement: parsedMortgageAgreement,
             deposit: numericFields.deposit,
@@ -254,6 +263,30 @@ export const createProperty = async (req, res) => {
 
             images,
         });
+console.log("[CreateProperty] Property saved successfully");
+console.log("[CreateProperty] Property ID:", String(property._id));
+console.log("[CreateProperty] Property city:", property.city);
+console.log("[CreateProperty] Property type:", property.propertyType);
+console.log("[CreateProperty] Listing type:", property.listingType);
+console.log("[CreateProperty] Publisher ID:", String(property.userId));
+        // Notify matching users without failing property creation
+        // if the notification process encounters an error.
+        try {
+            const io = req.app.get("io");
+
+            const notificationResult =
+                await notifyMatchingPropertyAlerts(property, io);
+
+            console.log(
+                "Property alert notifications:",
+                notificationResult
+            );
+        } catch (notificationError) {
+            console.error(
+                "Property created, but alert notifications failed:",
+                notificationError
+            );
+        }
 
         return res.status(201).json({
             message: "Property created successfully.",

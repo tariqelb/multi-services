@@ -1,10 +1,8 @@
-
 import axiosInstance from "../api/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import {
-    Bell,
     Menu,
     X,
     UserRound,
@@ -13,6 +11,9 @@ import {
     LogOut,
     ChevronDown,
 } from "lucide-react";
+
+import NotificationMenu from "./NotificationMenu";
+import { connectSocket, disconnectSocket } from "../Socket/Socket";
 
 export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const [profileOpen, setProfileOpen] = useState(false);
@@ -25,6 +26,8 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     // Get the authenticated user and latest profile from Redux.
     const user = useSelector((state) => state.auth?.user);
     const profileState = useSelector((state) => state.profile);
+
+    const isAuthenticated = Boolean(user);
 
     // Support profile data stored directly or inside profileState.user.
     const profile = profileState?.user || profileState;
@@ -59,6 +62,19 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         user?.avatar ||
         user?.profilePicture ||
         "";
+
+    // Connect Socket.IO while the user is authenticated.
+    useEffect(() => {
+        if (isAuthenticated) {
+            connectSocket();
+        } else {
+            disconnectSocket();
+        }
+
+        return () => {
+            disconnectSocket();
+        };
+    }, [isAuthenticated]);
 
     // Reset the fallback when the image changes.
     useEffect(() => {
@@ -100,6 +116,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         } catch (error) {
             console.error("Logout request failed:", error);
         } finally {
+            disconnectSocket();
             dispatch({ type: "LOGOUT" });
             setProfileOpen(false);
             navigate("/login", { replace: true });
@@ -146,14 +163,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
 
             {/* Notifications and user profile */}
             <div className="flex items-center space-x-3 sm:space-x-4">
-                <button
-                    type="button"
-                    aria-label="Notifications"
-                    className="relative rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-                >
-                    <Bell size={20} />
-                    <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
-                </button>
+                {isAuthenticated && <NotificationMenu />}
 
                 <div
                     ref={profileRef}

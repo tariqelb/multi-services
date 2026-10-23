@@ -365,7 +365,7 @@ export default function PropertyAlert() {
                 sx={{
                     width: "100%",
                     minWidth: 0,
-                    borderBottom: "1px solid #e2e8f0",
+                    borderBottom: "1px solid #939292",
                     pb: { xs: 2.5, sm: 3, md: 4 },
                 }}
             >
@@ -458,7 +458,7 @@ export default function PropertyAlert() {
                     minWidth: 0,
                     boxSizing: "border-box",
                     p: { xs: 2.5, sm: 4, md: 6 },
-                    border: "1px solid #e2e8f0",
+                    border: "1px solid #939292",
                     borderRadius: { xs: 3, sm: 4 },
                     bgcolor: "#ffffff",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
@@ -589,7 +589,7 @@ export default function PropertyAlert() {
                 <Box
                     sx={{
                         bgcolor: "#f8fafc",
-                        border: "1px solid #e2e8f0",
+                        border: "1px solid #939292",
                         borderRadius: 3,
                         p: { xs: 2, sm: 3 },
                         mb: { xs: 3, sm: 4 },
@@ -641,7 +641,7 @@ export default function PropertyAlert() {
                                         height: "auto",
                                         minHeight: 38,
                                         bgcolor: "#ffffff",
-                                        border: "1px solid #cbd5e1",
+                                        border: "1px solid #939292",
                                         fontWeight: 600,
                                         fontSize: { xs: "0.85rem", sm: "0.95rem" },
                                         borderRadius: 2,
@@ -734,7 +734,7 @@ export default function PropertyAlert() {
                             width: "100%",
                             boxSizing: "border-box",
                             bgcolor: "#ffffff",
-                            border: "1px solid #e2e8f0",
+                            border: "1px solid #939292",
                             borderRadius: 4,
                         }}
                     >
@@ -746,7 +746,7 @@ export default function PropertyAlert() {
                         sx={{
                             p: { xs: 3, sm: 5, md: 6 },
                             textAlign: "center",
-                            border: "1px dashed #cbd5e1",
+                            border: "1px dashed #939292",
                             borderRadius: 4,
                             bgcolor: "#ffffff",
                             boxSizing: "border-box",
@@ -789,7 +789,7 @@ export default function PropertyAlert() {
                                     minWidth: 0,
                                     boxSizing: "border-box",
                                     p: { xs: 2.5, sm: 4, md: 5 },
-                                    border: "1px solid #e2e8f0",
+                                    border: "1px solid #939292",
                                     borderRadius: { xs: 3, sm: 4 },
                                     bgcolor: "#ffffff",
                                     boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
@@ -944,7 +944,7 @@ export default function PropertyAlert() {
                                                 sx={{
                                                     maxWidth: "100%",
                                                     bgcolor: "#f8fafc",
-                                                    border: "1px solid #e2e8f0",
+                                                    border: "1px solid #939292",
                                                     color: "#334155",
                                                     fontWeight: 600,
                                                     fontSize: {

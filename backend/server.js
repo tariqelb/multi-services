@@ -1,15 +1,32 @@
 import "dotenv/config";
+import http from "node:http";
+
 import app from "./app.js";
 import connectDB from "./config/db.js";
+import initializeSocket from "./config/socket.js";
 
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
-    await connectDB();
+    try {
+        await connectDB();
 
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
+        // Create the HTTP server using the existing Express app.
+        const server = http.createServer(app);
+
+        // Initialize Socket.IO on the same HTTP server.
+        const io = initializeSocket(server);
+
+        // Make Socket.IO accessible to Express controllers.
+        app.set("io", io);
+
+        server.listen(PORT, () => {
+            console.log(`Server running on http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error("Failed to start server:", error);
+        process.exit(1);
+    }
 };
 
 startServer();
