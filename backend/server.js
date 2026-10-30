@@ -24,7 +24,7 @@ const startServer = async () => {
         // Make Socket.IO accessible to Express controllers.
         app.set("io", io);
 
-        server.listen(PORT, () => {
+        server.listen(PORT, "0.0.0.0",() => {
             console.log(`Server running on http://localhost:${PORT}`);
         });
     } catch (error) {
