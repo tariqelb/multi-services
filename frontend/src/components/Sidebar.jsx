@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
     Box,
@@ -20,7 +21,7 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Sidebar({
     sidebarOpen,
@@ -29,6 +30,7 @@ export default function Sidebar({
     setActiveNav,
 }) {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const navigationItems = [
         { name: "Home", icon: HomeIcon, path: "/" },
@@ -68,10 +70,7 @@ export default function Sidebar({
     const handleNavigation = (item) => {
         setActiveNav(item.name);
         setSidebarOpen(false);
-
-        if (item.path) {
-            navigate(item.path);
-        }
+        navigate(item.path);
     };
 
     return (
@@ -90,7 +89,6 @@ export default function Sidebar({
                 flexDirection: "column",
                 justifyContent: "space-between",
 
-                // Mobile: overlay the middle content.
                 position: {
                     xs: "fixed",
                     md: "sticky",
@@ -108,7 +106,6 @@ export default function Sidebar({
                     md: "calc(100vh - 4rem)",
                 },
 
-                // Slide in/out on mobile; always visible on desktop.
                 transform: {
                     xs: sidebarOpen
                         ? "translateX(0)"
@@ -154,7 +151,10 @@ export default function Sidebar({
                 <List sx={{ px: 2 }}>
                     {navigationItems.map((item) => {
                         const Icon = item.icon;
-                        const isActive = activeNav === item.name;
+
+                        // Highlight only the item matching the current URL.
+                        const isActive =
+                            location.pathname === item.path;
 
                         return (
                             <ListItem

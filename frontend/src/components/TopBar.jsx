@@ -1,3 +1,4 @@
+
 import axiosInstance from "../api/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +13,7 @@ import {
     ChevronDown,
 } from "lucide-react";
 
+import { getProfile } from "../redux/actions/profile/profileAction";
 import NotificationMenu from "./NotificationMenu";
 import { connectSocket, disconnectSocket } from "../Socket/Socket";
 
@@ -24,10 +26,29 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const navigate = useNavigate();
 
     const user = useSelector((state) => state.auth?.user);
-    const profileState = useSelector((state) => state.profile);
+    const profile = useSelector((state) => state.profile);
 
     const isAuthenticated = Boolean(user);
-    const profile = profileState?.user || profileState;
+
+    // Load the profile as soon as the user is authenticated.
+    useEffect(() => {
+        if (isAuthenticated) {
+            dispatch(getProfile());
+        }
+    }, [isAuthenticated, dispatch]);
+
+    // Connect or disconnect the user's socket.
+    useEffect(() => {
+        if (isAuthenticated) {
+            connectSocket();
+        } else {
+            disconnectSocket();
+        }
+
+        return () => {
+            disconnectSocket();
+        };
+    }, [isAuthenticated]);
 
     const firstName = profile?.firstName || user?.firstName || "";
     const lastName = profile?.lastName || user?.lastName || "";
@@ -47,7 +68,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         displayName.charAt(0).toUpperCase();
 
     const email = profile?.email || user?.email || "";
-    const role = user?.role || "Member";
+    const role = user?.role || profile?.role || "Member";
 
     const avatar =
         profile?.profileImage ||
@@ -56,22 +77,57 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         user?.profilePicture ||
         "";
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            connectSocket();
-        } else {
-            disconnectSocket();
+    // Support Base64, Blob, external URLs and relative backend paths.
+    const getAvatarUrl = (image) => {
+        if (!image) return "";
+
+        const imagePath =
+            typeof image === "string"
+                ? image.trim()
+                : image?.url || image?.path || "";
+
+        if (!imagePath) return "";
+
+        // Base64 image: use it directly.
+        if (
+            imagePath.startsWith("data:image/") ||
+            imagePath.startsWith("blob:")
+        ) {
+            return imagePath;
         }
 
-        return () => {
-            disconnectSocket();
-        };
-    }, [isAuthenticated]);
+        // External image URL, such as Cloudinary.
+        if (/^https?:\/\//i.test(imagePath)) {
+            return imagePath;
+        }
 
+        // Relative backend image path.
+        const apiBaseUrl =
+            axiosInstance.defaults.baseURL ||
+            import.meta.env.VITE_API_URL ||
+            "";
+
+        try {
+            const backendOrigin = new URL(
+                apiBaseUrl,
+                window.location.origin
+            ).origin;
+
+            return `${backendOrigin}/${imagePath.replace(/^\/+/, "")}`;
+        } catch (error) {
+            console.error("Invalid profile image URL:", error);
+            return "";
+        }
+    };
+
+    const avatarUrl = getAvatarUrl(avatar);
+
+    // Reset image error when the image changes.
     useEffect(() => {
         setAvatarError(false);
-    }, [avatar]);
+    }, [avatarUrl]);
 
+    // Close the profile menu when clicking outside or pressing Escape.
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -123,7 +179,9 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                 <button
                     type="button"
                     onClick={() => setSidebarOpen((open) => !open)}
-                    aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+                    aria-label={
+                        sidebarOpen ? "Close sidebar" : "Open sidebar"
+                    }
                     aria-expanded={sidebarOpen}
                     className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 md:hidden"
                 >
@@ -159,12 +217,18 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                         aria-haspopup="menu"
                         className="flex items-center gap-1.5 rounded-lg p-1 transition-colors hover:bg-gray-100 sm:gap-3 sm:p-1.5"
                     >
-                        {avatar && !avatarError ? (
+                        {avatarUrl && !avatarError ? (
                             <img
-                                src={avatar}
+                                src={avatarUrl}
                                 alt={`${displayName}'s profile`}
                                 className="h-8 w-8 shrink-0 rounded-full object-cover sm:h-9 sm:w-9"
-                                onError={() => setAvatarError(true)}
+                                onError={() => {
+                                    console.error(
+                                        "Failed to load profile image:",
+                                        avatarUrl
+                                    );
+                                    setAvatarError(true);
+                                }}
                             />
                         ) : (
                             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0d3562] text-sm font-semibold text-white sm:h-9 sm:w-9">
@@ -176,6 +240,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                             <p className="truncate text-sm font-semibold text-gray-800">
                                 {displayName}
                             </p>
+
                             <p className="truncate text-xs text-gray-500">
                                 {role}
                             </p>
@@ -198,6 +263,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                 <p className="truncate text-sm font-semibold text-gray-900">
                                     {displayName}
                                 </p>
+
                                 <p className="truncate text-xs text-gray-500">
                                     {email}
                                 </p>
@@ -210,7 +276,9 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                             key={path}
                                             to={path}
                                             role="menuitem"
-                                            onClick={() => setProfileOpen(false)}
+                                            onClick={() =>
+                                                setProfileOpen(false)
+                                            }
                                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-indigo-600"
                                         >
                                             <Icon size={18} />

@@ -14,7 +14,7 @@ export default function PublishPropertyPage() {
                 minHeight: "calc(100vh - 64px)",
             }}
         >
-            <Typography
+            {/* <Typography
                 variant="h4"
                 sx={{
                     fontWeight: 800,
@@ -23,7 +23,7 @@ export default function PublishPropertyPage() {
                 }}
             >
                 Publish a Property
-            </Typography>
+            </Typography> */}
 
             <PropertyInsertForm />
         </Box>
