@@ -89,24 +89,38 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// CORS configuration: allow all origins with credentials.
+// Allow all origins while supporting credentialed requests.
 const corsOptions = {
-    origin: true,
+    origin: (origin, callback) => {
+        callback(null, true);
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: [
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS",
+    ],
+    allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+    ],
+    optionsSuccessStatus: 204,
 };
 
+// Apply CORS before all routes and middleware.
 app.use(cors(corsOptions));
 
-// Handle preflight requests.
+// Handle all preflight requests.
 app.options(/.*/, cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
 
 // Serve local images only during development.
-// Production images are served through Cloudinary.
 if (process.env.NODE_ENV !== "production") {
     app.use(
         "/uploads",
@@ -117,7 +131,7 @@ if (process.env.NODE_ENV !== "production") {
 // API routes.
 app.use("/api", routes);
 
-// Backend health-check endpoint.
+// Backend health check.
 app.get("/", (req, res) => {
     res.status(200).json({
         message: "Multi-services API is running",
@@ -153,4 +167,3 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
-
