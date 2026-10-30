@@ -9,6 +9,16 @@ const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
     try {
+        const showOutboundIP = async () => {
+            try {
+                const response = await fetch("https://api.ipify.org?format=json");
+                const data = await response.json();
+
+                console.log("BACK4APP_OUTBOUND_IP:", data.ip);
+            } catch (error) {
+                console.error("Could not detect outbound IP:", error.message);
+            }
+        };
         await connectDB();
 
         const server = http.createServer(app);
