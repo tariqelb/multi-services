@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "dev": "node --watch server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "job:account-deletion": "node scripts/runAccountDeletion.js",
+    "job:external-listings": "node scripts/runExternalListings.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,7 @@
     "axios": "^1.20.0",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
+    "cloudinary": "^2.11.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^18.0.7",

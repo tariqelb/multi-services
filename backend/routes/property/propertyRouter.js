@@ -39,16 +39,17 @@ router.post(
     propertyUpload.array("images", 15),
     (req, res, next) => {
         console.log("[After Multer] File count:", req.files?.length ?? 0);
+
         console.log(
             "[After Multer] Files:",
             (req.files || []).map((file) => ({
                 fieldname: file.fieldname,
                 originalname: file.originalname,
-                filename: file.filename,
+                mimetype: file.mimetype,
                 size: file.size,
-                path: file.path,
             }))
         );
+
         next();
     },
     createProperty

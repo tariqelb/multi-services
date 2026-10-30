@@ -1,5 +1,3 @@
-import cron from "node-cron";
-
 import ExternalListing from "../DatabaseModels/Schema/ExternalListing.js";
 
 import {
@@ -11,8 +9,6 @@ import {
     extractPageMetadata,
 } from "../services/externalListings/metadataExtractor.js";
 
-let isRunning = false;
-
 async function refreshListing(listing) {
     const extracted = supportsAqariUrl(listing.sourceUrl)
         ? await extractAqariListing(listing.sourceUrl)
@@ -22,65 +18,51 @@ async function refreshListing(listing) {
     listing.lastSeenAt = new Date();
     listing.lastError = "";
     listing.status = "active";
-
-    // Preserve listing fields until a field-level
-    // manual/source provenance system is implemented.
     listing.contentHash = extracted.contentHash || "";
 
     await listing.save();
 }
 
-export function startExternalListingsJob() {
-    cron.schedule(
-        "*/15 * * * *",
-        async () => {
-            if (isRunning) {
-                return;
-            }
+export async function runExternalListingsJob() {
+    console.info("[ExternalListings] Starting refresh.");
 
-            isRunning = true;
+    const listings = await ExternalListing.find({
+        status: { $ne: "unavailable" },
+    })
+        .sort({ lastCheckedAt: 1 })
+        .limit(10);
+
+    for (const listing of listings) {
+        try {
+            await refreshListing(listing);
+        } catch (error) {
+            listing.lastCheckedAt = new Date();
+            listing.lastError =
+                error instanceof Error
+                    ? error.message
+                    : "Refresh failed.";
 
             try {
-                const listings = await ExternalListing.find({
-                    status: { $ne: "unavailable" },
-                })
-                    .sort({ lastCheckedAt: 1 })
-                    .limit(10);
-
-                for (const listing of listings) {
-                    try {
-                        await refreshListing(listing);
-                    } catch (error) {
-                        listing.lastCheckedAt = new Date();
-                        listing.lastError =
-                            error instanceof Error
-                                ? error.message
-                                : "Refresh failed.";
-
-                        await listing.save();
-                    }
-
-                    // Avoid rapidly sending requests to the
-                    // same source website.
-                    await new Promise((resolve) =>
-                        setTimeout(resolve, 2000)
-                    );
-                }
-            } catch (error) {
+                await listing.save();
+            } catch (saveError) {
                 console.error(
-                    "External listings job failed:",
-                    error
+                    "[ExternalListings] Could not save refresh error:",
+                    saveError.message
                 );
-            } finally {
-                isRunning = false;
             }
-        },
-        {
-            timezone: "Africa/Casablanca",
-        }
-    );
 
-    console.log(
-        "External listings refresh job scheduled."
+            console.error(
+                "[ExternalListings] Refresh failed:",
+                listing.sourceUrl,
+                error.message
+            );
+        }
+
+        // Avoid sending requests too quickly to source websites.
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+
+    console.info(
+        `[ExternalListings] Finished. Processed ${listings.length} listings.`
     );
 }

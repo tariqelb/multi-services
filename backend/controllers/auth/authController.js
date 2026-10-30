@@ -3,6 +3,14 @@ import User from "../../DatabaseModels/Schema/User.js";
 import jwt from "jsonwebtoken";
 import { generateToken } from "../../utils/generateToken.js"
 
+
+const authCookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
+};
+
 export const signup = async (req, res) => {
     try {
         const {
@@ -135,12 +143,16 @@ export const login = async (req, res) => {
         const token = generateToken(user);
 
         // Store the token in an HTTP-only cookie.
+        // res.cookie("token", token, {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === "production",
+        //     sameSite: "lax",
+        //     maxAge: 48 * 60 * 60 * 1000,
+        //     path: "/",
+        // });
         res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            ...authCookieOptions,
             maxAge: 48 * 60 * 60 * 1000,
-            path: "/",
         });
 
         if (user.scheduledDeletionAt) {
@@ -200,13 +212,21 @@ export const getMe = async (req, res) => {
     }
 };
 
+// export const logout = (req, res) => {
+//     res.clearCookie("token", {
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === "production",
+//         sameSite: "lax",
+//         path: "/",
+//     });
+
+//     return res.status(200).json({
+//         message: "Logout successful",
+//     });
+// };
+
 export const logout = (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-    });
+    res.clearCookie("token", authCookieOptions);
 
     return res.status(200).json({
         message: "Logout successful",
