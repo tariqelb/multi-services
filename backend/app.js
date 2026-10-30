@@ -89,27 +89,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-const allowedOrigins = [
-    ...(process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "")
-        .split(",")
-        .map((origin) => origin.trim().replace(/\/$/, ""))
-        .filter(Boolean),
-
-    ...(process.env.NODE_ENV !== "production"
-        ? ["http://localhost:5173"]
-        : []),
-];
-
+// CORS configuration: allow all origins with credentials.
 const corsOptions = {
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-
-        console.error("CORS blocked origin:", origin);
-        return callback(new Error("Not allowed by CORS"));
-    },
+    origin: true,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
@@ -168,3 +153,4 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
+
