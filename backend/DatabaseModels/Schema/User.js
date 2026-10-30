@@ -1,63 +1,128 @@
+
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
     {
         firstName: {
             type: String,
-            required: true,
             trim: true,
-            minlength: 2,
-            maxlength: 50,
+            required: true,
         },
-
         lastName: {
             type: String,
-            required: true,
             trim: true,
-            minlength: 2,
-            maxlength: 50,
+            required: true,
         },
-
         email: {
             type: String,
             required: true,
             unique: true,
             lowercase: true,
             trim: true,
-            maxlength: 254,
         },
-
+        role: {
+            type: String,
+            enum: ["client", "admin"],
+            default: "client",
+            lowercase: true,
+            trim: true,
+            required: true,
+        },
+        emailVerified: {
+            type: Boolean,
+            default: false,
+        },
+        emailVerificationCodeHash: {
+            type: String,
+            select: false,
+        },
+        emailVerificationExpires: {
+            type: Date,
+            select: false,
+        },
         phoneNumber: {
             type: String,
             trim: true,
-            maxlength: 20,
             default: "",
         },
-
+        phoneVerified: {
+            type: Boolean,
+            default: false,
+        },
+        phoneVerificationSessionId: {
+            type: String,
+            select: false,
+        },
+        phoneVerificationExpires: {
+            type: Date,
+            select: false,
+        },
         password: {
             type: String,
             required: true,
             select: false,
         },
-
         address: {
             type: String,
-            trim: true,
-            maxlength: 300,
             default: "",
+            trim: true,
         },
-
         bio: {
             type: String,
-            trim: true,
-            maxlength: 1000,
             default: "",
+            trim: true,
         },
-
         profileImage: {
             type: String,
-            trim: true,
             default: "",
+        },
+        notificationPreferences: {
+            email: {
+                enabled: {
+                    type: Boolean,
+                    default: true,
+                },
+                propertyAlerts: {
+                    type: Boolean,
+                    default: true,
+                },
+            },
+            whatsapp: {
+                enabled: {
+                    type: Boolean,
+                    default: false,
+                },
+                propertyAlerts: {
+                    type: Boolean,
+                    default: false,
+                },
+                phoneNumber: {
+                    type: String,
+                    default: "",
+                    trim: true,
+                },
+                verified: {
+                    type: Boolean,
+                    default: false,
+                },
+                verificationSessionId: {
+                    type: String,
+                    select: false,
+                },
+                verificationExpires: {
+                    type: Date,
+                    select: false,
+                },
+            },
+
+        },
+        deletionRequestedAt: {
+            type: Date,
+            default: null,
+        },
+        scheduledDeletionAt: {
+            type: Date,
+            default: null,
         },
     },
     {
@@ -65,6 +130,10 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-const User = mongoose.model("User", userSchema);
+
+
+const User =
+    mongoose.models.User ||
+    mongoose.model("User", userSchema);
 
 export default User;

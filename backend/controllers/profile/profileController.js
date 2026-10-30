@@ -24,6 +24,10 @@ function getImageSizeFromDataUrl(value) {
     };
 }
 
+
+
+
+
 export async function updateMyProfile(req, res) {
     try {
         const userId = req.user?.userId;
@@ -141,20 +145,58 @@ export async function updateMyProfile(req, res) {
             });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { $set: updates },
-            {
-                new: true,
-                runValidators: true,
-            }
-        ).select("-password");
+       
+        const updatedUser = await User.findById(userId).select(
+            "+emailVerificationCodeHash " +
+            "+emailVerificationExpires " +
+            "+phoneVerificationSessionId " +
+            "+phoneVerificationExpires"
+        );
 
         if (!updatedUser) {
             return res.status(404).json({
                 message: "User not found.",
             });
         }
+
+        // Reset email verification only when the email actually changes.
+        if (
+            Object.hasOwn(updates, "email") &&
+            updates.email !== updatedUser.email
+        ) {
+            updatedUser.email = updates.email;
+            updatedUser.emailVerified = false;
+            updatedUser.emailVerificationCodeHash = undefined;
+            updatedUser.emailVerificationExpires = undefined;
+        }
+
+        // Reset phone verification only when the phone number changes.
+        if (
+            Object.hasOwn(updates, "phoneNumber") &&
+            updates.phoneNumber !== updatedUser.phoneNumber
+        ) {
+            updatedUser.phoneNumber = updates.phoneNumber;
+            updatedUser.phoneVerified = false;
+            updatedUser.phoneVerificationSessionId = undefined;
+            updatedUser.phoneVerificationExpires = undefined;
+        }
+
+        // Apply the other allowed profile changes.
+        const fieldsToUpdate = [
+            "firstName",
+            "lastName",
+            "address",
+            "bio",
+            "profileImage",
+        ];
+
+        for (const field of fieldsToUpdate) {
+            if (Object.hasOwn(updates, field)) {
+                updatedUser[field] = updates[field];
+            }
+        }
+
+        await updatedUser.save();
 
         return res.status(200).json({
             message: "Profile updated successfully.",
@@ -163,12 +205,15 @@ export async function updateMyProfile(req, res) {
                 firstName: updatedUser.firstName,
                 lastName: updatedUser.lastName,
                 email: updatedUser.email,
+                emailVerified: updatedUser.emailVerified,
                 phoneNumber: updatedUser.phoneNumber ?? "",
+                phoneVerified: updatedUser.phoneVerified,
                 address: updatedUser.address ?? "",
                 bio: updatedUser.bio ?? "",
                 profileImage: updatedUser.profileImage ?? "",
             },
         });
+
     } catch (error) {
         if (error.code === 11000 && error.keyPattern?.email) {
             return res.status(409).json({
@@ -190,9 +235,10 @@ export async function updateMyProfile(req, res) {
     }
 }
 
+
+
 export async function getMyProfile(req, res) {
     try {
-        // The authentication middleware should set req.user.
         const userId = req.user?.userId;
 
         if (!userId) {
@@ -201,10 +247,9 @@ export async function getMyProfile(req, res) {
             });
         }
 
-        // Fetch only the authenticated user's profile.
         const user = await User.findById(userId)
             .select(
-                "firstName lastName email phoneNumber address bio profileImage createdAt updatedAt"
+                "firstName lastName email emailVerified phoneNumber phoneVerified address bio profileImage createdAt updatedAt"
             )
             .lean();
 
@@ -221,7 +266,9 @@ export async function getMyProfile(req, res) {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
+                emailVerified: user.emailVerified ?? false,
                 phoneNumber: user.phoneNumber ?? "",
+                phoneVerified: user.phoneVerified ?? false,
                 address: user.address ?? "",
                 bio: user.bio ?? "",
                 profileImage: user.profileImage ?? "",
@@ -237,6 +284,7 @@ export async function getMyProfile(req, res) {
         });
     }
 }
+
 
 export async function updateMyPassword(req, res) {
     try {
@@ -313,6 +361,243 @@ export async function updateMyPassword(req, res) {
 
         return res.status(500).json({
             message: "Unable to update your password.",
+        });
+    }
+}
+
+export async function getMyNotificationPreferences(req, res) {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({
+                message: "Authentication required.",
+            });
+        }
+
+        const user = await User.findById(userId)
+            .select("notificationPreferences phoneNumber")
+            .lean();
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+            });
+        }
+
+        const saved = user.notificationPreferences || {};
+        const email = saved.email || {};
+        const whatsapp = saved.whatsapp || {};
+
+        return res.status(200).json({
+            message: "Notification preferences fetched successfully.",
+            preferences: {
+                email: {
+                    enabled: email.enabled ?? true,
+                    propertyAlerts: email.propertyAlerts ?? true,
+                },
+                whatsapp: {
+                    enabled: whatsapp.enabled ?? false,
+                    propertyAlerts: whatsapp.propertyAlerts ?? false,
+                    phoneNumber:
+                        whatsapp.phoneNumber || user.phoneNumber || "",
+                    verified: whatsapp.verified ?? false,
+                },
+            },
+        });
+    } catch (error) {
+        console.error("Get notification preferences error:", error);
+
+        return res.status(500).json({
+            message: "Unable to fetch notification preferences.",
+        });
+    }
+}
+
+export async function updateMyNotificationPreferences(req, res) {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({
+                message: "Authentication required.",
+            });
+        }
+
+        const { email, whatsapp } = req.body;
+        const updates = {};
+
+        // Validate and update email preferences.
+        if (email !== undefined) {
+            if (
+                !email ||
+                typeof email !== "object" ||
+                Array.isArray(email)
+            ) {
+                return res.status(400).json({
+                    message: "Email preferences must be an object.",
+                });
+            }
+
+            const allowedEmailFields = [
+                "enabled",
+                "propertyAlerts",
+            ];
+
+            for (const field of Object.keys(email)) {
+                if (!allowedEmailFields.includes(field)) {
+                    return res.status(400).json({
+                        message: `Invalid email preference: ${field}.`,
+                    });
+                }
+
+                if (typeof email[field] !== "boolean") {
+                    return res.status(400).json({
+                        message: `${field} must be a boolean.`,
+                    });
+                }
+
+                updates[`notificationPreferences.email.${field}`] =
+                    email[field];
+            }
+        }
+
+        // Validate and update WhatsApp preferences.
+        if (whatsapp !== undefined) {
+            if (
+                !whatsapp ||
+                typeof whatsapp !== "object" ||
+                Array.isArray(whatsapp)
+            ) {
+                return res.status(400).json({
+                    message: "WhatsApp preferences must be an object.",
+                });
+            }
+
+            const allowedWhatsAppFields = [
+                "enabled",
+                "propertyAlerts",
+                "phoneNumber",
+            ];
+
+            for (const field of Object.keys(whatsapp)) {
+                if (!allowedWhatsAppFields.includes(field)) {
+                    return res.status(400).json({
+                        message: `Invalid WhatsApp preference: ${field}.`,
+                    });
+                }
+
+                const value = whatsapp[field];
+
+                if (
+                    field === "enabled" ||
+                    field === "propertyAlerts"
+                ) {
+                    if (typeof value !== "boolean") {
+                        return res.status(400).json({
+                            message: `${field} must be a boolean.`,
+                        });
+                    }
+
+                    updates[
+                        `notificationPreferences.whatsapp.${field}`
+                    ] = value;
+                }
+
+                if (field === "phoneNumber") {
+                    if (typeof value !== "string") {
+                        return res.status(400).json({
+                            message: "Phone number must be a string.",
+                        });
+                    }
+
+                    const phoneNumber = value.trim();
+
+                    if (
+                        phoneNumber.length > 20 ||
+                        (phoneNumber !== "" &&
+                            !/^\+?[0-9\s().-]{7,20}$/.test(
+                                phoneNumber
+                            ))
+                    ) {
+                        return res.status(400).json({
+                            message: "Please provide a valid phone number.",
+                        });
+                    }
+
+                    updates[
+                        "notificationPreferences.whatsapp.phoneNumber"
+                    ] = phoneNumber;
+
+                    // A changed number must be verified again.
+                    const existingUser = await User.findById(userId)
+                        .select(
+                            "notificationPreferences.whatsapp.phoneNumber"
+                        )
+                        .lean();
+
+                    const existingPhone =
+                        existingUser?.notificationPreferences
+                            ?.whatsapp?.phoneNumber || "";
+
+                    if (phoneNumber !== existingPhone) {
+                        updates[
+                            "notificationPreferences.whatsapp.verified"
+                        ] = false;
+                    }
+                }
+            }
+        }
+
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({
+                message: "No notification preference changes provided.",
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updates },
+            {
+                new: true,
+                runValidators: true,
+                setDefaultsOnInsert: true,
+            }
+        ).select("notificationPreferences phoneNumber");
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                message: "User not found.",
+            });
+        }
+
+        const saved = updatedUser.notificationPreferences;
+
+        return res.status(200).json({
+            message: "Notification preferences updated successfully.",
+            preferences: {
+                email: {
+                    enabled: saved?.email?.enabled ?? true,
+                    propertyAlerts:
+                        saved?.email?.propertyAlerts ?? true,
+                },
+                whatsapp: {
+                    enabled: saved?.whatsapp?.enabled ?? false,
+                    propertyAlerts:
+                        saved?.whatsapp?.propertyAlerts ?? false,
+                    phoneNumber:
+                        saved?.whatsapp?.phoneNumber ||
+                        updatedUser.phoneNumber ||
+                        "",
+                    verified: saved?.whatsapp?.verified ?? false,
+                },
+            },
+        });
+    } catch (error) {
+        console.error("Update notification preferences error:", error);
+
+        return res.status(500).json({
+            message: "Unable to update notification preferences.",
         });
     }
 }

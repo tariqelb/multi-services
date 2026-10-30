@@ -143,6 +143,13 @@ export const login = async (req, res) => {
             path: "/",
         });
 
+        if (user.scheduledDeletionAt) {
+            user.deletionRequestedAt = null;
+            user.scheduledDeletionAt = null;
+
+            await user.save();
+        }
+
         return res.status(200).json({
             message: "Login successful",
             user: {

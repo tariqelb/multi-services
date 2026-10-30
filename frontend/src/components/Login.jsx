@@ -13,27 +13,41 @@ function Login() {
 
     return (
         <div
-            className="flex min-h-screen flex-row bg-cover bg-center bg-no-repeat"
+            className="flex min-h-screen w-full flex-col items-center gap-6 bg-cover bg-center bg-no-repeat px-4 py-6 sm:px-6 md:flex-row md:items-start md:justify-center md:gap-8 md:px-8 md:py-12 lg:justify-around lg:px-12 lg:py-16"
             style={{ backgroundImage: `url(${loginBackground})` }}
         >
-            <div className="m-61 ml-25 flex items-start justify-start rounded-2xl border-2 bg-white/70 p-8 shadow-lg  overflow-hidden">
-                <p className="m-0 flex flex-col items-start p-0 text-left text-2xl font-medium text-black">
-                    <span className="p-5 opacity-0 animate-[fadeInUp_0.6s_ease-out_0.2s_forwards]">
+            {/* Welcome section */}
+            <div className="flex w-full min-w-0 max-w-xl items-start justify-start overflow-hidden rounded-2xl bg-white/50 p-3 shadow-lg sm:p-5 md:mt-8 md:w-1/2 md:p-4 lg:mt-12 lg:p-6">
+                <p className="m-0 flex w-full min-w-0 flex-col items-start p-0 text-left text-lg font-bold text-black sm:text-xl lg:text-2xl">
+                    <span className="m-1 rounded-2xl border bg-white/70 p-3 opacity-0 animate-[fadeInUp_0.6s_ease-out_0.2s_forwards] sm:m-2 sm:p-5">
                         Welcome to your application where you can do multiple
                         tasks in one place
                     </span>
 
-                    <span className="p-4 opacity-0 animate-[fadeInUp_0.6s_ease-out_0.8s_forwards]">Find a house ...</span>
-                    <span className="p-4 opacity-0 animate-[fadeInUp_0.6s_ease-out_1.4s_forwards]">Book a transport ...</span>
-                    <span className="p-4 opacity-0 animate-[fadeInUp_0.6s_ease-out_2.0s_forwards]">Get a worker for a specific job ...</span>
-                    <span className="p-4 opacity-0 animate-[fadeInUp_0.6s_ease-out_2.6s_forwards]">And more ...</span>
-                    <span className="p-4 opacity-0 animate-[fadeInUp_0.6s_ease-out_3.2s_forwards]">
+                    <span className="m-1 rounded-2xl border bg-white/60 p-3 opacity-0 animate-[fadeInUp_0.6s_ease-out_0.8s_forwards] sm:m-2 sm:p-4">
+                        Find a house ...
+                    </span>
+
+                    <span className="m-1 rounded-2xl border bg-white/60 p-3 opacity-0 animate-[fadeInUp_0.6s_ease-out_1.4s_forwards] sm:m-2 sm:p-4">
+                        Book a transport ...
+                    </span>
+
+                    <span className="m-1 rounded-2xl border bg-white/60 p-3 opacity-0 animate-[fadeInUp_0.6s_ease-out_2.0s_forwards] sm:m-2 sm:p-4">
+                        Get a worker for a specific job ...
+                    </span>
+
+                    <span className="m-1 rounded-2xl border bg-white/60 p-3 opacity-0 animate-[fadeInUp_0.6s_ease-out_2.6s_forwards] sm:m-2 sm:p-4">
+                        And more ...
+                    </span>
+
+                    <span className="m-1 rounded-2xl border bg-white/50 p-3 opacity-0 animate-[fadeInUp_0.6s_ease-out_3.2s_forwards] sm:m-2 sm:p-4">
                         All in one place, here where magic happen
                     </span>
                 </p>
             </div>
 
-            <div className="mt-30 mb-30 flex min-w-sm rounded-2xl border-2 bg-white/80 p-0">
+            {/* Login / Signup form */}
+            <div className="flex w-full min-w-0 max-w-md items-start justify-center overflow-hidden rounded-2xl border-2 border-white/50 bg-white/80 p-0 shadow-lg md:mt-8 md:w-1/2 lg:mt-12">
                 {activeForm === "login" ? (
                     <LoginForm />
                 ) : (

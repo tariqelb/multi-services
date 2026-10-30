@@ -869,7 +869,7 @@ export default function PropertyAlert() {
 
                                     <Tooltip title="Delete alert">
                                         <span>
-                                            <IconButton
+                                            <Button
                                                 aria-label={`Delete alert for ${alert.city}`}
                                                 disabled={deletingId === alert._id}
                                                 onClick={() =>
@@ -879,6 +879,11 @@ export default function PropertyAlert() {
                                                     flexShrink: 0,
                                                     color: "#ef4444",
                                                     bgcolor: "#fef2f2",
+                                                    border: "1px solid #fecaca",
+                                                    borderRadius: 2,
+                                                    fontSize: "1rem",
+                                                    width: "130px",
+                                                    height: "40px",
                                                     p: { xs: 1, sm: 1.5 },
                                                     "&:hover": {
                                                         bgcolor: "#fee2e2",
@@ -886,11 +891,12 @@ export default function PropertyAlert() {
                                                 }}
                                             >
                                                 {deletingId === alert._id ? (
-                                                    <CircularProgress size={22} />
+                                                     <CircularProgress size={22} />
                                                 ) : (
-                                                    <Delete />
+                                                    // <Delete />
+                                                    <Box>Delete</Box>
                                                 )}
-                                            </IconButton>
+                                            </Button>
                                         </span>
                                     </Tooltip>
                                 </Stack>

@@ -23,20 +23,14 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Get the authenticated user and latest profile from Redux.
     const user = useSelector((state) => state.auth?.user);
     const profileState = useSelector((state) => state.profile);
 
     const isAuthenticated = Boolean(user);
-
-    // Support profile data stored directly or inside profileState.user.
     const profile = profileState?.user || profileState;
 
-    const firstName =
-        profile?.firstName || user?.firstName || "";
-
-    const lastName =
-        profile?.lastName || user?.lastName || "";
+    const firstName = profile?.firstName || user?.firstName || "";
+    const lastName = profile?.lastName || user?.lastName || "";
 
     const displayName =
         [firstName, lastName].filter(Boolean).join(" ") ||
@@ -55,7 +49,6 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const email = profile?.email || user?.email || "";
     const role = user?.role || "Member";
 
-    // The backend saves the image as profileImage.
     const avatar =
         profile?.profileImage ||
         user?.profileImage ||
@@ -63,7 +56,6 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         user?.profilePicture ||
         "";
 
-    // Connect Socket.IO while the user is authenticated.
     useEffect(() => {
         if (isAuthenticated) {
             connectSocket();
@@ -76,12 +68,10 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         };
     }, [isAuthenticated]);
 
-    // Reset the fallback when the image changes.
     useEffect(() => {
         setAvatarError(false);
     }, [avatar]);
 
-    // Close the profile menu when clicking outside or pressing Escape.
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -102,10 +92,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         document.addEventListener("keydown", handleEscape);
 
         return () => {
-            document.removeEventListener(
-                "mousedown",
-                handleClickOutside
-            );
+            document.removeEventListener("mousedown", handleClickOutside);
             document.removeEventListener("keydown", handleEscape);
         };
     }, []);
@@ -130,79 +117,73 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     ];
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2 sm:px-4 md:px-6">
             {/* Brand and mobile sidebar button */}
-            <div className="flex items-center space-x-3">
+            <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
                 <button
                     type="button"
-                    onClick={() =>
-                        setSidebarOpen((open) => !open)
-                    }
-                    aria-label={
-                        sidebarOpen ? "Close sidebar" : "Open sidebar"
-                    }
-                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 md:hidden"
+                    onClick={() => setSidebarOpen((open) => !open)}
+                    aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+                    aria-expanded={sidebarOpen}
+                    className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 md:hidden"
                 >
-                    {sidebarOpen ? (
-                        <X size={20} />
-                    ) : (
-                        <Menu size={20} />
-                    )}
+                    {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
 
-                <Link to="/" className="flex items-center space-x-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#14539a] text-lg font-bold text-white shadow-sm">
+                <Link
+                    to="/"
+                    className="flex min-w-0 items-center gap-2 sm:gap-3"
+                >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#14539a] text-lg font-bold text-white shadow-sm">
                         M
                     </div>
 
-                    <span className="text-xl font-bold tracking-tight text-gray-900">
+                    <span className="truncate text-base font-bold tracking-tight text-gray-900 sm:text-xl">
                         MultiService
                     </span>
                 </Link>
             </div>
 
             {/* Notifications and user profile */}
-            <div className="flex items-center space-x-3 sm:space-x-4">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-3 md:gap-4">
                 {isAuthenticated && <NotificationMenu />}
 
                 <div
                     ref={profileRef}
-                    className="relative border-l border-gray-200 pl-3 sm:pl-4"
+                    className="relative border-l border-gray-200 pl-2 sm:pl-3 md:pl-4"
                 >
                     <button
                         type="button"
-                        onClick={() =>
-                            setProfileOpen((open) => !open)
-                        }
+                        onClick={() => setProfileOpen((open) => !open)}
                         aria-expanded={profileOpen}
                         aria-haspopup="menu"
-                        className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-gray-100 sm:gap-3"
+                        className="flex items-center gap-1.5 rounded-lg p-1 transition-colors hover:bg-gray-100 sm:gap-3 sm:p-1.5"
                     >
                         {avatar && !avatarError ? (
                             <img
                                 src={avatar}
                                 alt={`${displayName}'s profile`}
-                                className="h-9 w-9 rounded-full object-cover"
+                                className="h-8 w-8 shrink-0 rounded-full object-cover sm:h-9 sm:w-9"
                                 onError={() => setAvatarError(true)}
                             />
                         ) : (
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0d3562] text-sm font-semibold text-white">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0d3562] text-sm font-semibold text-white sm:h-9 sm:w-9">
                                 {initials}
                             </div>
                         )}
 
-                        <div className="hidden text-left leading-tight sm:block">
-                            <p className="max-w-36 truncate text-sm font-semibold text-gray-800">
+                        <div className="hidden max-w-36 text-left leading-tight sm:block">
+                            <p className="truncate text-sm font-semibold text-gray-800">
                                 {displayName}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="truncate text-xs text-gray-500">
                                 {role}
                             </p>
                         </div>
 
                         <ChevronDown
                             size={16}
-                            className={`hidden text-gray-500 transition-transform sm:block ${
+                            className={`hidden shrink-0 text-gray-500 transition-transform sm:block ${
                                 profileOpen ? "rotate-180" : ""
                             }`}
                         />
@@ -211,7 +192,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                     {profileOpen && (
                         <div
                             role="menu"
-                            className="absolute right-0 mt-3 w-64 overflow-hidden rounded-xl border border-gray-200 bg-white py-2 shadow-xl"
+                            className="absolute right-0 mt-3 w-[min(16rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-gray-200 bg-white py-2 shadow-xl"
                         >
                             <div className="border-b border-gray-100 px-4 py-3">
                                 <p className="truncate text-sm font-semibold text-gray-900">
@@ -229,9 +210,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                             key={path}
                                             to={path}
                                             role="menuitem"
-                                            onClick={() =>
-                                                setProfileOpen(false)
-                                            }
+                                            onClick={() => setProfileOpen(false)}
                                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-indigo-600"
                                         >
                                             <Icon size={18} />

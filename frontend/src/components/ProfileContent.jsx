@@ -90,7 +90,7 @@ export default function ProfileContent() {
                 />
 
                 {/* Show the edit form in a modal */}
-                {isEditing && (
+                {/* {isEditing && (
                     <div
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
                         onClick={handleCancel}
@@ -131,7 +131,7 @@ export default function ProfileContent() {
 
                 <div className="mt-6">
                     <Password />
-                </div>
+                </div> */}
             </div>
         </main>
     );

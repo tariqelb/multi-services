@@ -178,6 +178,7 @@ export default function NotificationMenu() {
 
     return (
         <>
+            {/* Notification button */}
             <Tooltip title="Notifications">
                 <IconButton
                     color="inherit"
@@ -185,6 +186,14 @@ export default function NotificationMenu() {
                     aria-label={`Notifications, ${unreadCount} unread`}
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
+                    sx={{
+                        width: 40,
+                        height: 40,
+                        minWidth: 40,
+                        flexShrink: 0,
+                        p: 1,
+                        borderRadius: 2,
+                    }}
                 >
                     <Badge
                         badgeContent={unreadCount}
@@ -201,10 +210,12 @@ export default function NotificationMenu() {
                 </IconButton>
             </Tooltip>
 
+            {/* Notifications dropdown */}
             <Menu
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleClose}
+                disableScrollLock
                 anchorOrigin={{
                     vertical: "bottom",
                     horizontal: "right",
@@ -216,18 +227,26 @@ export default function NotificationMenu() {
                 slotProps={{
                     paper: {
                         sx: {
-                            width: { xs: 320, sm: 390 },
-                            maxWidth: "calc(100vw - 24px)",
-                            maxHeight: 480,
+                            width: {
+                                xs: "min(340px, calc(100vw - 16px))",
+                                sm: 390,
+                            },
+                            maxWidth: "calc(100vw - 16px)",
+                            maxHeight: {
+                                xs: "calc(100dvh - 90px)",
+                                sm: 480,
+                            },
                             mt: 1,
                             borderRadius: 2,
+                            overflow: "hidden",
                         },
                     },
                 }}
             >
+                {/* Header */}
                 <Box
                     sx={{
-                        px: 2,
+                        px: { xs: 1.5, sm: 2 },
                         py: 1.5,
                         display: "flex",
                         alignItems: "center",
@@ -235,11 +254,15 @@ export default function NotificationMenu() {
                         gap: 1,
                     }}
                 >
-                    <Box>
+                    <Box sx={{ minWidth: 0 }}>
                         <Typography fontWeight={800}>
                             Notifications
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                        >
                             {unreadCount} unread
                         </Typography>
                     </Box>
@@ -260,33 +283,51 @@ export default function NotificationMenu() {
 
                 <Divider />
 
+                {/* Error message */}
                 {error && (
                     <Box sx={{ px: 2, py: 1 }}>
                         <Typography color="error" variant="body2">
                             {error}
                         </Typography>
-                        <Button size="small" onClick={fetchNotifications}>
+
+                        <Button
+                            size="small"
+                            onClick={fetchNotifications}
+                        >
                             Retry
                         </Button>
                     </Box>
                 )}
 
+                {/* Loading */}
                 {loading && notifications.length === 0 ? (
-                    <Box sx={{ py: 4, display: "flex", justifyContent: "center" }}>
+                    <Box
+                        sx={{
+                            py: 4,
+                            display: "flex",
+                            justifyContent: "center",
+                        }}
+                    >
                         <CircularProgress size={26} />
                     </Box>
                 ) : notifications.length === 0 ? (
+                    /* Empty state */
                     <Stack
                         alignItems="center"
                         spacing={1}
                         sx={{ py: 5, px: 2 }}
                     >
                         <NotificationsNone
-                            sx={{ fontSize: 38, color: "text.disabled" }}
+                            sx={{
+                                fontSize: 38,
+                                color: "text.disabled",
+                            }}
                         />
+
                         <Typography fontWeight={600}>
                             You're all caught up
                         </Typography>
+
                         <Typography
                             variant="body2"
                             color="text.secondary"
@@ -296,7 +337,17 @@ export default function NotificationMenu() {
                         </Typography>
                     </Stack>
                 ) : (
-                    <Box sx={{ maxHeight: 350, overflowY: "auto" }}>
+                    /* Notifications list */
+                    <Box
+                        sx={{
+                            maxHeight: {
+                                xs: "calc(100dvh - 190px)",
+                                sm: 350,
+                            },
+                            overflowY: "auto",
+                            overflowX: "hidden",
+                        }}
+                    >
                         {notifications.map((notification) => (
                             <MenuItem
                                 key={notification._id}
@@ -307,7 +358,7 @@ export default function NotificationMenu() {
                                     alignItems: "flex-start",
                                     whiteSpace: "normal",
                                     py: 1.5,
-                                    px: 2,
+                                    px: { xs: 1.5, sm: 2 },
                                     gap: 1.25,
                                     bgcolor: notification.isRead
                                         ? "background.paper"
@@ -325,12 +376,18 @@ export default function NotificationMenu() {
                                     }}
                                 />
 
-                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Box
+                                    sx={{
+                                        flex: 1,
+                                        minWidth: 0,
+                                    }}
+                                >
                                     <Typography
                                         variant="body2"
                                         fontWeight={
                                             notification.isRead ? 500 : 800
                                         }
+                                        sx={{ overflowWrap: "anywhere" }}
                                     >
                                         {notification.title}
                                     </Typography>
@@ -349,7 +406,10 @@ export default function NotificationMenu() {
                                     <Typography
                                         variant="caption"
                                         color="text.disabled"
-                                        sx={{ display: "block", mt: 0.75 }}
+                                        sx={{
+                                            display: "block",
+                                            mt: 0.75,
+                                        }}
                                     >
                                         {new Date(
                                             notification.createdAt
@@ -367,7 +427,10 @@ export default function NotificationMenu() {
                                                 notification._id
                                             )
                                         }
-                                        sx={{ mt: -0.5 }}
+                                        sx={{
+                                            mt: -0.5,
+                                            flexShrink: 0,
+                                        }}
                                     >
                                         <Delete fontSize="small" />
                                     </IconButton>

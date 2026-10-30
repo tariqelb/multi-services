@@ -1,5 +1,35 @@
 import PropertyAlert from "../../DatabaseModels/Schema/PropertyAlert.js";
+import User from "../../DatabaseModels/Schema/User.js";
 import { createAndEmitNotification } from "../../Notification/NotificationService.js";
+import { sendPropertyAlertEmail } from "../../services/emailService.js";
+
+export const sendEmailIfEnabled = async (alert, property) => {
+    // PropertyAlert uses the "user" field for its owner.
+    const user = await User.findById(alert.user)
+        .select("email notificationPreferences");
+
+    if (!user?.email) {
+        return { sent: false, reason: "No email address" };
+    }
+
+    const emailPreferences =
+        user.notificationPreferences?.email;
+
+    if (
+        emailPreferences?.enabled !== true ||
+        emailPreferences?.propertyAlerts !== true
+    ) {
+        return { sent: false, reason: "Email alerts disabled" };
+    }
+
+    await sendPropertyAlertEmail({
+        to: user.email,
+        property,
+    });
+
+    return { sent: true };
+};
+
 
 const escapeRegex = (value) =>
     value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -89,10 +119,55 @@ const notifyMatchingPropertyAlerts = async (property, io) => {
     console.log("Notifications saved:", notifiedUsers);
     console.log("==========================================\n");
 
+    // Send email alerts independently of in-app notifications.
+    const uniqueAlertsByUser = new Map();
+
+    for (const alert of matchingAlerts) {
+        const userId = String(alert.user);
+
+        if (!uniqueAlertsByUser.has(userId)) {
+            uniqueAlertsByUser.set(userId, alert);
+        }
+    }
+
+    const emailResults = await Promise.allSettled(
+        [...uniqueAlertsByUser.values()].map(async (alert) => {
+            const result = await sendEmailIfEnabled(alert, property);
+
+            console.log(
+                `[PropertyAlertEmail] User ${alert.user}:`,
+                result
+            );
+
+            return result;
+        })
+    );
+
+    emailResults.forEach((result, index) => {
+        if (result.status === "rejected") {
+            console.error(
+                "[PropertyAlertEmail] Failed:",
+                result.reason?.message ?? result.reason
+            );
+        }
+    });
+
+    const emailsSent = emailResults.filter(
+        (result) =>
+            result.status === "fulfilled" &&
+            result.value.sent
+    ).length;
+
+    console.log("Property alert emails sent:", emailsSent);
+
     return {
         matchedUsers: userIds.length,
         notifiedUsers,
         failedNotifications: results.length - notifiedUsers,
+        emailsSent,
+        failedEmails: emailResults.filter(
+            (result) => result.status === "rejected"
+        ).length,
     };
 };
 

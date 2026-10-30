@@ -26,6 +26,14 @@ import ProfilePropertyDetails from "./components/ProfilePropertyDetails"
 import { Box } from "@mui/material";
 import SavedPropertiesList from "./components/SavedPropertyList";
 import PropertyAlert from "./components/PropertyAlert";
+import NotificationPage from "./components/NotificationPage"
+import SettingPage from "./components/Settings/SettingsPage"
+import FeedbackPage from "./components/FeedbackPage"
+import Dashboard from "./components/admin/Dashboard";
+import VisitTracker from "./components/admin/components/VisitTracker";
+import ExternalListings from "./components/admin/externalListings/ExternalListings";
+import ExternalListingSources from "./components/admin/externalListings/ExternalListingSources";
+
 
 async function requireAuth() {
     try {
@@ -68,6 +76,7 @@ function DashboardLayout() {
 
     return (
         <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f9fafb' }}>
+            <VisitTracker />
             <TopBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} user={userData} />
             <Box sx={{ display: 'flex', flex: 1, position: 'relative' }}>
                 <Sidebar 
@@ -126,6 +135,10 @@ const router = createBrowserRouter([
                 element: <SavedPropertiesList />,
             },
             {
+                path: "/notificationpage",
+                element: <NotificationPage />,
+            },
+            {
                 path: "/alert",
                 element: <PropertyAlert />,
             },
@@ -138,6 +151,26 @@ const router = createBrowserRouter([
                         element: <ProfileOverview />,
                     }
                 ],
+            },
+            {
+                path: "/dashboard",
+                element: <Dashboard />,
+            },
+            {
+                path: "/setting",
+                element: <SettingPage />,
+            },
+            {
+                path: "/feedback",
+                element: <FeedbackPage />,
+            },
+            {
+                path: "/externalListings",
+                element: <ExternalListings />,
+            },
+            {
+                path: "/addexternalListings",
+                element: <ExternalListingSources />,
             },
         ],
     },

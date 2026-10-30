@@ -1,4 +1,3 @@
-
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../api/axiosInstance";
@@ -15,7 +14,6 @@ import {
 
 import { activeFormAction } from "../redux/actions/activeFormAction";
 
-
 function LoginForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -29,6 +27,7 @@ function LoginForm() {
     const user = useSelector(
         (state) => state.auth.user
     );
+
     console.log("is user logged :", user);
 
     const handleSubmit = async (event) => {
@@ -59,7 +58,8 @@ function LoginForm() {
             console.log("User:", response.data.user);
             navigate("/");
         } catch (error) {
-            console.log(error)
+            console.log(error);
+
             dispatch(
                 loginFailure(
                     error.response?.data?.message ||
@@ -75,12 +75,15 @@ function LoginForm() {
     };
 
     return (
-        <div className="min-w-lg rounded-2xl p-10">
+        <div className="mx-auto w-full min-w-0 max-w-lg rounded-2xl p-4 sm:p-6 md:p-10">
             <h2 className="mb-5 text-center text-xl font-bold text-black">
                 Login
             </h2>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <form
+                onSubmit={handleSubmit}
+                className="flex flex-col gap-4 sm:gap-6"
+            >
                 <input
                     type="email"
                     placeholder="Enter your email"
@@ -90,7 +93,7 @@ function LoginForm() {
                         emailRef.current = event.target.value;
                         dispatch(setLoginEmail(event.target.value));
                     }}
-                    className="h-13 rounded border border-gray-300 bg-white px-3 text-md text-black outline-none focus:border-teal-600"
+                    className="h-12 w-full min-w-0 rounded border border-gray-300 bg-white px-3 text-base text-black outline-none focus:border-teal-600 sm:h-13"
                 />
 
                 <input
@@ -102,17 +105,17 @@ function LoginForm() {
                     onChange={(event) => {
                         dispatch(setLoginPassword(event.target.value));
                     }}
-                    className="h-13 rounded border border-gray-300 bg-white px-3 text-md text-black outline-none focus:border-teal-600"
+                    className="h-12 w-full min-w-0 rounded border border-gray-300 bg-white px-3 text-base text-black outline-none focus:border-teal-600 sm:h-13"
                 />
 
                 {error && (
-                    <p role="alert" className="text-sm text-red-600">
+                    <p role="alert" className="break-words text-sm text-red-600">
                         {error}
                     </p>
                 )}
 
                 {user && (
-                    <p className="text-sm text-green-700">
+                    <p className="break-words text-sm text-green-700">
                         Welcome, {user.firstName}!
                     </p>
                 )}
@@ -120,18 +123,18 @@ function LoginForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="h-13 rounded bg-teal-600 text-sm font-bold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-12 w-full rounded bg-teal-600 text-sm font-bold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60 sm:h-13"
                 >
                     {loading ? "Logging in..." : "Login"}
                 </button>
             </form>
 
-            <p className="mt-4 text-center text-[16px] text-black">
+            <p className="mt-4 text-center text-sm text-black sm:text-base">
                 Don't have an account?{" "}
                 <button
                     type="button"
                     onClick={handleSignup}
-                    className="text-teal-600 hover:underline"
+                    className="font-medium text-teal-600 hover:underline"
                 >
                     Signup
                 </button>

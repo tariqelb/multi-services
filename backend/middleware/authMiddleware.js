@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
     console.log("\n========== AUTH MIDDLEWARE DEBUG ==========");
 
     // Check whether the token exists.
-    console.log("[Auth] Token exists:", Boolean(token));
+    console.log("[Auth] Token exists:", Boolean(token), token);
 
     if (!token) {
         console.log("[Auth] No token found in cookies.");
