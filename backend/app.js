@@ -92,31 +92,36 @@ const app = express();
 const allowedOrigins = [
     ...(process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "")
         .split(",")
-        .map((origin) => origin.trim())
+        .map((origin) => origin.trim().replace(/\/$/, ""))
         .filter(Boolean),
+
     ...(process.env.NODE_ENV !== "production"
         ? ["http://localhost:5173"]
         : []),
 ];
 
-app.use(
-    cors({
-        origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin)) {
-                return callback(null, true);
-            }
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
 
-            return callback(new Error("Not allowed by CORS"));
-        },
-        credentials: true,
-    })
-);
+        console.error("CORS blocked origin:", origin);
+        return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests.
+app.options(/.*/, cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
 
-// Keep local image serving for development.
-// Production property images are served from Cloudinary.
+// Serve local images only during development.
+// Production images are served through Cloudinary.
 if (process.env.NODE_ENV !== "production") {
     app.use(
         "/uploads",
@@ -124,8 +129,15 @@ if (process.env.NODE_ENV !== "production") {
     );
 }
 
-// Register API routes.
+// API routes.
 app.use("/api", routes);
+
+// Backend health-check endpoint.
+app.get("/", (req, res) => {
+    res.status(200).json({
+        message: "Multi-services API is running",
+    });
+});
 
 // Centralized error handler.
 app.use((err, req, res, next) => {
@@ -145,8 +157,10 @@ app.use((err, req, res, next) => {
     }
 
     if (err) {
+        console.error("Application error:", err);
+
         return res.status(400).json({
-            message: err.message || "Upload failed.",
+            message: err.message || "Request failed.",
         });
     }
 
