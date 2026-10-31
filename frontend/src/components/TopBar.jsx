@@ -12,7 +12,7 @@ import {
     LogOut,
     ChevronDown,
 } from "lucide-react";
-
+import logo from "../assets/logo.png";
 import { getProfile } from "../redux/actions/profile/profileAction";
 import NotificationMenu from "./NotificationMenu";
 import { connectSocket, disconnectSocket } from "../Socket/Socket";
@@ -192,10 +192,14 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                     to="/"
                     className="flex min-w-0 items-center gap-2 sm:gap-3"
                 >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#14539a] text-lg font-bold text-white shadow-sm">
-                        M
+                   
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#14539a] shadow-sm">
+                        <img
+                            src={logo}
+                            alt="MultiService logo"
+                            className="h-full w-full object-contain"
+                        />
                     </div>
-
                     <span className="truncate text-base font-bold tracking-tight text-gray-900 sm:text-xl">
                         MultiService
                     </span>
