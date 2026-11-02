@@ -1,587 +1,3 @@
-
-// import React, { useRef, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import axiosInstance from "../api/axiosInstance";
-
-// import {
-//     updateField,
-//     setImages,
-//     setErrors,
-// } from "../redux/reducers/insertProperty/propertyFormSlice";
-
-// import {
-//     Box,
-//     Typography,
-//     Divider,
-//     Stack,
-//     Chip,
-//     Paper,
-//     Snackbar,
-//     Alert,
-// } from "@mui/material";
-
-// import PropertyInsertFormOwnerInfo from "./PropertyInsertFormOwnerInfo";
-// import PropertyInsertFormDetails from "./PropertyInsertFormDetails";
-// import PropertyInsertFormImages from "./PropertyInsertFormImages";
-// import PropertyInsertFormPublish from "./PropertyInsertFormPublish";
-// import PropertyInsertFormDescription from "./PropertyInsertFormDescription";
-
-// // Section header
-// const SectionHeader = ({ icon, title, subtitle, number }) => (
-//     <Box sx={{ mb: 3 }}>
-//         <Stack direction="row" spacing={1.5} alignItems="center">
-//             <Box
-//                 sx={{
-//                     width: 44,
-//                     height: 44,
-//                     display: "flex",
-//                     alignItems: "center",
-//                     justifyContent: "center",
-//                     borderRadius: "12px",
-//                     bgcolor: "#eef2ff",
-//                     color: "#4f46e5",
-//                     flexShrink: 0,
-//                     fontWeight: 700,
-//                     fontSize: "1.1rem",
-//                 }}
-//             >
-//                 {icon}
-//             </Box>
-
-//             <Box sx={{ flex: 1, minWidth: 0 }}>
-//                 <Typography
-//                     variant="h6"
-//                     sx={{
-//                         fontWeight: 750,
-//                         color: "#172033",
-//                         fontSize: "1.08rem",
-//                     }}
-//                 >
-//                     {title}
-//                 </Typography>
-
-//                 <Typography
-//                     variant="body2"
-//                     sx={{ color: "#7b8497", mt: 0.3 }}
-//                 >
-//                     {subtitle}
-//                 </Typography>
-//             </Box>
-
-//             <Chip
-//                 label={`0${number}`}
-//                 size="small"
-//                 sx={{
-//                     fontWeight: 700,
-//                     color: "#4f46e5",
-//                     bgcolor: "#f3f4ff",
-//                     borderRadius: "8px",
-//                 }}
-//             />
-//         </Stack>
-
-//         <Divider sx={{ mt: 2.5, borderColor: "#edf0f5" }} />
-//     </Box>
-// );
-
-// // Section container
-// const SectionPaper = ({ children }) => (
-//     <Paper
-//         elevation={0}
-//         sx={{
-//             p: { xs: 2.5, sm: 3.5, md: 4 },
-//             mb: 3,
-//             border: "1px solid #e9edf4",
-//             borderRadius: "16px",
-//             bgcolor: "#ffffff",
-//             boxShadow: "0 3px 12px rgba(15, 23, 42, 0.025)",
-//         }}
-//     >
-//         {children}
-//     </Paper>
-// );
-
-// export default function PropertyInsertForm({ onAddProperty }) {
-//     const dispatch = useDispatch();
-
-//     const formData = useSelector(
-//         (state) => state.propertyForm.formData
-//     );
-
-//     const errors = useSelector(
-//         (state) => state.propertyForm.errors
-//     );
-
-//     const [loading, setLoading] = useState(false);
-
-//     const [notification, setNotification] = useState({
-//         open: false,
-//         message: "",
-//         severity: "success",
-//     });
-
-//     const fileInputRef = useRef(null);
-
-//     const propertyTypes = [
-//         "Apartment",
-//         "House",
-//         "Villa",
-//         "Studio",
-//         "Room",
-//         "Store",
-//         "Office",
-//         "Land",
-//         "Warehouse",
-//         "Commercial space",
-//         "Commercial store",
-//         "Garage",
-//         "other",
-
-//     ];
-
-//     const fieldSx = {
-//         "& .MuiOutlinedInput-root": {
-//             borderRadius: "10px",
-//             backgroundColor: "#ffffff",
-//             transition: "all 0.2s ease",
-//             "& fieldset": {
-//                 borderColor: "#dfe3eb",
-//             },
-//             "&:hover fieldset": {
-//                 borderColor: "#93a9f9",
-//             },
-//             "&.Mui-focused fieldset": {
-//                 borderColor: "#4f46e5",
-//                 borderWidth: "1.5px",
-//             },
-//         },
-//         "& .MuiInputLabel-root.Mui-focused": {
-//             color: "#4f46e5",
-//         },
-//     };
-
-//     // Update Redux form fields, including checkbox values.
-//     const handleChange = (e) => {
-//         const { name, value, type, checked } = e.target;
-
-//         dispatch(
-//             updateField({
-//                 name,
-//                 value: type === "checkbox" ? checked : value,
-//             })
-//         );
-//     };
-
-//     const handleRoleChange = (_, value) => {
-//         if (value !== null) {
-//             dispatch(
-//                 updateField({
-//                     name: "role",
-//                     value,
-//                 })
-//             );
-//         }
-//     };
-
-//     const handleListingTypeChange = (_, value) => {
-//         if (value !== null) {
-//             dispatch(
-//                 updateField({
-//                     name: "listingType",
-//                     value,
-//                 })
-//             );
-//         }
-//     };
-
-//     // Select and validate images.
-//     const handleImageChange = (e) => {
-//         const selectedFiles = Array.from(e.target.files || []);
-//         const currentImages = formData.images || [];
-
-//         const validFiles = selectedFiles.filter(
-//             (file) =>
-//                 ["image/jpeg", "image/png", "image/webp"].includes(
-//                     file.type
-//                 ) &&
-//                 file.size <= 5 * 1024 * 1024
-//         );
-
-//         const remaining = Math.max(0, 15 - currentImages.length);
-
-//         const newImages = validFiles
-//             .slice(0, remaining)
-//             .map((file) => ({
-//                 file,
-//                 url: URL.createObjectURL(file),
-//             }));
-
-//         if (selectedFiles.length !== validFiles.length) {
-//             setNotification({
-//                 open: true,
-//                 message:
-//                     "Some images were rejected. Use JPG, PNG, or WEBP images up to 5 MB each.",
-//                 severity: "warning",
-//             });
-//         }
-
-//         if (validFiles.length > remaining) {
-//             setNotification({
-//                 open: true,
-//                 message: "You can upload a maximum of 15 images.",
-//                 severity: "warning",
-//             });
-//         }
-
-//         dispatch(setImages([...currentImages, ...newImages]));
-
-//         // Allow selecting the same file again.
-//         e.target.value = "";
-//     };
-
-//     // Remove an image from the selected list.
-//     const handleRemoveImage = (index) => {
-//         const image = (formData.images || [])[index];
-
-//         if (image?.url) {
-//             URL.revokeObjectURL(image.url);
-//         }
-
-//         dispatch(
-//             setImages(
-//                 (formData.images || []).filter(
-//                     (_, imageIndex) => imageIndex !== index
-//                 )
-//             )
-//         );
-//     };
-
-//     // Validate and submit the property.
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-
-//         if (loading) return;
-
-//         const validationErrors = {};
-
-//         const requiredFields = [
-//             "firstName",
-//             "lastName",
-//             "phone",
-//             "title",
-//             "listingType",
-//             "propertyType",
-//             "city",
-//             "price",
-//             "surface",
-//         ];
-
-//         requiredFields.forEach((key) => {
-//             if (!String(formData[key] ?? "").trim()) {
-//                 validationErrors[key] = "This field is required";
-//             }
-//         });
-
-//         // Validate numeric fields, including rental costs.
-//         const numericFields = [
-//             "price",
-//             "surface",
-//             "rooms",
-//             "salons",
-//             "bathrooms",
-//             "floor",
-//             "syndicateFees",
-//             "deposit",
-//             "mediatorFee",
-//         ];
-
-//         numericFields.forEach((key) => {
-//             const value = formData[key];
-
-//             if (
-//                 value === "" ||
-//                 value === null ||
-//                 value === undefined
-//             ) {
-//                 if (key === "price" || key === "surface") {
-//                     validationErrors[key] = "This field is required";
-//                 }
-//                 return;
-//             }
-
-//             const number = Number(value);
-
-//             if (!Number.isFinite(number) || number < 0) {
-//                 validationErrors[key] =
-//                     "Enter a valid non-negative number";
-//             } else if (key === "surface" && number <= 0) {
-//                 validationErrors[key] =
-//                     "Surface must be greater than zero";
-//             }
-//         });
-
-//         if (
-//             formData.email &&
-//             !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
-//         ) {
-//             validationErrors.email = "Enter a valid email address";
-//         }
-
-//         if (formData.mapLink) {
-//             try {
-//                 const url = new URL(formData.mapLink);
-
-//                 if (!["http:", "https:"].includes(url.protocol)) {
-//                     throw new Error("Invalid URL protocol");
-//                 }
-//             } catch {
-//                 validationErrors.mapLink = "Enter a valid map URL";
-//             }
-//         }
-
-//         if ((formData.images || []).length > 15) {
-//             validationErrors.images = "Maximum 15 images allowed";
-//         }
-
-//         dispatch(setErrors(validationErrors));
-
-//         if (Object.keys(validationErrors).length > 0) {
-//             setNotification({
-//                 open: true,
-//                 message: "Please correct the highlighted fields.",
-//                 severity: "error",
-//             });
-//             return;
-//         }
-
-//         // Provide defaults for the new rental fields.
-//         const submissionData = {
-//             ...formData,
-//             rentWithContract: formData.rentWithContract ?? false,
-//             mortgageAgreement: formData.mortgageAgreement ?? false,
-//             deposit: formData.deposit ?? 0,
-//             mediatorFee: formData.mediatorFee ?? 0,
-//         };
-
-//         // Build multipart FormData.
-//         const payload = new FormData();
-
-//         Object.entries(submissionData).forEach(([key, value]) => {
-//             if (key === "images") {
-//                 (value || []).forEach((image) => {
-//                     if (image?.file instanceof File) {
-//                         payload.append("images", image.file);
-//                     }
-//                 });
-//             } else if (value !== null && value !== undefined) {
-//                 payload.append(key, String(value));
-//             }
-//         });
-
-//         try {
-//             setLoading(true);
-
-//             const response = await axiosInstance.post(
-//                 "/property/insert",
-//                 payload
-//             );
-
-//             setNotification({
-//                 open: true,
-//                 message:
-//                     response.data?.message ||
-//                     "Property published successfully!",
-//                 severity: "success",
-//             });
-
-//             if (typeof onAddProperty === "function") {
-//                 onAddProperty(response.data?.property);
-//             }
-//         } catch (error) {
-//             console.error("[Frontend] Failed to publish property:", {
-//                 message: error.message,
-//                 status: error.response?.status,
-//                 response: error.response?.data,
-//             });
-
-//             setNotification({
-//                 open: true,
-//                 message:
-//                     error.response?.data?.message ||
-//                     "Failed to publish property. Please try again.",
-//                 severity: "error",
-//             });
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     return (
-//         <div className="flex bg-gray-100/70 m-9 border-[1px] border-gray-200 rounded-[15px]">
-//             <Box
-//                 sx={{
-//                     width: "100%",
-//                     maxWidth: 1100,
-//                     mx: "auto",
-//                     py: { xs: 2, md: 4 },
-//                     px: { xs: 1, sm: 2 },
-//                 }}
-//             >
-//                 {/* Page heading */}
-//                 <Box sx={{ mb: 4, px: { xs: 1, sm: 0 } }}>
-//                     <Stack
-//                         direction="row"
-//                         alignItems="center"
-//                         spacing={1}
-//                         sx={{ mb: 1.5 }}
-//                     >
-//                         <Chip
-//                             label="PROPERTY MARKETPLACE"
-//                             size="small"
-//                             sx={{
-//                                 bgcolor: "#eef2ff",
-//                                 color: "#4f46e5",
-//                                 fontWeight: 750,
-//                                 fontSize: "0.68rem",
-//                                 letterSpacing: "0.6px",
-//                                 borderRadius: "6px",
-//                             }}
-//                         />
-//                     </Stack>
-
-//                     <Typography
-//                         variant="h4"
-//                         sx={{
-//                             fontWeight: 800,
-//                             letterSpacing: "-0.8px",
-//                             color: "#172033",
-//                             fontSize: {
-//                                 xs: "1.8rem",
-//                                 sm: "2.25rem",
-//                             },
-//                             mb: 1,
-//                         }}
-//                     >
-//                         Publish a Property
-//                     </Typography>
-
-//                     <Typography
-//                         variant="body1"
-//                         sx={{
-//                             color: "#737e91",
-//                             maxWidth: 650,
-//                             lineHeight: 1.8,
-//                         }}
-//                     >
-//                         Add your property details, provide accurate contact
-//                         information, and showcase your property to potential
-//                         buyers and tenants.
-//                     </Typography>
-
-//                     <Stack
-//                         direction="row"
-//                         spacing={1}
-//                         alignItems="center"
-//                         sx={{ mt: 2 }}
-//                     >
-//                         <Box
-//                             component="span"
-//                             sx={{
-//                                 color: "#10b981",
-//                                 fontWeight: 700,
-//                                 fontSize: "1.1rem",
-//                             }}
-//                         >
-//                             ✓
-//                         </Box>
-
-//                         <Typography
-//                             variant="caption"
-//                             sx={{ color: "#64748b" }}
-//                         >
-//                             Fields marked with * are required
-//                         </Typography>
-//                     </Stack>
-//                 </Box>
-
-//                 {/* Property form */}
-//                 <Box component="form" onSubmit={handleSubmit}>
-//                     <PropertyInsertFormOwnerInfo
-//                         formData={formData}
-//                         errors={errors}
-//                         handleChange={handleChange}
-//                         handleRoleChange={handleRoleChange}
-//                         fieldSx={fieldSx}
-//                         SectionPaper={SectionPaper}
-//                         SectionHeader={SectionHeader}
-//                     />
-
-//                     <PropertyInsertFormDetails
-//                         formData={formData}
-//                         errors={errors}
-//                         handleChange={handleChange}
-//                         handleListingTypeChange={handleListingTypeChange}
-//                         propertyTypes={propertyTypes}
-//                         fieldSx={fieldSx}
-//                         SectionPaper={SectionPaper}
-//                         SectionHeader={SectionHeader}
-//                     />
-
-//                     <PropertyInsertFormDescription
-//                         formData={formData}
-//                         errors={errors}
-//                         handleChange={handleChange}
-//                         fieldSx={fieldSx}
-//                         SectionPaper={SectionPaper}
-//                         SectionHeader={SectionHeader}
-//                     />
-
-//                     <PropertyInsertFormImages
-//                         formData={formData}
-//                         fileInputRef={fileInputRef}
-//                         handleImageChange={handleImageChange}
-//                         handleRemoveImage={handleRemoveImage}
-//                         SectionPaper={SectionPaper}
-//                         SectionHeader={SectionHeader}
-//                     />
-
-//                     <PropertyInsertFormPublish loading={loading} />
-//                 </Box>
-//             </Box>
-
-//             {/* Success and error notifications */}
-//             <Snackbar
-//                 open={notification.open}
-//                 autoHideDuration={5000}
-//                 onClose={() =>
-//                     setNotification((previous) => ({
-//                         ...previous,
-//                         open: false,
-//                     }))
-//                 }
-//                 anchorOrigin={{
-//                     vertical: "top",
-//                     horizontal: "right",
-//                 }}
-//             >
-//                 <Alert
-//                     severity={notification.severity}
-//                     variant="filled"
-//                     onClose={() =>
-//                         setNotification((previous) => ({
-//                             ...previous,
-//                             open: false,
-//                         }))
-//                     }
-//                     sx={{ width: "100%" }}
-//                 >
-//                     {notification.message}
-//                 </Alert>
-//             </Snackbar>
-//         </div>
-//     );
-// }
-
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../api/axiosInstance";
@@ -696,6 +112,8 @@ export default function PropertyInsertForm({ onAddProperty }) {
     );
 
     const [loading, setLoading] = useState(false);
+    const [profileLoading, setProfileLoading] = useState(true);
+    const [profile, setProfile] = useState(null);
 
     const [notification, setNotification] = useState({
         open: false,
@@ -704,6 +122,128 @@ export default function PropertyInsertForm({ onAddProperty }) {
     });
 
     const fileInputRef = useRef(null);
+
+    // Load authenticated user's profile.
+    useEffect(() => {
+        let cancelled = false;
+
+        const loadUserProfile = async () => {
+            setProfileLoading(true);
+
+            try {
+                const response = await axiosInstance.get("/auth/me");
+                const user = response.data?.user;
+
+                if (!user) {
+                    throw new Error("User profile not found");
+                }
+
+                const whatsapp = user.notificationPreferences?.whatsapp;
+
+                const whatsappPhoneNumber =
+                    typeof whatsapp?.phoneNumber === "string"
+                        ? whatsapp.phoneNumber.trim()
+                        : "";
+
+                const userProfile = {
+                    firstName: user.firstName || "",
+                    lastName: user.lastName || "",
+                    email: user.email || "",
+                    whatsappPhoneNumber,
+                    whatsappVerified: whatsapp?.verified === true,
+                    emailVerified: user.emailVerified === true,
+                };
+
+                console.log(
+                    "[Property Form] Authenticated user:",
+                    user
+                );
+
+                console.log(
+                    "[Property Form] Contact information:",
+                    userProfile
+                );
+
+                if (cancelled) return;
+
+                setProfile(userProfile);
+
+                // Populate read-only contact information in Redux.
+                dispatch(
+                    updateField({
+                        name: "firstName",
+                        value: userProfile.firstName,
+                    })
+                );
+
+                dispatch(
+                    updateField({
+                        name: "lastName",
+                        value: userProfile.lastName,
+                    })
+                );
+
+                dispatch(
+                    updateField({
+                        name: "email",
+                        value: userProfile.email,
+                    })
+                );
+
+                dispatch(
+                    updateField({
+                        name: "phone",
+                        value: whatsappPhoneNumber,
+                    })
+                );
+
+                dispatch(
+                    updateField({
+                        name: "whatsappPhoneNumber",
+                        value: whatsappPhoneNumber,
+                    })
+                );
+            } catch (error) {
+                console.error(
+                    "[Property Form] Failed to load profile:",
+                    error.response?.data || error.message
+                );
+
+                if (!cancelled) {
+                    setProfile(null);
+
+                    setNotification({
+                        open: true,
+                        message:
+                            "Unable to load your profile. Please try again.",
+                        severity: "error",
+                    });
+                }
+            } finally {
+                if (!cancelled) {
+                    setProfileLoading(false);
+                }
+            }
+        };
+
+        loadUserProfile();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [dispatch]);
+
+    // Set the email visibility default without overriding an existing choice.
+    useEffect(() => {
+        if (formData.showEmail === undefined) {
+            dispatch(
+                updateField({
+                    name: "showEmail",
+                    value: false,
+                })
+            );
+        }
+    }, [dispatch, formData.showEmail]);
 
     // Reset page scroll position when this page mounts.
     useEffect(() => {
@@ -751,7 +291,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
         },
     };
 
-    // Update Redux form fields, including checkbox values.
+    // Update Redux form fields.
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
 
@@ -792,13 +332,18 @@ export default function PropertyInsertForm({ onAddProperty }) {
 
         const validFiles = selectedFiles.filter(
             (file) =>
-                ["image/jpeg", "image/png", "image/webp"].includes(
-                    file.type
-                ) &&
+                [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp",
+                ].includes(file.type) &&
                 file.size <= 5 * 1024 * 1024
         );
 
-        const remaining = Math.max(0, 15 - currentImages.length);
+        const remaining = Math.max(
+            0,
+            15 - currentImages.length
+        );
 
         const newImages = validFiles
             .slice(0, remaining)
@@ -814,9 +359,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                     "Some images were rejected. Use JPG, PNG, or WEBP images up to 5 MB each.",
                 severity: "warning",
             });
-        }
-
-        if (validFiles.length > remaining) {
+        } else if (validFiles.length > remaining) {
             setNotification({
                 open: true,
                 message: "You can upload a maximum of 15 images.",
@@ -851,7 +394,48 @@ export default function PropertyInsertForm({ onAddProperty }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (loading) return;
+        if (loading || profileLoading) return;
+
+        if (!profile) {
+            setNotification({
+                open: true,
+                message:
+                    "Unable to verify your profile. Please reload the page.",
+                severity: "error",
+            });
+
+            return;
+        }
+
+        // Check email and WhatsApp verification.
+        if (
+            !profile.emailVerified ||
+            !profile.whatsappVerified ||
+            !profile.whatsappPhoneNumber
+        ) {
+            const missingVerification = [];
+
+            if (!profile.emailVerified) {
+                missingVerification.push("email");
+            }
+
+            if (
+                !profile.whatsappPhoneNumber ||
+                !profile.whatsappVerified
+            ) {
+                missingVerification.push("WhatsApp number");
+            }
+
+            setNotification({
+                open: true,
+                message: `Please verify your ${missingVerification.join(
+                    " and "
+                )} in your profile before publishing a property.`,
+                severity: "warning",
+            });
+
+            return;
+        }
 
         const validationErrors = {};
 
@@ -897,6 +481,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 if (key === "price" || key === "surface") {
                     validationErrors[key] = "This field is required";
                 }
+
                 return;
             }
 
@@ -942,12 +527,27 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 message: "Please correct the highlighted fields.",
                 severity: "error",
             });
+
             return;
         }
 
-        // Provide defaults for the new rental fields.
+        // Exclude profile information and verification flags.
+        // The backend retrieves contact information from the authenticated user.
+        const {
+            firstName,
+            lastName,
+            email,
+            phone,
+            whatsappPhoneNumber,
+            emailVerified,
+            phoneVerified,
+            whatsappVerified,
+            ...propertyFields
+        } = formData;
+
         const submissionData = {
-            ...formData,
+            ...propertyFields,
+            showEmail: formData.showEmail ?? false,
             rentWithContract: formData.rentWithContract ?? false,
             mortgageAgreement: formData.mortgageAgreement ?? false,
             deposit: formData.deposit ?? 0,
@@ -989,11 +589,14 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 onAddProperty(response.data?.property);
             }
         } catch (error) {
-            console.error("[Frontend] Failed to publish property:", {
-                message: error.message,
-                status: error.response?.status,
-                response: error.response?.data,
-            });
+            console.error(
+                "[Frontend] Failed to publish property:",
+                {
+                    message: error.message,
+                    status: error.response?.status,
+                    response: error.response?.data,
+                }
+            );
 
             setNotification({
                 open: true,
@@ -1064,9 +667,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
                             lineHeight: 1.8,
                         }}
                     >
-                        Add your property details, provide accurate contact
-                        information, and showcase your property to potential
-                        buyers and tenants.
+                        Add your property details, provide accurate
+                        contact information, and showcase your property
+                        to potential buyers and tenants.
                     </Typography>
 
                     <Stack
@@ -1136,7 +739,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
                         SectionHeader={SectionHeader}
                     />
 
-                    <PropertyInsertFormPublish loading={loading} />
+                    <PropertyInsertFormPublish
+                        loading={loading || profileLoading}
+                    />
                 </Box>
             </Box>
 

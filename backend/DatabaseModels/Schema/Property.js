@@ -133,6 +133,10 @@ const propertySchema = new mongoose.Schema(
             min: 0,
             default: 0,
         },
+        showEmail: {
+            type: Boolean,
+            default: false,
+        },
 
         images: [
             {

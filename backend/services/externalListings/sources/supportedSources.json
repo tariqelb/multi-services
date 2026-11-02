@@ -1,0 +1,26 @@
+[
+    {
+        "sourceName": "Aqari Annonces",
+        "hostnames": [
+            "aqari-annonces.com",
+            "www.aqari-annonces.com"
+        ],
+        "pathPrefix": "/properties/"
+    },
+    {
+        "sourceName": "Mr Semsar",
+        "hostnames": [
+            "mrsemsar.ma",
+            "www.mrsemsar.ma"
+        ],
+        "pathPrefix": "/listing/"
+    },
+    {
+        "sourceName": "3a9arai",
+        "hostnames": [
+            "3a9arai.ma",
+            "www.3a9arai.ma"
+        ],
+        "pathPrefix": "/annonce/"
+    }
+]

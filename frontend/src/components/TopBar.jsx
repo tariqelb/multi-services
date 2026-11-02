@@ -12,7 +12,7 @@ import {
     LogOut,
     ChevronDown,
 } from "lucide-react";
-import logo from "../assets/logo.png";
+import logo from "../assets/iconlogo.png";
 import { getProfile } from "../redux/actions/profile/profileAction";
 import NotificationMenu from "./NotificationMenu";
 import { connectSocket, disconnectSocket } from "../Socket/Socket";
@@ -36,6 +36,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             dispatch(getProfile());
         }
     }, [isAuthenticated, dispatch]);
+    console.log("Profile: ", profile)
 
     // Connect or disconnect the user's socket.
     useEffect(() => {

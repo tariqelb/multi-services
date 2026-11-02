@@ -20,8 +20,11 @@ import HomeWorkIcon from "@mui/icons-material/HomeWork";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import PublicIcon from "@mui/icons-material/Public";
+import AddLinkIcon from "@mui/icons-material/AddLink";
 
 import { useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Sidebar({
     sidebarOpen,
@@ -32,13 +35,26 @@ export default function Sidebar({
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Get the user's role from Redux
+    const role = useSelector((state) => state.profile?.role);
+
+    const isAdmin = role?.toLowerCase() === "admin";
+
     const navigationItems = [
         { name: "Home", icon: HomeIcon, path: "/" },
         { name: "Properties", icon: HomeWorkIcon, path: "/properties" },
         { name: "Publish", icon: CloudUploadIcon, path: "/properties/publish" },
-        { name: "My Publication", icon: LibraryBooksIcon, path: "/mypublication" },
+        {
+            name: "My Publication",
+            icon: LibraryBooksIcon,
+            path: "/mypublication",
+        },
         { name: "Saved", icon: BookmarkIcon, path: "/saved" },
-        { name: "Alert", icon: NotificationsActiveIcon, path: "/alert" },
+        {
+            name: "Alert",
+            icon: NotificationsActiveIcon,
+            path: "/alert",
+        },
         {
             name: "Notifications",
             icon: NotificationsIcon,
@@ -49,22 +65,27 @@ export default function Sidebar({
             icon: RateReviewOutlinedIcon,
             path: "/feedback",
         },
-        {
-            name: "Dashboard",
-            icon: DashboardOutlinedIcon,
-            path: "/dashboard",
-        },
         { name: "Settings", icon: SettingsIcon, path: "/setting" },
-        {
-            name: "External listing",
-            icon: SettingsIcon,
-            path: "/externalListings",
-        },
-        {
-            name: "Add External listing",
-            icon: SettingsIcon,
-            path: "/addexternalListings",
-        },
+        ...(isAdmin ?
+          [{ name: "Statistic", icon: DashboardOutlinedIcon, path: "/dashboard" }] 
+          : [])
+        ,
+
+        // Admin-only navigation
+        ...(isAdmin
+            ? [
+                  {
+                      name: "External listing",
+                      icon: PublicIcon,
+                      path: "/externalListings",
+                  },
+                  {
+                      name: "Add External listing",
+                      icon: AddLinkIcon,
+                      path: "/addexternalListings",
+                  },
+              ]
+            : []),
     ];
 
     const handleNavigation = (item) => {
@@ -93,10 +114,7 @@ export default function Sidebar({
                     xs: "fixed",
                     md: "sticky",
                 },
-                top: {
-                    xs: "4rem",
-                    md: "4rem",
-                },
+                top: "4rem",
                 left: {
                     xs: 0,
                     md: "auto",
@@ -152,9 +170,12 @@ export default function Sidebar({
                     {navigationItems.map((item) => {
                         const Icon = item.icon;
 
-                        // Highlight only the item matching the current URL.
                         const isActive =
-                            location.pathname === item.path;
+                            location.pathname === item.path ||
+                            (item.path !== "/" &&
+                                location.pathname.startsWith(
+                                    `${item.path}/`
+                                ));
 
                         return (
                             <ListItem

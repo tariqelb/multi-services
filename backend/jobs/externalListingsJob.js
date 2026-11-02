@@ -1,18 +1,26 @@
 import ExternalListing from "../DatabaseModels/Schema/ExternalListing.js";
 
 import {
-    extractAqariListing,
-    supportsAqariUrl,
-} from "../services/externalListings/sources/aqariSource.js";
-
-import {
-    extractPageMetadata,
-} from "../services/externalListings/metadataExtractor.js";
+    extractExternalListing,
+    supportsExternalListingUrl,
+} from "../services/externalListings/sources/externalListingSource.js";
 
 async function refreshListing(listing) {
-    const extracted = supportsAqariUrl(listing.sourceUrl)
-        ? await extractAqariListing(listing.sourceUrl)
-        : await extractPageMetadata(listing.sourceUrl);
+    if (!supportsExternalListingUrl(listing.sourceUrl)) {
+        throw new Error(
+            "Unsupported listing source URL."
+        );
+    }
+
+    const extracted = await extractExternalListing(
+        listing.sourceUrl
+    );
+
+    if (!extracted) {
+        throw new Error(
+            "Could not extract usable listing information."
+        );
+    }
 
     listing.lastCheckedAt = new Date();
     listing.lastSeenAt = new Date();
@@ -32,10 +40,16 @@ export async function runExternalListingsJob() {
         .sort({ lastCheckedAt: 1 })
         .limit(10);
 
+    let succeeded = 0;
+    let failed = 0;
+
     for (const listing of listings) {
         try {
             await refreshListing(listing);
+            succeeded++;
         } catch (error) {
+            failed++;
+
             listing.lastCheckedAt = new Date();
             listing.lastError =
                 error instanceof Error
@@ -58,11 +72,22 @@ export async function runExternalListingsJob() {
             );
         }
 
-        // Avoid sending requests too quickly to source websites.
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // Avoid sending requests too quickly.
+        await new Promise((resolve) =>
+            setTimeout(resolve, 2000)
+        );
     }
 
+    const summary = {
+        processed: listings.length,
+        succeeded,
+        failed,
+    };
+
     console.info(
-        `[ExternalListings] Finished. Processed ${listings.length} listings.`
+        "[ExternalListings] Finished:",
+        summary
     );
+
+    return summary;
 }

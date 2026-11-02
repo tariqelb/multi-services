@@ -236,7 +236,6 @@ export async function updateMyProfile(req, res) {
 }
 
 
-
 export async function getMyProfile(req, res) {
     try {
         const userId = req.user?.userId;
@@ -249,7 +248,21 @@ export async function getMyProfile(req, res) {
 
         const user = await User.findById(userId)
             .select(
-                "firstName lastName email emailVerified phoneNumber phoneVerified address bio profileImage createdAt updatedAt"
+                [
+                    "firstName",
+                    "lastName",
+                    "email",
+                    "emailVerified",
+                    "phoneNumber",
+                    "phoneVerified",
+                    "notificationPreferences",
+                    "address",
+                    "bio",
+                    "profileImage",
+                    "role",
+                    "createdAt",
+                    "updatedAt",
+                ].join(" ")
             )
             .lean();
 
@@ -259,19 +272,46 @@ export async function getMyProfile(req, res) {
             });
         }
 
+        const whatsapp = user.notificationPreferences?.whatsapp || {};
+        const emailNotifications =
+            user.notificationPreferences?.email || {};
+
         return res.status(200).json({
             message: "Profile fetched successfully.",
+
             user: {
                 id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
+
+                firstName: user.firstName || "",
+                lastName: user.lastName || "",
+                email: user.email || "",
+
                 emailVerified: user.emailVerified ?? false,
-                phoneNumber: user.phoneNumber ?? "",
+
+                phoneNumber: user.phoneNumber || "",
                 phoneVerified: user.phoneVerified ?? false,
-                address: user.address ?? "",
-                bio: user.bio ?? "",
-                profileImage: user.profileImage ?? "",
+
+                notificationPreferences: {
+                    email: {
+                        enabled: emailNotifications.enabled ?? false,
+                        propertyAlerts:
+                            emailNotifications.propertyAlerts ?? false,
+                    },
+
+                    whatsapp: {
+                        enabled: whatsapp.enabled ?? false,
+                        phoneNumber: whatsapp.phoneNumber || "",
+                        propertyAlerts:
+                            whatsapp.propertyAlerts ?? false,
+                        verified: whatsapp.verified ?? false,
+                    },
+                },
+
+                address: user.address || "",
+                bio: user.bio || "",
+                profileImage: user.profileImage || "",
+                role: user.role || "Member",
+
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt,
             },

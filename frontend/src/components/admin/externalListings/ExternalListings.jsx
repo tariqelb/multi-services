@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useState } from "react";
 import {
     Alert,
@@ -10,9 +9,20 @@ import {
     Chip,
     Divider,
     Grid,
+    Pagination,
     Stack,
     Typography,
 } from "@mui/material";
+import {
+    TextField,
+    MenuItem,
+    InputAdornment,
+} from "@mui/material";
+
+import SearchIcon from "@mui/icons-material/Search";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import ClearIcon from "@mui/icons-material/Clear";
+
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import BedOutlinedIcon from "@mui/icons-material/BedOutlined";
@@ -21,6 +31,7 @@ import SquareFootOutlinedIcon from "@mui/icons-material/SquareFootOutlined";
 import axiosInstance from "../../../api/axiosInstance";
 
 const API_URL = "/external-listings";
+const ITEMS_PER_PAGE = 9;
 
 function getListings(data) {
     if (Array.isArray(data)) return data;
@@ -61,7 +72,6 @@ function getPropertyImage(listing) {
 
             if (!["https:", "http:"].includes(url.protocol)) continue;
 
-            // Avoid displaying common generic branding images as property photos.
             const imagePath = url.pathname.toLowerCase();
 
             if (
@@ -183,6 +193,7 @@ function PropertyImage({ listing }) {
                             strokeLinejoin="round"
                         />
                     </Box>
+
                     <Typography variant="body2">
                         Property image unavailable
                     </Typography>
@@ -297,6 +308,7 @@ function PropertyCard({ listing }) {
                         fontSize="small"
                         color="action"
                     />
+
                     <Typography
                         variant="body2"
                         color="text.secondary"
@@ -315,6 +327,7 @@ function PropertyCard({ listing }) {
                 {details.length > 0 && (
                     <>
                         <Divider />
+
                         <Stack
                             direction="row"
                             gap={1.5}
@@ -330,6 +343,7 @@ function PropertyCard({ listing }) {
                                     sx={{ color: "text.secondary" }}
                                 >
                                     {detail.icon}
+
                                     <Typography variant="body2">
                                         {detail.label}
                                     </Typography>
@@ -393,31 +407,515 @@ function PropertyCard({ listing }) {
     );
 }
 
+const moroccanCities = [
+    { en: "Agadir", ar: "أكادير" },
+    { en: "Ain Harrouda", ar: "عين حرودة" },
+    { en: "Aït Melloul", ar: "أيت ملول" },
+    { en: "Ait Ourir", ar: "أيت أورير" },
+    { en: "Al Hoceima", ar: "الحسيمة" },
+    { en: "Azrou", ar: "أزرو" },
+    { en: "Benguerir", ar: "بن جرير" },
+    { en: "Beni Ansar", ar: "بني أنصار" },
+    { en: "Beni Mellal", ar: "بني ملال" },
+    { en: "Benslimane", ar: "بن سليمان" },
+    { en: "Berrechid", ar: "برشيد" },
+    { en: "Berkane", ar: "بركان" },
+    { en: "Biougra", ar: "بيوكرى" },
+    { en: "Bni Yakhlef", ar: "بني يخلف" },
+    { en: "Bouskoura", ar: "بوسكورة" },
+    { en: "Bouznika", ar: "بوزنيقة" },
+    { en: "Casablanca", ar: "الدار البيضاء" },
+    { en: "Dcheira El Jihadia", ar: "الدشيرة الجهادية" },
+    { en: "Dar Bouazza (Tamaris)", ar: "دار بوعزة" },
+    { en: "Drargua", ar: "الدراركة" },
+    { en: "Ech-challalate", ar: "الشلالات" },
+    { en: "El Jadida", ar: "الجديدة" },
+    { en: "El Kelaa Des Sraghna", ar: "قلعة السراغنة" },
+    { en: "Essaouira", ar: "الصويرة" },
+    { en: "Errachidia", ar: "الرشيدية" },
+    { en: "Fez", ar: "فاس" },
+    { en: "Fquih Ben Salah", ar: "الفقيه بن صالح" },
+    { en: "Fnideq", ar: "الفنيدق" },
+    { en: "Guelmim", ar: "كلميم" },
+    { en: "Guercif", ar: "جرسيف" },
+    { en: "Inezgane", ar: "إنزكان" },
+    { en: "Kenitra", ar: "القنيطرة" },
+    { en: "Khemisset", ar: "الخميسات" },
+    { en: "Khenifra", ar: "خنيفرة" },
+    { en: "Khouribga", ar: "خريبكة" },
+    { en: "Ksar El Kebir", ar: "القصر الكبير" },
+    { en: "Lahraouyine", ar: "الهراويين" },
+    { en: "Larache", ar: "العرائش" },
+    { en: "Lqliaa", ar: "القليعة" },
+    { en: "M'diq", ar: "المضيق" },
+    { en: "Marrakesh", ar: "مراكش" },
+    { en: "Martil", ar: "مرتيل" },
+    { en: "Mehdya", ar: "المهدية" },
+    { en: "Meknes", ar: "مكناس" },
+    { en: "Midelt", ar: "ميدلت" },
+    { en: "Mohammedia", ar: "المحمدية" },
+    { en: "Nador", ar: "الناظور" },
+    { en: "Ouarzazate", ar: "ورزازات" },
+    { en: "Oued Zem", ar: "وادي زم" },
+    { en: "Oujda", ar: "وجدة" },
+    { en: "Oulad Teima", ar: "أولاد تايمة" },
+    { en: "Ouazzane", ar: "وزان" },
+    { en: "Rabat", ar: "الرباط" },
+    { en: "Salé", ar: "سلا" },
+    { en: "Safi", ar: "آسفي" },
+    { en: "Sefrou", ar: "صفرو" },
+    { en: "Settat", ar: "سطات" },
+    { en: "Skhirat", ar: "الصخيرات" },
+    { en: "Sidi Bennour", ar: "سيدي بنور" },
+    { en: "Sidi Kacem", ar: "سيدي قاسم" },
+    { en: "Sidi Slimane", ar: "سيدي سليمان" },
+    { en: "Sidi Taibi", ar: "سيدي الطيبي" },
+    { en: "Souk El Arbaa", ar: "سوق الأربعاء" },
+    { en: "Souk Sebt Ouled Nemma", ar: "سوق السبت أولاد النمة" },
+    { en: "Taourirt", ar: "تاوريرت" },
+    { en: "Tamensourte", ar: "تامنصورت" },
+    { en: "Tan-Tan", ar: "طانطان" },
+    { en: "Tanger", ar: "طنجة" },
+    { en: "Taza", ar: "تازة" },
+    { en: "Temara", ar: "تمارة" },
+    { en: "Tetouan", ar: "تطوان" },
+    { en: "Tifelt", ar: "تيفلت" },
+    { en: "Tit Mellil", ar: "تيط مليل" },
+    { en: "Tiznit", ar: "تيزنيت" },
+    { en: "Youssoufia", ar: "اليوسفية" },
+].sort((a, b) => a.en.localeCompare(b.en, "en"));
+
+function ExternalListingFilters({
+    listings,
+    filters,
+    onFilterChange,
+    onClear,
+    activeFilterCount,
+}) {
+   const cities = moroccanCities;
+
+    const propertyTypes = [
+        ...new Set(
+            listings
+                .map((item) => cleanText(item.propertyType))
+                .filter(Boolean)
+        ),
+    ].sort();
+
+    const sources = [
+        ...new Set(
+            listings
+                .map((item) => cleanText(item.sourceName))
+                .filter(Boolean)
+        ),
+    ].sort();
+
+    const listingTypes = [
+        "For Sale",
+        "For Rent",
+        "Unknown",
+    ];
+
+    const handleChange = (field) => (event) => {
+        onFilterChange(field, event.target.value);
+    };
+
+    return (
+        <Box
+            sx={{
+                mb: 3,
+                p: { xs: 2, sm: 2.5 },
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 3,
+                bgcolor: "background.paper",
+                boxShadow: 1,
+            }}
+        >
+            {/* Filter heading */}
+            <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                flexWrap="wrap"
+                gap={1}
+                sx={{ mb: 2.5 }}
+            >
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <FilterAltOutlinedIcon color="action" />
+
+                    <Typography fontWeight={750}>
+                        Filter Properties
+                    </Typography>
+
+                    {activeFilterCount > 0 && (
+                        <Chip
+                            label={`${activeFilterCount} active`}
+                            color="primary"
+                            size="small"
+                        />
+                    )}
+                </Stack>
+
+                {activeFilterCount > 0 && (
+                    <Button
+                        size="small"
+                        color="inherit"
+                        startIcon={<ClearIcon />}
+                        onClick={onClear}
+                        sx={{ textTransform: "none" }}
+                    >
+                        Clear filters
+                    </Button>
+                )}
+            </Stack>
+
+            {/* Search */}
+            <TextField
+                fullWidth
+                size="small"
+                placeholder="Search by title, description, or neighborhood..."
+                value={filters.search}
+                onChange={handleChange("search")}
+                sx={{ mb: 2 }}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon color="action" />
+                        </InputAdornment>
+                    ),
+                }}
+            />
+
+            {/* Select filters */}
+            <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <TextField
+                        select
+                        fullWidth
+                        size="small"
+                        label="Listing Type"
+                        value={filters.listingType}
+                        onChange={handleChange("listingType")}
+                    >
+                        <MenuItem value="All">
+                            All Listing Types
+                        </MenuItem>
+
+                        {listingTypes.map((type) => (
+                            <MenuItem key={type} value={type}>
+                                {type}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <TextField
+                        select
+                        fullWidth
+                        size="small"
+                        label="Property Type"
+                        value={filters.propertyType}
+                        onChange={handleChange("propertyType")}
+                    >
+                        <MenuItem value="All">
+                            All Property Types
+                        </MenuItem>
+
+                        {propertyTypes.map((type) => (
+                            <MenuItem key={type} value={type}>
+                                {type}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <TextField
+                    select
+                    fullWidth
+                    size="small"
+                    label="City"
+                    value={filters.city}
+                    onChange={handleChange("city")}
+                >
+                    <MenuItem value="All">
+                        All Cities / جميع المدن
+                    </MenuItem>
+
+                    {cities.map((city) => (
+                        <MenuItem key={city.en} value={city.en}>
+                            <Stack
+                                direction="row"
+                                justifyContent="space-between"
+                                alignItems="center"
+                                sx={{ width: "100%" }}
+                            >
+                                <span>{city.en}</span>
+
+                                <Typography
+                                    component="span"
+                                    variant="body2"
+                                    color="text.secondary"
+                                    dir="rtl"
+                                >
+                                    {city.ar}
+                                </Typography>
+                            </Stack>
+                        </MenuItem>
+                    ))}
+                </TextField>
+            </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <TextField
+                        select
+                        fullWidth
+                        size="small"
+                        label="Source Website"
+                        value={filters.source}
+                        onChange={handleChange("source")}
+                    >
+                        <MenuItem value="All">
+                            All Sources
+                        </MenuItem>
+
+                        {sources.map((source) => (
+                            <MenuItem key={source} value={source}>
+                                {source}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </Grid>
+
+                {/* Price range */}
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        label="Minimum Price (MAD)"
+                        value={filters.minPrice}
+                        onChange={handleChange("minPrice")}
+                        slotProps={{
+                            htmlInput: { min: 0 },
+                        }}
+                    />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        label="Maximum Price (MAD)"
+                        value={filters.maxPrice}
+                        onChange={handleChange("maxPrice")}
+                        slotProps={{
+                            htmlInput: { min: 0 },
+                        }}
+                    />
+                </Grid>
+            </Grid>
+        </Box>
+    );
+}
+
+
 export default function ExternalListings() {
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [page, setPage] = useState(1);
 
-    const loadListings = useCallback(async () => {
-        setLoading(true);
-        setError("");
+    const ITEMS_PER_PAGE = 9;
 
-        try {
-            const response = await axiosInstance.get(API_URL);
-            setListings(getListings(response.data));
-        } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                    "Unable to load property listings. Please try again later."
-            );
-        } finally {
-            setLoading(false);
+    const initialFilters = {
+        search: "",
+        listingType: "All",
+        propertyType: "All",
+        city: "All",
+        source: "All",
+        minPrice: "",
+        maxPrice: "",
+    };
+
+    const [filters, setFilters] = useState(initialFilters);
+
+ const loadListings = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+        const firstResponse = await axiosInstance.get(API_URL, {
+            params: {
+                page: 1,
+                limit: 50,
+            },
+        });
+
+        const firstListings = getListings(firstResponse.data);
+
+        const pagination =
+            firstResponse.data?.pagination ||
+            firstResponse.data?.data?.pagination;
+
+        const totalPages = pagination?.totalPages || 1;
+
+        let allListings = [...firstListings];
+
+        // Fetch remaining backend pages.
+        if (totalPages > 1) {
+            const requests = [];
+
+            for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+                requests.push(
+                    axiosInstance.get(API_URL, {
+                        params: {
+                            page: currentPage,
+                            limit: 50,
+                        },
+                    })
+                );
+            }
+
+            const responses = await Promise.all(requests);
+
+            responses.forEach((response) => {
+                allListings.push(...getListings(response.data));
+            });
         }
-    }, []);
+
+        setListings(allListings);
+        setPage(1);
+    } catch (err) {
+        console.error("Failed to load external listings:", err);
+
+        setError(
+            err.response?.data?.message ||
+                "Unable to load property listings. Please try again later."
+        );
+    } finally {
+        setLoading(false);
+    }
+}, []);
 
     useEffect(() => {
         loadListings();
     }, [loadListings]);
+
+    const handleFilterChange = (field, value) => {
+        setFilters((current) => ({
+            ...current,
+            [field]: value,
+        }));
+
+        setPage(1);
+    };
+
+    const clearFilters = () => {
+        setFilters(initialFilters);
+        setPage(1);
+    };
+
+    const activeFilterCount = Object.entries(filters).filter(
+        ([key, value]) => {
+            return value !== "" &&
+                value !== "All" &&
+                value !== "All Cities";
+        }
+    ).length;
+
+    // Apply all filters together.
+    const filteredListings = listings.filter((listing) => {
+        const search = normalizeFilter(filters.search);
+
+        const searchableText = normalizeFilter([
+            listing.title,
+            listing.description,
+            listing.city,
+            listing.neighborhood,
+            listing.propertyType,
+            listing.sourceName,
+        ].join(" "));
+
+        const matchesSearch =
+            !search || searchableText.includes(search);
+
+        const matchesListingType =
+            filters.listingType === "All" ||
+            normalizeFilter(listing.listingType) ===
+                normalizeFilter(filters.listingType);
+
+        const matchesPropertyType =
+            filters.propertyType === "All" ||
+            normalizeFilter(listing.propertyType) ===
+                normalizeFilter(filters.propertyType);
+
+        const selectedCity = moroccanCities.find(
+            (city) => city.en === filters.city
+        );
+            
+        const matchesCity =
+            filters.city === "All" ||
+            normalizeFilter(listing.city) === normalizeFilter(selectedCity?.en) ||
+            normalizeFilter(listing.city) === normalizeFilter(selectedCity?.ar);
+
+        const matchesSource =
+            filters.source === "All" ||
+            normalizeFilter(listing.sourceName) ===
+                normalizeFilter(filters.source);
+
+        const price = Number(listing.price);
+
+        const hasPrice =
+            listing.price !== null &&
+            listing.price !== undefined &&
+            listing.price !== "" &&
+            Number.isFinite(price);
+
+        const minPrice =
+            filters.minPrice === ""
+                ? null
+                : Number(filters.minPrice);
+
+        const maxPrice =
+            filters.maxPrice === ""
+                ? null
+                : Number(filters.maxPrice);
+
+        const matchesMinPrice =
+            minPrice === null ||
+            (hasPrice && price >= minPrice);
+
+        const matchesMaxPrice =
+            maxPrice === null ||
+            (hasPrice && price <= maxPrice);
+
+        return (
+            matchesSearch &&
+            matchesListingType &&
+            matchesPropertyType &&
+            matchesCity &&
+            matchesSource &&
+            matchesMinPrice &&
+            matchesMaxPrice
+        );
+    });
+
+    const totalPages = Math.ceil(
+        filteredListings.length / ITEMS_PER_PAGE
+    );
+
+    const paginatedListings = filteredListings.slice(
+        (page - 1) * ITEMS_PER_PAGE,
+        page * ITEMS_PER_PAGE
+    );
+
+    const handlePageChange = (event, value) => {
+        setPage(value);
+    };
 
     return (
         <Box
@@ -428,6 +926,7 @@ export default function ExternalListings() {
                 p: { xs: 2, md: 3 },
             }}
         >
+            {/* Page heading */}
             <Box sx={{ mb: 3 }}>
                 <Typography
                     variant="h4"
@@ -470,40 +969,143 @@ export default function ExternalListings() {
                     sx={{ py: 10 }}
                 >
                     <CircularProgress />
+
                     <Typography color="text.secondary">
                         Loading properties...
                     </Typography>
                 </Stack>
-            ) : listings.length === 0 ? (
-                <Box
-                    sx={{
-                        py: 8,
-                        px: 2,
-                        textAlign: "center",
-                        border: 1,
-                        borderColor: "divider",
-                        borderRadius: 3,
-                    }}
-                >
-                    <Typography variant="h6" fontWeight={700}>
-                        No properties available
-                    </Typography>
-                    <Typography color="text.secondary" sx={{ mt: 1 }}>
-                        New listings will appear here when they are collected.
-                    </Typography>
-                </Box>
             ) : (
-                <Grid container spacing={3}>
-                    {listings.map((listing, index) => (
-                        <Grid
-                            key={listing._id || listing.sourceUrl || index}
-                            size={{ xs: 12, sm: 6, lg: 4 }}
+                <>
+                    {/* Property filters */}
+                    <ExternalListingFilters
+                        listings={listings}
+                        filters={filters}
+                        onFilterChange={handleFilterChange}
+                        onClear={clearFilters}
+                        activeFilterCount={activeFilterCount}
+                    />
+
+                    {/* Results heading */}
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        flexWrap="wrap"
+                        gap={1}
+                        sx={{ mb: 3 }}
+                    >
+                        <Typography
+                            variant="h6"
+                            fontWeight={750}
                         >
-                            <PropertyCard listing={listing} />
-                        </Grid>
-                    ))}
-                </Grid>
+                            {filters.search ||
+                            activeFilterCount > 0
+                                ? "Filtered Properties"
+                                : "Property Listings"}
+                        </Typography>
+
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                        >
+                            {filteredListings.length}{" "}
+                            {filteredListings.length === 1
+                                ? "property"
+                                : "properties"}
+                            {" "}found
+                        </Typography>
+                    </Stack>
+
+                    {/* Empty state */}
+                    {filteredListings.length === 0 ? (
+                        <Box
+                            sx={{
+                                py: 8,
+                                px: 2,
+                                textAlign: "center",
+                                border: 1,
+                                borderColor: "divider",
+                                borderRadius: 3,
+                            }}
+                        >
+                            <Typography
+                                variant="h6"
+                                fontWeight={700}
+                            >
+                                No properties found
+                            </Typography>
+
+                            <Typography
+                                color="text.secondary"
+                                sx={{ mt: 1, mb: 2 }}
+                            >
+                                Try changing your search or filters.
+                            </Typography>
+
+                            {activeFilterCount > 0 && (
+                                <Button
+                                    variant="outlined"
+                                    onClick={clearFilters}
+                                    sx={{ textTransform: "none" }}
+                                >
+                                    Clear Filters
+                                </Button>
+                            )}
+                        </Box>
+                    ) : (
+                        <>
+                            <Grid container spacing={3}>
+                                {paginatedListings.map((listing, index) => (
+                                    <Grid
+                                        key={
+                                            listing._id ||
+                                            listing.sourceUrl ||
+                                            index
+                                        }
+                                        size={{
+                                            xs: 12,
+                                            sm: 6,
+                                            lg: 4,
+                                        }}
+                                    >
+                                        <PropertyCard listing={listing} />
+                                    </Grid>
+                                ))}
+                            </Grid>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        mt: 5,
+                                    }}
+                                >
+                                    <Pagination
+                                        count={totalPages}
+                                        page={Math.min(page, totalPages)}
+                                        onChange={handlePageChange}
+                                        color="primary"
+                                        size="large"
+                                        showFirstButton
+                                        showLastButton
+                                    />
+                                </Box>
+                            )}
+                        </>
+                    )}
+                </>
             )}
         </Box>
     );
+}
+
+// Normalize text for consistent filtering.
+function normalizeFilter(value) {
+    return String(value ?? "")
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
 }

@@ -2,7 +2,17 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { supportsExternalListingUrl } from "./sources/aqariSource.js";
+// import {
+//     getSourceConfig,
+//     registerSupportedSource,
+//     supportsExternalListingUrl,
+// } from "./sources/externalListingSource.js";
+
+import {
+    getSourceConfig,
+    inspectListingUrl,
+    registerSupportedSource,
+} from "./sources/externalListingSource.js";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFile);
@@ -12,11 +22,43 @@ const SOURCES_FILE = path.resolve(
     "../../data/externalListingSources.json"
 );
 
+async function ensureSourcesFile() {
+    await fs.mkdir(path.dirname(SOURCES_FILE), {
+        recursive: true,
+    });
+
+    try {
+        await fs.access(SOURCES_FILE);
+    } catch {
+        await fs.writeFile(
+            SOURCES_FILE,
+            JSON.stringify({ urls: [] }, null, 2) + "\n",
+            "utf8"
+        );
+    }
+}
+
 async function readSourcesFile() {
+    await ensureSourcesFile();
+
     const content = await fs.readFile(SOURCES_FILE, "utf8");
     const data = JSON.parse(content);
 
     return Array.isArray(data.urls) ? data.urls : [];
+}
+
+async function writeSourcesFile(urls) {
+    await ensureSourcesFile();
+
+    await fs.writeFile(
+        SOURCES_FILE,
+        JSON.stringify(
+            { urls: [...new Set(urls)] },
+            null,
+            2
+        ) + "\n",
+        "utf8"
+    );
 }
 
 export async function getListingSourceUrls() {
@@ -27,54 +69,73 @@ export async function getListingSourceUrls() {
             urls
                 .filter((url) => typeof url === "string")
                 .map((url) => url.trim())
-                .filter(supportsExternalListingUrl)
+                .filter(Boolean)
         ),
     ];
 }
-
 export async function addListingSourceUrl(inputUrl) {
-    if (typeof inputUrl !== "string" || !inputUrl.trim()) {
-        throw new Error("A listing URL is required.");
+    const inspected = inspectListingUrl(inputUrl);
+
+    if (!inspected) {
+        throw new Error(
+            "Please provide a valid HTTPS listing URL."
+        );
     }
 
-    const url = inputUrl.trim();
+    // Check whether this website is already registered.
+    let source = getSourceConfig(inspected.normalizedUrl);
 
-    if (!supportsExternalListingUrl(url)) {
+    // Automatically register previously unknown websites.
+    if (!source) {
+        await registerSupportedSource(inspected.normalizedUrl);
+        source = getSourceConfig(inspected.normalizedUrl);
+    }
+
+    if (!source) {
         throw new Error(
-            "Only supported Aqari Annonces and Mr Semsar listing URLs are allowed."
+            "Could not register this listing website."
         );
     }
 
     const urls = await readSourcesFile();
 
-    if (urls.includes(url)) {
-        return { url, added: false };
-    }
-
-    urls.push(url);
-
-    await fs.writeFile(
-        SOURCES_FILE,
-        JSON.stringify({ urls }, null, 2) + "\n",
-        "utf8"
+    const existingUrl = urls.find(
+        (item) => item === inspected.normalizedUrl
     );
 
-    return { url, added: true };
+    if (existingUrl) {
+        return {
+            url: existingUrl,
+            added: false,
+        };
+    }
+
+    urls.push(inspected.normalizedUrl);
+    await writeSourcesFile(urls);
+
+    return {
+        url: inspected.normalizedUrl,
+        added: true,
+        sourceName: source.sourceName,
+    };
 }
 
 export async function removeListingSourceUrl(inputUrl) {
+    if (typeof inputUrl !== "string") {
+        return false;
+    }
+
     const urls = await readSourcesFile();
-    const remaining = urls.filter((url) => url !== inputUrl);
+
+    const remaining = urls.filter(
+        (url) => url !== inputUrl
+    );
 
     if (remaining.length === urls.length) {
         return false;
     }
 
-    await fs.writeFile(
-        SOURCES_FILE,
-        JSON.stringify({ urls: remaining }, null, 2) + "\n",
-        "utf8"
-    );
+    await writeSourcesFile(remaining);
 
     return true;
 }

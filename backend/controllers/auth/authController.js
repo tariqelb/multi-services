@@ -3,6 +3,9 @@ import User from "../../DatabaseModels/Schema/User.js";
 import jwt from "jsonwebtoken";
 import { generateToken } from "../../utils/generateToken.js"
 
+import { randomInt } from "crypto";
+import PendingSignup from "../../DatabaseModels/Schema/PendingSignup.js";
+import { sendVerificationEmail } from "../../services/emailService.js";
 
 const authCookieOptions = {
     httpOnly: true,
@@ -29,19 +32,26 @@ export const signup = async (req, res) => {
             !confirmPassword
         ) {
             return res.status(400).json({
-                message: "All fields are required",
+                message: "All fields are required.",
+            });
+        }
+
+        if (firstName.trim().length < 2 ||
+            lastName.trim().length < 2) {
+            return res.status(400).json({
+                message: "Names must contain at least 2 characters.",
             });
         }
 
         if (password.length < 8) {
             return res.status(400).json({
-                message: "Password must contain at least 8 characters",
+                message: "Password must contain at least 8 characters.",
             });
         }
 
         if (password !== confirmPassword) {
             return res.status(400).json({
-                message: "Passwords do not match",
+                message: "Passwords do not match.",
             });
         }
 
@@ -53,21 +63,148 @@ export const signup = async (req, res) => {
 
         if (existingUser) {
             return res.status(409).json({
-                message: "An account with this email already exists",
+                message: "An account with this email already exists.",
             });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12);
+        // Generate verification code
+        const code = randomInt(100000, 1000000).toString();
 
-        const user = await User.create({
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
+        // Hash password and verification code
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const hashedCode = await bcrypt.hash(code, 10);
+
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+        // Replace any previous pending registration
+        await PendingSignup.findOneAndUpdate(
+            { email: normalizedEmail },
+            {
+                $set: {
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim(),
+                    password: hashedPassword,
+                    verificationCode: hashedCode,
+                    attempts: 0,
+                    expiresAt,
+                },
+            },
+            { upsert: true, new: true, runValidators: true }
+        );
+
+        // Send verification email
+        await sendVerificationEmail({
+            to: normalizedEmail,
+            code,
+        });
+
+        return res.status(200).json({
+            message: "Verification code sent to your email.",
             email: normalizedEmail,
-            password: hashedPassword,
+            expiresIn: 600,
+        });
+    } catch (error) {
+        console.error("Signup error:", error.message);
+
+        return res.status(500).json({
+            message: "Unable to start registration. Please try again.",
+        });
+    }
+};
+
+
+export const verifyEmail = async (req, res) => {
+    try {
+        const { email, code } = req.body;
+
+        if (!email?.trim() || !code?.trim()) {
+            return res.status(400).json({
+                message: "Email and verification code are required.",
+            });
+        }
+
+        if (!/^\d{6}$/.test(code)) {
+            return res.status(400).json({
+                message: "Invalid verification code.",
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const pendingSignup = await PendingSignup.findOne({
+            email: normalizedEmail,
+        }).select("+password +verificationCode");
+
+        if (!pendingSignup) {
+            return res.status(404).json({
+                message: "Registration not found. Please signup again.",
+            });
+        }
+
+        if (pendingSignup.expiresAt <= new Date()) {
+            await PendingSignup.deleteOne({
+                _id: pendingSignup._id,
+            });
+
+            return res.status(400).json({
+                message: "Verification code expired. Please signup again.",
+            });
+        }
+
+        if (pendingSignup.attempts >= 5) {
+            await PendingSignup.deleteOne({
+                _id: pendingSignup._id,
+            });
+
+            return res.status(429).json({
+                message: "Too many attempts. Please signup again.",
+            });
+        }
+
+        const isValidCode = await bcrypt.compare(
+            code,
+            pendingSignup.verificationCode
+        );
+
+        if (!isValidCode) {
+            pendingSignup.attempts += 1;
+            await pendingSignup.save();
+
+            return res.status(400).json({
+                message: "Incorrect verification code.",
+                remainingAttempts: 5 - pendingSignup.attempts,
+            });
+        }
+
+        // Check that the email was not registered meanwhile
+        const existingUser = await User.findOne({
+            email: normalizedEmail,
+        });
+
+        if (existingUser) {
+            await PendingSignup.deleteOne({
+                _id: pendingSignup._id,
+            });
+
+            return res.status(409).json({
+                message: "An account with this email already exists.",
+            });
+        }
+
+        // Create the actual user only after verification
+        const user = await User.create({
+            firstName: pendingSignup.firstName,
+            lastName: pendingSignup.lastName,
+            email: pendingSignup.email,
+            password: pendingSignup.password,
+        });
+
+        await PendingSignup.deleteOne({
+            _id: pendingSignup._id,
         });
 
         return res.status(201).json({
-            message: "Account created successfully",
+            message: "Email verified. Your account was created successfully.",
             user: {
                 id: user._id,
                 firstName: user.firstName,
@@ -77,25 +214,81 @@ export const signup = async (req, res) => {
             },
         });
     } catch (error) {
+        console.error("Email verification error:", error.message);
+
         if (error.code === 11000) {
             return res.status(409).json({
-                message: "An account with this email already exists",
+                message: "An account with this email already exists.",
             });
         }
-
-        if (error.name === "ValidationError") {
-            return res.status(400).json({
-                message: "Invalid user data",
-            });
-        }
-
-        console.error("Signup error:", error.message);
 
         return res.status(500).json({
-            message: "Internal server error",
+            message: "Email verification failed.",
         });
     }
 };
+
+
+export const resendVerificationCode = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email?.trim()) {
+            return res.status(400).json({
+                message: "Email is required.",
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const pendingSignup = await PendingSignup.findOne({
+            email: normalizedEmail,
+        });
+
+        if (!pendingSignup) {
+            return res.status(404).json({
+                message: "No pending registration found.",
+            });
+        }
+
+        if (pendingSignup.expiresAt <= new Date()) {
+            await PendingSignup.deleteOne({
+                _id: pendingSignup._id,
+            });
+
+            return res.status(400).json({
+                message: "Registration expired. Please signup again.",
+            });
+        }
+
+        const code = randomInt(100000, 1000000).toString();
+
+        pendingSignup.verificationCode = await bcrypt.hash(code, 10);
+        pendingSignup.attempts = 0;
+        pendingSignup.expiresAt = new Date(
+            Date.now() + 10 * 60 * 1000
+        );
+
+        await pendingSignup.save();
+
+        await sendVerificationEmail({
+            to: normalizedEmail,
+            code,
+        });
+
+        return res.status(200).json({
+            message: "A new verification code has been sent.",
+            expiresIn: 600,
+        });
+    } catch (error) {
+        console.error("Resend verification error:", error.message);
+
+        return res.status(500).json({
+            message: "Unable to resend verification code.",
+        });
+    }
+};
+
 
 
 export const login = async (req, res) => {
@@ -182,14 +375,18 @@ export const login = async (req, res) => {
     }
 };
 
+
 export const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.userId)
-            .select("-password");
+            .select(
+                "firstName lastName email phoneNumber emailVerified phoneVerified notificationPreferences role address bio profileImage createdAt"
+            );
 
         if (!user) {
-            return res.status(401).json({
-                message: "User no longer exists",
+            return res.status(404).json({
+                authenticated: false,
+                message: "User not found",
             });
         }
 
@@ -200,17 +397,41 @@ export const getMe = async (req, res) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
+                phoneNumber: user.phoneNumber,
+                emailVerified: user.emailVerified,
+                phoneVerified: user.phoneVerified,
+
+                // WhatsApp information
+                notificationPreferences: {
+                    whatsapp: {
+                        enabled:
+                            user.notificationPreferences?.whatsapp?.enabled ?? false,
+                        phoneNumber:
+                            user.notificationPreferences?.whatsapp?.phoneNumber ?? "",
+                        propertyAlerts:
+                            user.notificationPreferences?.whatsapp?.propertyAlerts ?? false,
+                        verified:
+                            user.notificationPreferences?.whatsapp?.verified ?? false,
+                    },
+                },
+
+                role: user.role,
+                address: user.address,
+                bio: user.bio,
+                profileImage: user.profileImage,
                 createdAt: user.createdAt,
             },
         });
     } catch (error) {
-        console.error("Get current user error:", error.message);
+        console.error("[Auth] Get current user error:", error);
 
         return res.status(500).json({
-            message: "Internal server error",
+            authenticated: false,
+            message: "Failed to retrieve user profile",
         });
     }
 };
+
 
 // export const logout = (req, res) => {
 //     res.clearCookie("token", {

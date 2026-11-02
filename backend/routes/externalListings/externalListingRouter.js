@@ -15,15 +15,16 @@ import {
     getExternalListingSources,
     addExternalListingSource,
     deleteExternalListingSource,
+    refreshExternalListings,
+    importNewExternalListings,
 } from "../../controllers/externalListings/externalListingController.js";
 
 const router = express.Router();
 
-// Public reading endpoints.
+// Public reading endpoint.
 router.get("/", getExternalListings);
 
 // Administrator-only source management endpoints.
-// Keep these BEFORE the dynamic "/:id" route.
 router.get(
     "/sources",
     authMiddleware,
@@ -45,7 +46,21 @@ router.delete(
     deleteExternalListingSource
 );
 
-// Administrator-only listing management endpoints.
+// Administrator-only collection and import endpoints.
+router.post(
+    "/import",
+    authMiddleware,
+    adminMiddleware,
+    importNewExternalListings
+);
+
+router.post(
+    "/refresh",
+    authMiddleware,
+    adminMiddleware,
+    refreshExternalListings
+);
+
 router.post(
     "/preview",
     authMiddleware,
@@ -81,7 +96,7 @@ router.patch(
     refreshExternalListing
 );
 
-// Keep the dynamic route LAST among GET routes.
+// Keep dynamic GET route last.
 router.get("/:id", getExternalListingById);
 
 export default router;

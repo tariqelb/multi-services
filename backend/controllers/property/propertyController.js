@@ -1,63 +1,103 @@
-// import Property from "../../DatabaseModels/Schema/Property.js";
-// import mongoose from "mongoose";
-// import fs from "node:fs/promises";
-// import {
-//     uploadPropertyImages,
-//     deletePropertyImages,
-// } from "../../middleware/propertyUpload.js";
-// import notifyMatchingPropertyAlerts from "./propertyAlertNotificationService.js";
 
-// // const removeUploadedFiles = async (files = []) => {
-// //     await Promise.all(
-// //         files.map(async (file) => {
-// //             try {
-// //                 await fs.unlink(file.path);
-// //             } catch (error) {
-// //                 if (error.code !== "ENOENT") {
-// //                     console.error(
-// //                         "[Backend] Failed to remove uploaded file:",
-// //                         file.path,
-// //                         error.message
-// //                     );
-// //                 }
-// //             }
-// //         })
-// //     );
-// // };
+import Property from "../../DatabaseModels/Schema/Property.js";
+import User from "../../DatabaseModels/Schema/User.js";
+import mongoose from "mongoose";
 
-// const removeUploadedFiles = async (files = []) => {
-//     await deletePropertyImages(files);
-// };
+import {
+    uploadPropertyImages,
+    deletePropertyImages,
+} from "../../middleware/propertyUpload.js";
+
+import notifyMatchingPropertyAlerts from "./propertyAlertNotificationService.js";
+
+// Remove uploaded files if property creation fails.
+const removeUploadedFiles = async (images = []) => {
+    if (images.length > 0) {
+        await deletePropertyImages(images);
+    }
+};
+
+// Convert multipart form values into Booleans.
+const parseBoolean = (value, field) => {
+    if (
+        value === undefined ||
+        value === null ||
+        value === ""
+    ) {
+        return false;
+    }
+
+    if (value === true || value === "true") {
+        return true;
+    }
+
+    if (value === false || value === "false") {
+        return false;
+    }
+
+    throw new Error(`${field} must be true or false.`);
+};
 
 // export const createProperty = async (req, res) => {
 //     const uploadedFiles = req.files || [];
-//     //added couldy
 //     let uploadedImages = [];
 
 //     try {
+//         // 1. Validate authenticated user.
 //         const userId = req.user?.userId;
-//         //added cloudy
-//         uploadedImages = await uploadPropertyImages(uploadedFiles);
-// console.log("\n========== CREATE PROPERTY DEBUG ==========");
-// console.log("[CreateProperty] Controller entered");
-// console.log("[CreateProperty] User ID:", req.user?.userId);
-// console.log("[CreateProperty] Uploaded files:", uploadedFiles.length);
-// console.log("[CreateProperty] Request body:", req.body);
 
 //         if (!userId || !mongoose.isValidObjectId(userId)) {
-//             await removeUploadedFiles(uploadedFiles);
-
 //             return res.status(401).json({
 //                 message: "Authenticated user ID is missing or invalid.",
 //             });
 //         }
 
+//         // 2. Retrieve authenticated user's profile.
+//         // The + explicitly includes fields configured with select: false.
+//         const user = await User.findById(userId).select(
+//             "+emailVerified +phoneVerified firstName lastName email phoneNumber"
+//         );
+
+//         if (!user) {
+//             return res.status(404).json({
+//                 message: "User profile not found.",
+//             });
+//         }
+
+//         // 3. Check verification using MongoDB values.
+//         const emailVerified = user.emailVerified === true;
+//         const phoneVerified = user.phoneVerified === true;
+
+//         console.log("[CreateProperty] User verification:", {
+//             userId: user._id,
+//             emailVerified,
+//             phoneVerified,
+//             hasPhoneNumber: Boolean(user.phoneNumber),
+//         });
+
+//         if (!emailVerified || !phoneVerified) {
+//             const missingVerification = [];
+
+//             if (!emailVerified) {
+//                 missingVerification.push("email");
+//             }
+
+//             if (!phoneVerified) {
+//                 missingVerification.push("phone number");
+//             }
+
+//             return res.status(403).json({
+//                 message: `Please verify your ${missingVerification.join(
+//                     " and "
+//                 )} in your profile before publishing a property.`,
+//                 emailVerified,
+//                 phoneVerified,
+//             });
+//         }
+
+//         // 4. Retrieve property information from request body.
 //         const {
 //             role,
-//             firstName,
-//             lastName,
-//             email,
-//             phone,
 //             title,
 //             description,
 //             listingType,
@@ -73,15 +113,20 @@
 //             bathrooms,
 //             floor,
 //             syndicateFees,
-
-//             // New fields
 //             rentWithContract,
 //             mortgageAgreement,
 //             deposit,
 //             mediatorFee,
+//             showEmail,
 //         } = req.body;
 
-//         // Validate required fields.
+//         // Contact information always comes from the authenticated user.
+//         const firstName = user.firstName;
+//         const lastName = user.lastName;
+//         const email = user.email;
+//         const phone = user.phoneNumber;
+
+//         // 5. Validate required fields.
 //         const requiredFields = {
 //             firstName,
 //             lastName,
@@ -95,24 +140,22 @@
 //         };
 
 //         const missingFields = Object.entries(requiredFields)
-//             .filter(
-//                 ([, value]) =>
-//                     value === undefined ||
-//                     value === null ||
-//                     String(value).trim() === ""
+//             .filter(([, value]) =>
+//                 value === undefined ||
+//                 value === null ||
+//                 String(value).trim() === ""
 //             )
 //             .map(([key]) => key);
 
 //         if (missingFields.length > 0) {
-//             await removeUploadedFiles(uploadedFiles);
-
 //             return res.status(400).json({
-//                 message: "Please fill in all required fields.",
+//                 message:
+//                     "Please complete your profile and fill in all required property fields.",
 //                 missingFields,
 //             });
 //         }
 
-//         // Validate description.
+//         // 6. Validate description.
 //         const propertyDescription =
 //             typeof description === "string"
 //                 ? description.trim()
@@ -122,14 +165,12 @@
 //             description !== undefined &&
 //             typeof description !== "string"
 //         ) {
-//             await removeUploadedFiles(uploadedFiles);
-
 //             return res.status(400).json({
 //                 message: "Description must be a string.",
 //             });
 //         }
 
-//         // Validate numeric fields.
+//         // 7. Validate numeric fields.
 //         const numericFields = {
 //             price,
 //             surface,
@@ -143,10 +184,12 @@
 //         };
 
 //         for (const [field, value] of Object.entries(numericFields)) {
-//             if (value === undefined || value === "") {
+//             if (
+//                 value === undefined ||
+//                 value === null ||
+//                 value === ""
+//             ) {
 //                 if (["price", "surface"].includes(field)) {
-//                     await removeUploadedFiles(uploadedFiles);
-
 //                     return res.status(400).json({
 //                         message: `${field} is required.`,
 //                     });
@@ -159,10 +202,9 @@
 //             const number = Number(value);
 
 //             if (!Number.isFinite(number) || number < 0) {
-//                 await removeUploadedFiles(uploadedFiles);
-
 //                 return res.status(400).json({
-//                     message: `${field} must be a valid non-negative number.`,
+//                     message:
+//                         `${field} must be a valid non-negative number.`,
 //                 });
 //             }
 
@@ -170,31 +212,15 @@
 //         }
 
 //         if (numericFields.surface <= 0) {
-//             await removeUploadedFiles(uploadedFiles);
-
 //             return res.status(400).json({
 //                 message: "Surface must be greater than zero.",
 //             });
 //         }
 
-//         // Validate boolean fields.
-//         const parseBoolean = (value, field) => {
-//             if (
-//                 value === undefined ||
-//                 value === null ||
-//                 value === ""
-//             ) {
-//                 return false;
-//             }
-
-//             if (value === true || value === "true") return true;
-//             if (value === false || value === "false") return false;
-
-//             throw new Error(`${field} must be true or false.`);
-//         };
-
+//         // 8. Parse Boolean fields.
 //         let parsedRentWithContract;
 //         let parsedMortgageAgreement;
+//         let parsedShowEmail;
 
 //         try {
 //             parsedRentWithContract = parseBoolean(
@@ -206,50 +232,52 @@
 //                 mortgageAgreement,
 //                 "mortgageAgreement"
 //             );
-//         } catch (error) {
-//             await removeUploadedFiles(uploadedFiles);
 
+//             parsedShowEmail = parseBoolean(
+//                 showEmail,
+//                 "showEmail"
+//             );
+//         } catch (error) {
 //             return res.status(400).json({
 //                 message: error.message,
 //             });
 //         }
 
-//         // Validate map URL.
+//         // 9. Validate map URL.
 //         if (mapLink) {
 //             try {
 //                 const parsedUrl = new URL(mapLink);
 
-//                 if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+//                 if (
+//                     !["http:", "https:"].includes(parsedUrl.protocol)
+//                 ) {
 //                     throw new Error("Invalid URL protocol");
 //                 }
 //             } catch {
-//                 await removeUploadedFiles(uploadedFiles);
-
 //                 return res.status(400).json({
 //                     message: "Please provide a valid map URL.",
 //                 });
 //             }
 //         }
 
-//         // Prepare uploaded images.
-//         // const images = uploadedFiles.map((file) => ({
-//         //     filename: file.filename,
-//         //     path: `/uploads/properties/${file.filename}`,
-//         // }));
-//         //added cloudy
-//         const images = uploadedImages;
+//         // 10. Upload property images.
+//         uploadedImages = await uploadPropertyImages(uploadedFiles);
 
-//         // Create property.
-//         console.log("[CreateProperty] Validation passed");
-//         console.log("[CreateProperty] Preparing to save property...");
-//         // Create property.
+//         // 11. Create property.
 //         const property = await Property.create({
 //             userId,
+
 //             role,
+
+//             // Authenticated user's contact information.
 //             firstName,
 //             lastName,
 //             email,
 //             phone,
+
+//             // Public email visibility preference.
+//             showEmail: parsedShowEmail,
+
 //             title,
 //             description: propertyDescription,
 //             status: "Available",
@@ -273,43 +301,41 @@
 //             deposit: numericFields.deposit,
 //             mediatorFee: numericFields.mediatorFee,
 
-//             images,
+//             images: uploadedImages,
 //         });
-// console.log("[CreateProperty] Property saved successfully");
-// console.log("[CreateProperty] Property ID:", String(property._id));
-// console.log("[CreateProperty] Property city:", property.city);
-// console.log("[CreateProperty] Property type:", property.propertyType);
-// console.log("[CreateProperty] Listing type:", property.listingType);
-// console.log("[CreateProperty] Publisher ID:", String(property.userId));
-//         // Notify matching users without failing property creation
-//         // if the notification process encounters an error.
+
+//         // 12. Notify matching property alerts.
 //         try {
 //             const io = req.app.get("io");
 
-//             const notificationResult =
-//                 await notifyMatchingPropertyAlerts(property, io);
-
-//             console.log(
-//                 "Property alert notifications:",
-//                 notificationResult
-//             );
+//             await notifyMatchingPropertyAlerts(property, io);
 //         } catch (notificationError) {
 //             console.error(
-//                 "Property created, but alert notifications failed:",
+//                 "[CreateProperty] Notification error:",
 //                 notificationError
 //             );
 //         }
 
+//         // 13. Return successful response.
 //         return res.status(201).json({
 //             message: "Property created successfully.",
 //             property,
 //         });
 //     } catch (error) {
-//         // await removeUploadedFiles(uploadedFiles);
-//         //added cloudy
-//         await removeUploadedFiles(uploadedImages);
+//         // Clean uploaded images if creation fails.
+//         try {
+//             await removeUploadedFiles(uploadedImages);
+//         } catch (cleanupError) {
+//             console.error(
+//                 "[CreateProperty] Image cleanup error:",
+//                 cleanupError
+//             );
+//         }
 
-//         console.error("[Backend] Create property error:", error);
+//         console.error(
+//             "[Backend] Create property error:",
+//             error
+//         );
 
 //         if (
 //             error.name === "ValidationError" ||
@@ -326,46 +352,91 @@
 //         });
 //     }
 // };
-
-import Property from "../../DatabaseModels/Schema/Property.js";
-import mongoose from "mongoose";
-
-import {
-    uploadPropertyImages,
-    deletePropertyImages,
-} from "../../middleware/propertyUpload.js";
-
-import notifyMatchingPropertyAlerts from "./propertyAlertNotificationService.js";
-
-const removeUploadedFiles = async (images = []) => {
-    await deletePropertyImages(images);
-};
-
 export const createProperty = async (req, res) => {
     const uploadedFiles = req.files || [];
     let uploadedImages = [];
 
     try {
+        // 1. Validate authenticated user.
         const userId = req.user?.userId;
 
-        console.log("\n========== CREATE PROPERTY DEBUG ==========");
-        console.log("[CreateProperty] Controller entered");
-        console.log("[CreateProperty] User ID:", userId);
-        console.log("[CreateProperty] Uploaded files:", uploadedFiles.length);
-
-        // Validate authentication before uploading images.
         if (!userId || !mongoose.isValidObjectId(userId)) {
             return res.status(401).json({
                 message: "Authenticated user ID is missing or invalid.",
             });
         }
 
+        // 2. Check active User model schema.
+        console.log("[CreateProperty] Active User model:", {
+            database: mongoose.connection.name,
+            collection: User.collection.name,
+            emailVerified: User.schema.path("emailVerified")?.instance,
+            whatsappPhoneNumber: User.schema.path(
+                "notificationPreferences.whatsapp.phoneNumber"
+            )?.instance,
+            whatsappVerified: User.schema.path(
+                "notificationPreferences.whatsapp.verified"
+            )?.instance,
+        });
+
+        // 3. Retrieve authenticated user's profile and WhatsApp information.
+        const user = await User.findById(userId).select(
+            "firstName lastName email emailVerified notificationPreferences.whatsapp"
+        );
+
+        if (!user) {
+            console.error("[CreateProperty] User not found:", userId);
+
+            return res.status(404).json({
+                message: "User profile not found.",
+            });
+        }
+
+        const whatsapp = user.notificationPreferences?.whatsapp;
+
+        const whatsappPhoneNumber =
+            whatsapp?.phoneNumber?.trim() || "";
+
+        // 4. Check verification.
+        const emailVerified = user.emailVerified === true;
+        const phoneVerified = whatsapp?.verified === true;
+
+        console.log("[CreateProperty] Retrieved user:", {
+            userId: user._id.toString(),
+            email: user.email,
+            emailVerified,
+            whatsappPhoneNumber,
+            whatsappVerified: phoneVerified,
+        });
+
+        if (!emailVerified || !phoneVerified || !whatsappPhoneNumber) {
+            const missingVerification = [];
+
+            if (!emailVerified) {
+                missingVerification.push("email");
+            }
+
+            if (!phoneVerified || !whatsappPhoneNumber) {
+                missingVerification.push("WhatsApp number");
+            }
+
+            return res.status(403).json({
+                message: `Please verify your ${missingVerification.join(
+                    " and "
+                )} in your profile before publishing a property.`,
+                emailVerified,
+                phoneVerified,
+                hasPhoneNumber: Boolean(whatsappPhoneNumber),
+            });
+        }
+
+        console.log(
+            "[CreateProperty] Email and WhatsApp verification passed."
+        );
+
+        // 5. Retrieve property information.
         const {
             role,
-            firstName,
-            lastName,
-            email,
-            phone,
             title,
             description,
             listingType,
@@ -385,9 +456,16 @@ export const createProperty = async (req, res) => {
             mortgageAgreement,
             deposit,
             mediatorFee,
+            showEmail,
         } = req.body;
 
-        // Validate required fields.
+        // Contact information comes from the authenticated user.
+        const firstName = user.firstName;
+        const lastName = user.lastName;
+        const email = user.email;
+        const phone = whatsappPhoneNumber;
+
+        // 6. Validate required fields.
         const requiredFields = {
             firstName,
             lastName,
@@ -401,27 +479,22 @@ export const createProperty = async (req, res) => {
         };
 
         const missingFields = Object.entries(requiredFields)
-            .filter(
-                ([, value]) =>
-                    value === undefined ||
-                    value === null ||
-                    String(value).trim() === ""
+            .filter(([, value]) =>
+                value === undefined ||
+                value === null ||
+                String(value).trim() === ""
             )
             .map(([key]) => key);
 
         if (missingFields.length > 0) {
             return res.status(400).json({
-                message: "Please fill in all required fields.",
+                message:
+                    "Please complete your profile and fill in all required property fields.",
                 missingFields,
             });
         }
 
-        // Validate description.
-        const propertyDescription =
-            typeof description === "string"
-                ? description.trim()
-                : "";
-
+        // 7. Validate description.
         if (
             description !== undefined &&
             typeof description !== "string"
@@ -431,7 +504,12 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // Validate numeric fields.
+        const propertyDescription =
+            typeof description === "string"
+                ? description.trim()
+                : "";
+
+        // 8. Validate numeric fields.
         const numericFields = {
             price,
             surface,
@@ -445,7 +523,11 @@ export const createProperty = async (req, res) => {
         };
 
         for (const [field, value] of Object.entries(numericFields)) {
-            if (value === undefined || value === "") {
+            if (
+                value === undefined ||
+                value === null ||
+                value === ""
+            ) {
                 if (["price", "surface"].includes(field)) {
                     return res.status(400).json({
                         message: `${field} is required.`,
@@ -460,7 +542,8 @@ export const createProperty = async (req, res) => {
 
             if (!Number.isFinite(number) || number < 0) {
                 return res.status(400).json({
-                    message: `${field} must be a valid non-negative number.`,
+                    message:
+                        `${field} must be a valid non-negative number.`,
                 });
             }
 
@@ -473,24 +556,10 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // Validate boolean fields.
-        const parseBoolean = (value, field) => {
-            if (
-                value === undefined ||
-                value === null ||
-                value === ""
-            ) {
-                return false;
-            }
-
-            if (value === true || value === "true") return true;
-            if (value === false || value === "false") return false;
-
-            throw new Error(`${field} must be true or false.`);
-        };
-
+        // 9. Parse Boolean fields.
         let parsedRentWithContract;
         let parsedMortgageAgreement;
+        let parsedShowEmail;
 
         try {
             parsedRentWithContract = parseBoolean(
@@ -502,18 +571,25 @@ export const createProperty = async (req, res) => {
                 mortgageAgreement,
                 "mortgageAgreement"
             );
+
+            parsedShowEmail = parseBoolean(
+                showEmail,
+                "showEmail"
+            );
         } catch (error) {
             return res.status(400).json({
                 message: error.message,
             });
         }
 
-        // Validate map URL.
+        // 10. Validate map URL.
         if (mapLink) {
             try {
                 const parsedUrl = new URL(mapLink);
 
-                if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+                if (
+                    !["http:", "https:"].includes(parsedUrl.protocol)
+                ) {
                     throw new Error("Invalid URL protocol");
                 }
             } catch {
@@ -523,14 +599,14 @@ export const createProperty = async (req, res) => {
             }
         }
 
-        // Upload images after validating the property data.
+        // 11. Upload images.
         uploadedImages = await uploadPropertyImages(uploadedFiles);
 
-        const images = uploadedImages;
+        console.log("[CreateProperty] Images uploaded:", {
+            count: uploadedImages.length,
+        });
 
-        console.log("[CreateProperty] Images uploaded:", images.length);
-
-        // Save property.
+        // 12. Create property using the verified WhatsApp number.
         const property = await Property.create({
             userId,
             role,
@@ -538,6 +614,7 @@ export const createProperty = async (req, res) => {
             lastName,
             email,
             phone,
+            showEmail: parsedShowEmail,
             title,
             description: propertyDescription,
             status: "Available",
@@ -547,7 +624,6 @@ export const createProperty = async (req, res) => {
             neighborhood,
             fullAddress,
             mapLink,
-
             price: numericFields.price,
             surface: numericFields.surface,
             rooms: numericFields.rooms,
@@ -555,28 +631,25 @@ export const createProperty = async (req, res) => {
             bathrooms: numericFields.bathrooms,
             floor: numericFields.floor,
             syndicateFees: numericFields.syndicateFees,
-
             rentWithContract: parsedRentWithContract,
             mortgageAgreement: parsedMortgageAgreement,
             deposit: numericFields.deposit,
             mediatorFee: numericFields.mediatorFee,
-
-            images,
+            images: uploadedImages,
         });
 
-        console.log("[CreateProperty] Property saved:", property._id);
+        console.log("[CreateProperty] Property created:", {
+            propertyId: property._id.toString(),
+            userId: property.userId.toString(),
+            title: property.title,
+            contactPhone: property.phone,
+        });
 
-        // Notify matching users without failing property creation.
+        // 13. Notify matching property alerts.
         try {
             const io = req.app.get("io");
 
-            const notificationResult =
-                await notifyMatchingPropertyAlerts(property, io);
-
-            console.log(
-                "[CreateProperty] Property alert notifications:",
-                notificationResult
-            );
+            await notifyMatchingPropertyAlerts(property, io);
         } catch (notificationError) {
             console.error(
                 "[CreateProperty] Notification error:",
@@ -584,15 +657,23 @@ export const createProperty = async (req, res) => {
             );
         }
 
+        // 14. Return success.
         return res.status(201).json({
             message: "Property created successfully.",
             property,
         });
     } catch (error) {
-        // Remove Cloudinary images if property creation fails.
-        await removeUploadedFiles(uploadedImages);
+        console.error("[CreateProperty] Error:", error);
 
-        console.error("[Backend] Create property error:", error);
+        // Clean uploaded images if creation fails.
+        try {
+            await removeUploadedFiles(uploadedImages);
+        } catch (cleanupError) {
+            console.error(
+                "[CreateProperty] Image cleanup error:",
+                cleanupError
+            );
+        }
 
         if (
             error.name === "ValidationError" ||

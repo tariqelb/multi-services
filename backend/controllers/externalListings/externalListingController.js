@@ -2,11 +2,12 @@ import crypto from "node:crypto";
 // import { collectTestFixtures } from "../../services/externalListings/testFixtureCollector.js";
 import ExternalListing from "../../DatabaseModels/Schema/ExternalListing.js";
 import { collectAqariListings } from "../../services/externalListings/aqariCollector.js";
+import { runExternalListingsJob } from "../../jobs/externalListingsJob.js";
 
 import {
-    extractAqariListing,
-    supportsAqariUrl,
-} from "../../services/externalListings/sources/aqariSource.js";
+    extractExternalListing,
+    supportsExternalListingUrl,
+} from "../../services/externalListings/sources/externalListingSource.js";
 
 import {
     extractPageMetadata,
@@ -40,17 +41,6 @@ function createContentHash(data) {
         .digest("hex");
 }
 
-async function extractListing(url) {
-    const metadata = supportsAqariUrl(url)
-        ? await extractAqariListing(url)
-        : normalizeExternalListing(
-              await extractPageMetadata(url)
-          );
-
-    metadata.contentHash = createContentHash(metadata);
-
-    return metadata;
-}
 
 function getErrorMessage(error) {
     return error instanceof Error
@@ -303,6 +293,153 @@ export async function getExternalListingById(
     }
 }
 
+
+// POST /api/external-listings/import
+export async function importNewExternalListings(req, res) {
+    try {
+        console.log("[ExternalListings] Starting import.");
+
+        const sourceUrls = await getListingSourceUrls();
+
+        if (!sourceUrls.length) {
+            return res.status(200).json({
+                success: true,
+                message: "No registered listing sources found.",
+                summary: {
+                    total: 0,
+                    imported: 0,
+                    updated: 0,
+                    skipped: 0,
+                    failed: 0,
+                },
+            });
+        }
+
+        const summary = {
+            total: sourceUrls.length,
+            imported: 0,
+            updated: 0,
+            skipped: 0,
+            failed: 0,
+        };
+
+        const results = [];
+
+        const fields = [
+            "title",
+            "description",
+            "imageUrl",
+            "imageUrls",
+            "price",
+            "currency",
+            "priceUnit",
+            "listingType",
+            "propertyType",
+            "city",
+            "neighborhood",
+            "surface",
+            "rooms",
+            "bathrooms",
+        ];
+
+        for (const sourceUrl of sourceUrls) {
+            try {
+                const extracted = await extractListing(sourceUrl);
+
+                const data = normalizeExternalListing(extracted);
+
+                data.contentHash = createContentHash(data);
+
+                const existing = await ExternalListing.findOne({
+                    sourceUrl: data.sourceUrl,
+                });
+
+                if (!existing) {
+                    await ExternalListing.create({
+                        ...data,
+                        status: "active",
+                        lastCheckedAt: new Date(),
+                        lastSeenAt: new Date(),
+                        lastError: "",
+                    });
+
+                    summary.imported++;
+
+                    results.push({
+                        sourceUrl,
+                        status: "imported",
+                    });
+
+                    continue;
+                }
+
+                // Update tracking information for existing listings.
+                existing.lastCheckedAt = new Date();
+                existing.lastSeenAt = new Date();
+                existing.lastError = "";
+                existing.status = "active";
+                existing.contentHash = data.contentHash;
+
+                // Preserve manually edited listing information.
+                if (existing.extractionMethod !== "manual") {
+                    for (const field of fields) {
+                        if (data[field] !== undefined) {
+                            existing[field] = data[field];
+                        }
+                    }
+
+                    existing.extractionMethod =
+                        data.extractionMethod;
+                }
+
+                await existing.save();
+
+                summary.updated++;
+
+                results.push({
+                    sourceUrl,
+                    status: "updated",
+                });
+            } catch (error) {
+                summary.failed++;
+
+                console.error(
+                    `[ExternalListings] Import failed for ${sourceUrl}:`,
+                    error.message
+                );
+
+                results.push({
+                    sourceUrl,
+                    status: "failed",
+                    message: getErrorMessage(error),
+                });
+            }
+        }
+
+        console.log(
+            "[ExternalListings] Import finished:",
+            summary
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: `Import completed: ${summary.imported} new listings imported, ${summary.updated} updated, ${summary.failed} failed.`,
+            summary,
+            results,
+        });
+    } catch (error) {
+        console.error(
+            "[ExternalListings] Import execution failed:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: getErrorMessage(error),
+        });
+    }
+}
+
 // PATCH /api/external-listings/:id/refresh
 export async function refreshExternalListing(
     req,
@@ -530,4 +667,44 @@ export async function deleteExternalListingSource(req, res) {
             message: "Could not remove listing source.",
         });
     }
+}
+
+
+export async function refreshExternalListings(req, res) {
+    try {
+        await runExternalListingsJob();
+
+        return res.status(200).json({
+            success: true,
+            message: "External listings collector completed successfully.",
+        });
+    } catch (error) {
+        console.error(
+            "[ExternalListings] Collector execution failed:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to execute the external listings collector.",
+        });
+    }
+}
+
+async function extractListing(url) {
+    if (!supportsExternalListingUrl(url)) {
+        throw new Error("Unsupported external listing URL.");
+    }
+
+    const metadata = await extractExternalListing(url);
+
+    if (!metadata) {
+        throw new Error(
+            "Could not extract usable listing information."
+        );
+    }
+
+    metadata.contentHash = createContentHash(metadata);
+
+    return metadata;
 }

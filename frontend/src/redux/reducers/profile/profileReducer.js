@@ -11,8 +11,25 @@ const initialState = {
     lastName: "",
     email: "",
     phoneNumber: "",
+    emailVerified: false,
+    phoneVerified: false,
+
+    notificationPreferences: {
+        email: {
+            enabled: false,
+            propertyAlerts: false,
+        },
+        whatsapp: {
+            enabled: false,
+            phoneNumber: "",
+            propertyAlerts: false,
+            verified: false,
+        },
+    },
+
     address: "",
     bio: "",
+    role: "",
     profileImage: "",
     loading: false,
     error: null,

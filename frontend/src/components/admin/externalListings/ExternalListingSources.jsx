@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../api/axiosInstance";
 
@@ -8,6 +9,8 @@ export default function ExternalListingSources() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [removingUrl, setRemovingUrl] = useState("");
+    const [refreshing, setRefreshing] = useState(false);
+    const [importing, setImporting] = useState(false);
 
     async function loadSources() {
         try {
@@ -18,7 +21,18 @@ export default function ExternalListingSources() {
                 "/external-listings/sources"
             );
 
-            setUrls(response.data.urls || []);
+            const sources = response.data.urls || [];
+
+            setUrls(
+                sources
+                    .map((source) =>
+                        typeof source === "string"
+                            ? source
+                            : source.url
+                    )
+                    .filter(Boolean)
+                    .reverse()
+            );
         } catch (err) {
             setError(
                 err.response?.data?.message ||
@@ -33,22 +47,80 @@ export default function ExternalListingSources() {
         loadSources();
     }, []);
 
+    async function handleRefresh() {
+        setError("");
+        setMessage("");
+        setRefreshing(true);
+
+        try {
+            const response = await axiosInstance.post(
+                "/external-listings/refresh"
+            );
+
+            setMessage(
+                response.data.message ||
+                    "External listings refreshed successfully."
+            );
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                    "Failed to refresh external listings."
+            );
+        } finally {
+            setRefreshing(false);
+        }
+    }
+
+    async function handleImport() {
+        setError("");
+        setMessage("");
+        setImporting(true);
+
+        try {
+            const response = await axiosInstance.post(
+                "/external-listings/import"
+            );
+
+            setMessage(
+                response.data.message ||
+                    "New external listings imported successfully."
+            );
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                    "Failed to import new external listings."
+            );
+        } finally {
+            setImporting(false);
+        }
+    }
+
     async function handleAdd(event) {
         event.preventDefault();
         setError("");
         setMessage("");
 
+        const trimmedUrl = url.trim();
+
         try {
             const response = await axiosInstance.post(
                 "/external-listings/sources",
-                { url: url.trim() }
+                { url: trimmedUrl }
             );
 
             setMessage(
-                response.data.message || "Listing source added successfully."
+                response.data.message ||
+                    "Listing source added successfully."
             );
+
             setUrl("");
+
             await loadSources();
+
+            // Run the collector after adding a new source.
+            if (response.data.added) {
+                await handleRefresh();
+            }
         } catch (err) {
             setError(
                 err.response?.data?.message ||
@@ -71,11 +143,12 @@ export default function ExternalListingSources() {
             setUrls((current) =>
                 current.filter((item) => item !== sourceUrl)
             );
-            setMessage("Listing source removed.");
+
+            setMessage("Listing source deleted successfully.");
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Failed to remove listing source."
+                    "Failed to delete listing source."
             );
         } finally {
             setRemovingUrl("");
@@ -91,8 +164,8 @@ export default function ExternalListingSources() {
                 </h1>
 
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 sm:text-base">
-                    Manage the property URLs used by the external listings
-                    collector.
+                    Manage the websites used to collect external
+                    property listings.
                 </p>
             </div>
 
@@ -105,7 +178,7 @@ export default function ExternalListingSources() {
                     type="url"
                     value={url}
                     onChange={(event) => setUrl(event.target.value)}
-                    placeholder="Paste an Aqari or Mr Semsar listing URL"
+                    placeholder="Paste an Aqari, Mr Semsar, or 3a9arai listing URL"
                     required
                     aria-label="External listing URL"
                     className="box-border h-12 w-full min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 sm:px-4 sm:text-base"
@@ -113,11 +186,18 @@ export default function ExternalListingSources() {
 
                 <button
                     type="submit"
-                    className="h-12 w-full shrink-0 rounded-lg bg-emerald-600 px-5 font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 sm:w-auto"
+                    disabled={refreshing || importing}
+                    className="h-12 w-full shrink-0 rounded-lg bg-emerald-600 px-5 font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
                     Add URL
                 </button>
             </form>
+
+            {/* Supported Websites */}
+            <p className="mb-5 text-sm text-slate-500">
+                Supported websites: Aqari Annonces, Mr Semsar, and
+                3a9arai. New websites can also be registered automatically.
+            </p>
 
             {/* Feedback Messages */}
             {error && (
@@ -150,12 +230,74 @@ export default function ExternalListingSources() {
             <div className="w-full min-w-0">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
-                        Saved Sources
+                        Registered Sources
                     </h2>
 
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
-                        {urls.length} {urls.length === 1 ? "source" : "sources"}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+                            {urls.length} {urls.length === 1 ? "source" : "sources"}
+                        </span>
+
+                        {/* Import New Listings */}
+                        <button
+                            type="button"
+                            onClick={handleImport}
+                            disabled={
+                                importing ||
+                                refreshing ||
+                                loading ||
+                                urls.length === 0
+                            }
+                            className="flex h-9 items-center justify-center gap-2 rounded-lg border border-emerald-200 px-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <svg
+                                className={`h-4 w-4 ${importing ? "animate-spin" : ""}`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M12 4v12m0 0 4-4m-4 4-4-4M5 20h14"
+                                />
+                            </svg>
+
+                            {importing ? "Importing..." : "Import New Listings"}
+                        </button>
+
+                        {/* Refresh Existing Listings */}
+                        <button
+                            type="button"
+                            onClick={handleRefresh}
+                            disabled={
+                                refreshing ||
+                                importing ||
+                                loading ||
+                                urls.length === 0
+                            }
+                            className="flex h-9 items-center justify-center gap-2 rounded-lg border border-blue-200 px-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <svg
+                                className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6l2 3M18.5 15A7 7 0 0 1 6 18l-2-3"
+                                />
+                            </svg>
+
+                            {refreshing ? "Refreshing..." : "Refresh"}
+                        </button>
+                    </div>
                 </div>
 
                 {loading ? (
@@ -167,11 +309,12 @@ export default function ExternalListingSources() {
                 ) : urls.length === 0 ? (
                     <div className="flex min-h-40 w-full flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center sm:py-12">
                         <p className="font-semibold text-slate-700">
-                            No listing sources have been added.
+                            No external listing sources added yet.
                         </p>
 
                         <p className="mt-2 text-sm text-slate-500">
-                            Add a property listing URL above to get started.
+                            Add a supported property listing URL above
+                            to get started.
                         </p>
                     </div>
                 ) : (
@@ -221,8 +364,8 @@ export default function ExternalListingSources() {
                                         className="h-10 shrink-0 rounded-lg border border-red-200 px-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
                                     >
                                         {removingUrl === sourceUrl
-                                            ? "Removing..."
-                                            : "Remove"}
+                                            ? "Deleting..."
+                                            : "Delete"}
                                     </button>
                                 </div>
                             </article>

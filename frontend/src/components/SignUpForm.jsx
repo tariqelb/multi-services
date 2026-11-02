@@ -1,10 +1,9 @@
 
-import axiosInstance from "../api/axiosInstance";
-import { useDispatch, useSelector } from "react-redux";
-import { activeFormAction } from "../redux/actions/activeFormAction";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import axiosInstance from "../api/axiosInstance";
+import { activeFormAction } from "../redux/actions/activeFormAction";
 
 import {
     setSignupFirstName,
@@ -12,25 +11,25 @@ import {
     setSignupEmail,
     setSignupPassword,
     setSignupConfirmPassword,
-    resetSignupForm,
 } from "../redux/actions/signupAction";
+
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function SignUpForm() {
     const dispatch = useDispatch();
 
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
     const [validation, setValidation] = useState({});
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const {
-        firstName,
-        lastName,
-        email,
-        password,
-        confirmPassword,
+        firstName = "",
+        lastName = "",
+        email = "",
+        password = "",
+        confirmPassword = "",
     } = useSelector((state) => state.signup);
 
     const handleLogin = () => {
@@ -64,6 +63,7 @@ function SignUpForm() {
         }
 
         setValidation(errors);
+
         return Object.keys(errors).length === 0;
     };
 
@@ -71,7 +71,6 @@ function SignUpForm() {
         event.preventDefault();
 
         setError("");
-        setSuccess("");
 
         if (!validateForm()) return;
 
@@ -81,22 +80,24 @@ function SignUpForm() {
             const response = await axiosInstance.post("/auth/signup", {
                 firstName: firstName.trim(),
                 lastName: lastName.trim(),
-                email: email.trim(),
+                email: email.trim().toLowerCase(),
                 password,
                 confirmPassword,
             });
 
-            setSuccess(
-                response.data.message || "Account created successfully."
-            );
+            console.log("Signup successful:", response.data);
 
-            dispatch(resetSignupForm());
             setValidation({});
-            handleLogin();
+
+            // Display the email verification component.
+            dispatch(activeFormAction("verify"));
+
         } catch (error) {
+            console.error("Signup error:", error);
+
             setError(
                 error.response?.data?.message ||
-                "Unable to create your account. Please try again."
+                "Unable to start registration. Please try again."
             );
         } finally {
             setLoading(false);
@@ -115,6 +116,8 @@ function SignUpForm() {
 
     return (
         <div className="m-0 w-full min-w-0 max-w-full rounded-2xl p-5 sm:p-8 md:p-10 lg:p-15">
+
+            {/* Title */}
             <h2 className="mb-5 text-center text-2xl font-bold text-black">
                 Signup
             </h2>
@@ -123,6 +126,7 @@ function SignUpForm() {
                 onSubmit={handleSubmit}
                 className="flex w-full flex-col gap-4"
             >
+
                 {/* First name */}
                 <div className="flex min-w-0 flex-col gap-1">
                     <input
@@ -133,7 +137,10 @@ function SignUpForm() {
                         minLength={2}
                         autoComplete="given-name"
                         onChange={(event) => {
-                            dispatch(setSignupFirstName(event.target.value));
+                            dispatch(
+                                setSignupFirstName(event.target.value)
+                            );
+
                             setValidation((prev) => ({
                                 ...prev,
                                 firstName: "",
@@ -157,7 +164,10 @@ function SignUpForm() {
                         minLength={2}
                         autoComplete="family-name"
                         onChange={(event) => {
-                            dispatch(setSignupLastName(event.target.value));
+                            dispatch(
+                                setSignupLastName(event.target.value)
+                            );
+
                             setValidation((prev) => ({
                                 ...prev,
                                 lastName: "",
@@ -180,7 +190,10 @@ function SignUpForm() {
                         required
                         autoComplete="email"
                         onChange={(event) => {
-                            dispatch(setSignupEmail(event.target.value));
+                            dispatch(
+                                setSignupEmail(event.target.value)
+                            );
+
                             setValidation((prev) => ({
                                 ...prev,
                                 email: "",
@@ -205,7 +218,10 @@ function SignUpForm() {
                             minLength={8}
                             autoComplete="new-password"
                             onChange={(event) => {
-                                dispatch(setSignupPassword(event.target.value));
+                                dispatch(
+                                    setSignupPassword(event.target.value)
+                                );
+
                                 setValidation((prev) => ({
                                     ...prev,
                                     password: "",
@@ -221,7 +237,9 @@ function SignUpForm() {
                                 setShowPassword((prev) => !prev)
                             }
                             aria-label={
-                                showPassword ? "Hide password" : "Show password"
+                                showPassword
+                                    ? "Hide password"
+                                    : "Show password"
                             }
                             aria-pressed={showPassword}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-teal-600"
@@ -244,7 +262,9 @@ function SignUpForm() {
                     <div className="relative w-full">
                         <input
                             type={
-                                showConfirmPassword ? "text" : "password"
+                                showConfirmPassword
+                                    ? "text"
+                                    : "password"
                             }
                             placeholder="Confirm your password"
                             value={confirmPassword}
@@ -252,14 +272,19 @@ function SignUpForm() {
                             autoComplete="new-password"
                             onChange={(event) => {
                                 dispatch(
-                                    setSignupConfirmPassword(event.target.value)
+                                    setSignupConfirmPassword(
+                                        event.target.value
+                                    )
                                 );
+
                                 setValidation((prev) => ({
                                     ...prev,
                                     confirmPassword: "",
                                 }));
                             }}
-                            className={passwordInputClass("confirmPassword")}
+                            className={passwordInputClass(
+                                "confirmPassword"
+                            )}
                         />
 
                         <button
@@ -288,16 +313,13 @@ function SignUpForm() {
                     </span>
                 </div>
 
-                {/* API messages */}
+                {/* API error */}
                 {error && (
-                    <p role="alert" className="break-words text-sm text-red-600">
+                    <p
+                        role="alert"
+                        className="break-words text-sm text-red-600"
+                    >
                         {error}
-                    </p>
-                )}
-
-                {success && (
-                    <p role="status" className="break-words text-sm text-green-700">
-                        {success}
                     </p>
                 )}
 
@@ -307,7 +329,9 @@ function SignUpForm() {
                     disabled={loading}
                     className="h-13 w-full rounded bg-teal-600 text-base font-bold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    {loading ? "Creating account..." : "Signup"}
+                    {loading
+                        ? "Sending verification code..."
+                        : "Continue"}
                 </button>
             </form>
 

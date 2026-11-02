@@ -71,7 +71,7 @@ function LoginForm() {
 
     const handleSignup = () => {
         dispatch(clearLoginStatus());
-        dispatch(activeFormAction("signin"));
+        dispatch(activeFormAction("signup"));
     };
 
     return (
