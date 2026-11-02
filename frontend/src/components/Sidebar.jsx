@@ -43,6 +43,7 @@ export default function Sidebar({
     const navigationItems = [
         { name: "Home", icon: HomeIcon, path: "/" },
         { name: "Properties", icon: HomeWorkIcon, path: "/properties" },
+        { name: "External listing", icon: PublicIcon, path: "/externalListings",},
         { name: "Publish", icon: CloudUploadIcon, path: "/properties/publish" },
         {
             name: "My Publication",
@@ -74,11 +75,7 @@ export default function Sidebar({
         // Admin-only navigation
         ...(isAdmin
             ? [
-                  {
-                      name: "External listing",
-                      icon: PublicIcon,
-                      path: "/externalListings",
-                  },
+                  
                   {
                       name: "Add External listing",
                       icon: AddLinkIcon,

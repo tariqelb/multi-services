@@ -90,7 +90,7 @@ export default function SettingsPage() {
     const dispatch = useDispatch();
 
     const authUser = useSelector(
-        (state) => state.loginForm?.user ?? state.auth?.user ?? {}
+        (state) => state.auth?.user ?? state.loginForm?.user ?? null
     );
 
     const [profile, setProfile] = useState(emptyProfile);
@@ -253,12 +253,21 @@ export default function SettingsPage() {
     }, []);
 
     useEffect(() => {
-        loadProfile();
-    }, [loadProfile]);
+        if (!authUser) {
+            setProfileLoading(false);
+            setPreferencesLoading(false);
 
-    useEffect(() => {
+            setProfile(emptyProfile);
+            setSavedProfile(null);
+            setProfileError("");
+            setPreferencesError("");
+
+            return;
+        }
+
+        loadProfile();
         loadPreferences();
-    }, [loadPreferences]);
+    }, [authUser, loadProfile, loadPreferences]);
 
     // Email verification
     const sendEmailVerificationCode = useCallback(async () => {

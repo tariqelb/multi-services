@@ -25,7 +25,10 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const user = useSelector((state) => state.auth?.user);
+
+    const user = useSelector(
+        (state) => state.auth?.user ?? state.loginForm?.user ?? null
+    );
     const profile = useSelector((state) => state.profile);
 
     const isAuthenticated = Boolean(user);
@@ -155,22 +158,26 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     }, []);
 
     const handleLogout = async () => {
+        setProfileOpen(false);
+
         try {
             await axiosInstance.post("/auth/logout");
         } catch (error) {
-            console.error("Logout request failed:", error);
+            console.error(
+                "Logout request failed:",
+                error.response?.data?.message || error.message
+            );
         } finally {
             disconnectSocket();
             dispatch({ type: "LOGOUT" });
-            setProfileOpen(false);
             navigate("/login", { replace: true });
         }
     };
 
     const menuItems = [
         { label: "My Profile", path: "/profile", icon: UserRound },
-        { label: "Settings", path: "/settings", icon: Settings },
-        { label: "Messages", path: "/messages", icon: MessageCircle },
+        { label: "Settings", path: "/setting", icon: Settings },
+        // { label: "Messages", path: "/messages", icon: MessageCircle },
     ];
 
     return (
