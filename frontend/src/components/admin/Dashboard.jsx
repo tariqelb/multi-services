@@ -6,6 +6,7 @@ import DashboardNavigation from "./components/DashboardNavigation";
 import UsersSection from "./components/UsersSection";
 import AnalyticsPlaceholder from "./components/AnalyticsPlaceholder";
 import VisitsSection from "./components/VisitsSection";
+import ExternalClicksSection from "./externalListings/ExternalClicksSection";
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("users");
@@ -51,9 +52,7 @@ export default function Dashboard() {
             <Box mt={4}>
                 {activeTab === "users" && <UsersSection />}
 
-                {activeTab === "clicks" && (
-                    <AnalyticsPlaceholder type="clicks" />
-                )}
+                {activeTab === "clicks" && <ExternalClicksSection />}
 
                 {activeTab === "visits" && <VisitsSection />}
             </Box>

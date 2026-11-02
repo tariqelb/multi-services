@@ -11,6 +11,8 @@ import accountDeletionRoutes from "./profile/accountDeletionRoutes.js";
 import feedbackRoutes from "./feedback/feedbackRoutes.js";
 import dashboardRouter from "./dashboard/dashboardRouter.js";
 import externalListingRouter from "./externalListings/externalListingRouter.js";
+import externalListingClickRoutes from "./externalListings/externalListingClickRoutes.js";
+import externalListingAnalyticsRoutes from "./externalListings/externalListingAnalyticsRoutes.js";
 
 const router = express.Router();
 
@@ -24,4 +26,10 @@ router.use("/test-email", emailTestRouter);
 router.use("/feedback", feedbackRoutes);
 router.use("/dashboard", dashboardRouter);
 router.use("/external-listings", externalListingRouter);
+
+
+// Keep your existing route registrations.
+router.use("/external-listings", externalListingClickRoutes);
+
+router.use("/external-listing-analytics", externalListingAnalyticsRoutes);
 export default router;

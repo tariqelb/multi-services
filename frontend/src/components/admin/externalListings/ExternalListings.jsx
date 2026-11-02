@@ -219,8 +219,7 @@ function PropertyImage({ listing }) {
         </Box>
     );
 }
-
-function PropertyCard({ listing }) {
+function PropertyCard({ listing, onTrackClick }) {
     const title = cleanText(listing.title) || "Property listing";
     const description = cleanText(listing.description);
     const location = getLocation(listing);
@@ -398,6 +397,7 @@ function PropertyCard({ listing }) {
                         variant="contained"
                         fullWidth
                         endIcon={<OpenInNewIcon />}
+                        onClick={() => onTrackClick(listing)}
                     >
                         View original listing
                     </Button>
@@ -743,6 +743,22 @@ export default function ExternalListings() {
 
     const [filters, setFilters] = useState(initialFilters);
 
+    const handleTrackClick = useCallback(async (listing) => {
+        try {
+            await axiosInstance.post(
+                `${API_URL}/${listing._id}/click`
+            );
+        } catch (error) {
+            // Tracking should never prevent visitors
+            // from opening the original property.
+            console.error(
+                "Unable to track external listing click:",
+                error.message
+            );
+        }
+    }, []);
+
+
  const loadListings = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -1068,7 +1084,9 @@ export default function ExternalListings() {
                                             lg: 4,
                                         }}
                                     >
-                                        <PropertyCard listing={listing} />
+                                        <PropertyCard
+                                            listing={listing} onTrackClick={handleTrackClick}
+                                        />
                                     </Grid>
                                 ))}
                             </Grid>
