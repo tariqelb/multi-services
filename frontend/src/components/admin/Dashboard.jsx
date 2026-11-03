@@ -7,6 +7,7 @@ import UsersSection from "./components/UsersSection";
 import AnalyticsPlaceholder from "./components/AnalyticsPlaceholder";
 import VisitsSection from "./components/VisitsSection";
 import ExternalClicksSection from "./externalListings/ExternalClicksSection";
+import PropertyClicksSection from "./components/PropertyClicksSection";
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("users");
@@ -52,9 +53,11 @@ export default function Dashboard() {
             <Box mt={4}>
                 {activeTab === "users" && <UsersSection />}
 
-                {activeTab === "clicks" && <ExternalClicksSection />}
+                {activeTab === "external listings clicks" && <ExternalClicksSection />}
 
                 {activeTab === "visits" && <VisitsSection />}
+                
+                {activeTab === "internal property clicks" && <PropertyClicksSection />}
             </Box>
         </Box>
     );

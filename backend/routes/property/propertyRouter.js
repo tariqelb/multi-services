@@ -8,6 +8,9 @@ import { getPropertyById } from "../../controllers/property/getPropertyById.js";
 import { deleteProperty } from "../../controllers/property/deletePropertyController.js";
 import { editPropertyStatus } from "../../controllers/property/editPropertyStatusController.js";
 
+import { getPropertyClickAnalytics, trackPropertyClick } from "../../controllers/property/propertyClickController.js";
+
+
 import {
     saveProperty,
     unsaveProperty,
@@ -25,6 +28,10 @@ import {
 
 const router = express.Router();
 
+
+router.get("/clicks", getPropertyClickAnalytics);
+
+router.post("/:id/click", trackPropertyClick);
 // Insert a property
 router.post(
     "/insert",

@@ -184,7 +184,19 @@ export default function PropertyList({
     };
 
     const handleSelectProperty = (property) => {
-        if (!property) return;
+        if (!property?._id) return;
+
+        // Record the click without delaying navigation.
+        axiosInstance
+            .post(`/property/${property._id}/click`)
+            .catch((error) => {
+                console.error(
+                    "Unable to track property click:",
+                    error.message
+                );
+            });
+
+        // Preserve your existing property selection behavior.
         onSelectProperty?.(property);
     };
 
