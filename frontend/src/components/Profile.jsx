@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 
 export default function Profile() {
     return (
-        <Box sx={{ width: '100%', minHeight: 'calc(100vh - 4rem)', bgcolor: '#f9fafb' }}>
+        <Box sx={{ width: '100%', minHeight: 'calc(100vh - 4rem)', bgcolor: 'background.default' }}>
             {/* Outlet automatically renders index route or nested dynamic route */}
             <Outlet />
         </Box>

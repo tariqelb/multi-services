@@ -1,27 +1,88 @@
-
 import User from "../../DatabaseModels/Schema/User.js";
 import bcrypt from "bcryptjs";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { randomBytes } from "node:crypto";
+import { fileURLToPath } from "node:url";
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
-function getImageSizeFromDataUrl(value) {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const PROFILE_UPLOAD_DIR = path.resolve(
+    __dirname,
+    "../../uploads/profile"
+);
+
+const PROFILE_IMAGE_PREFIX = "/uploads/profile/";
+
+function getImageFromDataUrl(value) {
     const match = value.match(
         /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]*={0,2})$/
     );
 
-    if (!match) {
+    if (!match) return null;
+
+    const buffer = Buffer.from(match[2], "base64");
+
+    if (
+        !buffer.length ||
+        buffer.toString("base64") !== match[2] ||
+        buffer.length > MAX_IMAGE_SIZE
+    ) {
         return null;
     }
 
-    const base64 = match[2];
-
-    if (!base64 || base64.length % 4 !== 0) {
-        return null;
-    }
+    const extensions = {
+        jpeg: "jpg",
+        png: "png",
+        webp: "webp",
+    };
 
     return {
-        size: Buffer.from(base64, "base64").length,
+        buffer,
+        extension: extensions[match[1]],
     };
+}
+
+async function deleteProfileImage(imagePath) {
+    if (!imagePath?.startsWith(PROFILE_IMAGE_PREFIX)) return;
+
+    const filename = imagePath.slice(PROFILE_IMAGE_PREFIX.length);
+
+    if (
+        !filename ||
+        filename.includes("/") ||
+        filename.includes("\\") ||
+        filename.includes("..")
+    ) {
+        return;
+    }
+
+    try {
+        await fs.unlink(
+            path.join(PROFILE_UPLOAD_DIR, filename)
+        );
+    } catch (error) {
+        if (error.code !== "ENOENT") {
+            console.error("Unable to delete profile image:", error);
+        }
+    }
+}
+
+function getProfileImagePath(filename) {
+    if (!filename || typeof filename !== "string") return null;
+
+    // Only allow files inside uploads/profile.
+    if (
+        filename.includes("/") ||
+        filename.includes("\\") ||
+        filename.includes("..")
+    ) {
+        return null;
+    }
+
+    return path.join(PROFILE_UPLOAD_DIR, filename);
 }
 
 
@@ -29,12 +90,27 @@ function getImageSizeFromDataUrl(value) {
 
 
 export async function updateMyProfile(req, res) {
+    let newImageFilePath = null;
+
     try {
         const userId = req.user?.userId;
 
         if (!userId) {
             return res.status(401).json({
                 message: "Authentication required.",
+            });
+        }
+
+        const updatedUser = await User.findById(userId).select(
+            "+emailVerificationCodeHash " +
+            "+emailVerificationExpires " +
+            "+phoneVerificationSessionId " +
+            "+phoneVerificationExpires"
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                message: "User not found.",
             });
         }
 
@@ -49,11 +125,12 @@ export async function updateMyProfile(req, res) {
         ];
 
         const updates = {};
+        let newImage = null;
+
+        const oldImagePath = updatedUser.profileImage || "";
 
         for (const field of allowedFields) {
-            if (!Object.hasOwn(req.body, field)) {
-                continue;
-            }
+            if (!Object.hasOwn(req.body, field)) continue;
 
             const value = req.body[field];
 
@@ -63,14 +140,17 @@ export async function updateMyProfile(req, res) {
                 });
             }
 
-            // Validate profile images separately.
             if (field === "profileImage") {
+                // Existing image: no upload necessary.
+                if (value === oldImagePath) continue;
+
+                // Empty value means remove the image.
                 if (value === "") {
                     updates.profileImage = "";
                     continue;
                 }
 
-                const image = getImageSizeFromDataUrl(value);
+                const image = getImageFromDataUrl(value);
 
                 if (!image) {
                     return res.status(400).json({
@@ -79,13 +159,7 @@ export async function updateMyProfile(req, res) {
                     });
                 }
 
-                if (image.size > MAX_IMAGE_SIZE) {
-                    return res.status(400).json({
-                        message: "Profile image cannot exceed 2 MB.",
-                    });
-                }
-
-                updates.profileImage = value;
+                newImage = image;
                 continue;
             }
 
@@ -95,7 +169,7 @@ export async function updateMyProfile(req, res) {
                     : value.trim();
 
             if (
-                (field === "firstName" || field === "lastName") &&
+                ["firstName", "lastName"].includes(field) &&
                 (cleanValue.length < 2 || cleanValue.length > 50)
             ) {
                 return res.status(400).json({
@@ -139,27 +213,37 @@ export async function updateMyProfile(req, res) {
             updates[field] = cleanValue;
         }
 
-        if (Object.keys(updates).length === 0) {
+        if (Object.keys(updates).length === 0 && !newImage) {
             return res.status(400).json({
                 message: "No profile changes were provided.",
             });
         }
 
-       
-        const updatedUser = await User.findById(userId).select(
-            "+emailVerificationCodeHash " +
-            "+emailVerificationExpires " +
-            "+phoneVerificationSessionId " +
-            "+phoneVerificationExpires"
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({
-                message: "User not found.",
+        // Save the new image.
+        if (newImage) {
+            await fs.mkdir(PROFILE_UPLOAD_DIR, {
+                recursive: true,
             });
+
+            const filename =
+                `profile-${Date.now()}-${randomBytes(4).toString("hex")}.` +
+                newImage.extension;
+
+            newImageFilePath = path.join(
+                PROFILE_UPLOAD_DIR,
+                filename
+            );
+
+            await fs.writeFile(
+                newImageFilePath,
+                newImage.buffer
+            );
+
+            updates.profileImage =
+                `${PROFILE_IMAGE_PREFIX}${filename}`;
         }
 
-        // Reset email verification only when the email actually changes.
+        // Handle email changes.
         if (
             Object.hasOwn(updates, "email") &&
             updates.email !== updatedUser.email
@@ -170,7 +254,7 @@ export async function updateMyProfile(req, res) {
             updatedUser.emailVerificationExpires = undefined;
         }
 
-        // Reset phone verification only when the phone number changes.
+        // Handle phone changes.
         if (
             Object.hasOwn(updates, "phoneNumber") &&
             updates.phoneNumber !== updatedUser.phoneNumber
@@ -181,7 +265,6 @@ export async function updateMyProfile(req, res) {
             updatedUser.phoneVerificationExpires = undefined;
         }
 
-        // Apply the other allowed profile changes.
         const fieldsToUpdate = [
             "firstName",
             "lastName",
@@ -198,6 +281,14 @@ export async function updateMyProfile(req, res) {
 
         await updatedUser.save();
 
+        // Delete the previous image only after the database save succeeds.
+        if (
+            oldImagePath &&
+            oldImagePath !== updatedUser.profileImage
+        ) {
+            await deleteProfileImage(oldImagePath);
+        }
+
         return res.status(200).json({
             message: "Profile updated successfully.",
             user: {
@@ -213,8 +304,21 @@ export async function updateMyProfile(req, res) {
                 profileImage: updatedUser.profileImage ?? "",
             },
         });
-
     } catch (error) {
+        // Clean up a newly uploaded image if the database save fails.
+        if (newImageFilePath) {
+            try {
+                await fs.unlink(newImageFilePath);
+            } catch (cleanupError) {
+                if (cleanupError.code !== "ENOENT") {
+                    console.error(
+                        "Image cleanup error:",
+                        cleanupError
+                    );
+                }
+            }
+        }
+
         if (error.code === 11000 && error.keyPattern?.email) {
             return res.status(409).json({
                 message: "This email address is already in use.",

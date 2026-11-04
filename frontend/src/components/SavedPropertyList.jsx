@@ -166,7 +166,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                     alignItems: "center",
                 }}
             >
-                <CircularProgress sx={{ color: "#059669" }} />
+                <CircularProgress sx={{ color: "#2563EB" }} />
             </Box>
         );
     }
@@ -200,7 +200,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                     variant="h5"
                     sx={{
                         fontWeight: 700,
-                        color: "#1f2937",
+                        color: "#0F172A",
                         mb: 1,
                     }}
                 >
@@ -210,7 +210,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                 <Typography
                     variant="body1"
                     sx={{
-                        color: "#6b7280",
+                        color: "#5B6577",
                         maxWidth: 420,
                         mb: 3,
                     }}
@@ -223,14 +223,14 @@ export default function SavedPropertiesList({ onViewDetails }) {
                     variant="contained"
                     onClick={() => navigate("/properties")}
                     sx={{
-                        backgroundColor: "#059669",
+                        backgroundColor: "#2563EB",
                         textTransform: "none",
                         fontWeight: 600,
                         px: 4,
                         py: 1.2,
                         borderRadius: 2,
                         "&:hover": {
-                            backgroundColor: "#047857",
+                            backgroundColor: "#1D4ED8",
                         },
                     }}
                 >
@@ -271,7 +271,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                     variant="h5"
                     sx={{
                         fontWeight: 700,
-                        color: "#1f2937",
+                        color: "#0F172A",
                     }}
                 >
                     {selectedCategory === "All Properties"
@@ -281,7 +281,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
 
                 <Typography
                     variant="body2"
-                    sx={{ color: "#6b7280", fontWeight: 600 }}
+                    sx={{ color: "#5B6577", fontWeight: 600 }}
                 >
                     {filteredSavedRecords.length}{" "}
                     {filteredSavedRecords.length === 1
@@ -315,8 +315,8 @@ export default function SavedPropertiesList({ onViewDetails }) {
                         py: 6,
                         textAlign: "center",
                         border: "1px dashed #d1d5db",
-                        borderRadius: 3,
-                        backgroundColor: "#fafafa",
+                        borderRadius: "16px",
+                        backgroundColor: "#F4F7FB",
                     }}
                 >
                     <Typography
@@ -332,7 +332,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
 
                     <Typography
                         variant="body2"
-                        sx={{ color: "#6b7280", mb: 2 }}
+                        sx={{ color: "#5B6577", mb: 2 }}
                     >
                         You haven't saved any listings in this category yet.
                     </Typography>

@@ -184,19 +184,7 @@ export default function PropertyList({
     };
 
     const handleSelectProperty = (property) => {
-        if (!property?._id) return;
-
-        // Record the click without delaying navigation.
-        axiosInstance
-            .post(`/property/${property._id}/click`)
-            .catch((error) => {
-                console.error(
-                    "Unable to track property click:",
-                    error.message
-                );
-            });
-
-        // Preserve your existing property selection behavior.
+        if (!property) return;
         onSelectProperty?.(property);
     };
 
@@ -307,7 +295,7 @@ export default function PropertyList({
                     variant="h5"
                     sx={{
                         fontWeight: 700,
-                        color: "#1f2937",
+                        color: "#0F172A",
                         fontSize: {
                             xs: "1.2rem",
                             sm: "1.4rem",
@@ -324,7 +312,7 @@ export default function PropertyList({
                 <Typography
                     variant="body2"
                     sx={{
-                        color: "#6b7280",
+                        color: "#5B6577",
                         flexShrink: 0,
                     }}
                 >
@@ -343,8 +331,8 @@ export default function PropertyList({
                         px: { xs: 1.5, sm: 2 },
                         textAlign: "center",
                         border: "1px dashed #d1d5db",
-                        borderRadius: 3,
-                        backgroundColor: "#fafafa",
+                        borderRadius: "16px",
+                        backgroundColor: "#F4F7FB",
                         width: "100%",
                         boxSizing: "border-box",
                         overflowWrap: "anywhere",
@@ -368,7 +356,7 @@ export default function PropertyList({
                     <Typography
                         variant="body2"
                         sx={{
-                            color: "#6b7280",
+                            color: "#5B6577",
                             mb: 2,
                         }}
                     >

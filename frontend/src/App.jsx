@@ -33,7 +33,7 @@ import Dashboard from "./components/admin/Dashboard";
 import VisitTracker from "./components/admin/components/VisitTracker";
 import ExternalListings from "./components/admin/externalListings/ExternalListings";
 import ExternalListingSources from "./components/admin/externalListings/ExternalListingSources";
-
+import Footer from "./components/Footer"
 
 async function requireAuth() {
     try {
@@ -74,23 +74,73 @@ function DashboardLayout() {
         avatar: user.profileImage || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'
     };
 
+    // return (
+    //     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f9fafb' }}>
+    //         <VisitTracker />
+    //         <TopBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} user={userData} />
+    //         <Box sx={{ display: 'flex', flex: 1, position: 'relative',  }}>
+    //             <Sidebar 
+    //                 sidebarOpen={sidebarOpen} 
+    //                 setSidebarOpen={setSidebarOpen} 
+    //                 activeNav={activeNav} 
+    //                 setActiveNav={setActiveNav} 
+    //             />
+    //             <Outlet />
+    //         </Box>
+    //         <   Footer/>
+    //     </Box>
+    // );
     return (
-        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f9fafb' }}>
-            <VisitTracker />
-            <TopBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} user={userData} />
-            <Box sx={{ display: 'flex', flex: 1, position: 'relative' }}>
-                <Sidebar 
-                    sidebarOpen={sidebarOpen} 
-                    setSidebarOpen={setSidebarOpen} 
-                    activeNav={activeNav} 
-                    setActiveNav={setActiveNav} 
-                />
-                {/* <Outlet /> renders whichever sub-page matches the active URL */}
-                <Outlet />
+    <Box
+        sx={{
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            bgcolor: "#f9fafb",
+        }}
+    >
+        <VisitTracker />
+
+        <TopBar
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            user={userData}
+        />
+
+        {/* Main layout */}
+        <Box sx={{ display: "flex", flex: 1, position: "relative" }}>
+
+            {/* Sidebar */}
+            <Sidebar
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                activeNav={activeNav}
+                setActiveNav={setActiveNav}
+            />
+
+            {/* Content + Footer */}
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    minWidth: 0,
+                }}
+            >
+                {/* Current page */}
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Outlet />
+                </Box>
+
+                {/* Footer */}
+                <Footer />
             </Box>
+
         </Box>
-    );
+    </Box>
+);
 }
+                {/* <Outlet /> renders whichever sub-page matches the active URL */}
 
 const router = createBrowserRouter([
     {

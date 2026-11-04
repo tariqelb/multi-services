@@ -114,7 +114,7 @@ export default function Password() {
                                 setCurrentPassword(event.target.value)
                             }
                             disabled={passwordLoading}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 disabled:bg-gray-50"
+                            className="w-full rounded-[10px] border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50"
                         />
                     </div>
 
@@ -135,7 +135,7 @@ export default function Password() {
                                 setNewPassword(event.target.value)
                             }
                             disabled={passwordLoading}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 disabled:bg-gray-50"
+                            className="w-full rounded-[10px] border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50"
                         />
                     </div>
 
@@ -156,7 +156,7 @@ export default function Password() {
                                 setConfirmPassword(event.target.value)
                             }
                             disabled={passwordLoading}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 disabled:bg-gray-50"
+                            className="w-full rounded-[10px] border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50"
                         />
                     </div>
                 </div>
@@ -183,7 +183,7 @@ export default function Password() {
                     <button
                         type="submit"
                         disabled={passwordLoading}
-                        className="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-[10px] bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {passwordLoading ? "Updating..." : "Update password"}
                     </button>

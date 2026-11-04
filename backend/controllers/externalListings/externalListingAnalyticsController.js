@@ -4,10 +4,7 @@ import ExternalListingClick from "../../DatabaseModels/Schema/ExternalListingCli
 export const getExternalListingAnalytics = async (req, res) => {
     try {
         const page = Math.max(1, Number(req.query.page) || 1);
-        const limit = Math.min(
-            50,
-            Math.max(1, Number(req.query.limit) || 8)
-        );
+        const limit = 6;
 
         const skip = (page - 1) * limit;
 

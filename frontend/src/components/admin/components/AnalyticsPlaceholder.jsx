@@ -12,19 +12,12 @@ export default function AnalyticsPlaceholder({ type }) {
 
     return (
         <Card
-            elevation={0}
-            sx={{
-                p: { xs: 3, md: 5 },
-                textAlign: "center",
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 3,
-            }}
+            sx={{ p: { xs: 3, md: 5 }, textAlign: "center" }}
         >
             <Stack alignItems="center" spacing={1.5}>
                 <Icon sx={{ fontSize: 48, color: "text.secondary" }} />
 
-                <Typography variant="h5" fontWeight={800}>
+                <Typography variant="h5" fontWeight={700}>
                     {isClicks ? "Click Analytics" : "Visit Analytics"}
                 </Typography>
 

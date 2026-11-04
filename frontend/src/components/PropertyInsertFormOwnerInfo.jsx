@@ -65,12 +65,12 @@ export default function PropertyInsertFormOwnerInfo({
                             sm: "0.88rem",
                         },
                         color: "#667085",
-                        border: "1px solid #e1e6ef",
+                        border: "1px solid #D5DCE8",
                         borderRadius: "10px !important",
                         "&.Mui-selected": {
-                            color: "#4f46e5",
-                            bgcolor: "#ececec",
-                            borderColor: "#a5b4fc",
+                            color: "#2563EB",
+                            bgcolor: "#EFF6FF",
+                            borderColor: "#93C5FD",
                         },
                     },
                 }}

@@ -162,7 +162,7 @@ export default function PropertyCategoryBar({
         minWidth: 0,
         width: "100%",
         "& .MuiOutlinedInput-root": {
-            borderRadius: 2.5,
+            borderRadius: "10px",
             backgroundColor: "#fff",
         },
     };
@@ -180,7 +180,7 @@ export default function PropertyCategoryBar({
                 variant="h5"
                 sx={{
                     fontWeight: 700,
-                    color: "#1f2937",
+                    color: "#0F172A",
                     pb: 2,
                     fontSize: { xs: "1.25rem", sm: "1.5rem" },
                 }}
@@ -190,18 +190,18 @@ export default function PropertyCategoryBar({
 
             <Box
                 sx={{
-                    width: { xs: "100%", sm: "95%" },
+                    width: "100%",
                     maxWidth: "100%",
                     minWidth: 0,
                     mb: 3,
                     px: { xs: 1.5, sm: 2.5, md: 3 },
                     py: { xs: 1.5, sm: 2 },
                     border: 1,
-                    borderRadius: 3,
-                    borderColor: "#d3d8dd",
+                    borderRadius: "16px",
+                    borderColor: "#E2E8F0",
                     boxSizing: "border-box",
                     overflow: "hidden",
-                    ml: { xs: 0, sm: 2, md: 5 },
+                    bgcolor: "#fff",
                 }}
             >
                 {/* Property type categories */}
@@ -250,30 +250,30 @@ export default function PropertyCategoryBar({
                                     overflowWrap: "anywhere",
                                     textAlign: "center",
                                     textTransform: "none",
-                                    fontWeight: 700,
+                                    fontWeight: 600,
                                     fontSize: {
                                         xs: "0.72rem",
                                         sm: "0.85rem",
                                     },
                                     lineHeight: 1.3,
-                                    borderRadius: 2.5,
+                                    borderRadius: "999px",
                                     color: active ? "#fff" : "#334155",
                                     backgroundColor: active
-                                        ? "#059669"
+                                        ? "#2563EB"
                                         : "#fff",
                                     borderColor: active
-                                        ? "#059669"
-                                        : "#cbd5e1",
+                                        ? "#2563EB"
+                                        : "#D5DCE8",
                                     boxShadow: active
-                                        ? "0 4px 12px rgba(5, 150, 105, 0.2)"
+                                        ? "0 4px 12px rgba(37, 99, 235, 0.2)"
                                         : "none",
                                     transition: "all 0.2s ease",
                                     "&:hover": {
                                         backgroundColor: active
-                                            ? "#047857"
+                                            ? "#1D4ED8"
                                             : "#f8fafc",
                                         borderColor: active
-                                            ? "#047857"
+                                            ? "#1D4ED8"
                                             : "#94a3b8",
                                     },
                                 }}
@@ -300,12 +300,12 @@ export default function PropertyCategoryBar({
                                         px: 0.6,
                                         borderRadius: "6px",
                                         fontSize: "0.72rem",
-                                        fontWeight: 800,
+                                        fontWeight: 700,
                                         lineHeight: 1,
                                         backgroundColor: active
                                             ? "rgba(255, 255, 255, 0.2)"
                                             : "#f1f5f9",
-                                        color: active ? "#fff" : "#64748b",
+                                        color: active ? "#fff" : "#5B6577",
                                     }}
                                 >
                                     {categoryCount}
@@ -324,8 +324,8 @@ export default function PropertyCategoryBar({
                         gap: { xs: 2, sm: 3, md: 5 },
                         mt: 1.5,
                         p: { xs: 1, sm: 1.5 },
-                        borderRadius: 3,
-                        backgroundColor: "#f9fafb",
+                        borderRadius: "16px",
+                        backgroundColor: "#F4F7FB",
                         boxSizing: "border-box",
                         width: "100%",
                         minWidth: 0,
@@ -393,8 +393,8 @@ export default function PropertyCategoryBar({
                             minWidth: { xs: 0, sm: "auto" },
                             width: { xs: "100%", sm: "auto" },
                             px: 2.5,
-                            borderRadius: 2.5,
-                            borderColor: "#cbd5e1",
+                            borderRadius: "10px",
+                            borderColor: "#D5DCE8",
                             color: "#475569",
                             fontWeight: 700,
                             textTransform: "none",

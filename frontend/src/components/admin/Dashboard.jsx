@@ -1,64 +1,49 @@
 
 import { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
+import PageLayout from "./components/PageLayout";
 import DashboardNavigation from "./components/DashboardNavigation";
 import UsersSection from "./components/UsersSection";
-import AnalyticsPlaceholder from "./components/AnalyticsPlaceholder";
 import VisitsSection from "./components/VisitsSection";
 import ExternalClicksSection from "./externalListings/ExternalClicksSection";
-import PropertyClicksSection from "./components/PropertyClicksSection";
+import PropertyClicksSection from "./components/PropertyClicks/PropertyClicksSection";
+import PublicationsReviewSection from "./components/PublicationReviews/PublicationsReviewSection";
+import FeedbackSection from "./components/feedback/FeedbackSection";
+
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("users");
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                maxWidth: 1600,
-                mx: "auto",
-                px: { xs: 2.5, sm: 3, md: 5 },
-                py: { xs: 4, md: 6 },
-                boxSizing: "border-box",
-                minHeight: "100vh",
-            }}
+        <PageLayout
+            title="Admin Dashboard"
+            subtitle="Monitor users and activity across your marketplace."
         >
-            <Box mb={5}>
-                <Typography
-                    variant="h4"
-                    fontWeight={900}
-                    sx={{
-                        color: "#064e3b",
-                        mb: 1,
-                        fontSize: { xs: "2rem", md: "2.35rem" },
-                    }}
-                >
-                    Admin Dashboard
-                </Typography>
-
-                <Typography
-                    color="text.secondary"
-                    sx={{ fontSize: "1.05rem" }}
-                >
-                    Monitor users and activity across your marketplace.
-                </Typography>
-            </Box>
-
             <DashboardNavigation
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
             />
 
-            <Box mt={4}>
+            <Box mt={3}>
                 {activeTab === "users" && <UsersSection />}
 
-                {activeTab === "external listings clicks" && <ExternalClicksSection />}
+                {activeTab === "publications" && (
+                    <PublicationsReviewSection />
+                )}
+
+                {activeTab === "internal property clicks" && (
+                    <PropertyClicksSection />
+                )}
+
+                {activeTab === "external listings clicks" && (
+                    <ExternalClicksSection />
+                )}
 
                 {activeTab === "visits" && <VisitsSection />}
-                
-                {activeTab === "internal property clicks" && <PropertyClicksSection />}
+
+                {activeTab === "feedback" && <FeedbackSection />}
             </Box>
-        </Box>
+        </PageLayout>
     );
 }

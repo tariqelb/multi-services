@@ -18,16 +18,16 @@ export default function PublishFab() {
                     bottom: 32,
                     right: 32,
                     zIndex: 9999,
-                    bgcolor: '#059669',
+                    bgcolor: '#2563EB',
                     color: '#ffffff',
                     px: 3,
                     py: 1.5,
-                    fontWeight: 700,
+                    fontWeight: 600,
                     textTransform: 'none',
                     fontSize: '0.95rem',
-                    boxShadow: '0 10px 25px -5px rgba(5, 150, 105, 0.4)',
+                    boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.4)',
                     '&:hover': {
-                        bgcolor: '#047857',
+                        bgcolor: '#1D4ED8',
                     },
                 }}
             >

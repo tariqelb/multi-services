@@ -30,17 +30,17 @@ export default function PropertyInsertFormImages({
             <Box
                 onClick={() => fileInputRef.current?.click()}
                 sx={{
-                    border: '2px dashed #c7d2fe',
+                    border: '2px dashed #BFDBFE',
                     borderRadius: '14px',
                     px: 2,
                     py: { xs: 4, sm: 5 },
                     textAlign: 'center',
-                    bgcolor: '#f8faff',
+                    bgcolor: '#F5F9FF',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
                     '&:hover': {
-                        borderColor: '#6366f1',
-                        bgcolor: '#f0f4ff',
+                        borderColor: '#3B82F6',
+                        bgcolor: '#EFF6FF',
                     },
                 }}
             >
@@ -54,8 +54,8 @@ export default function PropertyInsertFormImages({
                         justifyContent: 'center',
                         alignItems: 'center',
                         borderRadius: '18px',
-                        bgcolor: '#e8edff',
-                        color: '#4f46e5',
+                        bgcolor: '#DBEAFE',
+                        color: '#2563EB',
                         fontSize: '26px',
                     }}
                 >
@@ -64,14 +64,14 @@ export default function PropertyInsertFormImages({
 
                 <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: 750, color: '#263248', mb: 0.7 }}
+                    sx={{ fontWeight: 600, color: '#0F172A', mb: 0.7 }}
                 >
                     Click to upload your property images
                 </Typography>
 
                 <Typography
                     variant="body2"
-                    sx={{ color: '#778399', mb: 2 }}
+                    sx={{ color: '#5B6577', mb: 2 }}
                 >
                     Select up to 15 images to showcase your property.
                 </Typography>
@@ -86,8 +86,8 @@ export default function PropertyInsertFormImages({
                         borderRadius: '9px',
                         textTransform: 'none',
                         fontWeight: 700,
-                        borderColor: '#c7d2fe',
-                        color: '#4f46e5',
+                        borderColor: '#BFDBFE',
+                        color: '#2563EB',
                         px: 3,
                         py: 1,
                     }}
@@ -98,7 +98,7 @@ export default function PropertyInsertFormImages({
                 <Typography
                     variant="caption"
                     display="block"
-                    sx={{ color: '#98a2b3', mt: 2 }}
+                    sx={{ color: '#5B6577', mt: 2 }}
                 >
                     JPG, JPEG, PNG or WEBP · Maximum 5 MB per image
                 </Typography>
@@ -123,7 +123,7 @@ export default function PropertyInsertFormImages({
                     >
                         <Typography
                             variant="subtitle2"
-                            sx={{ fontWeight: 750, color: '#263248' }}
+                            sx={{ fontWeight: 600, color: '#0F172A' }}
                         >
                             Selected Images
                         </Typography>
@@ -131,7 +131,7 @@ export default function PropertyInsertFormImages({
                         <Chip
                             size="small"
                             label={`${images.length}/15 images`}
-                            sx={{ bgcolor: '#eef2ff', color: '#4f46e5' }}
+                            sx={{ bgcolor: '#EFF6FF', color: '#2563EB' }}
                         />
                     </Stack>
 
@@ -190,7 +190,7 @@ export default function PropertyInsertFormImages({
                                                 bottom: 6,
                                                 left: 6,
                                                 height: 23,
-                                                bgcolor: '#4f46e5',
+                                                bgcolor: '#2563EB',
                                                 color: '#ffffff',
                                                 fontWeight: 700,
                                             }}

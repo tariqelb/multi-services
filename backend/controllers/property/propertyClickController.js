@@ -80,11 +80,7 @@ export const getPropertyClickAnalytics = async (req, res) => {
             Number.parseInt(req.query.page, 10) || 1
         );
 
-        const limit = Math.min(
-            100,
-            Math.max(1, Number.parseInt(req.query.limit, 10) || 8)
-        );
-
+        const limit = 6;
         const skip = (page - 1) * limit;
 
         const [
@@ -97,7 +93,7 @@ export const getPropertyClickAnalytics = async (req, res) => {
         ] = await Promise.all([
             // Paginated property click records
             PropertyClick.find({})
-                .sort({ lastClickedAt: -1 })
+                .sort({ lastClickedAt: -1, _id: -1 })
                 .skip(skip)
                 .limit(limit)
                 .lean(),

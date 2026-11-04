@@ -10,15 +10,15 @@ export default function PublishPropertyPage() {
                 flex: 1,
                 minWidth: 0,
                 p: { xs: 2, md: 4 },
-                bgcolor: "#f9fafb",
+                bgcolor: "background.default",
                 minHeight: "calc(100vh - 64px)",
             }}
         >
             {/* <Typography
                 variant="h4"
                 sx={{
-                    fontWeight: 800,
-                    color: "#1f2937",
+                    fontWeight: 700,
+                    color: "#0F172A",
                     mb: 3,
                 }}
             >

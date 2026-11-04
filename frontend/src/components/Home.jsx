@@ -4,6 +4,8 @@ import TopBar from "./TopBar";
 import Sidebar from "./Sidebar";
 import MiddleContent from "./MiddleContent";
 import PublishFab from "./PublishFab";
+import Footer from "./Footer"
+
 
 export default function Home() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -16,7 +18,7 @@ export default function Home() {
     };
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col overflow-x-clip bg-gray-50 font-sans text-gray-800">
+        <div className="relative flex min-h-screen w-full flex-col overflow-x-clip bg-[#F4F7FB] font-sans text-gray-800">
             {/* Top navigation */}
             <TopBar
                 sidebarOpen={sidebarOpen}
@@ -59,6 +61,7 @@ export default function Home() {
 
             {/* Floating publish button */}
             {/* <PublishFab /> */}
+            {/* <Footer/> */}
         </div>
     );
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getCountries, getCountryCallingCode } from "libphonenumber-js";
+
 import {
     Alert,
     Avatar,
@@ -13,6 +14,7 @@ import {
     Typography,
     MenuItem,
 } from "@mui/material";
+
 import {
     AccountCircle,
     CameraAlt,
@@ -20,7 +22,16 @@ import {
 } from "@mui/icons-material";
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+const ALLOWED_IMAGE_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+];
+
+const BACKEND_URL = (
+    import.meta.env.VITE_API_URL || "http://localhost:3000/api"
+).replace(/\/api\/?$/, "");
 
 const COUNTRY_CODES = getCountries()
     .map((country) => ({
@@ -57,12 +68,31 @@ function splitPhoneNumber(value = "") {
         };
     }
 
-    // Preserve an unrecognized international prefix instead of
-    // accidentally adding a second country code.
     return {
         countryCode: "",
         localNumber: normalized,
     };
+}
+
+function getProfileImageUrl(image) {
+    if (!image) return undefined;
+
+    // Temporary preview while the image is being uploaded.
+    if (image.startsWith("data:image/")) {
+        return image;
+    }
+
+    // Absolute URL.
+    if (/^https?:\/\//i.test(image)) {
+        return image;
+    }
+
+    // Backend uploaded image.
+    if (image.startsWith("/uploads/")) {
+        return `${BACKEND_URL}${image}`;
+    }
+
+    return image;
 }
 
 export default function AccountProfile({
@@ -83,6 +113,7 @@ export default function AccountProfile({
 
     useEffect(() => {
         const parsed = splitPhoneNumber(profile.phoneNumber);
+
         setCountryCode(parsed.countryCode);
         setLocalNumber(parsed.localNumber);
     }, [profile.phoneNumber]);
@@ -98,6 +129,7 @@ export default function AccountProfile({
 
     const handleCountryCodeChange = (event) => {
         const nextCountryCode = event.target.value;
+
         setCountryCode(nextCountryCode);
 
         setProfile((previous) => ({
@@ -108,6 +140,7 @@ export default function AccountProfile({
 
     const handlePhoneNumberChange = (event) => {
         const nextLocalNumber = event.target.value.replace(/\D/g, "");
+
         setLocalNumber(nextLocalNumber);
 
         setProfile((previous) => ({
@@ -118,6 +151,7 @@ export default function AccountProfile({
 
     const handleImageChange = (event) => {
         const file = event.target.files?.[0];
+
         event.target.value = "";
 
         if (!file) return;
@@ -142,7 +176,7 @@ export default function AccountProfile({
                 profileImage: reader.result,
             }));
 
-            onImageChanged(true);
+            onImageChanged?.(true);
         };
 
         reader.onerror = () => {
@@ -158,7 +192,7 @@ export default function AccountProfile({
             profileImage: "",
         }));
 
-        onImageChanged(true);
+        onImageChanged?.(true);
 
         if (imageInputRef.current) {
             imageInputRef.current.value = "";
@@ -169,11 +203,13 @@ export default function AccountProfile({
         `${profile.firstName?.[0] || ""}${profile.lastName?.[0] || ""}`
             .toUpperCase() || "U";
 
+    const profileImageUrl = getProfileImageUrl(profile.profileImage);
+
     return (
         <Card
             variant="outlined"
             sx={{
-                borderRadius: 3.5,
+                borderRadius: "16px",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
             }}
         >
@@ -188,9 +224,9 @@ export default function AccountProfile({
                         sx={{
                             width: 52,
                             height: 52,
-                            borderRadius: 2.5,
-                            bgcolor: "#ecfdf5",
-                            color: "#047857",
+                            borderRadius: "10px",
+                            bgcolor: "#EFF6FF",
+                            color: "#1D4ED8",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -201,9 +237,14 @@ export default function AccountProfile({
                     </Box>
 
                     <Box>
-                        <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5 }}>
+                        <Typography
+                            variant="h6"
+                            fontWeight={700}
+                            sx={{ mb: 0.5 }}
+                        >
                             Account &amp; Profile
                         </Typography>
+
                         <Typography variant="body2" color="text.secondary">
                             Manage your personal information.
                         </Typography>
@@ -242,25 +283,28 @@ export default function AccountProfile({
                         mb={5}
                     >
                         <Avatar
-                            src={profile.profileImage || undefined}
+                            src={profileImageUrl}
                             alt={`${profile.firstName} ${profile.lastName}`}
                             sx={{
                                 width: 92,
                                 height: 92,
                                 bgcolor: "#d1fae5",
-                                color: "#047857",
+                                color: "#1D4ED8",
                                 fontSize: 32,
-                                fontWeight: 800,
+                                fontWeight: 700,
                                 flexShrink: 0,
                             }}
                         >
-                            {!profile.profileImage && initials}
+                            {!profileImageUrl && initials}
                         </Avatar>
 
                         <Box sx={{ flexGrow: 1 }}>
                             <Typography
                                 fontWeight={700}
-                                sx={{ fontSize: "1.05rem", mb: 0.5 }}
+                                sx={{
+                                    fontSize: "1.05rem",
+                                    mb: 0.5,
+                                }}
                             >
                                 Profile picture
                             </Typography>
@@ -270,7 +314,8 @@ export default function AccountProfile({
                                 color="text.secondary"
                                 sx={{ mb: 2 }}
                             >
-                                Update your picture to help others recognize you.
+                                Update your picture to help others recognize
+                                you.
                             </Typography>
 
                             <Stack
@@ -293,6 +338,7 @@ export default function AccountProfile({
                                     }}
                                 >
                                     Upload picture
+
                                     <input
                                         ref={imageInputRef}
                                         hidden
@@ -381,26 +427,33 @@ export default function AccountProfile({
                                 select
                                 label="Country code"
                                 value={
-                                    COUNTRY_CODES.find((country) => country.code === countryCode)
-                                        ?.country ?? "MA"
+                                    COUNTRY_CODES.find(
+                                        (country) =>
+                                            country.code === countryCode
+                                    )?.country ?? "MA"
                                 }
                                 onChange={(event) => {
                                     const selected = COUNTRY_CODES.find(
-                                        (country) => country.country === event.target.value
+                                        (country) =>
+                                            country.country ===
+                                            event.target.value
                                     );
 
                                     if (selected) {
-                                        setCountryCode(selected.code);
-                                        setProfile((previous) => ({
-                                            ...previous,
-                                            phoneNumber: `${selected.code}${localNumber}`,
-                                        }));
+                                        handleCountryCodeChange({
+                                            target: {
+                                                value: selected.code,
+                                            },
+                                        });
                                     }
                                 }}
                                 fullWidth
                             >
                                 {COUNTRY_CODES.map((country) => (
-                                    <MenuItem key={country.country} value={country.country}>
+                                    <MenuItem
+                                        key={country.country}
+                                        value={country.country}
+                                    >
                                         {country.label}
                                     </MenuItem>
                                 ))}
@@ -453,13 +506,15 @@ export default function AccountProfile({
                             }
                             startIcon={<SaveOutlined />}
                             sx={{
-                                bgcolor: "#047857",
-                                "&:hover": { bgcolor: "#065f46" },
+                                bgcolor: "#1D4ED8",
+                                "&:hover": {
+                                    bgcolor: "#1E40AF",
+                                },
                                 textTransform: "none",
                                 fontWeight: 700,
                                 py: 1.75,
                                 px: 4,
-                                borderRadius: 2.5,
+                                borderRadius: "10px",
                                 minHeight: 48,
                             }}
                         >

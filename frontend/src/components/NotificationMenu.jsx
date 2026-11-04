@@ -192,7 +192,7 @@ export default function NotificationMenu() {
                         minWidth: 40,
                         flexShrink: 0,
                         p: 1,
-                        borderRadius: 2,
+                        borderRadius: "10px",
                     }}
                 >
                     <Badge
@@ -237,7 +237,7 @@ export default function NotificationMenu() {
                                 sm: 480,
                             },
                             mt: 1,
-                            borderRadius: 2,
+                            borderRadius: "16px",
                             overflow: "hidden",
                         },
                     },
@@ -255,7 +255,7 @@ export default function NotificationMenu() {
                     }}
                 >
                     <Box sx={{ minWidth: 0 }}>
-                        <Typography fontWeight={800}>
+                        <Typography fontWeight={700}>
                             Notifications
                         </Typography>
 
@@ -362,7 +362,7 @@ export default function NotificationMenu() {
                                     gap: 1.25,
                                     bgcolor: notification.isRead
                                         ? "background.paper"
-                                        : "action.hover",
+                                        : "#F5F9FF",
                                 }}
                             >
                                 <Circle
@@ -385,7 +385,7 @@ export default function NotificationMenu() {
                                     <Typography
                                         variant="body2"
                                         fontWeight={
-                                            notification.isRead ? 500 : 800
+                                            notification.isRead ? 500 : 700
                                         }
                                         sx={{ overflowWrap: "anywhere" }}
                                     >

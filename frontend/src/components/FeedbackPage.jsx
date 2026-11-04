@@ -1,5 +1,6 @@
-import React, { useState } from "react";
 import axiosInstance from "../api/axiosInstance";
+import React, { useRef, useState } from "react";
+import PageLayout from "./PageLayout";
 import {
     Alert,
     Box,
@@ -91,7 +92,8 @@ export default function FeedbackPage() {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [attachment, setAttachment] = useState(null);
+    const [attachments, setAttachments] = useState([]);
+    const attachmentInputRef = useRef(null);
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
@@ -130,10 +132,11 @@ export default function FeedbackPage() {
         setSuccess(false);
     };
 
-    const handleAttachmentChange = (event) => {
-        const file = event.target.files?.[0];
 
-        if (!file) return;
+    const handleAttachmentChange = (event) => {
+        const selectedFiles = Array.from(event.target.files || []);
+
+        if (!selectedFiles.length) return;
 
         const allowedTypes = [
             "image/jpeg",
@@ -143,10 +146,27 @@ export default function FeedbackPage() {
             "text/plain",
         ];
 
-        if (!allowedTypes.includes(file.type)) {
+        const validFiles = [];
+        let errorMessage = "";
+
+        for (const file of selectedFiles) {
+            if (!allowedTypes.includes(file.type)) {
+                errorMessage = `${file.name}: unsupported file type.`;
+                break;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                errorMessage = `${file.name}: file exceeds the 5 MB limit.`;
+                break;
+            }
+
+            validFiles.push(file);
+        }
+
+        if (errorMessage) {
             setSnackbar({
                 open: true,
-                message: "Please upload a PNG, JPG, WEBP, GIF, or TXT file.",
+                message: errorMessage,
                 severity: "error",
             });
 
@@ -154,20 +174,42 @@ export default function FeedbackPage() {
             return;
         }
 
-        if (file.size > 5 * 1024 * 1024) {
-            setSnackbar({
-                open: true,
-                message: "The attachment must be smaller than 5 MB.",
-                severity: "error",
-            });
+        setAttachments((previous) => {
+            const combined = [...previous];
 
-            event.target.value = "";
-            return;
-        }
+            for (const file of validFiles) {
+                const duplicate = combined.some(
+                    (existing) =>
+                        existing.name === file.name &&
+                        existing.size === file.size &&
+                        existing.lastModified === file.lastModified
+                );
 
-        setAttachment(file);
-        setSuccess(false);
+                if (!duplicate) combined.push(file);
+            }
+
+            if (combined.length > 5) {
+                setSnackbar({
+                    open: true,
+                    message: "You can attach a maximum of 5 files.",
+                    severity: "error",
+                });
+
+                return previous;
+            }
+
+            return combined;
+        });
+
+        event.target.value = "";
     };
+
+    const handleRemoveAttachment = (index) => {
+        setAttachments((previous) =>
+            previous.filter((_, fileIndex) => fileIndex !== index)
+        );
+    };
+
 
     const validateForm = () => {
         const nextErrors = {};
@@ -188,12 +230,12 @@ export default function FeedbackPage() {
             nextErrors.description = "The description cannot exceed 5000 characters.";
         }
 
-        if (
-            formData.email.trim() &&
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
-        ) {
-            nextErrors.email = "Please enter a valid email address.";
-        }
+        // if (
+        //     formData.email.trim() &&
+        //     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
+        // ) {
+        //     nextErrors.email = "Please enter a valid email address.";
+        // }
 
         if (
             formData.type === "user_report" &&
@@ -208,20 +250,32 @@ export default function FeedbackPage() {
         return Object.keys(nextErrors).length === 0;
     };
 
+
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (!validateForm()) return;
 
         try {
             setLoading(true);
 
-            const payload = {
-                type: formData.type,
-                subject: formData.subject,
-                description: formData.description,
-                priority: formData.priority,
-                reportedUser: formData.reportedUser || null,
-                pageUrl: window.location.href,
-            };
+            const payload = new FormData();
+
+            payload.append("type", formData.type);
+            payload.append("subject", formData.subject.trim());
+            payload.append("description", formData.description.trim());
+            payload.append("priority", formData.priority);
+            payload.append(
+                "reportedUser",
+                formData.type === "user_report"
+                    ? formData.reportedUser.trim()
+                    : ""
+            );
+            payload.append("pageUrl", window.location.href);
+
+            attachments.forEach((file) => {
+                payload.append("attachments", file);
+            });
 
             const response = await axiosInstance.post(
                 "/feedback",
@@ -232,13 +286,21 @@ export default function FeedbackPage() {
                 setSuccess(true);
 
                 setFormData({
-                    type: "feedback",
-                    subject: "",
-                    description: "",
-                    priority: "medium",
-                    reportedUser: "",
-                    email: "",
-                    pageUrl: "",
+                    ...INITIAL_FORM,
+                    pageUrl: window.location.href,
+                });
+
+                setAttachments([]);
+                setErrors({});
+
+                if (attachmentInputRef.current) {
+                    attachmentInputRef.current.value = "";
+                }
+
+                setSnackbar({
+                    open: true,
+                    message: "Your feedback was submitted successfully.",
+                    severity: "success",
                 });
             }
         } catch (error) {
@@ -247,14 +309,18 @@ export default function FeedbackPage() {
                 error.response?.data || error
             );
 
-            setError(
-                error.response?.data?.message ||
-                "Failed to submit your report. Please try again."
-            );
+            setSnackbar({
+                open: true,
+                message:
+                    error.response?.data?.message ||
+                    "Failed to submit your report. Please try again.",
+                severity: "error",
+            });
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleReset = () => {
         setFormData({
@@ -262,67 +328,37 @@ export default function FeedbackPage() {
             pageUrl: window.location.href,
         });
 
-        setAttachment(null);
+        setAttachments([]);
         setErrors({});
         setSuccess(false);
+
+        if (attachmentInputRef.current) {
+            attachmentInputRef.current.value = "";
+        }
     };
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                maxWidth: 1100,
-                mx: "auto",
-                px: { xs: 2, sm: 3, md: 4 },
-                py: { xs: 3, md: 5 },
-            }}
-        >
-            {/* Page heading */}
-            <Stack spacing={1} sx={{ mb: 4 }}>
-                <Stack direction="row" alignItems="center" spacing={1.5}>
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: 48,
-                            height: 48,
-                            borderRadius: 3,
-                            bgcolor: "#ecfdf5",
-                            color: "#047857",
-                        }}
-                    >
-                        <FeedbackOutlined sx={{ fontSize: 27 }} />
-                    </Box>
-
-                    <Box>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                fontWeight: 900,
-                                letterSpacing: "-0.8px",
-                                fontSize: { xs: "1.7rem", md: "2.15rem" },
-                            }}
-                        >
-                            Feedback & Reports
-                        </Typography>
-
-                        <Typography variant="body2" color="text.secondary">
-                            Help us improve your experience.
-                        </Typography>
-                    </Box>
-                </Stack>
-
-                <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    sx={{ maxWidth: 720, lineHeight: 1.8, mt: 1 }}
+        <PageLayout
+            title="Feedback & Reports"
+            subtitle="Help us improve your experience. Found a bug, have an idea, or experienced a problem with another user? Tell us what happened so we can investigate."
+            maxWidth={1100}
+            icon={
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 48,
+                        height: 48,
+                        borderRadius: "12px",
+                        bgcolor: "#EFF6FF",
+                        color: "#1D4ED8",
+                    }}
                 >
-                    Found a bug, have an idea, or experienced a problem with
-                    another user? Tell us what happened so we can investigate.
-                </Typography>
-            </Stack>
-
+                    <FeedbackOutlined sx={{ fontSize: 27 }} />
+                </Box>
+            }
+        >
             <Box
                 component="form"
                 onSubmit={handleSubmit}
@@ -333,15 +369,14 @@ export default function FeedbackPage() {
                     <Card
                         variant="outlined"
                         sx={{
-                            borderRadius: 3.5,
-                            borderColor: "#e5e7eb",
-                            boxShadow: "0 4px 20px rgba(0,0,0,0.025)",
+                            borderRadius: "16px",
+                            borderColor: "#E2E8F0",
                         }}
                     >
                         <CardContent sx={{ p: { xs: 2.5, md: 3.5 } }}>
                             <Typography
                                 variant="h6"
-                                fontWeight={800}
+                                fontWeight={700}
                                 sx={{ mb: 0.75 }}
                             >
                                 What would you like to report?
@@ -379,11 +414,11 @@ export default function FeedbackPage() {
                                             }
                                             sx={{
                                                 cursor: "pointer",
-                                                borderRadius: 3,
+                                                borderRadius: "16px",
                                                 borderWidth: selected ? 2 : 1,
                                                 borderColor: selected
                                                     ? type.color
-                                                    : "#e5e7eb",
+                                                    : "#E2E8F0",
                                                 bgcolor: selected
                                                     ? type.background
                                                     : "#fff",
@@ -408,13 +443,13 @@ export default function FeedbackPage() {
                                                             display: "flex",
                                                             alignItems: "center",
                                                             justifyContent: "center",
-                                                            borderRadius: 2.5,
+                                                            borderRadius: "10px",
                                                             bgcolor: "#fff",
                                                             color: type.color,
                                                             border: "1px solid",
                                                             borderColor: selected
                                                                 ? type.color
-                                                                : "#e5e7eb",
+                                                                : "#E2E8F0",
                                                         }}
                                                     >
                                                         {type.icon}
@@ -422,7 +457,7 @@ export default function FeedbackPage() {
 
                                                     <Box sx={{ flex: 1 }}>
                                                         <Typography
-                                                            fontWeight={800}
+                                                            fontWeight={700}
                                                             sx={{ mb: 0.5 }}
                                                         >
                                                             {type.label}
@@ -464,15 +499,14 @@ export default function FeedbackPage() {
                     <Card
                         variant="outlined"
                         sx={{
-                            borderRadius: 3.5,
-                            borderColor: "#e5e7eb",
-                            boxShadow: "0 4px 20px rgba(0,0,0,0.025)",
+                            borderRadius: "16px",
+                            borderColor: "#E2E8F0",
                         }}
                     >
                         <CardContent sx={{ p: { xs: 2.5, md: 3.5 } }}>
                             <Typography
                                 variant="h6"
-                                fontWeight={800}
+                                fontWeight={700}
                                 sx={{ mb: 0.75 }}
                             >
                                 Tell us more
@@ -592,7 +626,7 @@ export default function FeedbackPage() {
 
                                 <Divider />
 
-                                <TextField
+                                {/* <TextField
                                     name="email"
                                     label="Contact email (optional)"
                                     type="email"
@@ -605,9 +639,11 @@ export default function FeedbackPage() {
                                         "If provided, we may use this address to follow up on your report."
                                     }
                                     fullWidth
-                                />
+                                /> */}
 
                                 {/* Attachment */}
+                                
+                                {/* Attachments */}
                                 <Box>
                                     <Button
                                         component="label"
@@ -616,15 +652,17 @@ export default function FeedbackPage() {
                                         sx={{
                                             textTransform: "none",
                                             fontWeight: 700,
-                                            borderRadius: 2.5,
+                                            borderRadius: "10px",
                                             py: 1.1,
                                         }}
                                     >
-                                        Attach screenshot or log
+                                        Attach screenshots or logs
 
                                         <input
+                                            ref={attachmentInputRef}
                                             hidden
                                             type="file"
+                                            multiple
                                             accept=".png,.jpg,.jpeg,.webp,.gif,.txt"
                                             onChange={handleAttachmentChange}
                                         />
@@ -637,17 +675,29 @@ export default function FeedbackPage() {
                                         sx={{ mt: 1 }}
                                     >
                                         Optional. PNG, JPG, WEBP, GIF, or TXT.
-                                        Maximum size: 5 MB.
+                                        Maximum 5 files, 5 MB each.
                                     </Typography>
 
-                                    {attachment && (
-                                        <Chip
-                                            label={attachment.name}
-                                            onDelete={() => setAttachment(null)}
-                                            sx={{ mt: 1.5, maxWidth: "100%" }}
-                                        />
+                                    {attachments.length > 0 && (
+                                        <Stack
+                                            direction="row"
+                                            flexWrap="wrap"
+                                            useFlexGap
+                                            gap={1}
+                                            sx={{ mt: 1.5 }}
+                                        >
+                                            {attachments.map((file, index) => (
+                                                <Chip
+                                                    key={`${file.name}-${file.lastModified}-${index}`}
+                                                    label={file.name}
+                                                    onDelete={() => handleRemoveAttachment(index)}
+                                                    sx={{ maxWidth: "100%" }}
+                                                />
+                                            ))}
+                                        </Stack>
                                     )}
                                 </Box>
+
                             </Stack>
                         </CardContent>
                     </Card>
@@ -656,7 +706,7 @@ export default function FeedbackPage() {
                     <Alert
                         severity="info"
                         icon={<LightbulbOutlined />}
-                        sx={{ borderRadius: 3, alignItems: "flex-start" }}
+                        sx={{ borderRadius: "16px", alignItems: "flex-start" }}
                     >
                         <Typography fontWeight={700} sx={{ mb: 0.5 }}>
                             A quick reminder
@@ -681,7 +731,7 @@ export default function FeedbackPage() {
                             sx={{
                                 textTransform: "none",
                                 fontWeight: 700,
-                                borderRadius: 2.5,
+                                borderRadius: "10px",
                                 px: 3,
                                 py: 1.35,
                             }}
@@ -703,19 +753,7 @@ export default function FeedbackPage() {
                                 )
                             }
                             disabled={loading}
-                            sx={{
-                                textTransform: "none",
-                                fontWeight: 800,
-                                borderRadius: 2.5,
-                                px: 4,
-                                py: 1.35,
-                                bgcolor: "#047857",
-                                boxShadow: "none",
-                                "&:hover": {
-                                    bgcolor: "#065f46",
-                                    boxShadow: "none",
-                                },
-                            }}
+                            sx={{ px: 4, py: 1.35 }}
                         >
                             {loading ? "Submitting..." : "Submit report"}
                         </Button>
@@ -761,6 +799,6 @@ export default function FeedbackPage() {
                     Your report has been submitted successfully.
                 </Alert>
             )}
-        </Box>
+        </PageLayout>
     );
 }

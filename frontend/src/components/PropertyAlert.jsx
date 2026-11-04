@@ -293,7 +293,7 @@ export default function PropertyAlert() {
     const sectionTitleSx = {
         fontSize: { xs: "1.05rem", sm: "1.15rem" },
         fontWeight: 700,
-        color: "#1e293b",
+        color: "#0F172A",
         mb: 2.5,
     };
 
@@ -310,12 +310,12 @@ export default function PropertyAlert() {
         maxWidth: "100%",
         px: { xs: 0.75, sm: 1.25 },
         py: 0.5,
-        borderRadius: 2.5,
+        borderRadius: "10px",
         fontWeight: 600,
         fontSize: { xs: "0.875rem", sm: "1rem" },
         bgcolor: selected ? "#eff6ff" : "transparent",
         color: selected ? "#1d4ed8" : "#334155",
-        borderColor: selected ? "#93c5fd" : "#cbd5e1",
+        borderColor: selected ? "#93c5fd" : "#D5DCE8",
         "& .MuiChip-label": {
             whiteSpace: "normal",
             overflowWrap: "anywhere",
@@ -365,7 +365,7 @@ export default function PropertyAlert() {
                 sx={{
                     width: "100%",
                     minWidth: 0,
-                    borderBottom: "1px solid #939292",
+                    borderBottom: "1px solid #E2E8F0",
                     pb: { xs: 2.5, sm: 3, md: 4 },
                 }}
             >
@@ -375,7 +375,7 @@ export default function PropertyAlert() {
                         height: { xs: 46, sm: 56, md: 64 },
                         borderRadius: { xs: 2.5, sm: 3 },
                         bgcolor: "#eff6ff",
-                        color: "#2563eb",
+                        color: "#2563EB",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -390,15 +390,11 @@ export default function PropertyAlert() {
 
                 <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography
-                        variant="h3"
-                        fontWeight={900}
+                        variant="h4" component="h1"
+                        fontWeight={700}
                         color="#0f172a"
                         sx={{
-                            fontSize: {
-                                xs: "1.5rem",
-                                sm: "2rem",
-                                md: "2.5rem",
-                            },
+                            fontSize: "1.875rem",
                             lineHeight: 1.2,
                             mb: 1,
                             overflowWrap: "anywhere",
@@ -458,7 +454,7 @@ export default function PropertyAlert() {
                     minWidth: 0,
                     boxSizing: "border-box",
                     p: { xs: 2.5, sm: 4, md: 6 },
-                    border: "1px solid #939292",
+                    border: "1px solid #E2E8F0",
                     borderRadius: { xs: 3, sm: 4 },
                     bgcolor: "#ffffff",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
@@ -466,7 +462,7 @@ export default function PropertyAlert() {
             >
                 <Typography
                     variant="h5"
-                    fontWeight={800}
+                    fontWeight={700}
                     color="#0f172a"
                     sx={{
                         fontSize: { xs: "1.35rem", sm: "1.5rem", md: "1.6rem" },
@@ -515,7 +511,7 @@ export default function PropertyAlert() {
                         mb: { xs: 4, sm: 5 },
                         "& .MuiOutlinedInput-root": {
                             minHeight: { xs: 54, sm: 60 },
-                            borderRadius: 2.5,
+                            borderRadius: "10px",
                             fontSize: { xs: "1rem", sm: "1.05rem" },
                         },
                     }}
@@ -589,8 +585,8 @@ export default function PropertyAlert() {
                 <Box
                     sx={{
                         bgcolor: "#f8fafc",
-                        border: "1px solid #939292",
-                        borderRadius: 3,
+                        border: "1px solid #E2E8F0",
+                        borderRadius: "16px",
                         p: { xs: 2, sm: 3 },
                         mb: { xs: 3, sm: 4 },
                         minWidth: 0,
@@ -641,7 +637,7 @@ export default function PropertyAlert() {
                                         height: "auto",
                                         minHeight: 38,
                                         bgcolor: "#ffffff",
-                                        border: "1px solid #939292",
+                                        border: "1px solid #E2E8F0",
                                         fontWeight: 600,
                                         fontSize: { xs: "0.85rem", sm: "0.95rem" },
                                         borderRadius: 2,
@@ -677,12 +673,12 @@ export default function PropertyAlert() {
                     onClick={handleAddAlert}
                     sx={{
                         minHeight: { xs: 50, sm: 58 },
-                        bgcolor: "#2563eb",
+                        bgcolor: "#2563EB",
                         fontWeight: 700,
                         textTransform: "none",
                         py: 1.5,
                         px: 2,
-                        borderRadius: 2.5,
+                        borderRadius: "10px",
                         fontSize: { xs: "1rem", sm: "1.1rem" },
                         boxShadow: "0 6px 18px rgba(37, 99, 235, 0.25)",
                         "&:hover": { bgcolor: "#1d4ed8" },
@@ -703,7 +699,7 @@ export default function PropertyAlert() {
                 >
                     <Typography
                         variant="h5"
-                        fontWeight={800}
+                        fontWeight={700}
                         color="#0f172a"
                         sx={{
                             fontSize: { xs: "1.25rem", sm: "1.45rem", md: "1.6rem" },
@@ -734,8 +730,8 @@ export default function PropertyAlert() {
                             width: "100%",
                             boxSizing: "border-box",
                             bgcolor: "#ffffff",
-                            border: "1px solid #939292",
-                            borderRadius: 4,
+                            border: "1px solid #E2E8F0",
+                            borderRadius: "16px",
                         }}
                     >
                         <CircularProgress />
@@ -746,8 +742,8 @@ export default function PropertyAlert() {
                         sx={{
                             p: { xs: 3, sm: 5, md: 6 },
                             textAlign: "center",
-                            border: "1px dashed #939292",
-                            borderRadius: 4,
+                            border: "1px dashed #E2E8F0",
+                            borderRadius: "16px",
                             bgcolor: "#ffffff",
                             boxSizing: "border-box",
                         }}
@@ -789,7 +785,7 @@ export default function PropertyAlert() {
                                     minWidth: 0,
                                     boxSizing: "border-box",
                                     p: { xs: 2.5, sm: 4, md: 5 },
-                                    border: "1px solid #939292",
+                                    border: "1px solid #E2E8F0",
                                     borderRadius: { xs: 3, sm: 4 },
                                     bgcolor: "#ffffff",
                                     boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
@@ -814,9 +810,9 @@ export default function PropertyAlert() {
                                                 width: { xs: 42, sm: 52 },
                                                 height: { xs: 42, sm: 52 },
                                                 flexShrink: 0,
-                                                borderRadius: 2.5,
+                                                borderRadius: "10px",
                                                 bgcolor: "#eff6ff",
-                                                color: "#2563eb",
+                                                color: "#2563EB",
                                                 display: "flex",
                                                 alignItems: "center",
                                                 justifyContent: "center",
@@ -834,7 +830,7 @@ export default function PropertyAlert() {
 
                                         <Box sx={{ minWidth: 0 }}>
                                             <Typography
-                                                fontWeight={800}
+                                                fontWeight={700}
                                                 variant="h6"
                                                 sx={{
                                                     fontSize: {
@@ -950,7 +946,7 @@ export default function PropertyAlert() {
                                                 sx={{
                                                     maxWidth: "100%",
                                                     bgcolor: "#f8fafc",
-                                                    border: "1px solid #939292",
+                                                    border: "1px solid #E2E8F0",
                                                     color: "#334155",
                                                     fontWeight: 600,
                                                     fontSize: {

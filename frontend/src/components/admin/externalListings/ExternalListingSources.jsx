@@ -156,14 +156,14 @@ export default function ExternalListingSources() {
     }
 
     return (
-        <section className="box-border min-h-[80vh] w-full min-w-0 max-w-full overflow-x-clip px-3 py-5 sm:px-5 sm:py-7 lg:px-8">
+        <section className="mx-auto box-border w-full min-w-0 max-w-[1120px] overflow-x-clip px-4 py-6 sm:px-6 md:px-8 md:py-8">
             {/* Page Header */}
-            <div className="mb-6 sm:mb-8">
-                <h1 className="text-xl font-bold text-slate-900 sm:text-2xl lg:text-3xl">
+            <div className="mb-6">
+                <h1 className="text-[1.875rem] font-bold leading-tight text-slate-900">
                     External Listing Sources
                 </h1>
 
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 sm:text-base">
+                <p className="mt-1.5 max-w-3xl text-base text-[#5B6577]">
                     Manage the websites used to collect external
                     property listings.
                 </p>
@@ -172,7 +172,7 @@ export default function ExternalListingSources() {
             {/* Add Source Form */}
             <form
                 onSubmit={handleAdd}
-                className="mb-6 flex w-full min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:p-4"
+                className="mb-6 flex w-full min-w-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:p-4"
             >
                 <input
                     type="url"
@@ -181,13 +181,13 @@ export default function ExternalListingSources() {
                     placeholder="Paste an Aqari, Mr Semsar, or 3a9arai listing URL"
                     required
                     aria-label="External listing URL"
-                    className="box-border h-12 w-full min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 sm:px-4 sm:text-base"
+                    className="box-border h-12 w-full min-w-0 flex-1 rounded-[10px] border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-base"
                 />
 
                 <button
                     type="submit"
                     disabled={refreshing || importing}
-                    className="h-12 w-full shrink-0 rounded-lg bg-emerald-600 px-5 font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                    className="h-12 w-full shrink-0 rounded-[10px] bg-blue-600 px-5 font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
                     Add URL
                 </button>
@@ -203,7 +203,7 @@ export default function ExternalListingSources() {
             {error && (
                 <div
                     role="alert"
-                    className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                    className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
                 >
                     <span className="min-w-0 break-words">{error}</span>
 
@@ -220,7 +220,7 @@ export default function ExternalListingSources() {
             {message && (
                 <p
                     role="status"
-                    className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+                    className="mb-5 rounded-[10px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
                 >
                     {message}
                 </p>
@@ -234,7 +234,7 @@ export default function ExternalListingSources() {
                     </h2>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+                        <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
                             {urls.length} {urls.length === 1 ? "source" : "sources"}
                         </span>
 
@@ -248,7 +248,7 @@ export default function ExternalListingSources() {
                                 loading ||
                                 urls.length === 0
                             }
-                            className="flex h-9 items-center justify-center gap-2 rounded-lg border border-emerald-200 px-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-9 items-center justify-center gap-2 rounded-[10px] border border-blue-200 px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <svg
                                 className={`h-4 w-4 ${importing ? "animate-spin" : ""}`}
@@ -278,7 +278,7 @@ export default function ExternalListingSources() {
                                 loading ||
                                 urls.length === 0
                             }
-                            className="flex h-9 items-center justify-center gap-2 rounded-lg border border-blue-200 px-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-9 items-center justify-center gap-2 rounded-[10px] border border-blue-200 px-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <svg
                                 className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
@@ -301,13 +301,13 @@ export default function ExternalListingSources() {
                 </div>
 
                 {loading ? (
-                    <div className="flex min-h-40 w-full items-center justify-center rounded-xl border border-slate-200 bg-white p-6">
+                    <div className="flex min-h-40 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white p-6">
                         <p className="text-sm text-slate-500">
                             Loading sources...
                         </p>
                     </div>
                 ) : urls.length === 0 ? (
-                    <div className="flex min-h-40 w-full flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center sm:py-12">
+                    <div className="flex min-h-40 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center sm:py-12">
                         <p className="font-semibold text-slate-700">
                             No external listing sources added yet.
                         </p>
@@ -322,10 +322,10 @@ export default function ExternalListingSources() {
                         {urls.map((sourceUrl, index) => (
                             <article
                                 key={sourceUrl}
-                                className="flex w-full min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-emerald-300 hover:shadow-md sm:flex-row sm:items-center sm:gap-4 sm:p-4 lg:p-5"
+                                className="flex w-full min-w-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-blue-300 sm:flex-row sm:items-center sm:gap-4 sm:p-4 lg:p-5"
                             >
                                 {/* Source Number */}
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-sm font-bold text-emerald-700">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-blue-50 text-sm font-bold text-blue-700">
                                     {String(index + 1).padStart(2, "0")}
                                 </div>
 
@@ -352,7 +352,7 @@ export default function ExternalListingSources() {
                                         href={sourceUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="mr-2 flex h-10 min-w-0 flex-1 items-center justify-center rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none"
+                                        className="mr-2 flex h-10 min-w-0 flex-1 items-center justify-center rounded-[10px] border border-slate-300 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none"
                                     >
                                         Open link
                                     </a>
@@ -361,7 +361,7 @@ export default function ExternalListingSources() {
                                         type="button"
                                         onClick={() => handleRemove(sourceUrl)}
                                         disabled={removingUrl === sourceUrl}
-                                        className="h-10 shrink-0 rounded-lg border border-red-200 px-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
+                                        className="h-10 shrink-0 rounded-[10px] border border-red-200 px-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
                                     >
                                         {removingUrl === sourceUrl
                                             ? "Deleting..."

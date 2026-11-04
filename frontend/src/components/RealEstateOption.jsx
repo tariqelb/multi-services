@@ -1,135 +1,38 @@
-// import React from 'react';
-// import { Box, Typography, CardActionArea } from '@mui/material';
-// import CategoryCard from './CategoryCard';
-
-// export default function RealEstateOption({ onSelectCategory, listRef }) {
-//   const categories = [
-//     { title: 'Apartment', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500' },
-//     { title: 'House', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=500' },
-//     { title: 'Villa', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=500' },
-//     { title: 'Studio', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500' },
-//     { title: 'Room', image: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=500' },
-//     { title: 'Store', image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500' },
-//     { title: 'Office', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=500' },
-//     { title: 'Land', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=500' },
-//     { title: 'Warehouse', image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=500' },
-//   ];
-
-//   const handleCategoryClick = (title) => {
-//     // 1. Update category filter
-//     onSelectCategory?.(title);
-
-//     // 2. Scroll smoothly to the property list section
-//     if (listRef?.current) {
-//       listRef.current.scrollIntoView({
-//         behavior: 'smooth',
-//         block: 'start',
-//       });
-//     }
-//   };
-
-//   return (
-//     <Box sx={{ px: { xs: 2, md: 6 }, py: 4 }}>
-//       <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#0f0e0e' }}>
-//         Explore Categories
-//       </Typography>
-      
-//       <Box
-//         sx={{
-//           backgroundColor: 'white',
-//           padding: { xs: 3, sm: 4, md: 5 },
-//           margin: { xs: 1, sm: 2, md: 3 },
-//           display: 'flex',
-//           flexWrap: 'wrap',
-//           justifyContent: 'space-around',
-//           alignItems: 'center',
-//           gap: 3,
-//           borderRadius: '16px',
-//           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-//           width: 'auto',
-//         }}
-//       >
-//         {categories.map((cat, index) => (
-//           <Box 
-//             key={index} 
-//             onClick={() => handleCategoryClick(cat.title)}
-//             sx={{ cursor: 'pointer', borderRadius: '12px', overflow: 'hidden' }}
-//           >
-//             <CategoryCard 
-//               title={cat.title} 
-//               image={cat.image} 
-//               width="420px" 
-//               height="190px" 
-//             />
-//           </Box>
-//         ))}
-//       </Box>
-//     </Box>
-//   );
-// }
-
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import CategoryCard from "./CategoryCard";
 
+import allPropertiesImage from "./../assets/all-properties.jpg";
+import apartmentImage from "./../assets/apartment.jpg";
+import houseImage from "./../assets/house.jpg";
+import villaImage from "./../assets/villa.jpg";
+import studioImage from "./../assets/studio.jpg";
+import roomImage from "./../assets/room.jpg";
+import storeImage from "./../assets/store.jpg";
+import officeImage from "./../assets/office.jpg";
+import landImage from "./../assets/land.jpg";
+import warehouseImage from "./../assets/warehouse.jpg";
+import commercialSpaceImage from "./../assets/commercial-space.jpg";
+import garageImage from "./../assets/garage.jpg";
+import otherImage from "./../assets/other.jpg";
+import commercialStoreImage from "./../assets/commercial-store.jpg";
+
 export default function RealEstateOption({ onSelectCategory, listRef }) {
     const categories = [
-        {
-            title: "All Properties",
-            image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500",
-        },
-        {
-            title: "Apartment",
-            image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500",
-        },
-        {
-            title: "House",
-            image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=500",
-        },
-        {
-            title: "Villa",
-            image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=500",
-        },
-        {
-            title: "Studio",
-            image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500",
-        },
-        {
-            title: "Room",
-            image: "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=500",
-        },
-        {
-            title: "Store",
-            image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500",
-        },
-        {
-            title: "Office",
-            image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=500",
-        },
-        {
-            title: "Land",
-            image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=500",
-        },
-        {
-            title: "Warehouse",
-            image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=500",
-        },
-        {
-            title: "Commercial space",
-            image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=500",
-        },
-        {
-            title: "Commercial store",
-            image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500",
-        },
-        {
-            title: "Garage",
-            image: "https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=500",
-        },
-        {
-            title: "other",
-            image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500",
-        },
+        { title: "All Properties", image: allPropertiesImage },
+        { title: "Apartment", image: apartmentImage },
+        { title: "House", image: houseImage },
+        { title: "Villa", image: villaImage },
+        { title: "Studio", image: studioImage },
+        { title: "Room", image: roomImage },
+        { title: "Store", image: storeImage },
+        { title: "Office", image: officeImage },
+        { title: "Land", image: landImage },
+        { title: "Warehouse", image: warehouseImage },
+        { title: "Commercial space", image: commercialSpaceImage },
+        { title: "Commercial store", image: commercialStoreImage },
+        { title: "Garage", image: garageImage },
+        { title: "other", image: otherImage },
     ];
 
     const handleCategoryClick = (title) => {
@@ -150,7 +53,7 @@ export default function RealEstateOption({ onSelectCategory, listRef }) {
                 sx={{
                     fontWeight: 700,
                     mb: 2,
-                    color: "#0f0e0e",
+                    color: "#0F172A",
                 }}
             >
                 Explore Categories
@@ -167,7 +70,7 @@ export default function RealEstateOption({ onSelectCategory, listRef }) {
         p: 1,
         borderRadius: "16px",
         backgroundColor: "white",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        border: "1px solid #E2E8F0",
     }}
 >
                 {categories.map((cat) => (

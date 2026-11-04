@@ -179,23 +179,23 @@ export default function PropertyInsertFormDetails({
                                 minWidth: 0,
                                 py: 1.4,
                                 px: 2,
-                                border: "1px solid #e1e6ef",
+                                border: "1px solid #D5DCE8",
                                 borderRadius: "10px !important",
                                 textTransform: "none",
                                 fontWeight: 650,
                                 color: "#667085",
                                 transition: "all 0.2s ease",
                                 "&:hover": {
-                                    bgcolor: "#ececec",
-                                    borderColor: "#c7d2fe",
+                                    bgcolor: "#EFF6FF",
+                                    borderColor: "#BFDBFE",
                                 },
                                 "&.Mui-selected": {
-                                    bgcolor: "#eef2ff",
-                                    color: "#4f46e5",
-                                    borderColor: "#a5b4fc",
+                                    bgcolor: "#EFF6FF",
+                                    color: "#2563EB",
+                                    borderColor: "#93C5FD",
                                 },
                                 "&.Mui-selected:hover": {
-                                    bgcolor: "#ececec",
+                                    bgcolor: "#EFF6FF",
                                 },
                             },
                         }}
@@ -224,13 +224,13 @@ export default function PropertyInsertFormDetails({
             <Box sx={{ mt: 4, mb: 2 }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
                     <Typography
-                        sx={{ color: "#4f46e5", fontWeight: 700 }}
+                        sx={{ color: "#2563EB", fontWeight: 700 }}
                     >
                         📍
                     </Typography>
                     <Typography
                         variant="subtitle1"
-                        sx={{ fontWeight: 750, color: "#263248" }}
+                        sx={{ fontWeight: 600, color: "#0F172A" }}
                     >
                         Property Location
                     </Typography>
@@ -238,7 +238,7 @@ export default function PropertyInsertFormDetails({
 
                 <Typography
                     variant="body2"
-                    sx={{ color: "#8490a3", mt: 0.5 }}
+                    sx={{ color: "#5B6577", mt: 0.5 }}
                 >
                     Help people find your property more easily.
                 </Typography>
@@ -296,13 +296,13 @@ export default function PropertyInsertFormDetails({
             <Box sx={{ mt: 4, mb: 2 }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
                     <Typography
-                        sx={{ color: "#4f46e5", fontWeight: 700 }}
+                        sx={{ color: "#2563EB", fontWeight: 700 }}
                     >
                         💳
                     </Typography>
                     <Typography
                         variant="subtitle1"
-                        sx={{ fontWeight: 750, color: "#263248" }}
+                        sx={{ fontWeight: 600, color: "#0F172A" }}
                     >
                         Price and Specifications
                     </Typography>
@@ -310,7 +310,7 @@ export default function PropertyInsertFormDetails({
 
                 <Typography
                     variant="body2"
-                    sx={{ color: "#8490a3", mt: 0.5 }}
+                    sx={{ color: "#5B6577", mt: 0.5 }}
                 >
                     Add the price, surface area, and property
                     characteristics.
@@ -396,7 +396,7 @@ export default function PropertyInsertFormDetails({
                         >
                             <Typography
                                 sx={{
-                                    color: "#4f46e5",
+                                    color: "#2563EB",
                                     fontWeight: 700,
                                 }}
                             >
@@ -405,8 +405,8 @@ export default function PropertyInsertFormDetails({
                             <Typography
                                 variant="subtitle1"
                                 sx={{
-                                    fontWeight: 750,
-                                    color: "#263248",
+                                    fontWeight: 600,
+                                    color: "#0F172A",
                                 }}
                             >
                                 Rental Terms
@@ -415,7 +415,7 @@ export default function PropertyInsertFormDetails({
 
                         <Typography
                             variant="body2"
-                            sx={{ color: "#8490a3", mt: 0.5 }}
+                            sx={{ color: "#5B6577", mt: 0.5 }}
                         >
                             Specify the rental conditions and additional
                             costs.
@@ -429,7 +429,7 @@ export default function PropertyInsertFormDetails({
                                     minHeight: 56,
                                     display: "flex",
                                     alignItems: "center",
-                                    border: "1px solid #e1e6ef",
+                                    border: "1px solid #D5DCE8",
                                     borderRadius: 2,
                                     px: 1.5,
                                 }}
@@ -459,7 +459,7 @@ export default function PropertyInsertFormDetails({
                                     minHeight: 56,
                                     display: "flex",
                                     alignItems: "center",
-                                    border: "1px solid #e1e6ef",
+                                    border: "1px solid #D5DCE8",
                                     borderRadius: 2,
                                     px: 1.5,
                                 }}

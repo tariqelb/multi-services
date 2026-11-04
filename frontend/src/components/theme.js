@@ -4,7 +4,7 @@ import { createTheme } from "@mui/material/styles";
 // so MUI pages and Tailwind pages use the exact same primary color.
 const theme = createTheme({
     palette: {
-        primary: { main: "#2563EB", dark: "#1D4ED8", light: "#DBEAFE" },
+        primary: { main: "#2563EB", dark: "#1D4ED8", light: "#DBEAFE" , toplight: "#e3eeff"},
         success: { main: "#0B6B43", light: "#DDF3E8" },
         error: { main: "#B42323", light: "#FCE4E4" },
         background: { default: "#F4F7FB", paper: "#FFFFFF" },

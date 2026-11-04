@@ -2,10 +2,11 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Box, Stack, Typography } from "@mui/material";
+import { Alert, Stack } from "@mui/material";
 import axiosInstance from "../../api/axiosInstance";
 import { updateProfile } from "../../redux/actions/profile/profileAction";
 
+import PageLayout from "../PageLayout";
 import AccountProfile from "./AccountProfile";
 import EmailNotifications from "./EmailNotifications";
 import WhatsappNotifications from "./WhatsappNotifications";
@@ -722,40 +723,16 @@ export default function SettingsPage() {
     };
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                px: { xs: 2.5, md: 5 },
-                py: { xs: 4, md: 6 },
-            }}
+        <PageLayout
+            title="Settings"
+            subtitle="Manage your profile, notification preferences, and account security."
+            maxWidth={900}
         >
-            <Box mb={5}>
-                <Typography
-                    variant="h4"
-                    fontWeight={900}
-                    sx={{
-                        color: "#064e3b",
-                        mb: 1,
-                        fontSize: { xs: "2rem", md: "2.35rem" },
-                    }}
-                >
-                    Settings
-                </Typography>
-
-                <Typography
-                    color="text.secondary"
-                    sx={{ fontSize: "1.05rem" }}
-                >
-                    Manage your profile, notification preferences, and
-                    account security.
-                </Typography>
-            </Box>
-
             {notice && (
                 <Alert
                     severity={notice.type}
                     onClose={() => setNotice(null)}
-                    sx={{ mb: 4, py: 1.5 }}
+                    sx={{ mb: 3, borderRadius: "10px" }}
                 >
                     {notice.message}
                 </Alert>
@@ -839,6 +816,6 @@ export default function SettingsPage() {
                     error={deletionError}
                 />
             </Stack>
-        </Box>
+        </PageLayout>
     );
 }

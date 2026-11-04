@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
     Box,
     Typography,
@@ -8,17 +7,7 @@ import {
 
 import PropertyCard from "./PropertyCard";
 import getImageUrl from "../utils/getImageUrl";
-// const API_URL = "http://localhost:3000";
-
-// function getImageUrl(image) {
-//     const path = typeof image === "string" ? image : image?.path;
-
-//     if (!path) return "";
-
-//     if (/^https?:\/\//i.test(path)) return path;
-
-//     return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
-// }
+import axiosInstance from "../api/axiosInstance";
 
 export default function SimilarProperties({
     properties = [],
@@ -27,8 +16,6 @@ export default function SimilarProperties({
     const [page, setPage] = useState(1);
     const itemsPerPage = 4;
 
-    if (properties.length === 0) return null;
-
     const totalPages = Math.ceil(properties.length / itemsPerPage);
 
     const displayedProperties = properties.slice(
@@ -36,9 +23,31 @@ export default function SimilarProperties({
         page * itemsPerPage
     );
 
-    const handlePageChange = (event, value) => {
+    // Track property clicks and preserve existing navigation behavior.
+    const handleSelectProperty = useCallback(
+        (property) => {
+            if (!property?._id) return;
+
+            // Send click statistics without delaying navigation.
+            axiosInstance
+                .post(`/property/${property._id}/click`)
+                .catch((error) => {
+                    console.error(
+                        "Unable to track similar property click:",
+                        error.message
+                    );
+                });
+
+            onSelectProperty?.(property);
+        },
+        [onSelectProperty]
+    );
+
+    const handlePageChange = (_event, value) => {
         setPage(value);
     };
+
+    if (properties.length === 0) return null;
 
     return (
         <Box
@@ -54,7 +63,7 @@ export default function SimilarProperties({
             <Typography
                 variant="h6"
                 sx={{
-                    fontWeight: 800,
+                    fontWeight: 700,
                     mb: 3,
                     color: "#0f172a",
                 }}
@@ -70,7 +79,11 @@ export default function SimilarProperties({
                         sm: "repeat(2, minmax(0, 1fr))",
                         lg: "repeat(4, minmax(0, 1fr))",
                     },
-                    gap: { xs: 3, sm: 2.5, md: 3 },
+                    gap: {
+                        xs: 3,
+                        sm: 2.5,
+                        md: 3,
+                    },
                     alignItems: "stretch",
                     width: "100%",
                 }}
@@ -85,7 +98,9 @@ export default function SimilarProperties({
                         title: property.title,
                         price:
                             property.price != null
-                                ? `${Number(property.price).toLocaleString()} MAD`
+                                ? `${Number(
+                                      property.price
+                                  ).toLocaleString()} MAD`
                                 : "0 MAD",
                         image: fullImageUrl,
                         listingType: property.listingType,
@@ -100,7 +115,9 @@ export default function SimilarProperties({
                         salons: property.salons,
                         bathrooms: property.bathrooms,
                         createdDate: property.createdAt
-                            ? new Date(property.createdAt).toLocaleDateString("en-GB")
+                            ? new Date(
+                                  property.createdAt
+                              ).toLocaleDateString("en-GB")
                             : "",
                     };
 
@@ -120,7 +137,7 @@ export default function SimilarProperties({
                             <PropertyCard
                                 property={formattedProperty}
                                 onClick={() =>
-                                    onSelectProperty?.(property)
+                                    handleSelectProperty(property)
                                 }
                             />
                         </Box>

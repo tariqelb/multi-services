@@ -128,7 +128,7 @@ function EmailVerification() {
                         onChange={handleCodeChange}
                         maxLength={6}
                         required
-                        className="h-14 w-full rounded border border-gray-600 bg-white px-4 text-center text-2xl font-bold tracking-[0.5em] text-black outline-none transition-colors focus:border-teal-600"
+                        className="h-14 w-full rounded-[10px] border border-gray-600 bg-white px-4 text-center text-2xl font-bold tracking-[0.5em] text-black outline-none transition-colors focus:border-blue-600"
                     />
 
                     <p className="text-xs text-gray-500">
@@ -157,7 +157,7 @@ function EmailVerification() {
                 <button
                     type="submit"
                     disabled={loading || code.length !== 6}
-                    className="h-13 w-full rounded bg-teal-600 text-base font-bold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-13 w-full rounded-[10px] bg-blue-600 text-base font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {loading ? "Verifying..." : "Verify email"}
                 </button>
@@ -172,7 +172,7 @@ function EmailVerification() {
                     type="button"
                     onClick={handleResendCode}
                     disabled={resending}
-                    className="mt-2 font-semibold text-teal-600 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mt-2 font-semibold text-blue-600 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {resending ? "Sending..." : "Resend verification code"}
                 </button>
@@ -182,7 +182,7 @@ function EmailVerification() {
                 <button
                     type="button"
                     onClick={() => dispatch(activeFormAction("signup"))}
-                    className="text-sm text-gray-600 hover:text-teal-600"
+                    className="text-sm text-gray-600 hover:text-blue-600"
                 >
                     Back to signup
                 </button>

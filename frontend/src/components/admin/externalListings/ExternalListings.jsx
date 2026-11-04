@@ -29,6 +29,7 @@ import BedOutlinedIcon from "@mui/icons-material/BedOutlined";
 import BathtubOutlinedIcon from "@mui/icons-material/BathtubOutlined";
 import SquareFootOutlinedIcon from "@mui/icons-material/SquareFootOutlined";
 import axiosInstance from "../../../api/axiosInstance";
+import PageLayout from "../../PageLayout";
 
 const API_URL = "/external-listings";
 const ITEMS_PER_PAGE = 9;
@@ -253,7 +254,7 @@ function PropertyCard({ listing, onTrackClick }) {
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                borderRadius: 3,
+                borderRadius: "16px",
                 overflow: "hidden",
                 bgcolor: "background.paper",
                 transition: "transform 0.2s, box-shadow 0.2s",
@@ -294,7 +295,7 @@ function PropertyCard({ listing, onTrackClick }) {
                 <Typography
                     variant="h5"
                     sx={{
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: "success.dark",
                         fontSize: "1.3rem",
                     }}
@@ -527,7 +528,7 @@ function ExternalListingFilters({
                 p: { xs: 2, sm: 2.5 },
                 border: "1px solid",
                 borderColor: "divider",
-                borderRadius: 3,
+                borderRadius: "16px",
                 bgcolor: "background.paper",
                 boxShadow: 1,
             }}
@@ -934,31 +935,11 @@ export default function ExternalListings() {
     };
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                maxWidth: 1600,
-                mx: "auto",
-                p: { xs: 2, md: 3 },
-            }}
+        <PageLayout
+            title="Discover Properties"
+            subtitle="Explore properties published on external real estate websites."
+            maxWidth={1280}
         >
-            {/* Page heading */}
-            <Box sx={{ mb: 3 }}>
-                <Typography
-                    variant="h4"
-                    sx={{
-                        fontWeight: 800,
-                        fontSize: { xs: "1.6rem", md: "2rem" },
-                    }}
-                >
-                    Discover Properties
-                </Typography>
-
-                <Typography color="text.secondary" sx={{ mt: 0.75 }}>
-                    Explore properties published on external real estate websites.
-                </Typography>
-            </Box>
-
             {error && (
                 <Alert
                     severity="error"
@@ -1041,7 +1022,7 @@ export default function ExternalListings() {
                                 textAlign: "center",
                                 border: 1,
                                 borderColor: "divider",
-                                borderRadius: 3,
+                                borderRadius: "16px",
                             }}
                         >
                             <Typography
@@ -1115,7 +1096,7 @@ export default function ExternalListings() {
                     )}
                 </>
             )}
-        </Box>
+        </PageLayout>
     );
 }
 

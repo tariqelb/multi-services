@@ -153,10 +153,12 @@ export default function ProfilePropertyList({
         <Box
             ref={listRef}
             sx={{
-                p: { xs: 2, md: 4 },
                 scrollMarginTop: "0px",
+                width: "100%",
                 maxWidth: "100%",
                 mx: "auto",
+                p: { xs: 2, md: 4 },
+                // mx: "auto",
             }}
         >
             {/* Property category filter */}
@@ -181,7 +183,7 @@ export default function ProfilePropertyList({
                     variant="h5"
                     sx={{
                         fontWeight: 700,
-                        color: "#1f2937",
+                        color: "#0F172A",
                     }}
                 >
                     {selectedCategory === "All Properties"
@@ -191,7 +193,7 @@ export default function ProfilePropertyList({
 
                 <Typography
                     variant="body2"
-                    sx={{ color: "#6b7280", fontWeight: 600 }}
+                    sx={{ color: "#5B6577", fontWeight: 600 }}
                 >
                     {filteredProperties.length}{" "}
                     {filteredProperties.length === 1
@@ -207,8 +209,8 @@ export default function ProfilePropertyList({
                         py: 6,
                         textAlign: "center",
                         border: "1px dashed #d1d5db",
-                        borderRadius: 3,
-                        backgroundColor: "#fafafa",
+                        borderRadius: "16px",
+                        backgroundColor: "#F4F7FB",
                     }}
                 >
                     <Typography
@@ -228,7 +230,7 @@ export default function ProfilePropertyList({
 
                     <Typography
                         variant="body2"
-                        sx={{ color: "#6b7280", mb: 2 }}
+                        sx={{ color: "#5B6577", mb: 2 }}
                     >
                         You haven't published any listings in this category yet.
                     </Typography>

@@ -62,6 +62,34 @@ const feedbackSchema = new mongoose.Schema(
             default: "open",
             index: true,
         },
+        attachments: [
+            {
+                originalName: {
+                    type: String,
+                    required: true,
+                },
+
+                filename: {
+                    type: String,
+                    required: true,
+                },
+
+                path: {
+                    type: String,
+                    required: true,
+                },
+
+                mimetype: {
+                    type: String,
+                    required: true,
+                },
+
+                size: {
+                    type: Number,
+                    required: true,
+                },
+            },
+        ],
     },
     {
         timestamps: true,

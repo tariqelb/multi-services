@@ -34,9 +34,9 @@ export default function PropertyContactOwner({ property }) {
             variant="outlined"
             sx={{
                 p: { xs: 3, md: 4 },
-                borderRadius: 4,
+                borderRadius: "16px",
+                borderColor: "#E2E8F0",
                 bgcolor: "#ffffff",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
                 textAlign: "center",
                 mb: 4,
             }}
@@ -44,9 +44,9 @@ export default function PropertyContactOwner({ property }) {
             <Typography
                 variant="h5"
                 sx={{
-                    fontWeight: 800,
+                    fontWeight: 700,
                     mb: 1,
-                    color: "#0f172a",
+                    color: "#0F172A",
                 }}
             >
                 Interested in this property?
@@ -55,7 +55,7 @@ export default function PropertyContactOwner({ property }) {
             <Typography
                 variant="body2"
                 sx={{
-                    color: "#64748b",
+                    color: "#5B6577",
                     mb: 3,
                 }}
             >
@@ -66,7 +66,7 @@ export default function PropertyContactOwner({ property }) {
                 variant="h6"
                 sx={{
                     fontWeight: 700,
-                    color: "#1e293b",
+                    color: "#0F172A",
                 }}
             >
                 {ownerName}
@@ -81,7 +81,7 @@ export default function PropertyContactOwner({ property }) {
                         sx={{
                             display: "inline-block",
                             mt: 1,
-                            color: "#047857",
+                            color: "#1D4ED8",
                             fontSize: "1.1rem",
                             fontWeight: 700,
                             textDecoration: "none",
@@ -121,15 +121,7 @@ export default function PropertyContactOwner({ property }) {
                             variant="contained"
                             startIcon={<Phone />}
                             fullWidth
-                            sx={{
-                                bgcolor: "#059669",
-                                "&:hover": {
-                                    bgcolor: "#047857",
-                                },
-                                textTransform: "none",
-                                fontWeight: 700,
-                                py: 1.2,
-                            }}
+                            sx={{ py: 1.2 }}
                         >
                             Call Owner
                         </Button>
@@ -143,14 +135,12 @@ export default function PropertyContactOwner({ property }) {
                             startIcon={<WhatsApp />}
                             fullWidth
                             sx={{
-                                color: "#059669",
-                                borderColor: "#059669",
+                                color: "#047857",
+                                borderColor: "#86CBA8",
                                 "&:hover": {
                                     borderColor: "#047857",
                                     bgcolor: "#ecfdf5",
                                 },
-                                textTransform: "none",
-                                fontWeight: 700,
                                 py: 1.2,
                             }}
                         >

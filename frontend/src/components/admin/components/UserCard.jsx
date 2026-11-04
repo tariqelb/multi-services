@@ -39,7 +39,7 @@ export default function UserCard({ user }) {
                 width: "100%",
                 border: "1px solid",
                 borderColor: "divider",
-                borderRadius: 3,
+                borderRadius: "16px",
                 overflow: "hidden",
             }}
         >
@@ -71,7 +71,7 @@ export default function UserCard({ user }) {
                             useFlexGap
                             mb={1}
                         >
-                            <Typography variant="h6" fontWeight={800}>
+                            <Typography variant="h6" fontWeight={700}>
                                 {fullName}
                             </Typography>
 
@@ -129,7 +129,7 @@ export default function UserCard({ user }) {
 
                 <Divider sx={{ my: 2.5 }} />
 
-                <Typography variant="subtitle2" fontWeight={800} mb={1.5}>
+                <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
                     User Activity
                 </Typography>
 

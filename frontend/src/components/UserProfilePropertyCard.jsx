@@ -175,7 +175,7 @@ export default function UserProfileCard({
                     position: "relative",
                     display: "flex",
                     flexDirection: { xs: "column", sm: "row" },
-                    borderRadius: 3,
+                    borderRadius: "16px",
                     borderColor: "#e2e8f0",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
                     overflow: "hidden",
@@ -238,7 +238,7 @@ export default function UserProfileCard({
                                 <Typography
                                     variant="caption"
                                     sx={{
-                                        color: "#64748b",
+                                        color: "#5B6577",
                                         fontWeight: 600,
                                     }}
                                 >
@@ -250,7 +250,7 @@ export default function UserProfileCard({
                                 <Typography
                                     variant="h6"
                                     sx={{
-                                        fontWeight: 800,
+                                        fontWeight: 700,
                                         color: "#0f172a",
                                         mt: 0.5,
                                     }}
@@ -260,8 +260,8 @@ export default function UserProfileCard({
                                 <Typography
                                     variant="h6"
                                     sx={{
-                                        fontWeight: 900,
-                                        color: "#059669",
+                                        fontWeight: 700,
+                                        color: "#2563EB",
                                         whiteSpace: "nowrap",
                                     }}
                                 >
@@ -280,9 +280,9 @@ export default function UserProfileCard({
                                     bgcolor:
                                         listingType === "For Rent"
                                             ? "#0284c7"
-                                            : "#059669",
+                                            : "#2563EB",
                                     color: "white",
-                                    fontWeight: 800,
+                                    fontWeight: 700,
                                     fontSize: "0.925rem",
                                     borderRadius: "16px",
                                 }}
@@ -298,7 +298,7 @@ export default function UserProfileCard({
                                     py: 0.2,
                                     bgcolor: statusInfo.bgcolor,
                                     color: statusInfo.color,
-                                    fontWeight: 800,
+                                    fontWeight: 700,
                                     fontSize: "0.925rem",
                                     textTransform: "capitalize",
                                     borderRadius: "16px",
@@ -314,14 +314,14 @@ export default function UserProfileCard({
                                 spacing={0.5}
                                 alignItems="center"
                                 sx={{
-                                    color: "#64748b",
+                                    color: "#5B6577",
                                     mb: 2,
                                 }}
                             >
                                 <LocationOn
                                     sx={{
                                         fontSize: 16,
-                                        color: "#059669",
+                                        color: "#2563EB",
                                     }}
                                 />
 
@@ -368,6 +368,8 @@ export default function UserProfileCard({
                     </Box>
 
                     {/* Actions Toolbar: aligned to the far right */}
+                    
+                    {/* Actions Toolbar */}
                     <Box
                         sx={{
                             display: "flex",
@@ -376,16 +378,19 @@ export default function UserProfileCard({
                             pt: 2,
                             borderTop: "1px solid #f1f5f9",
                             mt: "auto",
+                            width: "100%",
+                            overflowX: "auto",
                         }}
                     >
                         <Stack
                             direction="row"
-                            spacing={1.5}
+                            spacing={{ xs: 0.75, sm: 1.5 }}
                             justifyContent="flex-end"
                             alignItems="center"
                             sx={{
-                                flexWrap: "wrap",
-                                rowGap: 1,
+                                flexWrap: "nowrap",
+                                width: "100%",
+                                minWidth: 0,
                             }}
                         >
                             {/* Edit Status */}
@@ -395,7 +400,7 @@ export default function UserProfileCard({
                                 disabled={updatingStatus}
                                 startIcon={
                                     updatingStatus ? (
-                                        <CircularProgress size={16} />
+                                        <CircularProgress size={14} />
                                     ) : (
                                         <Edit />
                                     )
@@ -404,9 +409,19 @@ export default function UserProfileCard({
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
-                                    borderColor: "#cbd5e1",
+                                    borderColor: "#D5DCE8",
                                     color: "#0f172a",
                                     whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                    px: { xs: 0.8, sm: 1.5 },
+                                    fontSize: { xs: "0.68rem", sm: "0.875rem" },
+                                    "& .MuiButton-startIcon": {
+                                        mr: { xs: 0.5, sm: 1 },
+                                        ml: 0,
+                                        "& > *:nth-of-type(1)": {
+                                            fontSize: { xs: 15, sm: 20 },
+                                        },
+                                    },
                                 }}
                             >
                                 {updatingStatus ? "Updating..." : "Edit Status"}
@@ -431,7 +446,10 @@ export default function UserProfileCard({
                                         key={opt}
                                         selected={opt === currentStatus}
                                         onClick={() => handleSelectStatus(opt)}
-                                        sx={{ fontWeight: 600, fontSize: "0.875rem" }}
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "0.875rem",
+                                        }}
                                     >
                                         {opt}
                                     </MenuItem>
@@ -443,7 +461,6 @@ export default function UserProfileCard({
                                 variant="outlined"
                                 size="small"
                                 startIcon={<Visibility />}
-                                // onClick={() => onViewDetails?.(property)}
                                 onClick={() => {
                                     const propertyId = property._id || property.id;
 
@@ -459,9 +476,19 @@ export default function UserProfileCard({
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
-                                    borderColor: "#cbd5e1",
+                                    borderColor: "#D5DCE8",
                                     color: "#334155",
                                     whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                    px: { xs: 0.8, sm: 1.5 },
+                                    fontSize: { xs: "0.68rem", sm: "0.875rem" },
+                                    "& .MuiButton-startIcon": {
+                                        mr: { xs: 0.5, sm: 1 },
+                                        ml: 0,
+                                        "& > *:nth-of-type(1)": {
+                                            fontSize: { xs: 15, sm: 20 },
+                                        },
+                                    },
                                 }}
                             >
                                 View Details
@@ -478,12 +505,23 @@ export default function UserProfileCard({
                                     textTransform: "none",
                                     fontWeight: 700,
                                     whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                    px: { xs: 0.8, sm: 1.5 },
+                                    fontSize: { xs: "0.68rem", sm: "0.875rem" },
+                                    "& .MuiButton-startIcon": {
+                                        mr: { xs: 0.5, sm: 1 },
+                                        ml: 0,
+                                        "& > *:nth-of-type(1)": {
+                                            fontSize: { xs: 15, sm: 20 },
+                                        },
+                                    },
                                 }}
                             >
                                 Delete
                             </Button>
                         </Stack>
                     </Box>
+
                 </Box>
             </Card>
 
@@ -492,7 +530,7 @@ export default function UserProfileCard({
                 open={openDeleteModal}
                 onClose={() => setOpenDeleteModal(false)}
             >
-                <DialogTitle sx={{ fontWeight: 800 }}>
+                <DialogTitle sx={{ fontWeight: 700 }}>
                     Confirm Property Deletion
                 </DialogTitle>
 
@@ -510,7 +548,7 @@ export default function UserProfileCard({
                         sx={{
                             textTransform: "none",
                             fontWeight: 600,
-                            color: "#64748b",
+                            color: "#5B6577",
                         }}
                     >
                         Cancel

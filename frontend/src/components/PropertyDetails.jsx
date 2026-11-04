@@ -48,7 +48,7 @@ function InfoItem({ label, value }) {
         >
             <Typography
                 sx={{
-                    fontWeight: 800,
+                    fontWeight: 700,
                     fontSize: "1.15rem",
                     color: "#0f172a",
                     overflowWrap: "anywhere",
@@ -59,7 +59,7 @@ function InfoItem({ label, value }) {
 
             <Typography
                 variant="caption"
-                sx={{ color: "#64748b", fontWeight: 600 }}
+                sx={{ color: "#5B6577", fontWeight: 600 }}
             >
                 {label}
             </Typography>
@@ -283,7 +283,7 @@ export default function PropertyDetails({
             <Paper
                 variant="outlined"
                 sx={{
-                    borderRadius: 4,
+                    borderRadius: "16px",
                     overflow: "hidden",
                     mb: 4,
                     boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)",
@@ -395,8 +395,8 @@ export default function PropertyDetails({
                                     p: 0,
                                     border:
                                         index === activeImage
-                                            ? "3px solid #059669"
-                                            : "1px solid #cbd5e1",
+                                            ? "3px solid #2563EB"
+                                            : "1px solid #D5DCE8",
                                     borderRadius: 2,
                                     overflow: "hidden",
                                     cursor: "pointer",
@@ -425,7 +425,7 @@ export default function PropertyDetails({
                 variant="outlined"
                 sx={{
                     p: { xs: 3, md: 4 },
-                    borderRadius: 4,
+                    borderRadius: "16px",
                     mb: 4,
                     boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
                 }}
@@ -440,7 +440,7 @@ export default function PropertyDetails({
                         <Typography
                             variant="h5"
                             sx={{
-                                fontWeight: 800,
+                                fontWeight: 700,
                                 color: "#0f172a",
                                 mb: 1,
                                 overflowWrap: "anywhere",
@@ -460,7 +460,7 @@ export default function PropertyDetails({
                                         <LocationOn
                                             sx={{
                                                 fontSize: 20,
-                                                color: "#059669",
+                                                color: "#2563EB",
                                                 flexShrink: 0,
                                             }}
                                         />
@@ -482,7 +482,7 @@ export default function PropertyDetails({
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: "#64748b",
+                                            color: "#5B6577",
                                             pl: 3,
                                             overflowWrap: "anywhere",
                                         }}
@@ -506,8 +506,8 @@ export default function PropertyDetails({
                         <Typography
                             variant="h4"
                             sx={{
-                                fontWeight: 900,
-                                color: "#047857",
+                                fontWeight: 700,
+                                color: "#1D4ED8",
                                 mb: 0.5,
                                 overflowWrap: "anywhere",
                             }}
@@ -530,9 +530,9 @@ export default function PropertyDetails({
                                 label={property.listingType || "For Sale"}
                                 size="medium"
                                 sx={{
-                                    bgcolor: "#ecfdf5",
-                                    color: "#059669",
-                                    fontWeight: 800,
+                                    bgcolor: "#EFF6FF",
+                                    color: "#2563EB",
+                                    fontWeight: 700,
                                     fontSize: "1rem",
                                 }}
                             />
@@ -544,7 +544,7 @@ export default function PropertyDetails({
                                     sx={{
                                         bgcolor: statusInfo.bgcolor,
                                         color: statusInfo.color,
-                                        fontWeight: 800,
+                                        fontWeight: 700,
                                         textTransform: "capitalize",
                                         fontSize: "1rem",
                                     }}
@@ -686,17 +686,17 @@ export default function PropertyDetails({
                                 borderRadius: 1,
                                 px: 2,
                                 py: 0.75,
-                                borderColor: "#059669",
-                                color: "#059669",
+                                borderColor: "#2563EB",
+                                color: "#2563EB",
                                 bgcolor: "transparent",
                                 boxShadow: "none",
                                 "&:hover": {
-                                    borderColor: "#047857",
-                                    bgcolor: "#ecfdf5",
+                                    borderColor: "#1D4ED8",
+                                    bgcolor: "#EFF6FF",
                                     boxShadow: "none",
                                 },
                                 "&.Mui-disabled": {
-                                    borderColor: "#cbd5e1",
+                                    borderColor: "#D5DCE8",
                                     color: "#94a3b8",
                                 },
                             }}
@@ -724,7 +724,7 @@ export default function PropertyDetails({
                         <Typography
                             variant="body2"
                             sx={{
-                                color: "#64748b",
+                                color: "#5B6577",
                                 fontWeight: 600,
                                 mb: 0.5,
                             }}
@@ -736,7 +736,7 @@ export default function PropertyDetails({
                             component="a"
                             href={`mailto:${ownerEmail}`}
                             sx={{
-                                color: "#047857",
+                                color: "#1D4ED8",
                                 fontWeight: 600,
                                 textDecoration: "none",
                                 overflowWrap: "anywhere",
@@ -756,7 +756,7 @@ export default function PropertyDetails({
                 variant="outlined"
                 sx={{
                     p: { xs: 3, md: 4 },
-                    borderRadius: 4,
+                    borderRadius: "16px",
                     mb: 4,
                     boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
                 }}
@@ -764,7 +764,7 @@ export default function PropertyDetails({
                 <Typography
                     variant="h6"
                     sx={{
-                        fontWeight: 800,
+                        fontWeight: 700,
                         mb: 2,
                         color: "#0f172a",
                     }}
@@ -792,7 +792,7 @@ export default function PropertyDetails({
                         <Typography
                             variant="h6"
                             sx={{
-                                fontWeight: 800,
+                                fontWeight: 700,
                                 mb: 2,
                                 color: "#0f172a",
                             }}

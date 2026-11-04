@@ -45,13 +45,13 @@ export default function RealEstateBanner() {
                     sx={{
                     textTransform: 'none',
                     color: '#ffffff',
-                    backgroundColor: 'rgba(30, 58, 138, 0.8)',
+                    backgroundColor: 'rgba(37, 99, 235, 0.92)',
                     fontWeight: 600,
                     px: 2,
                     py: 1,
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     '&:hover': {
-                        backgroundColor: 'rgba(30, 58, 138, 1)',
+                        backgroundColor: '#1D4ED8',
                     }
                     }}
                 >
@@ -64,7 +64,7 @@ export default function RealEstateBanner() {
         {/* Main Banner Content */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
           <Box sx={{ textAlign: 'left', color: '#ffef45', maxWidth: '600px' }}>
-            <Typography variant="h4" sx={{ fontWeight: 800, mb: 2, lineHeight: 1.4 }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, lineHeight: 1.4 }}>
               Comprehensive Real Estate Platform <br />
               For Buying, Selling, and Renting Properties <br />
               Across All Cities in Morocco

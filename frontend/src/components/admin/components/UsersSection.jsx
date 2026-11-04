@@ -44,7 +44,7 @@ export default function UsersSection() {
     }, []);
 
     return (
-        <Box>
+        <Box sx={{ mb: 2 }}>
             <Stack
                 direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
@@ -52,11 +52,10 @@ export default function UsersSection() {
                 spacing={1}
                 mb={3}
             >
-                <Box>
-                    <Typography variant="h5" fontWeight={800}>
-                        Users
+                <Box sx={{pb:5}}>
+                    <Typography variant="h5" fontWeight={700}>
+                            Users
                     </Typography>
-
                     <Typography
                         variant="body2"
                         color="text.secondary"
@@ -64,8 +63,8 @@ export default function UsersSection() {
                     >
                         Account information and marketplace activity.
                     </Typography>
-                </Box>
 
+                </Box>
                 <Chip
                     icon={<PeopleAltOutlinedIcon />}
                     label={`${users.length} users`}

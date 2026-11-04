@@ -72,9 +72,8 @@ export default function ChangePassword({
         <Card
             variant="outlined"
             sx={{
-                borderRadius: 3.5,
-                boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
-            }}
+                borderRadius: "16px",
+                            }}
         >
             <CardContent sx={{ p: { xs: 3, md: 4.5 } }}>
                 <Stack
@@ -87,9 +86,9 @@ export default function ChangePassword({
                         sx={{
                             width: 52,
                             height: 52,
-                            borderRadius: 2.5,
-                            bgcolor: "#ecfdf5",
-                            color: "#047857",
+                            borderRadius: "10px",
+                            bgcolor: "#EFF6FF",
+                            color: "#1D4ED8",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -102,7 +101,7 @@ export default function ChangePassword({
                     <Box>
                         <Typography
                             variant="h6"
-                            fontWeight={800}
+                            fontWeight={700}
                             sx={{ mb: 0.5 }}
                         >
                             Change Password
@@ -183,13 +182,11 @@ export default function ChangePassword({
                         startIcon={<LockOutlined />}
                         sx={{
                             mt: 4,
-                            bgcolor: "#047857",
-                            "&:hover": { bgcolor: "#065f46" },
                             textTransform: "none",
                             fontWeight: 700,
                             py: 1.25,
                             px: 3,
-                            borderRadius: 2.5,
+                            borderRadius: "10px",
                         }}
                     >
                         {loading ? "Updating..." : "Update password"}

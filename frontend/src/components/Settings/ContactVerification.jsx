@@ -131,8 +131,8 @@ function VerificationStep({
         <Box
             sx={{
                 p: 2.5,
-                border: "1px solid #e5e7eb",
-                borderRadius: 2.5,
+                border: "1px solid #E2E8F0",
+                borderRadius: "10px",
             }}
         >
             <Stack
@@ -152,8 +152,8 @@ function VerificationStep({
                             width: 42,
                             height: 42,
                             borderRadius: 2,
-                            bgcolor: "#ecfdf5",
-                            color: "#047857",
+                            bgcolor: "#EFF6FF",
+                            color: "#1D4ED8",
                             display: "grid",
                             placeItems: "center",
                             flexShrink: 0,
@@ -253,12 +253,6 @@ function VerificationStep({
                                     variant="contained"
                                     onClick={handleConfirmCode}
                                     disabled={loading || code.length !== 6}
-                                    sx={{
-                                        bgcolor: "#047857",
-                                        "&:hover": {
-                                            bgcolor: "#065f46",
-                                        },
-                                    }}
                                 >
                                     {loading ? (
                                         <CircularProgress
@@ -320,16 +314,16 @@ export default function ContactVerification({
         <Box
             sx={{
                 p: 3,
-                border: "1px solid #e5e7eb",
-                borderRadius: 3,
+                border: "1px solid #E2E8F0",
+                borderRadius: "16px",
                 bgcolor: "white",
             }}
         >
             <Stack direction="row" alignItems="center" gap={1.5} mb={1}>
                 <VerifiedUserOutlinedIcon
-                    sx={{ color: "#047857", fontSize: 30 }}
+                    sx={{ color: "#1D4ED8", fontSize: 30 }}
                 />
-                <Typography variant="h6" fontWeight={800}>
+                <Typography variant="h6" fontWeight={700}>
                     Contact verification
                 </Typography>
             </Stack>

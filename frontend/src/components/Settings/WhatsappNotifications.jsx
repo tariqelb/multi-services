@@ -47,9 +47,8 @@ export default function WhatsappNotifications({
         <Card
             variant="outlined"
             sx={{
-                borderRadius: 3.5,
-                boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
-            }}
+                borderRadius: "16px",
+                            }}
         >
             <CardContent sx={{ p: { xs: 3, md: 4.5 } }}>
                 <Stack
@@ -62,9 +61,9 @@ export default function WhatsappNotifications({
                         sx={{
                             width: 52,
                             height: 52,
-                            borderRadius: 2.5,
-                            bgcolor: "#ecfdf5",
-                            color: "#047857",
+                            borderRadius: "10px",
+                            bgcolor: "#EFF6FF",
+                            color: "#1D4ED8",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -75,7 +74,7 @@ export default function WhatsappNotifications({
                     </Box>
 
                     <Box>
-                        <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5 }}>
+                        <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5 }}>
                             WhatsApp Notifications
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -153,7 +152,7 @@ export default function WhatsappNotifications({
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
-                                    borderRadius: 2.5,
+                                    borderRadius: "10px",
                                     py: 1.1,
                                 }}
                             >
@@ -198,7 +197,7 @@ export default function WhatsappNotifications({
                                             alignSelf: "flex-start",
                                             textTransform: "none",
                                             fontWeight: 700,
-                                            borderRadius: 2.5,
+                                            borderRadius: "10px",
                                             py: 1.1,
                                         }}
                                     >
@@ -220,7 +219,7 @@ export default function WhatsappNotifications({
                                 onChange={(event) =>
                                     update("enabled", event.target.checked)
                                 }
-                                color="success"
+                                color="primary"
                                 sx={{ mt: 0.5, mr: 2 }}
                             />
                         }
@@ -257,7 +256,7 @@ export default function WhatsappNotifications({
                                 onChange={(event) =>
                                     update("propertyAlerts", event.target.checked)
                                 }
-                                color="success"
+                                color="primary"
                                 sx={{ mt: 0.5, mr: 2 }}
                             />
                         }
@@ -289,13 +288,11 @@ export default function WhatsappNotifications({
                     disabled={loading || saving || (settings.enabled && !verified)}
                     sx={{
                         mt: 4,
-                        bgcolor: "#047857",
-                        "&:hover": { bgcolor: "#065f46" },
                         textTransform: "none",
                         fontWeight: 700,
                         py: 1.25,
                         px: 3,
-                        borderRadius: 2.5,
+                        borderRadius: "10px",
                     }}
                 >
                     {saving ? "Saving..." : "Save WhatsApp preferences"}

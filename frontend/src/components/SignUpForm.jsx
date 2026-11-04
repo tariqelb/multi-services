@@ -105,10 +105,10 @@ function SignUpForm() {
     };
 
     const inputClass = (field) =>
-        `h-13 w-full min-w-0 rounded border bg-white px-3 text-base text-black outline-none transition-colors focus:border-teal-600 ${
+        `h-13 w-full min-w-0 rounded-[10px] border bg-white px-3 text-base text-black outline-none transition-colors focus:border-blue-600 ${
             validation[field]
                 ? "border-red-500"
-                : "border-gray-600"
+                : "border-gray-300"
         }`;
 
     const passwordInputClass = (field) =>
@@ -242,7 +242,7 @@ function SignUpForm() {
                                     : "Show password"
                             }
                             aria-pressed={showPassword}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-teal-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
                         >
                             {showPassword ? (
                                 <VisibilityOff fontSize="small" />
@@ -298,7 +298,7 @@ function SignUpForm() {
                                     : "Show confirm password"
                             }
                             aria-pressed={showConfirmPassword}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-teal-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
                         >
                             {showConfirmPassword ? (
                                 <VisibilityOff fontSize="small" />
@@ -327,7 +327,7 @@ function SignUpForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="h-13 w-full rounded bg-teal-600 text-base font-bold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-13 w-full rounded-[10px] bg-blue-600 text-base font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {loading
                         ? "Sending verification code..."
@@ -341,7 +341,7 @@ function SignUpForm() {
                 <button
                     type="button"
                     onClick={handleLogin}
-                    className="text-teal-600 hover:underline"
+                    className="text-blue-600 hover:underline"
                 >
                     Login
                 </button>

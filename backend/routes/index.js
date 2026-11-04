@@ -25,11 +25,22 @@ router.use("/notifications", notificationRouter);
 router.use("/test-email", emailTestRouter);
 router.use("/feedback", feedbackRoutes);
 router.use("/dashboard", dashboardRouter);
-router.use("/external-listings", externalListingRouter);
+// External listing analytics — register before dynamic listing routes.
+router.use(
+    "/external-listings/analytics",
+    externalListingAnalyticsRoutes
+);
 
+// External listing click tracking.
+router.use(
+    "/external-listings",
+    externalListingClickRoutes
+);
 
-// Keep your existing route registrations.
-router.use("/external-listings", externalListingClickRoutes);
+// General external listing routes.
+router.use(
+    "/external-listings",
+    externalListingRouter
+);
 
-router.use("/external-listing-analytics", externalListingAnalyticsRoutes);
 export default router;

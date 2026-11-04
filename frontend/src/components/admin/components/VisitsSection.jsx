@@ -50,7 +50,7 @@ function SummaryCard({ title, value, icon, description }) {
                 height: "100%",
                 border: "1px solid",
                 borderColor: "divider",
-                borderRadius: 3,
+                borderRadius: "16px",
             }}
         >
             <CardContent sx={{ p: 2.5 }}>
@@ -71,8 +71,8 @@ function SummaryCard({ title, value, icon, description }) {
 
                         <Typography
                             variant="h4"
-                            fontWeight={900}
-                            sx={{ mt: 1, color: "#064e3b" }}
+                            fontWeight={700}
+                            sx={{ mt: 1, color: "#0F172A" }}
                         >
                             {value}
                         </Typography>
@@ -93,8 +93,8 @@ function SummaryCard({ title, value, icon, description }) {
                             width: 44,
                             height: 44,
                             borderRadius: 2,
-                            bgcolor: "#ecfdf5",
-                            color: "#047857",
+                            bgcolor: "#EFF6FF",
+                            color: "#1D4ED8",
                             flexShrink: 0,
                         }}
                     >
@@ -123,7 +123,7 @@ function VisitorCard({ visitor }) {
             sx={{
                 border: "1px solid",
                 borderColor: "divider",
-                borderRadius: 3,
+                borderRadius: "16px",
             }}
         >
             <CardContent sx={{ p: { xs: 2, md: 3 } }}>
@@ -136,8 +136,8 @@ function VisitorCard({ visitor }) {
                         sx={{
                             width: 52,
                             height: 52,
-                            bgcolor: "#047857",
-                            fontWeight: 800,
+                            bgcolor: "#1D4ED8",
+                            fontWeight: 700,
                         }}
                     >
                         {initials}
@@ -146,7 +146,7 @@ function VisitorCard({ visitor }) {
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography
                             variant="h6"
-                            fontWeight={800}
+                            fontWeight={700}
                             sx={{ overflowWrap: "anywhere" }}
                         >
                             {name}
@@ -300,7 +300,7 @@ export default function VisitsSection() {
     return (
         <Box>
             <Box mb={3}>
-                <Typography variant="h5" fontWeight={800}>
+                <Typography variant="h5" fontWeight={700}>
                     Website Visits
                 </Typography>
 
@@ -364,7 +364,7 @@ export default function VisitsSection() {
                     </Grid>
 
                     <Box mb={2}>
-                        <Typography variant="h6" fontWeight={800}>
+                        <Typography variant="h6" fontWeight={700}>
                             Recent Visitors
                         </Typography>
 

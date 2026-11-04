@@ -99,7 +99,7 @@ export default function SavedPropertyCard({
                 flexDirection: { xs: "column", sm: "row" },
                 height: { xs: "auto", sm: 280 },
                 minHeight: { xs: 280, sm: 280 },
-                borderRadius: 3,
+                borderRadius: "16px",
                 borderColor: "#e2e8f0",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
                 overflow: "hidden",
@@ -159,7 +159,7 @@ export default function SavedPropertyCard({
                             <Typography
                                 variant="caption"
                                 sx={{
-                                    color: "#64748b",
+                                    color: "#5B6577",
                                     fontWeight: 600,
                                 }}
                             >
@@ -171,7 +171,7 @@ export default function SavedPropertyCard({
                             <Typography
                                 variant="h6"
                                 sx={{
-                                    fontWeight: 800,
+                                    fontWeight: 700,
                                     color: "#0f172a",
                                     mt: 0.5,
                                     overflowWrap: "anywhere",
@@ -183,8 +183,8 @@ export default function SavedPropertyCard({
                             <Typography
                                 variant="h6"
                                 sx={{
-                                    fontWeight: 900,
-                                    color: "#059669",
+                                    fontWeight: 700,
+                                    color: "#2563EB",
                                     whiteSpace: "nowrap",
                                 }}
                             >
@@ -207,9 +207,9 @@ export default function SavedPropertyCard({
                                     bgcolor:
                                         listingType === "For Rent"
                                             ? "#0284c7"
-                                            : "#059669",
+                                            : "#2563EB",
                                     color: "white",
-                                    fontWeight: 800,
+                                    fontWeight: 700,
                                     fontSize: "0.925rem",
                                     borderRadius: "16px",
                                 }}
@@ -222,7 +222,7 @@ export default function SavedPropertyCard({
                                     height: 35,
                                     px: 0.5,
                                     ...statusInfo,
-                                    fontWeight: 800,
+                                    fontWeight: 700,
                                     fontSize: "0.925rem",
                                     textTransform: "capitalize",
                                     borderRadius: "16px",
@@ -240,14 +240,14 @@ export default function SavedPropertyCard({
                             spacing={0.5}
                             alignItems="center"
                             sx={{
-                                color: "#64748b",
+                                color: "#5B6577",
                                 mb: 2,
                             }}
                         >
                             <LocationOn
                                 sx={{
                                     fontSize: 16,
-                                    color: "#059669",
+                                    color: "#2563EB",
                                 }}
                             />
 
@@ -322,7 +322,7 @@ export default function SavedPropertyCard({
                             sx={{
                                 textTransform: "none",
                                 fontWeight: 700,
-                                borderColor: "#cbd5e1",
+                                borderColor: "#D5DCE8",
                                 color: "#334155",
                                 whiteSpace: "nowrap",
                             }}

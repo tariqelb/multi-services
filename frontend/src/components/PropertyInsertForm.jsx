@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../api/axiosInstance";
@@ -37,8 +38,8 @@ const SectionHeader = ({ icon, title, subtitle, number }) => (
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: "12px",
-                    bgcolor: "#eef2ff",
-                    color: "#4f46e5",
+                    bgcolor: "#EFF6FF",
+                    color: "#2563EB",
                     flexShrink: 0,
                     fontWeight: 700,
                     fontSize: "1.1rem",
@@ -51,8 +52,8 @@ const SectionHeader = ({ icon, title, subtitle, number }) => (
                 <Typography
                     variant="h6"
                     sx={{
-                        fontWeight: 750,
-                        color: "#172033",
+                        fontWeight: 600,
+                        color: "#0F172A",
                         fontSize: "1.08rem",
                     }}
                 >
@@ -61,7 +62,7 @@ const SectionHeader = ({ icon, title, subtitle, number }) => (
 
                 <Typography
                     variant="body2"
-                    sx={{ color: "#7b8497", mt: 0.3 }}
+                    sx={{ color: "#5B6577", mt: 0.3 }}
                 >
                     {subtitle}
                 </Typography>
@@ -72,14 +73,14 @@ const SectionHeader = ({ icon, title, subtitle, number }) => (
                 size="small"
                 sx={{
                     fontWeight: 700,
-                    color: "#4f46e5",
-                    bgcolor: "#f3f4ff",
+                    color: "#2563EB",
+                    bgcolor: "#EFF6FF",
                     borderRadius: "8px",
                 }}
             />
         </Stack>
 
-        <Divider sx={{ mt: 2.5, borderColor: "#edf0f5" }} />
+        <Divider sx={{ mt: 2.5, borderColor: "#E2E8F0" }} />
     </Box>
 );
 
@@ -90,7 +91,7 @@ const SectionPaper = ({ children }) => (
         sx={{
             p: { xs: 2.5, sm: 3.5, md: 4 },
             mb: 3,
-            border: "1px solid #e9edf4",
+            border: "1px solid #E2E8F0",
             borderRadius: "16px",
             bgcolor: "#ffffff",
             boxShadow: "0 3px 12px rgba(15, 23, 42, 0.025)",
@@ -154,21 +155,11 @@ export default function PropertyInsertForm({ onAddProperty }) {
                     emailVerified: user.emailVerified === true,
                 };
 
-                console.log(
-                    "[Property Form] Authenticated user:",
-                    user
-                );
-
-                console.log(
-                    "[Property Form] Contact information:",
-                    userProfile
-                );
-
                 if (cancelled) return;
 
                 setProfile(userProfile);
 
-                // Populate read-only contact information in Redux.
+                // Populate authenticated user's contact information.
                 dispatch(
                     updateField({
                         name: "firstName",
@@ -276,18 +267,18 @@ export default function PropertyInsertForm({ onAddProperty }) {
             backgroundColor: "#ffffff",
             transition: "all 0.2s ease",
             "& fieldset": {
-                borderColor: "#dfe3eb",
+                borderColor: "#D5DCE8",
             },
             "&:hover fieldset": {
-                borderColor: "#93a9f9",
+                borderColor: "#93C5FD",
             },
             "&.Mui-focused fieldset": {
-                borderColor: "#4f46e5",
+                borderColor: "#2563EB",
                 borderWidth: "1.5px",
             },
         },
         "& .MuiInputLabel-root.Mui-focused": {
-            color: "#4f46e5",
+            color: "#2563EB",
         },
     };
 
@@ -322,6 +313,63 @@ export default function PropertyInsertForm({ onAddProperty }) {
                     value,
                 })
             );
+        }
+    };
+
+    // Reset property fields after successful publication.
+    const resetPropertyForm = () => {
+        // Revoke image preview URLs.
+        (formData.images || []).forEach((image) => {
+            if (image?.url) {
+                URL.revokeObjectURL(image.url);
+            }
+        });
+
+        // Preserve authenticated user's contact information.
+        const profileFields = {
+            firstName: profile?.firstName || "",
+            lastName: profile?.lastName || "",
+            email: profile?.email || "",
+            phone: profile?.whatsappPhoneNumber || "",
+            whatsappPhoneNumber: profile?.whatsappPhoneNumber || "",
+        };
+
+        // Clear every form field according to its value type.
+        Object.entries(formData).forEach(([key, value]) => {
+            if (Object.prototype.hasOwnProperty.call(profileFields, key)) {
+                dispatch(
+                    updateField({
+                        name: key,
+                        value: profileFields[key],
+                    })
+                );
+
+                return;
+            }
+
+            let emptyValue = "";
+
+            if (Array.isArray(value)) {
+                emptyValue = [];
+            } else if (typeof value === "boolean") {
+                emptyValue = false;
+            }
+
+            dispatch(
+                updateField({
+                    name: key,
+                    value: emptyValue,
+                })
+            );
+        });
+
+        // Explicitly clear images and validation errors.
+        dispatch(setImages([]));
+        dispatch(setErrors({}));
+
+        // Clear the native file input.
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
         }
     };
 
@@ -577,6 +625,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 payload
             );
 
+            // Reset the form only after successful publication.
+            resetPropertyForm();
+
             setNotification({
                 open: true,
                 message:
@@ -611,7 +662,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
     };
 
     return (
-        <div className="flex bg-gray-100/70 m-9 border-[1px] border-gray-200 rounded-[15px]">
+        <div className="flex">
             <Box
                 sx={{
                     width: "100%",
@@ -633,9 +684,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
                             label="PROPERTY MARKETPLACE"
                             size="small"
                             sx={{
-                                bgcolor: "#eef2ff",
-                                color: "#4f46e5",
-                                fontWeight: 750,
+                                bgcolor: "#EFF6FF",
+                                color: "#2563EB",
+                                fontWeight: 600,
                                 fontSize: "0.68rem",
                                 letterSpacing: "0.6px",
                                 borderRadius: "6px",
@@ -646,13 +697,10 @@ export default function PropertyInsertForm({ onAddProperty }) {
                     <Typography
                         variant="h4"
                         sx={{
-                            fontWeight: 800,
-                            letterSpacing: "-0.8px",
-                            color: "#172033",
-                            fontSize: {
-                                xs: "1.8rem",
-                                sm: "2.25rem",
-                            },
+                            fontWeight: 700,
+                            letterSpacing: 0,
+                            color: "#0F172A",
+                            fontSize: "1.875rem",
                             mb: 1,
                         }}
                     >
@@ -662,7 +710,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                     <Typography
                         variant="body1"
                         sx={{
-                            color: "#737e91",
+                            color: "#5B6577",
                             maxWidth: 650,
                             lineHeight: 1.8,
                         }}
@@ -691,7 +739,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
 
                         <Typography
                             variant="caption"
-                            sx={{ color: "#64748b" }}
+                            sx={{ color: "#5B6577" }}
                         >
                             Fields marked with * are required
                         </Typography>

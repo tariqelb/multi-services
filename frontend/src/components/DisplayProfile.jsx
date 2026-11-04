@@ -19,7 +19,7 @@ export default function DisplayProfile({ profile = {}, onEdit }) {
     return (
         <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             {/* Profile header */}
-            <div className="flex flex-col gap-5 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white p-6 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white p-6 sm:flex-row sm:items-center">
                 {profile.profileImage ? (
                     <img
                         src={profile.profileImage}
@@ -27,7 +27,7 @@ export default function DisplayProfile({ profile = {}, onEdit }) {
                         className="h-20 w-20 shrink-0 rounded-full border-4 border-white object-cover shadow-sm"
                     />
                 ) : (
-                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white bg-indigo-100 text-2xl font-bold text-indigo-600 shadow-sm">
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white bg-blue-100 text-2xl font-bold text-blue-600 shadow-sm">
                         {initials}
                     </div>
                 )}
@@ -41,7 +41,7 @@ export default function DisplayProfile({ profile = {}, onEdit }) {
                         {profile.email || "No email provided"}
                     </p>
 
-                    <p className="mt-2 text-xs font-medium uppercase tracking-wider text-indigo-600">
+                    <p className="mt-2 text-xs font-medium uppercase tracking-wider text-blue-600">
                         Personal account
                     </p>
                 </div>
@@ -49,7 +49,7 @@ export default function DisplayProfile({ profile = {}, onEdit }) {
                 {/* <button
                     type="button"
                     onClick={onEdit}
-                    className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="inline-flex items-center justify-center rounded-[10px] bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                     Edit profile
                 </button> */}
@@ -71,7 +71,7 @@ export default function DisplayProfile({ profile = {}, onEdit }) {
                     {fields.map(({ label, value, fullWidth }) => (
                         <div
                             key={label}
-                            className={`min-w-0 rounded-xl border border-gray-200 bg-gray-50/70 p-4 transition hover:border-indigo-200 hover:bg-indigo-50/30 ${
+                            className={`min-w-0 rounded-xl border border-gray-200 bg-gray-50/70 p-4 transition hover:border-blue-200 hover:bg-blue-50/30 ${
                                 fullWidth ? "sm:col-span-2" : ""
                             }`}
                         >

@@ -66,10 +66,9 @@ export default function DeleteAccount({
         <Card
             variant="outlined"
             sx={{
-                borderRadius: 3.5,
+                borderRadius: "16px",
                 borderColor: isPending ? "#fcd34d" : "#fecaca",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
-            }}
+                            }}
         >
             <CardContent sx={{ p: { xs: 3, md: 4.5 } }}>
                 <Stack
@@ -82,7 +81,7 @@ export default function DeleteAccount({
                         sx={{
                             width: 52,
                             height: 52,
-                            borderRadius: 2.5,
+                            borderRadius: "10px",
                             bgcolor: isPending ? "#fef3c7" : "#fef2f2",
                             color: isPending ? "#92400e" : "#dc2626",
                             display: "flex",
@@ -99,7 +98,7 @@ export default function DeleteAccount({
                     </Box>
 
                     <Box>
-                        <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5 }}>
+                        <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5 }}>
                             Delete Account
                         </Typography>
 
@@ -149,7 +148,7 @@ export default function DeleteAccount({
                                 fontWeight: 700,
                                 py: 1.25,
                                 px: 3,
-                                borderRadius: 2.5,
+                                borderRadius: "10px",
                                 alignSelf: "flex-start",
                             }}
                         >
@@ -174,7 +173,7 @@ export default function DeleteAccount({
                                 fontWeight: 700,
                                 py: 1.25,
                                 px: 3,
-                                borderRadius: 2.5,
+                                borderRadius: "10px",
                                 alignSelf: "flex-start",
                             }}
                         >
@@ -232,7 +231,7 @@ export default function DeleteAccount({
                                     fontWeight: 700,
                                     py: 1.25,
                                     px: 3,
-                                    borderRadius: 2.5,
+                                    borderRadius: "10px",
                                 }}
                             >
                                 {loading
@@ -252,7 +251,7 @@ export default function DeleteAccount({
                                     fontWeight: 600,
                                     py: 1.25,
                                     px: 3,
-                                    borderRadius: 2.5,
+                                    borderRadius: "10px",
                                 }}
                             >
                                 Cancel

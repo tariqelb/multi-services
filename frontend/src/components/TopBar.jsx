@@ -8,7 +8,6 @@ import {
     X,
     UserRound,
     Settings,
-    MessageCircle,
     LogOut,
     ChevronDown,
 } from "lucide-react";
@@ -25,10 +24,10 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-
     const user = useSelector(
         (state) => state.auth?.user ?? state.loginForm?.user ?? null
     );
+
     const profile = useSelector((state) => state.profile);
 
     const isAuthenticated = Boolean(user);
@@ -39,7 +38,6 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             dispatch(getProfile());
         }
     }, [isAuthenticated, dispatch]);
-    console.log("Profile: ", profile)
 
     // Connect or disconnect the user's socket.
     useEffect(() => {
@@ -92,7 +90,6 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
 
         if (!imagePath) return "";
 
-        // Base64 image: use it directly.
         if (
             imagePath.startsWith("data:image/") ||
             imagePath.startsWith("blob:")
@@ -100,12 +97,10 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             return imagePath;
         }
 
-        // External image URL, such as Cloudinary.
         if (/^https?:\/\//i.test(imagePath)) {
             return imagePath;
         }
 
-        // Relative backend image path.
         const apiBaseUrl =
             axiosInstance.defaults.baseURL ||
             import.meta.env.VITE_API_URL ||
@@ -131,7 +126,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         setAvatarError(false);
     }, [avatarUrl]);
 
-    // Close the profile menu when clicking outside or pressing Escape.
+    // Close profile menu when clicking outside or pressing Escape.
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -177,21 +172,21 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const menuItems = [
         { label: "My Profile", path: "/profile", icon: UserRound },
         { label: "Settings", path: "/setting", icon: Settings },
-        // { label: "Messages", path: "/messages", icon: MessageCircle },
     ];
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2 sm:px-4 md:px-6">
+        <header className="sticky top-0 z-[60] flex h-16 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2 sm:px-4 md:px-6">
             {/* Brand and mobile sidebar button */}
             <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
                 <button
                     type="button"
+                    data-sidebar-toggle
                     onClick={() => setSidebarOpen((open) => !open)}
                     aria-label={
                         sidebarOpen ? "Close sidebar" : "Open sidebar"
                     }
                     aria-expanded={sidebarOpen}
-                    className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 md:hidden"
+                    className="shrink-0 rounded-[10px] p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 md:hidden"
                 >
                     {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
@@ -200,14 +195,14 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                     to="/"
                     className="flex min-w-0 items-center gap-2 sm:gap-3"
                 >
-                   
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#14539a] shadow-sm">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-[#0B2E5C] shadow-sm">
                         <img
                             src={logo}
                             alt="MultiService logo"
                             className="h-full w-full object-contain"
                         />
                     </div>
+
                     <span className="truncate text-base font-bold tracking-tight text-gray-900 sm:text-xl">
                         MultiService
                     </span>
@@ -224,10 +219,13 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                 >
                     <button
                         type="button"
-                        onClick={() => setProfileOpen((open) => !open)}
+                        onClick={() => {
+                            setSidebarOpen(false);
+                            setProfileOpen((open) => !open);
+                        }}
                         aria-expanded={profileOpen}
                         aria-haspopup="menu"
-                        className="flex items-center gap-1.5 rounded-lg p-1 transition-colors hover:bg-gray-100 sm:gap-3 sm:p-1.5"
+                        className="flex items-center gap-1.5 rounded-[10px] p-1 transition-colors hover:bg-gray-100 sm:gap-3 sm:p-1.5"
                     >
                         {avatarUrl && !avatarError ? (
                             <img
@@ -243,7 +241,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                 }}
                             />
                         ) : (
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0d3562] text-sm font-semibold text-white sm:h-9 sm:w-9">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0B2E5C] text-sm font-semibold text-white sm:h-9 sm:w-9">
                                 {initials}
                             </div>
                         )}
@@ -291,7 +289,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                             onClick={() =>
                                                 setProfileOpen(false)
                                             }
-                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-indigo-600"
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-blue-600"
                                         >
                                             <Icon size={18} />
                                             {label}

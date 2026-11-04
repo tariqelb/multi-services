@@ -93,7 +93,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                     boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
                 },
                 "&:focus-visible": {
-                    outline: "2px solid #2563eb",
+                    outline: "2px solid #2563EB",
                     outlineOffset: "3px",
                 },
             }}
@@ -120,7 +120,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                         variant="caption"
                         sx={{
                             fontWeight: 600,
-                            color: "#6b7280",
+                            color: "#5B6577",
                             fontSize: "0.8rem",
                             whiteSpace: "nowrap",
                         }}
@@ -135,7 +135,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                             sx={{
                                 bgcolor: "#e2e8f0",
                                 color: "#334155",
-                                fontWeight: 800,
+                                fontWeight: 700,
                                 fontSize: "0.75rem",
                                 height: 22,
                             }}
@@ -158,7 +158,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                     ? "#0284c7"
                                     : "#10b981",
                             color: "#ffffff",
-                            fontWeight: 800,
+                            fontWeight: 700,
                             fontSize: "0.75rem",
                             height: 24,
                             borderRadius: "6px",
@@ -170,7 +170,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                         size="small"
                         sx={{
                             ...currentStatusColor,
-                            fontWeight: 800,
+                            fontWeight: 700,
                             fontSize: "0.75rem",
                             height: 24,
                             borderRadius: "6px",
@@ -213,7 +213,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                             top: 10,
                             left: 10,
                             bgcolor: "rgba(255,255,255,0.95)",
-                            color: "#1f2937",
+                            color: "#0F172A",
                             px: 1.2,
                             py: 0.4,
                             borderRadius: "6px",
@@ -241,7 +241,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                     <Typography
                         variant="h6"
                         sx={{
-                            fontWeight: 800,
+                            fontWeight: 700,
                             color: "#111827",
                             mb: 1,
                             lineHeight: 1.3,
@@ -302,7 +302,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                         >
                             <Typography
                                 component="span"
-                                sx={{ color: "#6b7280", fontWeight: 600 }}
+                                sx={{ color: "#5B6577", fontWeight: 600 }}
                             >
                                 Price:
                             </Typography>
@@ -310,8 +310,8 @@ export default function PropertyCard({ property = {}, onClick }) {
                             <Typography
                                 component="span"
                                 sx={{
-                                    color: "#2563eb",
-                                    fontWeight: 800,
+                                    color: "#2563EB",
+                                    fontWeight: 700,
                                     fontSize: "0.95rem",
                                     textAlign: "right",
                                 }}
@@ -330,7 +330,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 <Typography
                                     component="span"
                                     sx={{
-                                        color: "#6b7280",
+                                        color: "#5B6577",
                                         fontWeight: 600,
                                     }}
                                 >
@@ -340,7 +340,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 <Typography
                                     component="span"
                                     sx={{
-                                        color: "#1f2937",
+                                        color: "#0F172A",
                                         fontWeight: 700,
                                     }}
                                 >
@@ -359,7 +359,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 <Typography
                                     component="span"
                                     sx={{
-                                        color: "#6b7280",
+                                        color: "#5B6577",
                                         fontWeight: 600,
                                     }}
                                 >
@@ -369,7 +369,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 <Typography
                                     component="span"
                                     sx={{
-                                        color: "#1f2937",
+                                        color: "#0F172A",
                                         fontWeight: 700,
                                     }}
                                 >
@@ -388,7 +388,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 <Typography
                                     component="span"
                                     sx={{
-                                        color: "#6b7280",
+                                        color: "#5B6577",
                                         fontWeight: 600,
                                     }}
                                 >
@@ -398,7 +398,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 <Typography
                                     component="span"
                                     sx={{
-                                        color: "#1f2937",
+                                        color: "#0F172A",
                                         fontWeight: 700,
                                     }}
                                 >
@@ -417,7 +417,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 <Typography
                                     component="span"
                                     sx={{
-                                        color: "#6b7280",
+                                        color: "#5B6577",
                                         fontWeight: 600,
                                     }}
                                 >
@@ -427,7 +427,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 <Typography
                                     component="span"
                                     sx={{
-                                        color: "#1f2937",
+                                        color: "#0F172A",
                                         fontWeight: 700,
                                     }}
                                 >

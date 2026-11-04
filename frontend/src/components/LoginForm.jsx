@@ -1,7 +1,10 @@
-import { useRef } from "react";
+
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axiosInstance from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
+import axiosInstance from "../api/axiosInstance";
 
 import {
     setLoginEmail,
@@ -17,18 +20,17 @@ import { activeFormAction } from "../redux/actions/activeFormAction";
 function LoginForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
     const emailRef = useRef("");
     const passwordRef = useRef(null);
+
+    const [showPassword, setShowPassword] = useState(false);
 
     const { loading, error } = useSelector(
         (state) => state.loginForm
     );
 
-    const user = useSelector(
-        (state) => state.auth.user
-    );
-
-    console.log("is user logged :", user);
+    const user = useSelector((state) => state.auth.user);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -48,18 +50,13 @@ function LoginForm() {
                 })
             );
 
-            // Clear the password input.
             passwordRef.current.value = "";
             passwordRef.current.blur();
 
-            // Clear the password from Redux.
             dispatch(setLoginPassword(""));
 
-            console.log("User:", response.data.user);
             navigate("/");
         } catch (error) {
-            console.log(error);
-
             dispatch(
                 loginFailure(
                     error.response?.data?.message ||
@@ -84,6 +81,7 @@ function LoginForm() {
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-4 sm:gap-6"
             >
+                {/* Email */}
                 <input
                     type="email"
                     placeholder="Enter your email"
@@ -93,48 +91,78 @@ function LoginForm() {
                         emailRef.current = event.target.value;
                         dispatch(setLoginEmail(event.target.value));
                     }}
-                    className="h-12 w-full min-w-0 rounded border border-gray-300 bg-white px-3 text-base text-black outline-none focus:border-teal-600 sm:h-13"
+                    className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 text-base text-black outline-none focus:border-blue-600"
                 />
 
-                <input
-                    ref={passwordRef}
-                    type="password"
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                    required
-                    onChange={(event) => {
-                        dispatch(setLoginPassword(event.target.value));
-                    }}
-                    className="h-12 w-full min-w-0 rounded border border-gray-300 bg-white px-3 text-base text-black outline-none focus:border-teal-600 sm:h-13"
-                />
+                {/* Password */}
+                <div className="relative w-full">
+                    <input
+                        ref={passwordRef}
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        autoComplete="current-password"
+                        required
+                        onChange={(event) => {
+                            dispatch(setLoginPassword(event.target.value));
+                        }}
+                        className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 pr-12 text-base text-black outline-none focus:border-blue-600"
+                    />
 
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setShowPassword((prev) => !prev)
+                        }
+                        aria-label={
+                            showPassword
+                                ? "Hide password"
+                                : "Show password"
+                        }
+                        aria-pressed={showPassword}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
+                    >
+                        {showPassword ? (
+                            <VisibilityOff fontSize="small" />
+                        ) : (
+                            <Visibility fontSize="small" />
+                        )}
+                    </button>
+                </div>
+
+                {/* Error */}
                 {error && (
-                    <p role="alert" className="break-words text-sm text-red-600">
+                    <p
+                        role="alert"
+                        className="break-words text-sm text-red-600"
+                    >
                         {error}
                     </p>
                 )}
 
+                {/* Logged-in user */}
                 {user && (
                     <p className="break-words text-sm text-green-700">
                         Welcome, {user.firstName}!
                     </p>
                 )}
 
+                {/* Submit */}
                 <button
                     type="submit"
                     disabled={loading}
-                    className="h-12 w-full rounded bg-teal-600 text-sm font-bold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60 sm:h-13"
+                    className="h-13 w-full rounded-[10px] bg-blue-600 text-sm font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {loading ? "Logging in..." : "Login"}
                 </button>
             </form>
 
+            {/* Signup */}
             <p className="mt-4 text-center text-sm text-black sm:text-base">
                 Don't have an account?{" "}
                 <button
                     type="button"
                     onClick={handleSignup}
-                    className="font-medium text-teal-600 hover:underline"
+                    className="font-medium text-blue-600 hover:underline"
                 >
                     Signup
                 </button>

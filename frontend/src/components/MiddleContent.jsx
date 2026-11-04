@@ -1,4 +1,6 @@
+
 import React from "react";
+import PageLayout from "./PageLayout";
 import {
     Box,
     Typography,
@@ -7,8 +9,16 @@ import {
     CardActionArea,
     CardContent,
     CardMedia,
+    Chip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+
+import propertiesImage from "../assets/properties.jpg";
+import carsImage from "../assets/cars.jpg";
+import servicesImage from "../assets/services.jpg";
+import deliveryManImage from "../assets/delivery-man.jpg";
+import transporterImage from "../assets/transporter.jpg";
+import driverImage from "../assets/driver.jpg";
 
 export default function MiddleContent({ activeNav }) {
     const navigate = useNavigate();
@@ -19,121 +29,64 @@ export default function MiddleContent({ activeNav }) {
             description: "Buy, Sell & Rent Properties",
             details:
                 "Explore thousands of verified residential and commercial properties available for immediate purchase, sale, or lease in your area.",
-            image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500",
+            image: propertiesImage,
             path: "/properties",
+            available: true,
         },
         {
             title: "Cars",
             description: "Buy, Sell & Rent Vehicles",
-            image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500",
             details:
                 "Browse a wide selection of brand new and pre-owned cars, trucks, and SUVs with transparent pricing and direct owner contacts.",
+            image: carsImage,
+            available: false,
         },
         {
             title: "Services",
             description: "Find Companies & Offices",
-            image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500",
             details:
                 "Connect with certified local professionals, corporate offices, agencies, and businesses ready to cater to your project requirements.",
+            image: servicesImage,
+            available: false,
         },
         {
             title: "Delivery Man",
             description: "Hire a Delivery Person",
-            image: "https://images.unsplash.com/photo-1617347454431-f49d7ff5c3b1?w=500",
             details:
                 "Book reliable on-demand couriers and delivery riders for fast, secure package transport and local errand execution.",
+            image: deliveryManImage,
+            available: false,
         },
         {
             title: "Transporter",
             description: "Book Transport Services",
-            image: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=500",
             details:
                 "Access heavy-duty trucks, moving vans, and logistics transport providers for smooth relocation and cargo delivery.",
+            image: transporterImage,
+            available: false,
         },
         {
             title: "Driver",
             description: "Hire a Personal Driver",
-            image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=500",
             details:
                 "Hire professional, vetted private drivers for daily commutes, special occasions, out-of-town trips, or personal chauffeuring.",
+            image: driverImage,
+            available: false,
         },
     ];
 
     const handleCardClick = (service) => {
-        if (service.path) {
+        if (service.available && service.path) {
             navigate(service.path);
         }
     };
 
     return (
-        <Box
-            component="main"
-            sx={{
-                flex: 1,
-                minWidth: 0,
-                width: "100%",
-                maxWidth: "100%",
-                boxSizing: "border-box",
-                bgcolor: "#f9fafb",
-                p: {
-                    xs: 2,
-                    sm: 3,
-                    md: 4,
-                },
-                minHeight: "calc(100vh - 4rem)",
-                overflowX: "clip",
-            }}
+        <PageLayout
+            title={`${activeNav} Overview`}
+            subtitle="Select a service category below to manage listings and requests."
+            maxWidth={1280}
         >
-            {/* Page Header */}
-            <Box
-                sx={{
-                    display: "flex",
-                    flexDirection: {
-                        xs: "column",
-                        md: "row",
-                    },
-                    justifyContent: "space-between",
-                    alignItems: {
-                        xs: "flex-start",
-                        md: "center",
-                    },
-                    mb: {
-                        xs: 3,
-                        md: 4,
-                    },
-                    gap: 2,
-                    minWidth: 0,
-                }}
-            >
-                <Box sx={{ minWidth: 0, width: "100%" }}>
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            fontWeight: 700,
-                            color: "#111827",
-                            fontSize: {
-                                xs: "1.2rem",
-                                sm: "1.5rem",
-                            },
-                            overflowWrap: "anywhere",
-                        }}
-                    >
-                        {activeNav} Overview
-                    </Typography>
-
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            color: "#6b7280",
-                            mt: 0.5,
-                            overflowWrap: "anywhere",
-                        }}
-                    >
-                        Select a service category below to manage listings and requests.
-                    </Typography>
-                </Box>
-            </Box>
-
             {/* Responsive Services Grid */}
             <Grid
                 container
@@ -165,8 +118,8 @@ export default function MiddleContent({ activeNav }) {
                         <Card
                             sx={{
                                 borderRadius: "16px",
-                                boxShadow:
-                                    "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                                boxShadow: "none",
+                                border: "1px solid #E2E8F0",
                                 overflow: "hidden",
                                 width: "100%",
                                 minWidth: 0,
@@ -185,6 +138,7 @@ export default function MiddleContent({ activeNav }) {
                         >
                             <CardActionArea
                                 onClick={() => handleCardClick(service)}
+                                disabled={!service.available}
                                 sx={{
                                     height: "100%",
                                     display: "flex",
@@ -192,6 +146,9 @@ export default function MiddleContent({ activeNav }) {
                                     alignItems: "stretch",
                                     justifyContent: "flex-start",
                                     minWidth: 0,
+                                    "&.Mui-disabled": {
+                                        opacity: 1,
+                                    },
                                 }}
                             >
                                 {/* Image Container */}
@@ -222,6 +179,28 @@ export default function MiddleContent({ activeNav }) {
                                                 "all 0.4s ease-in-out",
                                         }}
                                     />
+
+                                    {/* Coming Soon Badge */}
+                                    {!service.available && (
+                                        <Chip
+                                            label="Coming Soon"
+                                            size="small"
+                                            sx={{
+                                                position: "absolute",
+                                                top: 14,
+                                                left: 14,
+                                                zIndex: 3,
+                                                height: 28,
+                                                bgcolor: "#FEF3C7",
+                                                color: "#92400E",
+                                                fontWeight: 700,
+                                                fontSize: "0.75rem",
+                                                borderRadius: "7px",
+                                                boxShadow:
+                                                    "0 2px 8px rgba(0,0,0,0.12)",
+                                            }}
+                                        />
+                                    )}
 
                                     {/* Hover Overlay Details */}
                                     <Box
@@ -299,7 +278,7 @@ export default function MiddleContent({ activeNav }) {
                                         variant="h6"
                                         sx={{
                                             fontWeight: 700,
-                                            color: "#1f2937",
+                                            color: "#0F172A",
                                             fontSize: {
                                                 xs: "1rem",
                                                 sm: "1.05rem",
@@ -314,7 +293,7 @@ export default function MiddleContent({ activeNav }) {
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: "#6b7280",
+                                            color: "#5B6577",
                                             mt: 0.5,
                                             fontSize: {
                                                 xs: "0.8rem",
@@ -331,6 +310,6 @@ export default function MiddleContent({ activeNav }) {
                     </Grid>
                 ))}
             </Grid>
-        </Box>
+        </PageLayout>
     );
 }
