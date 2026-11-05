@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { v2 as cloudinary } from "cloudinary";
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
@@ -45,8 +46,51 @@ function getImageFromDataUrl(value) {
     };
 }
 
-async function deleteProfileImage(imagePath) {
-    if (!imagePath?.startsWith(PROFILE_IMAGE_PREFIX)) return;
+//cloudinary
+function uploadProfileImage(buffer, userId, extension) {
+    return new Promise((resolve, reject) => {
+        const publicId =
+            `profile-${userId}-${Date.now()}-${randomBytes(4).toString("hex")}`;
+
+        const stream = cloudinary.uploader.upload_stream(
+            {
+                folder: "multi-services/profiles",
+                public_id: publicId,
+                format: extension,
+                resource_type: "image",
+            },
+            (error, result) => {
+                if (error) return reject(error);
+
+                resolve({
+                    path: result.secure_url,
+                    publicId: result.public_id,
+                });
+            }
+        );
+
+        stream.end(buffer);
+    });
+}
+
+async function deleteProfileImage(imagePath, publicId = "") {
+    if (!imagePath) return;
+
+    if (process.env.NODE_ENV === "production") {
+        if (!publicId) return;
+
+        try {
+            await cloudinary.uploader.destroy(publicId, {
+                resource_type: "image",
+            });
+        } catch (error) {
+            console.error("Cloudinary deletion error:", error);
+        }
+
+        return;
+    }
+
+    if (!imagePath.startsWith(PROFILE_IMAGE_PREFIX)) return;
 
     const filename = imagePath.slice(PROFILE_IMAGE_PREFIX.length);
 
@@ -60,9 +104,7 @@ async function deleteProfileImage(imagePath) {
     }
 
     try {
-        await fs.unlink(
-            path.join(PROFILE_UPLOAD_DIR, filename)
-        );
+        await fs.unlink(path.join(PROFILE_UPLOAD_DIR, filename));
     } catch (error) {
         if (error.code !== "ENOENT") {
             console.error("Unable to delete profile image:", error);
@@ -86,11 +128,9 @@ function getProfileImagePath(filename) {
 }
 
 
-
-
-
 export async function updateMyProfile(req, res) {
     let newImageFilePath = null;
+    let newImagePublicId = null;
 
     try {
         const userId = req.user?.userId;
@@ -128,6 +168,8 @@ export async function updateMyProfile(req, res) {
         let newImage = null;
 
         const oldImagePath = updatedUser.profileImage || "";
+        const oldImagePublicId =
+            updatedUser.profileImagePublicId || "";
 
         for (const field of allowedFields) {
             if (!Object.hasOwn(req.body, field)) continue;
@@ -147,6 +189,7 @@ export async function updateMyProfile(req, res) {
                 // Empty value means remove the image.
                 if (value === "") {
                     updates.profileImage = "";
+                    updates.profileImagePublicId = "";
                     continue;
                 }
 
@@ -219,28 +262,43 @@ export async function updateMyProfile(req, res) {
             });
         }
 
-        // Save the new image.
+        // Save the new image according to the environment.
         if (newImage) {
-            await fs.mkdir(PROFILE_UPLOAD_DIR, {
-                recursive: true,
-            });
+            if (process.env.NODE_ENV === "production") {
+                const uploaded = await uploadProfileImage(
+                    newImage.buffer,
+                    userId,
+                    newImage.extension
+                );
 
-            const filename =
-                `profile-${Date.now()}-${randomBytes(4).toString("hex")}.` +
-                newImage.extension;
+                updates.profileImage = uploaded.path;
+                updates.profileImagePublicId = uploaded.publicId;
 
-            newImageFilePath = path.join(
-                PROFILE_UPLOAD_DIR,
-                filename
-            );
+                newImagePublicId = uploaded.publicId;
+            } else {
+                await fs.mkdir(PROFILE_UPLOAD_DIR, {
+                    recursive: true,
+                });
 
-            await fs.writeFile(
-                newImageFilePath,
-                newImage.buffer
-            );
+                const filename =
+                    `profile-${Date.now()}-${randomBytes(4).toString("hex")}.` +
+                    newImage.extension;
 
-            updates.profileImage =
-                `${PROFILE_IMAGE_PREFIX}${filename}`;
+                newImageFilePath = path.join(
+                    PROFILE_UPLOAD_DIR,
+                    filename
+                );
+
+                await fs.writeFile(
+                    newImageFilePath,
+                    newImage.buffer
+                );
+
+                updates.profileImage =
+                    `${PROFILE_IMAGE_PREFIX}${filename}`;
+
+                updates.profileImagePublicId = "";
+            }
         }
 
         // Handle email changes.
@@ -271,6 +329,7 @@ export async function updateMyProfile(req, res) {
             "address",
             "bio",
             "profileImage",
+            "profileImagePublicId",
         ];
 
         for (const field of fieldsToUpdate) {
@@ -286,7 +345,10 @@ export async function updateMyProfile(req, res) {
             oldImagePath &&
             oldImagePath !== updatedUser.profileImage
         ) {
-            await deleteProfileImage(oldImagePath);
+            await deleteProfileImage(
+                oldImagePath,
+                oldImagePublicId
+            );
         }
 
         return res.status(200).json({
@@ -305,17 +367,32 @@ export async function updateMyProfile(req, res) {
             },
         });
     } catch (error) {
-        // Clean up a newly uploaded image if the database save fails.
+        // Clean up a newly uploaded local image.
         if (newImageFilePath) {
             try {
                 await fs.unlink(newImageFilePath);
             } catch (cleanupError) {
                 if (cleanupError.code !== "ENOENT") {
                     console.error(
-                        "Image cleanup error:",
+                        "Local image cleanup error:",
                         cleanupError
                     );
                 }
+            }
+        }
+
+        // Clean up a newly uploaded Cloudinary image.
+        if (newImagePublicId) {
+            try {
+                await cloudinary.uploader.destroy(
+                    newImagePublicId,
+                    { resource_type: "image" }
+                );
+            } catch (cleanupError) {
+                console.error(
+                    "Cloudinary cleanup error:",
+                    cleanupError
+                );
             }
         }
 
