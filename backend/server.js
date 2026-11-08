@@ -22,10 +22,16 @@ const showOutboundIP = async () => {
 const startServer = async () => {
     try {
         await showOutboundIP();
-
+        console.log("[STARTUP] Starting backend...");
+        console.log("[STARTUP] Environment:", process.env.NODE_ENV);
+        console.log("[STARTUP] Port:", PORT);
+        
+        console.log("[STARTUP] Connecting to MongoDB...");
         await connectDB();
-
+        console.log("[STARTUP] MongoDB connected successfully.");
+        
         const server = http.createServer(app);
+        console.log("[STARTUP] Initializing Socket.IO...");
         const io = initializeSocket(server);
 
         app.set("io", io);
