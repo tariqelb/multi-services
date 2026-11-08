@@ -1,5 +1,7 @@
+///home/tariq/multi-services/app/frontend/src/components/admin/components/PropertyClicks/PropertyClicksSection.jsx
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
     Box,
@@ -28,10 +30,18 @@ const API_URL = "/property/clicks";
 const ITEMS_PER_PAGE = 6;
 
 const PropertyClicksSection = () => {
+    const { t, i18n } = useTranslation();
+
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [page, setPage] = useState(1);
+
+    const locale = i18n.language?.startsWith("ar")
+        ? "ar"
+        : i18n.language?.startsWith("fr")
+            ? "fr-FR"
+            : "en-US";
 
     const fetchAnalytics = useCallback(async () => {
         try {
@@ -51,12 +61,12 @@ const PropertyClicksSection = () => {
 
             setError(
                 err.response?.data?.message ||
-                "Unable to load property click analytics."
+                t("adminPropertyClicks.errors.load")
             );
         } finally {
             setLoading(false);
         }
-    }, [page]);
+    }, [page, t]);
 
     useEffect(() => {
         fetchAnalytics();
@@ -69,7 +79,6 @@ const PropertyClicksSection = () => {
     };
 
     const charts = data?.charts || {};
-
     const properties = data?.properties || [];
 
     const pagination = data?.pagination || {
@@ -103,12 +112,11 @@ const PropertyClicksSection = () => {
             {/* Header */}
             <Box sx={{ mb: 4 }}>
                 <Typography variant="h5" fontWeight={700} sx={{ mb: 1 }}>
-                    Property Click Analytics
+                    {t("adminPropertyClicks.title")}
                 </Typography>
 
                 <Typography variant="body2" color="text.secondary">
-                    Track property views and understand how visitors
-                    interact with your listings.
+                    {t("adminPropertyClicks.subtitle")}
                 </Typography>
             </Box>
 
@@ -136,8 +144,8 @@ const PropertyClicksSection = () => {
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
                     <SummaryCard
-                        title="Total Clicks"
-                        value={formatNumber(summary.totalClicks)}
+                        title={t("adminPropertyClicks.summary.totalClicks")}
+                        value={formatNumber(summary.totalClicks, locale)}
                         icon={<Visibility />}
                         color="#2563EB"
                     />
@@ -145,8 +153,8 @@ const PropertyClicksSection = () => {
 
                 <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
                     <SummaryCard
-                        title="Tracked Properties"
-                        value={formatNumber(summary.totalProperties)}
+                        title={t("adminPropertyClicks.summary.trackedProperties")}
+                        value={formatNumber(summary.totalProperties, locale)}
                         icon={<HomeWork />}
                         color="#2563EB"
                     />
@@ -154,8 +162,8 @@ const PropertyClicksSection = () => {
 
                 <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
                     <SummaryCard
-                        title="Cities"
-                        value={formatNumber(summary.totalCities)}
+                        title={t("adminPropertyClicks.summary.cities")}
+                        value={formatNumber(summary.totalCities, locale)}
                         icon={<LocationCity />}
                         color="#2563EB"
                     />
@@ -165,27 +173,27 @@ const PropertyClicksSection = () => {
             {/* Charts */}
             <Box sx={{ mb: 5 }}>
                 <Typography variant="h6" fontWeight={700} sx={{ mb: 2.5 }}>
-                    Click Statistics
+                    {t("adminPropertyClicks.charts.title")}
                 </Typography>
 
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, lg: 4 }}>
                         <AnalyticsChart
-                            title="Clicks by Property Type"
+                            title={t("adminPropertyClicks.charts.propertyTypes")}
                             data={charts.propertyTypes || []}
                         />
                     </Grid>
 
                     <Grid size={{ xs: 12, lg: 4 }}>
                         <AnalyticsChart
-                            title="Clicks by Listing Type"
+                            title={t("adminPropertyClicks.charts.listingTypes")}
                             data={charts.listingTypes || []}
                         />
                     </Grid>
 
                     <Grid size={{ xs: 12, lg: 4 }}>
                         <AnalyticsChart
-                            title="Clicks by City"
+                            title={t("adminPropertyClicks.charts.cities")}
                             data={charts.cities || []}
                         />
                     </Grid>
@@ -196,11 +204,11 @@ const PropertyClicksSection = () => {
             <Box>
                 <Box sx={{ mb: 2.5 }}>
                     <Typography variant="h6" fontWeight={700}>
-                        All Clicked Properties
+                        {t("adminPropertyClicks.properties.title")}
                     </Typography>
 
                     <Typography variant="body2" color="text.secondary">
-                        All tracked properties, ordered by their latest click.
+                        {t("adminPropertyClicks.properties.subtitle")}
                     </Typography>
                 </Box>
 
@@ -236,14 +244,13 @@ const PropertyClicksSection = () => {
                             }}
                         >
                             <Typography variant="body2" color="text.secondary">
-                                Showing{" "}
-                                {(page - 1) * ITEMS_PER_PAGE + 1}
-                                {" – "}
-                                {(page - 1) * ITEMS_PER_PAGE +
-                                    properties.length}
-                                {" of "}
-                                {formatNumber(pagination.total)}
-                                {" tracked properties"}
+                                {t("adminPropertyClicks.pagination.showing", {
+                                    from: (page - 1) * ITEMS_PER_PAGE + 1,
+                                    to:
+                                        (page - 1) * ITEMS_PER_PAGE +
+                                        properties.length,
+                                    total: formatNumber(pagination.total, locale),
+                                })}
                             </Typography>
 
                             {pagination.totalPages > 1 && (
@@ -282,7 +289,7 @@ const PropertyClicksSection = () => {
                         />
 
                         <Typography variant="h6" fontWeight={600}>
-                            No property clicks yet
+                            {t("adminPropertyClicks.empty.title")}
                         </Typography>
 
                         <Typography
@@ -290,8 +297,7 @@ const PropertyClicksSection = () => {
                             color="text.secondary"
                             textAlign="center"
                         >
-                            Property click statistics will appear here
-                            when visitors start viewing your listings.
+                            {t("adminPropertyClicks.empty.description")}
                         </Typography>
                     </Box>
                 )}

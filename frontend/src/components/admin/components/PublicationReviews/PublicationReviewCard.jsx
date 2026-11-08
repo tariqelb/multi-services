@@ -1,5 +1,9 @@
+// /home/tariq/multi-services/app/frontend/src/components/admin/components/PublicationReviews/PublicationReviewCard.jsx
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 import {
     Box,
     Typography,
@@ -26,7 +30,6 @@ import {
     Delete,
 } from "@mui/icons-material";
 
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../../api/axiosInstance";
 import getImageUrl from "../../../../utils/getImageUrl";
 
@@ -50,23 +53,41 @@ function getStatusStyles(status) {
     }
 }
 
-export default function PublicationReviewCard({
-    property = {},
-    onDeleted,
-}) {
+function getTranslationKey(value) {
+    return String(value || "")
+        .toLowerCase()
+        .trim()
+        .replaceAll(" ", "_")
+        .replaceAll("-", "_");
+}
+
+function getPropertyId(property) {
+    return (
+        property?._id ||
+        property?.id ||
+        property?.propertyId ||
+        property?.property?._id ||
+        property?.property?.id
+    );
+}
+
+export default function PublicationReviewCard({ property, onDeleted }) {
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleting, setDeleting] = useState(false);
-    const [deleted, setDeleted] = useState(false);
+
     const [notification, setNotification] = useState({
         open: false,
         message: "",
         severity: "success",
     });
 
+    const propertyId = getPropertyId(property);
+
     const {
-        title = "Untitled property",
+        title = t("adminPublications.card.untitled"),
         price = 0,
         images = [],
         listingType = "For Sale",
@@ -80,9 +101,7 @@ export default function PublicationReviewCard({
         createdAt,
     } = property;
 
-    const propertyId = property._id || property.id;
-
-    // The backend should populate userId with publisher details.
+    // The property API should populate userId with publisher details.
     const owner =
         property.userId && typeof property.userId === "object"
             ? property.userId
@@ -91,9 +110,10 @@ export default function PublicationReviewCard({
     const ownerName =
         [owner.firstName, owner.lastName].filter(Boolean).join(" ") ||
         owner.name ||
-        "Unknown user";
+        t("adminPublications.card.unknownUser");
 
-    const ownerEmail = owner.email || "No email available";
+    const ownerEmail =
+        owner.email || t("adminPublications.card.noEmail");
 
     const imagePath = images?.[0]?.path || images?.[0];
 
@@ -103,19 +123,40 @@ export default function PublicationReviewCard({
 
     const location = [neighborhood, city].filter(Boolean).join(", ");
 
-    const formattedPrice = Number(price || 0).toLocaleString();
+    const locale = i18n.language?.startsWith("ar")
+        ? "ar"
+        : i18n.language?.startsWith("fr")
+          ? "fr-FR"
+          : "en-US";
+
+    const formattedPrice = Number(price || 0).toLocaleString(locale);
 
     const formattedDate = createdAt
-        ? new Date(createdAt).toLocaleString("en-GB", {
+        ? new Date(createdAt).toLocaleString(locale, {
               day: "2-digit",
               month: "2-digit",
               year: "numeric",
               hour: "2-digit",
               minute: "2-digit",
           })
-        : "Date unavailable";
+        : t("adminPublications.card.dateUnavailable");
 
     const statusStyle = getStatusStyles(status);
+
+    const translatedStatus = t(
+        `adminPublications.statuses.${getTranslationKey(status)}`,
+        { defaultValue: status }
+    );
+
+    const translatedListingType = t(
+        `adminPublications.listingTypes.${getTranslationKey(listingType)}`,
+        { defaultValue: listingType }
+    );
+
+    const translatedPropertyType = t(
+        `adminPublications.propertyTypes.${getTranslationKey(propertyType)}`,
+        { defaultValue: propertyType }
+    );
 
     const showNotification = (message, severity = "success") => {
         setNotification({
@@ -127,7 +168,13 @@ export default function PublicationReviewCard({
 
     const handleViewDetails = () => {
         if (!propertyId) {
-            console.error("Property ID is missing:", property);
+            console.error("Publication ID is missing:", property);
+
+            showNotification(
+                t("adminPublications.notifications.missingId"),
+                "error"
+            );
+
             return;
         }
 
@@ -138,7 +185,10 @@ export default function PublicationReviewCard({
 
     const handleDeletePublication = async () => {
         if (!propertyId) {
-            showNotification("Property ID is missing.", "error");
+            showNotification(
+                t("adminPublications.notifications.missingId"),
+                "error"
+            );
             return;
         }
 
@@ -150,10 +200,9 @@ export default function PublicationReviewCard({
             );
 
             setDeleteDialogOpen(false);
-            setDeleted(true);
 
             showNotification(
-                "Publication deleted successfully.",
+                t("adminPublications.notifications.deleteSuccess"),
                 "success"
             );
 
@@ -166,17 +215,13 @@ export default function PublicationReviewCard({
 
             showNotification(
                 error.response?.data?.message ||
-                    "Failed to delete publication.",
+                    t("adminPublications.notifications.deleteError"),
                 "error"
             );
         } finally {
             setDeleting(false);
         }
     };
-
-    if (deleted) {
-        return null;
-    }
 
     return (
         <>
@@ -265,7 +310,7 @@ export default function PublicationReviewCard({
                             </Stack>
 
                             <Chip
-                                label={status}
+                                label={translatedStatus}
                                 size="small"
                                 sx={{
                                     ...statusStyle,
@@ -307,7 +352,7 @@ export default function PublicationReviewCard({
                             sx={{ mt: 1, mb: 1.5 }}
                         >
                             <Chip
-                                label={listingType}
+                                label={translatedListingType}
                                 size="small"
                                 color="primary"
                                 variant="outlined"
@@ -320,7 +365,7 @@ export default function PublicationReviewCard({
                                     fontWeight: 600,
                                 }}
                             >
-                                {propertyType}
+                                {translatedPropertyType}
                             </Typography>
                         </Stack>
 
@@ -365,15 +410,24 @@ export default function PublicationReviewCard({
                             }}
                         >
                             {surface !== "" && surface != null && (
-                                <Box>Surface: {surface} m²</Box>
+                                <Box>
+                                    {t("adminPublications.card.surface")}:{" "}
+                                    {surface} m²
+                                </Box>
                             )}
 
                             {rooms !== "" && rooms != null && (
-                                <Box>Rooms: {rooms}</Box>
+                                <Box>
+                                    {t("adminPublications.card.rooms")}:{" "}
+                                    {rooms}
+                                </Box>
                             )}
 
                             {bathrooms !== "" && bathrooms != null && (
-                                <Box>Bathrooms: {bathrooms}</Box>
+                                <Box>
+                                    {t("adminPublications.card.bathrooms")}:{" "}
+                                    {bathrooms}
+                                </Box>
                             )}
                         </Stack>
                     </Box>
@@ -447,7 +501,7 @@ export default function PublicationReviewCard({
                                     flexShrink: 0,
                                 }}
                             >
-                                View Details
+                                {t("adminPublications.card.viewDetails")}
                             </Button>
 
                             <Button
@@ -455,9 +509,7 @@ export default function PublicationReviewCard({
                                 color="error"
                                 size="small"
                                 startIcon={<Delete />}
-                                onClick={() =>
-                                    setDeleteDialogOpen(true)
-                                }
+                                onClick={() => setDeleteDialogOpen(true)}
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
@@ -465,7 +517,7 @@ export default function PublicationReviewCard({
                                     flexShrink: 0,
                                 }}
                             >
-                                Delete
+                                {t("adminPublications.card.delete")}
                             </Button>
                         </Stack>
                     </Box>
@@ -484,18 +536,18 @@ export default function PublicationReviewCard({
                 fullWidth
             >
                 <DialogTitle sx={{ fontWeight: 700 }}>
-                    Delete publication?
+                    {t("adminPublications.dialog.title")}
                 </DialogTitle>
 
                 <DialogContent>
                     <DialogContentText>
-                        Are you sure you want to delete "{title}"?
-                        This action cannot be undone.
+                        {t("adminPublications.dialog.confirm", { title })}
                     </DialogContentText>
                 </DialogContent>
 
                 <DialogActions sx={{ p: 2 }}>
                     <Button
+                        autoFocus
                         onClick={() => setDeleteDialogOpen(false)}
                         disabled={deleting}
                         sx={{
@@ -503,7 +555,7 @@ export default function PublicationReviewCard({
                             fontWeight: 600,
                         }}
                     >
-                        Cancel
+                        {t("adminPublications.card.cancel")}
                     </Button>
 
                     <Button
@@ -518,21 +570,7 @@ export default function PublicationReviewCard({
                                     color="inherit"
                                 />
                             ) : (
-                                // <Button
-                                //     variant="outlined"
-                                //     color="error"
-                                //     size="small"
-                                //     onClick={() => setDeleteDialogOpen(true)}
-                                //     sx={{
-                                //         textTransform: "none",
-                                //         fontWeight: 700,
-                                //         whiteSpace: "nowrap",
-                                //         flexShrink: 0,
-                                //     }}
-                                // >
-                                    
-                                // </Button>
-                                <Delete/>
+                                <Delete />
                             )
                         }
                         sx={{
@@ -540,7 +578,9 @@ export default function PublicationReviewCard({
                             fontWeight: 700,
                         }}
                     >
-                        {deleting ? "Deleting..." : "Delete"}
+                        {deleting
+                            ? t("adminPublications.card.deleting")
+                            : t("adminPublications.card.delete")}
                     </Button>
                 </DialogActions>
             </Dialog>

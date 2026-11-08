@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
     Alert,
@@ -8,6 +7,7 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 
@@ -15,6 +15,8 @@ import axiosInstance from "../../../api/axiosInstance";
 import UserCard from "./UserCard";
 
 export default function UsersSection() {
+    const { t } = useTranslation();
+
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -33,7 +35,7 @@ export default function UsersSection() {
             } catch (err) {
                 setError(
                     err.response?.data?.message ||
-                        "Failed to load users."
+                        t("usersSection.loadError")
                 );
             } finally {
                 setLoading(false);
@@ -54,20 +56,22 @@ export default function UsersSection() {
             >
                 <Box sx={{pb:5}}>
                     <Typography variant="h5" fontWeight={700}>
-                            Users
+                        {t("usersSection.title")}
                     </Typography>
                     <Typography
                         variant="body2"
                         color="text.secondary"
                         mt={0.5}
                     >
-                        Account information and marketplace activity.
+                        {t("usersSection.subtitle")}
                     </Typography>
 
                 </Box>
                 <Chip
                     icon={<PeopleAltOutlinedIcon />}
-                    label={`${users.length} users`}
+                    label={t("usersSection.userCount", {
+                        count: users.length,
+                    })}
                     variant="outlined"
                     sx={{ fontWeight: 700 }}
                 />
@@ -85,7 +89,7 @@ export default function UsersSection() {
                 <Alert severity="error">{error}</Alert>
             ) : users.length === 0 ? (
                 <Typography color="text.secondary" py={3}>
-                    No users found.
+                    {t("usersSection.empty")}
                 </Typography>
             ) : (
                 <Stack spacing={2.5}>

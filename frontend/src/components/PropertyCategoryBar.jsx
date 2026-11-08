@@ -1,4 +1,7 @@
+
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Autocomplete,
     Box,
@@ -9,104 +12,30 @@ import {
 } from "@mui/material";
 
 const categories = [
-    "All Properties",
-    "Apartment",
-    "House",
-    "Villa",
-    "Studio",
-    "Room",
-    "Store",
-    "Office",
-    "Land",
-    "Warehouse",
-    "Commercial space",
-    "Commercial store",
-    "Garage",
-    "other",
+    { value: "All Properties", key: "all" },
+    { value: "Apartment", key: "apartment" },
+    { value: "House", key: "house" },
+    { value: "Villa", key: "villa" },
+    { value: "Studio", key: "studio" },
+    { value: "Room", key: "room" },
+    { value: "Store", key: "store" },
+    { value: "Office", key: "office" },
+    { value: "Land", key: "land" },
+    { value: "Warehouse", key: "warehouse" },
+    { value: "Commercial space", key: "commercialSpace" },
+    { value: "Commercial store", key: "commercialStore" },
+    { value: "Garage", key: "garage" },
+    { value: "other", key: "other" },
 ];
+import cities from "../data/moroccanCities"
 
-const moroccanCities = [
-    "Agadir",
-    "Ain Harrouda",
-    "Aït Melloul",
-    "Ait Ourir",
-    "Al Hoceima",
-    "Azrou",
-    "Benguerir",
-    "Beni Ansar",
-    "Beni Mellal",
-    "Benslimane",
-    "Berrechid",
-    "Berkane",
-    "Biougra",
-    "Bni Yakhlef",
-    "Bouskoura",
-    "Bouznika",
-    "Casablanca",
-    "Dcheira El Jihadia",
-    "Dar Bouazza (Tamaris)",
-    "Drargua",
-    "Ech-challalate",
-    "El Jadida",
-    "El Kelaa Des Sraghna",
-    "Essaouira",
-    "Errachidia",
-    "Fez",
-    "Fquih Ben Salah",
-    "Fnideq",
-    "Guelmim",
-    "Guercif",
-    "Inezgane",
-    "Kenitra",
-    "Khemisset",
-    "Khenifra",
-    "Khouribga",
-    "Ksar El Kebir",
-    "Lahraouyine",
-    "Larache",
-    "Lqliaa",
-    "M'diq",
-    "Marrakesh",
-    "Martil",
-    "Mehdya",
-    "Meknes",
-    "Midelt",
-    "Mohammedia",
-    "Nador",
-    "Ouarzazate",
-    "Oued Zem",
-    "Oujda",
-    "Oulad Teima",
-    "Ouazzane",
-    "Rabat",
-    "Salé",
-    "Safi",
-    "Sefrou",
-    "Settat",
-    "Skhirat",
-    "Sidi Bennour",
-    "Sidi Kacem",
-    "Sidi Slimane",
-    "Sidi Taibi",
-    "Souk El Arbaa",
-    "Souk Sebt Ouled Nemma",
-    "Taourirt",
-    "Tamensourte",
-    "Tan-Tan",
-    "Tangier",
-    "Taza",
-    "Temara",
-    "Tetouan",
-    "Tifelt",
-    "Tit Mellil",
-    "Tiznit",
-    "Youssoufia",
-].sort((a, b) => a.localeCompare(b, "en"));
+const moroccanCities = cities
+
 
 const transactionTypes = [
-    { label: "All Transactions", value: "All" },
-    { label: "For Sale", value: "For Sale" },
-    { label: "For Rent", value: "For Rent" },
+    { value: "All", key: "allTransactions" },
+    { value: "For Sale", key: "forSale" },
+    { value: "For Rent", key: "forRent" },
 ];
 
 const normalize = (value) =>
@@ -122,6 +51,7 @@ const normalizeCity = (value) => {
     if (city === "tanger") return "tangier";
     if (city === "marrakech") return "marrakesh";
     if (city === "fes") return "fez";
+    if (city === "sale") return "sale";
 
     return city;
 };
@@ -135,6 +65,8 @@ export default function PropertyCategoryBar({
     selectedCity = "All Cities",
     onCityChange,
 }) {
+    const { t, i18n } = useTranslation();
+
     const getCategoryCount = (category) => {
         return properties.filter((property) => {
             const matchesCategory =
@@ -156,6 +88,23 @@ export default function PropertyCategoryBar({
                 matchesCity
             );
         }).length;
+    };
+
+    const getCityLabel = (city) => {
+        if (city === "All Cities") {
+            return t("properties.filter.allCities");
+        }
+
+        return i18n.language === "ar"
+            ? city.ar
+            : city.en;
+    };
+
+    const normalizeCityKey = (city) => {
+        return normalize(city)
+            .replace(/[()]/g, "")
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_|_$/g, "");
     };
 
     const filterFieldSx = {
@@ -185,7 +134,7 @@ export default function PropertyCategoryBar({
                     fontSize: { xs: "1.25rem", sm: "1.5rem" },
                 }}
             >
-                Filter
+                {t("properties.filter.title")}
             </Typography>
 
             <Box
@@ -204,10 +153,9 @@ export default function PropertyCategoryBar({
                     bgcolor: "#fff",
                 }}
             >
-                {/* Property type categories */}
                 <Box
                     component="nav"
-                    aria-label="Property Categories"
+                    aria-label={t("properties.filter.categoriesAriaLabel")}
                     sx={{
                         display: "grid",
                         gridTemplateColumns: {
@@ -227,15 +175,20 @@ export default function PropertyCategoryBar({
                     }}
                 >
                     {categories.map((category) => {
-                        const active = selectedCategory === category;
-                        const categoryCount = getCategoryCount(category);
+                        const active =
+                            selectedCategory === category.value;
+
+                        const categoryCount =
+                            getCategoryCount(category.value);
 
                         return (
                             <Button
-                                key={category}
+                                key={category.value}
                                 variant={active ? "contained" : "outlined"}
                                 disableElevation
-                                onClick={() => onCategoryChange?.(category)}
+                                onClick={() =>
+                                    onCategoryChange?.(category.value)
+                                }
                                 sx={{
                                     minWidth: 0,
                                     width: "100%",
@@ -285,7 +238,9 @@ export default function PropertyCategoryBar({
                                         overflowWrap: "anywhere",
                                     }}
                                 >
-                                    {category}
+                                    {t(
+                                        `properties.categories.${category.key}`
+                                    )}
                                 </Box>
 
                                 <Box
@@ -315,7 +270,6 @@ export default function PropertyCategoryBar({
                     })}
                 </Box>
 
-                {/* Transaction type and city filters */}
                 <Box
                     sx={{
                         display: "flex",
@@ -333,7 +287,7 @@ export default function PropertyCategoryBar({
                 >
                     <TextField
                         select
-                        label="Transaction Type"
+                        label={t("properties.filter.transactionType")}
                         value={selectedListingType}
                         onChange={(event) =>
                             onListingTypeChange?.(event.target.value)
@@ -348,21 +302,30 @@ export default function PropertyCategoryBar({
                         }}
                     >
                         {transactionTypes.map((type) => (
-                            <MenuItem key={type.value} value={type.value}>
-                                {type.label}
+                            <MenuItem
+                                key={type.value}
+                                value={type.value}
+                            >
+                                {t(`properties.filter.${type.key}`)}
                             </MenuItem>
                         ))}
                     </TextField>
 
                     <Autocomplete
-                        options={["All Cities", ...moroccanCities]}
-                        value={selectedCity}
-                        onChange={(_event, newValue) =>
-                            onCityChange?.(newValue || "All Cities")
+                        options={[
+                            { en: "All Cities", ar: "جميع المدن" },
+                            ...moroccanCities,
+                        ]}
+                        value={
+                            moroccanCities.find((city) => city.en === selectedCity) ||
+                            { en: "All Cities", ar: "جميع المدن" }
                         }
-                        getOptionLabel={(option) => option}
+                        onChange={(_event, newValue) =>
+                            onCityChange?.(newValue?.en || "All Cities")
+                        }
+                        getOptionLabel={getCityLabel}
                         isOptionEqualToValue={(option, value) =>
-                            option === value
+                            option.en === value.en
                         }
                         fullWidth
                         sx={{
@@ -375,8 +338,8 @@ export default function PropertyCategoryBar({
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="City"
-                                placeholder="Search a city"
+                                label={t("properties.filter.city")}
+                                placeholder={t("properties.filter.searchCity")}
                             />
                         )}
                     />
@@ -401,7 +364,7 @@ export default function PropertyCategoryBar({
                             flexShrink: 0,
                         }}
                     >
-                        Clear Filters
+                        {t("properties.filter.clearFilters")}
                     </Button>
                 </Box>
             </Box>

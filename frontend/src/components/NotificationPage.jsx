@@ -1,4 +1,7 @@
+
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Alert,
     Box,
@@ -27,6 +30,7 @@ const API_URL = "/notifications";
 
 export default function NotificationsPage() {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
 
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -47,12 +51,12 @@ export default function NotificationsPage() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Unable to load notifications."
+                    t("notifications.errors.load")
             );
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         fetchNotifications();
@@ -103,7 +107,7 @@ export default function NotificationsPage() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Unable to mark notification as read."
+                    t("notifications.errors.markRead")
             );
             return false;
         }
@@ -129,7 +133,7 @@ export default function NotificationsPage() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Unable to mark notifications as read."
+                    t("notifications.errors.markAllRead")
             );
         } finally {
             setMarkingAll(false);
@@ -157,7 +161,7 @@ export default function NotificationsPage() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Unable to delete notification."
+                    t("notifications.errors.delete")
             );
         } finally {
             setBusyId(null);
@@ -181,7 +185,16 @@ export default function NotificationsPage() {
 
         if (Number.isNaN(parsedDate.getTime())) return "";
 
-        return parsedDate.toLocaleString("en-GB", {
+        const localeMap = {
+            en: "en-GB",
+            fr: "fr-FR",
+            ar: "ar-MA",
+        };
+
+        const currentLanguage = i18n.language?.split("-")[0];
+        const locale = localeMap[currentLanguage] || "en-GB";
+
+        return parsedDate.toLocaleString(locale, {
             dateStyle: "medium",
             timeStyle: "short",
         });
@@ -189,9 +202,14 @@ export default function NotificationsPage() {
 
     return (
         <PageLayout
-            title="Notifications"
-            subtitle="Stay updated with your property alerts and activity."
-            icon={<NotificationsActive color="primary" sx={{ fontSize: 32 }} />}
+            title={t("notifications.title")}
+            subtitle={t("notifications.subtitle")}
+            icon={
+                <NotificationsActive
+                    color="primary"
+                    sx={{ fontSize: 32 }}
+                />
+            }
             action={
                 <Button
                     variant="outlined"
@@ -204,19 +222,44 @@ export default function NotificationsPage() {
                     }
                     disabled={unreadCount === 0 || markingAll}
                     onClick={handleMarkAllAsRead}
+                    sx={{
+                        width: "auto",
+                        minWidth: 0,
+                        height: { xs: 36, sm: 40 },
+                        px: { xs: 1.5, sm: 2 },
+                        borderRadius: "8px",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                    }}
                 >
-                    {markingAll ? "Updating..." : "Mark all as read"}
+                    {markingAll
+                        ? t("notifications.updating")
+                        : t("notifications.markAllRead")}
                 </Button>
             }
         >
             {/* Summary */}
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 3 }}>
+            <Stack
+                direction="row"
+                spacing={1}
+                flexWrap="wrap"
+                useFlexGap
+                sx={{ mb: 3 }}
+            >
                 <StatusBadge
                     icon={<NotificationsNone />}
-                    label={`${notifications.length} notifications`}
+                    label={t("notifications.totalCount", {
+                        count: notifications.length,
+                    })}
                 />
+
                 <StatusBadge
-                    label={`${unreadCount} unread`}
+                    label={t("notifications.unreadCount", {
+                        count: unreadCount,
+                    })}
                     tone={unreadCount > 0 ? "info" : "neutral"}
                 />
             </Stack>
@@ -224,10 +267,18 @@ export default function NotificationsPage() {
             {error && (
                 <Alert
                     severity="error"
-                    sx={{ mb: 3, borderRadius: "10px", overflowWrap: "anywhere" }}
+                    sx={{
+                        mb: 3,
+                        borderRadius: "10px",
+                        overflowWrap: "anywhere",
+                    }}
                     action={
-                        <Button color="inherit" size="small" onClick={fetchNotifications}>
-                            Retry
+                        <Button
+                            color="inherit"
+                            size="small"
+                            onClick={fetchNotifications}
+                        >
+                            {t("notifications.retry")}
                         </Button>
                     }
                 >
@@ -236,22 +287,48 @@ export default function NotificationsPage() {
             )}
 
             {loading ? (
-                <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        py: 10,
+                    }}
+                >
                     <CircularProgress />
                 </Box>
             ) : notifications.length === 0 ? (
-                <Card sx={{ textAlign: "center", py: { xs: 5, sm: 9 }, px: 3 }}>
-                    <NotificationsNone sx={{ fontSize: 56, color: "text.secondary", mb: 1.5 }} />
+                <Card
+                    sx={{
+                        textAlign: "center",
+                        py: { xs: 5, sm: 9 },
+                        px: 3,
+                    }}
+                >
+                    <NotificationsNone
+                        sx={{
+                            fontSize: 56,
+                            color: "text.secondary",
+                            mb: 1.5,
+                        }}
+                    />
 
-                    <Typography variant="h6">You're all caught up</Typography>
-
-                    <Typography color="text.secondary" sx={{ mt: 1 }}>
-                        New notifications will appear here when a property
-                        matches your alerts.
+                    <Typography variant="h6">
+                        {t("notifications.emptyTitle")}
                     </Typography>
 
-                    <Button variant="outlined" onClick={fetchNotifications} sx={{ mt: 3 }}>
-                        Refresh notifications
+                    <Typography
+                        color="text.secondary"
+                        sx={{ mt: 1 }}
+                    >
+                        {t("notifications.emptySubtitle")}
+                    </Typography>
+
+                    <Button
+                        variant="outlined"
+                        onClick={fetchNotifications}
+                        sx={{ mt: 3 }}
+                    >
+                        {t("notifications.refresh")}
                     </Button>
                 </Card>
             ) : (
@@ -261,37 +338,78 @@ export default function NotificationsPage() {
                             key={notification._id}
                             sx={{
                                 p: { xs: 2, sm: 2.5 },
-                                borderColor: notification.isRead ? "divider" : "#BFDBFE",
-                                bgcolor: notification.isRead ? "background.paper" : "#F5F9FF",
+                                borderColor: notification.isRead
+                                    ? "divider"
+                                    : "#BFDBFE",
+                                bgcolor: notification.isRead
+                                    ? "background.paper"
+                                    : "#F5F9FF",
                             }}
                         >
                             <Stack
-                                direction={{ xs: "column", sm: "row" }}
+                                direction={{
+                                    xs: "column",
+                                    sm: "row",
+                                }}
                                 justifyContent="space-between"
-                                alignItems={{ xs: "stretch", sm: "flex-start" }}
+                                alignItems={{
+                                    xs: "stretch",
+                                    sm: "flex-start",
+                                }}
                                 spacing={2}
                             >
-                                <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.75 }}>
+                                <Box
+                                    sx={{
+                                        minWidth: 0,
+                                        flexGrow: 1,
+                                    }}
+                                >
+                                    <Stack
+                                        direction="row"
+                                        spacing={1}
+                                        alignItems="center"
+                                        sx={{ mb: 0.75 }}
+                                    >
                                         <StatusBadge
-                                            label={notification.isRead ? "Read" : "New"}
-                                            tone={notification.isRead ? "neutral" : "info"}
+                                            label={
+                                                notification.isRead
+                                                    ? t("notifications.read")
+                                                    : t("notifications.new")
+                                            }
+                                            tone={
+                                                notification.isRead
+                                                    ? "neutral"
+                                                    : "info"
+                                            }
                                         />
-                                        <Typography variant="caption" color="text.secondary">
-                                            {formatDate(notification.createdAt)}
+
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                        >
+                                            {formatDate(
+                                                notification.createdAt
+                                            )}
                                         </Typography>
                                     </Stack>
 
                                     <Typography
                                         variant="h6"
-                                        sx={{ fontSize: "1.0625rem", overflowWrap: "anywhere" }}
+                                        sx={{
+                                            fontSize: "1.0625rem",
+                                            overflowWrap: "anywhere",
+                                        }}
                                     >
                                         {notification.title}
                                     </Typography>
 
                                     <Typography
                                         color="text.secondary"
-                                        sx={{ mt: 0.5, lineHeight: 1.6, overflowWrap: "anywhere" }}
+                                        sx={{
+                                            mt: 0.5,
+                                            lineHeight: 1.6,
+                                            overflowWrap: "anywhere",
+                                        }}
                                     >
                                         {notification.message}
                                     </Typography>
@@ -306,47 +424,99 @@ export default function NotificationsPage() {
                                     sx={{ flexShrink: 0 }}
                                 >
                                     {!notification.isRead && (
-                                        <Tooltip title="Mark as read">
-                                            <IconButton
-                                                aria-label="Mark as read"
-                                                onClick={() => handleMarkAsRead(notification)}
-                                                sx={{
-                                                    color: "primary.main",
-                                                    border: "1px solid #BFDBFE",
-                                                    borderRadius: "10px",
-                                                    width: 44,
-                                                    height: 40,
-                                                }}
-                                            >
-                                                <DoneAll />
-                                            </IconButton>
-                                        </Tooltip>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            startIcon={<DoneAll />}
+                                            aria-label={t(
+                                                "notifications.markRead"
+                                            )}
+                                            onClick={() =>
+                                                handleMarkAsRead(
+                                                    notification
+                                                )
+                                            }
+                                            sx={{
+                                                minWidth: "auto",
+                                                height: 36,
+                                                px: 1.5,
+                                                borderRadius: "8px",
+                                                textTransform: "none",
+                                                fontWeight: 600,
+                                                fontSize: "0.8rem",
+                                                whiteSpace: "nowrap",
+                                                color: "primary.main",
+                                                borderColor: "#BFDBFE",
+                                                "&:hover": {
+                                                    borderColor: "primary.main",
+                                                    backgroundColor: "action.hover",
+                                                },
+                                            }}
+                                        >
+                                            {t("notifications.markRead")}
+                                        </Button>
                                     )}
 
+                                        
                                     {notification.link && (
                                         <Button
                                             variant="outlined"
+                                            size="small"
                                             startIcon={<Visibility />}
                                             onClick={() => handleView(notification)}
+                                            sx={{
+                                                width: "auto",
+                                                minWidth: 90,
+                                                height: 40,
+                                                minHeight: 40,
+                                                maxHeight: 40,
+                                                px: 1.5,
+                                                py: 0,
+                                                borderRadius: "8px",
+                                                boxSizing: "border-box",
+                                                textTransform: "none",
+                                                fontWeight: 600,
+                                                fontSize: "0.8rem",
+                                                whiteSpace: "nowrap",
+                                                flexShrink: 0,
+                                            }}
                                         >
-                                            View
+                                            {t("notifications.view")}
                                         </Button>
                                     )}
 
                                     <Button
                                         variant="outlined"
                                         color="error"
-                                        aria-label="Delete notification"
+                                        size="small"
+                                        aria-label={t("notifications.delete")}
                                         disabled={busyId === notification._id}
                                         onClick={() => handleDelete(notification)}
-                                        sx={{ borderColor: "#F0B8B8" }}
+                                        sx={{
+                                            width: "auto",
+                                            minWidth: 90,
+                                            height: 40,
+                                            minHeight: 40,
+                                            maxHeight: 40,
+                                            px: 1.5,
+                                            py: 0,
+                                            borderRadius: "8px",
+                                            boxSizing: "border-box",
+                                            textTransform: "none",
+                                            fontWeight: 600,
+                                            fontSize: "0.8rem",
+                                            whiteSpace: "nowrap",
+                                            flexShrink: 0,
+                                            borderColor: "#F0B8B8",
+                                        }}
                                     >
                                         {busyId === notification._id ? (
-                                            <CircularProgress size={20} />
+                                            <CircularProgress size={18} />
                                         ) : (
-                                            "Delete"
+                                            t("notifications.delete")
                                         )}
                                     </Button>
+
                                 </Stack>
                             </Stack>
                         </Card>

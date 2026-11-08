@@ -1,16 +1,17 @@
 
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 import EmailVerification from "./EmailVerification";
 
 function AuthForm() {
+    const { t } = useTranslation();
+
     const activeForm = useSelector(
         (state) => state.activeForm.activeForm
     );
-
-    console.log("Current activeForm:", activeForm);
 
     return (
         <div className="w-full">
@@ -21,8 +22,10 @@ function AuthForm() {
             {activeForm === "verify" && <EmailVerification />}
 
             {!["login", "signup", "verify"].includes(activeForm) && (
-                <p className="p-5 text-red-600">
-                    Invalid authentication state: {String(activeForm)}
+                <p className="break-words p-5 text-red-600">
+                    {t("auth.invalidState", {
+                        state: String(activeForm),
+                    })}
                 </p>
             )}
         </div>

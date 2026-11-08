@@ -1,5 +1,7 @@
+//app/frontend/src/components/admin/components/feedback/FeedbackSection.jsx
 
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
     Box,
@@ -18,6 +20,8 @@ import FeedbackList from "./FeedbackList";
 import FeedbackDetails from "./FeedbackDetails";
 
 export default function FeedbackSection() {
+    const { t } = useTranslation();
+
     const [feedbacks, setFeedbacks] = useState([]);
     const [selectedFeedback, setSelectedFeedback] = useState(null);
 
@@ -80,12 +84,12 @@ export default function FeedbackSection() {
 
             setError(
                 err.response?.data?.message ||
-                "Unable to load feedback submissions."
+                t("adminFeedback.errors.load")
             );
         } finally {
             setLoading(false);
         }
-    }, [limit]);
+    }, [limit, t]);
 
     useEffect(() => {
         fetchFeedbacks();
@@ -131,7 +135,7 @@ export default function FeedbackSection() {
             );
 
             showNotification(
-                "Feedback status updated successfully."
+                t("adminFeedback.notifications.statusUpdated")
             );
 
             return true;
@@ -143,7 +147,7 @@ export default function FeedbackSection() {
 
             showNotification(
                 err.response?.data?.message ||
-                "Unable to update feedback status.",
+                t("adminFeedback.errors.updateStatus"),
                 "error"
             );
 
@@ -169,14 +173,14 @@ export default function FeedbackSection() {
                         fontWeight={700}
                         color="#0f172a"
                     >
-                        User Feedback
+                        {t("adminFeedback.title")}
                     </Typography>
 
                     <Typography
                         variant="body2"
                         color="text.secondary"
                     >
-                        Review feedback, bug reports, and user submissions.
+                        {t("adminFeedback.subtitle")}
                     </Typography>
                 </Box>
 
@@ -190,7 +194,7 @@ export default function FeedbackSection() {
                         fontWeight: 600,
                     }}
                 >
-                    Refresh
+                    {t("adminFeedback.refresh")}
                 </Button>
             </Box>
 
@@ -221,7 +225,7 @@ export default function FeedbackSection() {
                     }}
                 >
                     <Typography fontWeight={600} color="#334155">
-                        No feedback submissions yet
+                        {t("adminFeedback.empty.title")}
                     </Typography>
 
                     <Typography
@@ -229,7 +233,7 @@ export default function FeedbackSection() {
                         color="text.secondary"
                         sx={{ mt: 0.5 }}
                     >
-                        User feedback will appear here.
+                        {t("adminFeedback.empty.description")}
                     </Typography>
                 </Box>
             ) : (

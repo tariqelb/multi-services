@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const propertyTypes = [
@@ -64,6 +63,18 @@ const propertyAlertSchema = new mongoose.Schema(
                 message: "Select For Sale, For Rent, or both.",
             },
         },
+
+        // Archived alerts remain in the database for historical analytics.
+        isArchived: {
+            type: Boolean,
+            default: false,
+            index: true,
+        },
+
+        archivedAt: {
+            type: Date,
+            default: null,
+        },
     },
     {
         timestamps: true,
@@ -78,6 +89,16 @@ propertyAlertSchema.pre("validate", function () {
     if (this.listingTypes) {
         this.listingTypes = [...new Set(this.listingTypes)];
     }
+});
+
+propertyAlertSchema.index({
+    isArchived: 1,
+    createdAt: -1,
+});
+
+propertyAlertSchema.index({
+    user: 1,
+    isArchived: 1,
 });
 
 const PropertyAlert = mongoose.model(

@@ -1,4 +1,7 @@
+
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Typography,
@@ -11,7 +14,14 @@ import {
 
 import getImageUrl from "../utils/getImageUrl";
 
+const normalize = (value) =>
+    String(value ?? "")
+        .trim()
+        .toLowerCase();
+
 export default function PropertyCard({ property = {}, onClick }) {
+    const { t, i18n } = useTranslation();
+
     const {
         title = "Modern Property",
         price = "0 MAD",
@@ -34,7 +44,40 @@ export default function PropertyCard({ property = {}, onClick }) {
         : city;
 
     const formattedPrice =
-        typeof price === "number" ? `${price} MAD` : price;
+        typeof price === "number"
+            ? `${price.toLocaleString(i18n.language)} MAD`
+            : price;
+
+    const listingTypeKey = {
+        "for sale": "forSale",
+        "for rent": "forRent",
+    }[normalize(listingType)];
+
+    const statusKey = {
+        available: "available",
+        rented: "rented",
+        sold: "sold",
+        inactive: "inactive",
+    }[normalize(status)];
+
+    const propertyTypeKeys = {
+        apartment: "apartment",
+        house: "house",
+        villa: "villa",
+        studio: "studio",
+        room: "room",
+        store: "store",
+        office: "office",
+        land: "land",
+        warehouse: "warehouse",
+        "commercial space": "commercialSpace",
+        "commercial store": "commercialStore",
+        garage: "garage",
+        other: "other",
+    };
+
+    const translatedPropertyType =
+        propertyTypeKeys[normalize(propertyType)];
 
     const statusColors = {
         Available: {
@@ -58,7 +101,6 @@ export default function PropertyCard({ property = {}, onClick }) {
     const currentStatusColor =
         statusColors[status] || statusColors.Available;
 
-    // Convert old localhost image URLs to relative URLs.
     const imageUrl = getImageUrl(image);
 
     const fallbackImage =
@@ -130,7 +172,7 @@ export default function PropertyCard({ property = {}, onClick }) {
 
                     {referenceCode && (
                         <Chip
-                            label={`REF ${referenceCode}`}
+                            label={`${t("properties.card.reference")} ${referenceCode}`}
                             size="small"
                             sx={{
                                 bgcolor: "#e2e8f0",
@@ -150,11 +192,15 @@ export default function PropertyCard({ property = {}, onClick }) {
                     sx={{ flexShrink: 0 }}
                 >
                     <Chip
-                        label={listingType}
+                        label={
+                            listingTypeKey
+                                ? t(`properties.card.${listingTypeKey}`)
+                                : listingType
+                        }
                         size="small"
                         sx={{
                             bgcolor:
-                                listingType === "For Rent"
+                                normalize(listingType) === "for rent"
                                     ? "#0284c7"
                                     : "#10b981",
                             color: "#ffffff",
@@ -166,7 +212,11 @@ export default function PropertyCard({ property = {}, onClick }) {
                     />
 
                     <Chip
-                        label={status}
+                        label={
+                            statusKey
+                                ? t(`properties.card.${statusKey}`)
+                                : status
+                        }
                         size="small"
                         sx={{
                             ...currentStatusColor,
@@ -221,7 +271,12 @@ export default function PropertyCard({ property = {}, onClick }) {
                             fontSize: "0.78rem",
                         }}
                     >
-                        🏷️ {propertyType}
+                        🏷️{" "}
+                        {translatedPropertyType
+                            ? t(
+                                  `properties.categories.${translatedPropertyType}`
+                              )
+                            : propertyType}
                     </Box>
                 )}
             </Box>
@@ -304,7 +359,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                 component="span"
                                 sx={{ color: "#5B6577", fontWeight: 600 }}
                             >
-                                Price:
+                                {t("properties.card.price")}:
                             </Typography>
 
                             <Typography
@@ -334,7 +389,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                         fontWeight: 600,
                                     }}
                                 >
-                                    Surface:
+                                    {t("properties.card.surface")}:
                                 </Typography>
 
                                 <Typography
@@ -363,7 +418,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                         fontWeight: 600,
                                     }}
                                 >
-                                    Rooms:
+                                    {t("properties.card.rooms")}:
                                 </Typography>
 
                                 <Typography
@@ -392,7 +447,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                         fontWeight: 600,
                                     }}
                                 >
-                                    Salons:
+                                    {t("properties.card.salons")}:
                                 </Typography>
 
                                 <Typography
@@ -421,7 +476,7 @@ export default function PropertyCard({ property = {}, onClick }) {
                                         fontWeight: 600,
                                     }}
                                 >
-                                    Bathrooms:
+                                    {t("properties.card.bathrooms")}:
                                 </Typography>
 
                                 <Typography

@@ -1,5 +1,8 @@
+
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Typography,
@@ -9,6 +12,7 @@ import {
     Alert,
     Pagination,
 } from "@mui/material";
+
 import { BookmarkRemove } from "@mui/icons-material";
 
 import axiosInstance from "../api/axiosInstance";
@@ -16,6 +20,9 @@ import SavedPropertyCard from "./SavedPropertyCard";
 import PropertyCategoryBar from "./PropertyCategoryBar";
 
 export default function SavedPropertiesList({ onViewDetails }) {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -26,7 +33,6 @@ export default function SavedPropertiesList({ onViewDetails }) {
     const [page, setPage] = useState(1);
 
     const itemsPerPage = 5;
-    const navigate = useNavigate();
 
     const fetchSavedProperties = useCallback(async () => {
         try {
@@ -50,12 +56,12 @@ export default function SavedPropertiesList({ onViewDetails }) {
 
             setError(
                 err.response?.data?.message ||
-                "Failed to load saved properties. Please try again."
+                t("properties.savedList.fetchError")
             );
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         fetchSavedProperties();
@@ -101,7 +107,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
 
             setError(
                 err.response?.data?.message ||
-                "Failed to remove this property from your saved list."
+                t("properties.savedList.removeError")
             );
         } finally {
             setRemovingId(null);
@@ -112,16 +118,16 @@ export default function SavedPropertiesList({ onViewDetails }) {
         const propertyId = property?._id || property?.id;
 
         if (!propertyId) {
-            console.error("Property ID is missing.");
+            console.error("Property ID is missing:", property);
             return;
         }
 
-        if (onViewDetails) {
-            onViewDetails(property);
-            return;
-        }
-
-        navigate(`/properties/${propertyId}`);
+        navigate(`/property/${propertyId}`, {
+            state: {
+                property,
+                from: "/saved",
+            },
+        });
     };
 
     const filteredSavedRecords =
@@ -145,6 +151,26 @@ export default function SavedPropertiesList({ onViewDetails }) {
         setPage(value);
     };
 
+    const getCategoryLabel = (category) => {
+        if (category === "All Properties") {
+            return t("properties.savedList.allProperties");
+        }
+
+        const categoryKey = {
+            "commercial space": "commercialSpace",
+            "commercial store": "commercialStore",
+        }[category.toLowerCase()] ||
+            category
+                .toLowerCase()
+                .replace(/[^a-z0-9]+(.)/g, (_, char) =>
+                    char.toUpperCase()
+                );
+
+        return t(`properties.categories.${categoryKey}`, {
+            defaultValue: category,
+        });
+    };
+
     const totalPages = Math.ceil(
         filteredSavedRecords.length / itemsPerPage
     );
@@ -154,7 +180,6 @@ export default function SavedPropertiesList({ onViewDetails }) {
         page * itemsPerPage
     );
 
-    // Loading state
     if (loading) {
         return (
             <Box
@@ -171,7 +196,6 @@ export default function SavedPropertiesList({ onViewDetails }) {
         );
     }
 
-    // Full-page empty state
     if (!error && validSavedRecords.length === 0) {
         return (
             <Box
@@ -204,7 +228,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                         mb: 1,
                     }}
                 >
-                    No saved properties found
+                    {t("properties.savedList.emptyTitle")}
                 </Typography>
 
                 <Typography
@@ -215,8 +239,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                         mb: 3,
                     }}
                 >
-                    You haven't saved any properties yet. Explore our
-                    property listings and bookmark the ones you like.
+                    {t("properties.savedList.emptySubtitle")}
                 </Typography>
 
                 <Button
@@ -234,11 +257,13 @@ export default function SavedPropertiesList({ onViewDetails }) {
                         },
                     }}
                 >
-                    Explore properties
+                    {t("properties.savedList.explore")}
                 </Button>
             </Box>
         );
     }
+
+    const categoryLabel = getCategoryLabel(selectedCategory);
 
     return (
         <Box
@@ -275,8 +300,10 @@ export default function SavedPropertiesList({ onViewDetails }) {
                     }}
                 >
                     {selectedCategory === "All Properties"
-                        ? "Saved Properties"
-                        : `${selectedCategory} Saved Properties`}
+                        ? t("properties.savedList.title")
+                        : t("properties.savedList.categoryTitle", {
+                            category: categoryLabel,
+                        })}
                 </Typography>
 
                 <Typography
@@ -285,8 +312,8 @@ export default function SavedPropertiesList({ onViewDetails }) {
                 >
                     {filteredSavedRecords.length}{" "}
                     {filteredSavedRecords.length === 1
-                        ? "property"
-                        : "properties"}
+                        ? t("properties.savedList.property")
+                        : t("properties.savedList.properties")}
                 </Typography>
             </Box>
 
@@ -300,7 +327,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                             size="small"
                             onClick={fetchSavedProperties}
                         >
-                            Retry
+                            {t("properties.savedList.retry")}
                         </Button>
                     }
                 >
@@ -327,14 +354,14 @@ export default function SavedPropertiesList({ onViewDetails }) {
                             mb: 1,
                         }}
                     >
-                        No saved properties in this category
+                        {t("properties.savedList.noCategoryProperties")}
                     </Typography>
 
                     <Typography
                         variant="body2"
                         sx={{ color: "#5B6577", mb: 2 }}
                     >
-                        You haven't saved any listings in this category yet.
+                        {t("properties.savedList.noCategorySubtitle")}
                     </Typography>
 
                     <Button
@@ -344,7 +371,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                         }
                         sx={{ textTransform: "none" }}
                     >
-                        View all properties
+                        {t("properties.savedList.viewAll")}
                     </Button>
                 </Box>
             ) : (

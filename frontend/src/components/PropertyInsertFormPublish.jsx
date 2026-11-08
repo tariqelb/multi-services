@@ -1,4 +1,7 @@
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
     Box,
     Typography,
@@ -11,6 +14,8 @@ import {
 export default function PropertyInsertFormPublish({
     loading = false,
 }) {
+    const { t } = useTranslation();
+
     return (
         <Paper
             elevation={0}
@@ -32,14 +37,14 @@ export default function PropertyInsertFormPublish({
                         variant="subtitle1"
                         sx={{ fontWeight: 600, color: '#0F172A' }}
                     >
-                        Ready to publish?
+                        {t('properties.insert.publish.title')}
                     </Typography>
 
                     <Typography
                         variant="body2"
                         sx={{ color: '#5B6577', mt: 0.5 }}
                     >
-                        Review your details before submitting your listing.
+                        {t('properties.insert.publish.subtitle')}
                     </Typography>
                 </Box>
 
@@ -76,7 +81,9 @@ export default function PropertyInsertFormPublish({
                         },
                     }}
                 >
-                    {loading ? 'Publishing...' : 'Publish Property Listing'}
+                    {loading
+                        ? t('properties.insert.publish.loading')
+                        : t('properties.insert.publish.button')}
                 </Button>
             </Stack>
         </Paper>

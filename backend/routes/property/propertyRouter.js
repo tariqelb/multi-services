@@ -23,7 +23,8 @@ import { getUserProperties } from "../../controllers/property/getUserProperties.
 import {
     createPropertyAlert,
     getMyPropertyAlerts,
-    deletePropertyAlert,
+    archivePropertyAlert,
+    restorePropertyAlert,
 } from "../../controllers/property/propertyAlertController.js";
 
 const router = express.Router();
@@ -78,9 +79,15 @@ router.post("/save/:propertyId", authMiddleware, saveProperty);
 router.delete("/unsave/:propertyId", authMiddleware, unsaveProperty);
 
 // Property alert routes
+// Property alert routes.
 router.post("/alerts", authMiddleware, createPropertyAlert);
 router.get("/alerts", authMiddleware, getMyPropertyAlerts);
-router.delete("/alerts/:id", authMiddleware, deletePropertyAlert);
+
+// DELETE now archives instead of permanently deleting.
+router.delete("/alerts/:id", authMiddleware, archivePropertyAlert);
+
+// Restore an archived alert.
+router.patch("/alerts/:id/restore", authMiddleware, restorePropertyAlert);
 
 // Keep this dynamic route after the specific routes
 router.get("/:id", getPropertyById);

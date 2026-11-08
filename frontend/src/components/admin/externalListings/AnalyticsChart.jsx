@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Card,
@@ -16,6 +18,15 @@ import {
 } from "recharts";
 
 const AnalyticsChart = ({ title, data = [], description }) => {
+    const { t, i18n } = useTranslation();
+
+    const locale =
+        i18n.language?.startsWith("ar")
+            ? "ar"
+            : i18n.language?.startsWith("fr")
+              ? "fr-FR"
+              : "en-US";
+
     return (
         <Card
             elevation={0}
@@ -119,8 +130,8 @@ const AnalyticsChart = ({ title, data = [], description }) => {
                                         backgroundColor: "#FFFFFF",
                                     }}
                                     formatter={(value) => [
-                                        `${value} clicks`,
-                                        "Clicks",
+                                        `${Number(value).toLocaleString(locale)} ${t("adminExternalClicks.charts.clicks")}`,
+                                        t("adminExternalClicks.charts.clicks"),
                                     ]}
                                 />
 
@@ -143,7 +154,7 @@ const AnalyticsChart = ({ title, data = [], description }) => {
                                 variant="body2"
                                 color="text.secondary"
                             >
-                                No click data available yet.
+                                {t("adminExternalClicks.charts.noData")}
                             </Typography>
                         </Box>
                     )}

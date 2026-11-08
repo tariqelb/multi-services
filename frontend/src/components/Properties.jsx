@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 import RealEstateBanner from "./RealEstateBanner";
 import RealEstateOption from "./RealEstateOption";
-import PropertyInsertForm from "./PropertyInsertForm";
 import PropertyList from "./PropertyList";
 import PublishFab from "./PublishFab";
 
@@ -20,7 +19,6 @@ export default function Properties() {
         setRefreshTrigger((previous) => previous + 1);
     };
 
-    // Navigate to the selected property's details page.
     const handleSelectProperty = (property) => {
         const id = property._id || property.id;
 
@@ -43,7 +41,6 @@ export default function Properties() {
                 overflowX: "clip",
             }}
         >
-            {/* Banner */}
             <Box
                 sx={{
                     width: "100%",
@@ -55,7 +52,6 @@ export default function Properties() {
                 <RealEstateBanner />
             </Box>
 
-            {/* Property Categories */}
             <Box
                 sx={{
                     width: "100%",
@@ -70,7 +66,6 @@ export default function Properties() {
                 />
             </Box>
 
-            {/* Property List */}
             <Box
                 ref={propertySectionRef}
                 sx={{
@@ -89,15 +84,7 @@ export default function Properties() {
                 />
             </Box>
 
-            {/* Floating Publish Button */}
             <PublishFab />
-
-            {/* Property Insert Form */}
-            {/* 
-            <PropertyInsertForm
-                onAddProperty={handlePropertyAdded}
-            /> 
-            */}
         </Box>
     );
 }

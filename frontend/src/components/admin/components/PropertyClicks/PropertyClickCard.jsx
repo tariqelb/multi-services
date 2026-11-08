@@ -1,3 +1,4 @@
+
 import {
     Card,
     CardContent,
@@ -16,6 +17,7 @@ import {
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import {
     formatDate,
@@ -24,6 +26,27 @@ import {
 
 const PropertyClickCard = ({ property }) => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
+
+    const locale = i18n.language?.startsWith("ar")
+        ? "ar"
+        : i18n.language?.startsWith("fr")
+            ? "fr-FR"
+            : "en-US";
+
+    const translateValue = (value, category) => {
+        if (!value) return "";
+
+        const normalized = String(value)
+            .toLowerCase()
+            .replaceAll(" ", "_")
+            .replaceAll("-", "_");
+
+        return t(
+            `adminPropertyClicks.${category}.${normalized}`,
+            value
+        );
+    };
 
     const handleViewProperty = () => {
         if (!property?.propertyId) return;
@@ -70,14 +93,19 @@ const PropertyClickCard = ({ property }) => {
                             fontWeight={700}
                             noWrap
                         >
-                            {property.title || "Untitled property"}
+                            {property.title ||
+                                t("adminPropertyClicks.properties.untitled")}
                         </Typography>
 
                         <Typography
                             variant="body2"
                             color="text.secondary"
                         >
-                            {property.propertyType || "Unknown type"}
+                            {translateValue(
+                                property.propertyType,
+                                "propertyTypes"
+                            ) ||
+                                t("adminPropertyClicks.properties.unknownType")}
                         </Typography>
                     </Box>
 
@@ -132,7 +160,8 @@ const PropertyClickCard = ({ property }) => {
                         >
                             {[property.neighborhood, property.city]
                                 .filter(Boolean)
-                                .join(", ") || "Location unavailable"}
+                                .join(", ") ||
+                                t("adminPropertyClicks.properties.locationUnavailable")}
                         </Typography>
                     </Box>
 
@@ -152,7 +181,11 @@ const PropertyClickCard = ({ property }) => {
                             variant="body2"
                             color="text.secondary"
                         >
-                            {property.listingType || "Unknown listing type"}
+                            {translateValue(
+                                property.listingType,
+                                "listingTypes"
+                            ) ||
+                                t("adminPropertyClicks.properties.unknownListingType")}
                         </Typography>
                     </Box>
 
@@ -172,7 +205,7 @@ const PropertyClickCard = ({ property }) => {
                             variant="body2"
                             color="text.secondary"
                         >
-                            {formatPrice(property.price)}
+                            {formatPrice(property.price, locale)}
                         </Typography>
                     </Box>
 
@@ -192,7 +225,9 @@ const PropertyClickCard = ({ property }) => {
                             variant="body2"
                             color="text.secondary"
                         >
-                            Last clicked: {formatDate(property.lastClickedAt)}
+                            {t("adminPropertyClicks.properties.lastClicked", {
+                                date: formatDate(property.lastClickedAt, locale),
+                            })}
                         </Typography>
                     </Box>
                 </Box>
@@ -215,7 +250,9 @@ const PropertyClickCard = ({ property }) => {
                             textOverflow: "ellipsis",
                         }}
                     >
-                        ID: {property.propertyId}
+                        {t("adminPropertyClicks.properties.id", {
+                            id: property.propertyId,
+                        })}
                     </Typography>
 
                     <Button
@@ -224,7 +261,7 @@ const PropertyClickCard = ({ property }) => {
                         onClick={handleViewProperty}
                         disabled={!property.propertyId}
                     >
-                        View property →
+                        {t("adminPropertyClicks.properties.view")} →
                     </Button>
                 </Box>
             </CardContent>

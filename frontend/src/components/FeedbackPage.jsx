@@ -1,6 +1,9 @@
+
 import axiosInstance from "../api/axiosInstance";
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import PageLayout from "./PageLayout";
+
 import {
     Alert,
     Box,
@@ -11,12 +14,10 @@ import {
     CircularProgress,
     Divider,
     FormControl,
-    FormControlLabel,
     FormHelperText,
     InputLabel,
     MenuItem,
     Radio,
-    RadioGroup,
     Select,
     Snackbar,
     Stack,
@@ -31,7 +32,6 @@ import {
     ReportProblemOutlined,
     SendOutlined,
     AttachFileOutlined,
-    // CheckCircleOutline,
     TaskAlt,
     LightbulbOutlined,
 } from "@mui/icons-material";
@@ -39,32 +39,32 @@ import {
 const REPORT_TYPES = [
     {
         value: "feedback",
-        label: "General feedback",
-        description: "Share an idea or suggest an improvement.",
+        labelKey: "types.feedback.label",
+        descriptionKey: "types.feedback.description",
         icon: <FeedbackOutlined />,
         color: "#2563eb",
         background: "#eff6ff",
     },
     {
         value: "bug",
-        label: "Bug or technical issue",
-        description: "Report an error, broken feature, or unexpected behavior.",
+        labelKey: "types.bug.label",
+        descriptionKey: "types.bug.description",
         icon: <BugReportOutlined />,
         color: "#dc2626",
         background: "#fef2f2",
     },
     {
         value: "user_report",
-        label: "Report a user",
-        description: "Report suspicious behavior, harassment, or a problematic listing.",
+        labelKey: "types.userReport.label",
+        descriptionKey: "types.userReport.description",
         icon: <PersonOffOutlined />,
         color: "#9333ea",
         background: "#faf5ff",
     },
     {
         value: "other",
-        label: "Other problem",
-        description: "Tell us about another problem with the application.",
+        labelKey: "types.other.label",
+        descriptionKey: "types.other.description",
         icon: <ReportProblemOutlined />,
         color: "#d97706",
         background: "#fffbeb",
@@ -72,9 +72,9 @@ const REPORT_TYPES = [
 ];
 
 const PRIORITIES = [
-    { value: "low", label: "Low" },
-    { value: "medium", label: "Medium" },
-    { value: "high", label: "High" },
+    { value: "low", labelKey: "priorities.low" },
+    { value: "medium", labelKey: "priorities.medium" },
+    { value: "high", labelKey: "priorities.high" },
 ];
 
 const INITIAL_FORM = {
@@ -88,12 +88,15 @@ const INITIAL_FORM = {
 };
 
 export default function FeedbackPage() {
+    const { t } = useTranslation();
+
     const [formData, setFormData] = useState(INITIAL_FORM);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [attachments, setAttachments] = useState([]);
     const attachmentInputRef = useRef(null);
+
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
@@ -125,13 +128,13 @@ export default function FeedbackPage() {
             ...previous,
             type,
             subject: "",
-            reportedUser: type === "user_report" ? previous.reportedUser : "",
+            reportedUser:
+                type === "user_report" ? previous.reportedUser : "",
         }));
 
         setErrors({});
         setSuccess(false);
     };
-
 
     const handleAttachmentChange = (event) => {
         const selectedFiles = Array.from(event.target.files || []);
@@ -151,12 +154,16 @@ export default function FeedbackPage() {
 
         for (const file of selectedFiles) {
             if (!allowedTypes.includes(file.type)) {
-                errorMessage = `${file.name}: unsupported file type.`;
+                errorMessage = t("feedback.attachments.unsupportedType", {
+                    name: file.name,
+                });
                 break;
             }
 
             if (file.size > 5 * 1024 * 1024) {
-                errorMessage = `${file.name}: file exceeds the 5 MB limit.`;
+                errorMessage = t("feedback.attachments.fileTooLarge", {
+                    name: file.name,
+                });
                 break;
             }
 
@@ -191,7 +198,7 @@ export default function FeedbackPage() {
             if (combined.length > 5) {
                 setSnackbar({
                     open: true,
-                    message: "You can attach a maximum of 5 files.",
+                    message: t("feedback.attachments.maxFiles"),
                     severity: "error",
                 });
 
@@ -210,46 +217,44 @@ export default function FeedbackPage() {
         );
     };
 
-
     const validateForm = () => {
         const nextErrors = {};
 
         if (!formData.subject.trim()) {
-            nextErrors.subject = "Please enter a subject.";
+            nextErrors.subject = t("feedback.validation.subjectRequired");
         } else if (formData.subject.trim().length < 4) {
-            nextErrors.subject = "The subject must contain at least 4 characters.";
+            nextErrors.subject = t("feedback.validation.subjectMin");
         } else if (formData.subject.trim().length > 120) {
-            nextErrors.subject = "The subject cannot exceed 120 characters.";
+            nextErrors.subject = t("feedback.validation.subjectMax");
         }
 
         if (!formData.description.trim()) {
-            nextErrors.description = "Please describe the issue.";
+            nextErrors.description = t(
+                "feedback.validation.descriptionRequired"
+            );
         } else if (formData.description.trim().length < 10) {
-            nextErrors.description = "Please provide at least 10 characters.";
+            nextErrors.description = t(
+                "feedback.validation.descriptionMin"
+            );
         } else if (formData.description.trim().length > 5000) {
-            nextErrors.description = "The description cannot exceed 5000 characters.";
+            nextErrors.description = t(
+                "feedback.validation.descriptionMax"
+            );
         }
-
-        // if (
-        //     formData.email.trim() &&
-        //     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
-        // ) {
-        //     nextErrors.email = "Please enter a valid email address.";
-        // }
 
         if (
             formData.type === "user_report" &&
             !formData.reportedUser.trim()
         ) {
-            nextErrors.reportedUser =
-                "Enter the reported user's email, login, or profile identifier.";
+            nextErrors.reportedUser = t(
+                "feedback.validation.reportedUserRequired"
+            );
         }
 
         setErrors(nextErrors);
 
         return Object.keys(nextErrors).length === 0;
     };
-
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -299,7 +304,7 @@ export default function FeedbackPage() {
 
                 setSnackbar({
                     open: true,
-                    message: "Your feedback was submitted successfully.",
+                    message: t("feedback.success.submitted"),
                     severity: "success",
                 });
             }
@@ -313,14 +318,13 @@ export default function FeedbackPage() {
                 open: true,
                 message:
                     error.response?.data?.message ||
-                    "Failed to submit your report. Please try again.",
+                    t("feedback.errors.submit"),
                 severity: "error",
             });
         } finally {
             setLoading(false);
         }
     };
-
 
     const handleReset = () => {
         setFormData({
@@ -339,8 +343,8 @@ export default function FeedbackPage() {
 
     return (
         <PageLayout
-            title="Feedback & Reports"
-            subtitle="Help us improve your experience. Found a bug, have an idea, or experienced a problem with another user? Tell us what happened so we can investigate."
+            title={t("feedback.title")}
+            subtitle={t("feedback.subtitle")}
             maxWidth={1100}
             icon={
                 <Box
@@ -359,11 +363,7 @@ export default function FeedbackPage() {
                 </Box>
             }
         >
-            <Box
-                component="form"
-                onSubmit={handleSubmit}
-                noValidate
-            >
+            <Box component="form" onSubmit={handleSubmit} noValidate>
                 <Stack spacing={3}>
                     {/* Report type */}
                     <Card
@@ -379,7 +379,7 @@ export default function FeedbackPage() {
                                 fontWeight={700}
                                 sx={{ mb: 0.75 }}
                             >
-                                What would you like to report?
+                                {t("feedback.chooseType")}
                             </Typography>
 
                             <Typography
@@ -387,8 +387,7 @@ export default function FeedbackPage() {
                                 color="text.secondary"
                                 sx={{ mb: 3 }}
                             >
-                                Choose the category that best describes your
-                                message.
+                                {t("feedback.chooseTypeSubtitle")}
                             </Typography>
 
                             <Box
@@ -460,7 +459,9 @@ export default function FeedbackPage() {
                                                             fontWeight={700}
                                                             sx={{ mb: 0.5 }}
                                                         >
-                                                            {type.label}
+                                                            {t(
+                                                                `feedback.${type.labelKey}`
+                                                            )}
                                                         </Typography>
 
                                                         <Typography
@@ -468,7 +469,9 @@ export default function FeedbackPage() {
                                                             color="text.secondary"
                                                             sx={{ lineHeight: 1.6 }}
                                                         >
-                                                            {type.description}
+                                                            {t(
+                                                                `feedback.${type.descriptionKey}`
+                                                            )}
                                                         </Typography>
                                                     </Box>
 
@@ -476,7 +479,9 @@ export default function FeedbackPage() {
                                                         checked={selected}
                                                         value={type.value}
                                                         inputProps={{
-                                                            "aria-label": type.label,
+                                                            "aria-label": t(
+                                                                `feedback.${type.labelKey}`
+                                                            ),
                                                         }}
                                                         sx={{
                                                             p: 0,
@@ -509,7 +514,7 @@ export default function FeedbackPage() {
                                 fontWeight={700}
                                 sx={{ mb: 0.75 }}
                             >
-                                Tell us more
+                                {t("feedback.detailsTitle")}
                             </Typography>
 
                             <Typography
@@ -517,22 +522,25 @@ export default function FeedbackPage() {
                                 color="text.secondary"
                                 sx={{ mb: 3 }}
                             >
-                                Please provide enough information for us to
-                                understand the situation.
+                                {t("feedback.detailsSubtitle")}
                             </Typography>
 
                             <Stack spacing={3}>
                                 {formData.type === "user_report" && (
                                     <TextField
                                         name="reportedUser"
-                                        label="Reported user"
-                                        placeholder="User login, profile ID, or email"
+                                        label={t("feedback.reportedUser")}
+                                        placeholder={t(
+                                            "feedback.reportedUserPlaceholder"
+                                        )}
                                         value={formData.reportedUser}
                                         onChange={handleChange}
                                         error={Boolean(errors.reportedUser)}
                                         helperText={
                                             errors.reportedUser ||
-                                            "Provide an identifier if available. Do not include passwords or private credentials."
+                                            t(
+                                                "feedback.reportedUserHelper"
+                                            )
                                         }
                                         fullWidth
                                         required
@@ -541,20 +549,19 @@ export default function FeedbackPage() {
 
                                 <TextField
                                     name="subject"
-                                    label="Subject"
-                                    placeholder={
-                                        formData.type === "bug"
-                                            ? "Example: Unable to publish a property"
-                                            : formData.type === "user_report"
-                                              ? "Example: Suspicious property listing"
-                                              : "Briefly summarize your message"
-                                    }
+                                    label={t("feedback.subject")}
+                                    placeholder={t(
+                                        `feedback.subjectPlaceholders.${formData.type}`
+                                    )}
                                     value={formData.subject}
                                     onChange={handleChange}
                                     error={Boolean(errors.subject)}
                                     helperText={
                                         errors.subject ||
-                                        `${formData.subject.length}/120 characters`
+                                        t("feedback.characterCount", {
+                                            current: formData.subject.length,
+                                            max: 120,
+                                        })
                                     }
                                     inputProps={{ maxLength: 120 }}
                                     fullWidth
@@ -563,20 +570,20 @@ export default function FeedbackPage() {
 
                                 <TextField
                                     name="description"
-                                    label="Description"
-                                    placeholder={
-                                        formData.type === "bug"
-                                            ? "What happened? What did you expect to happen? Include the steps to reproduce the problem."
-                                            : formData.type === "user_report"
-                                              ? "Describe the behavior or listing you are reporting. Include relevant details without sharing sensitive personal information."
-                                              : "Write your feedback or explain the problem in detail..."
-                                    }
+                                    label={t("feedback.description")}
+                                    placeholder={t(
+                                        `feedback.descriptionPlaceholders.${formData.type}`
+                                    )}
                                     value={formData.description}
                                     onChange={handleChange}
                                     error={Boolean(errors.description)}
                                     helperText={
                                         errors.description ||
-                                        `${formData.description.length}/5000 characters`
+                                        t("feedback.characterCount", {
+                                            current:
+                                                formData.description.length,
+                                            max: 5000,
+                                        })
                                     }
                                     multiline
                                     minRows={5}
@@ -588,24 +595,26 @@ export default function FeedbackPage() {
 
                                 {formData.type === "bug" && (
                                     <TextField
-                                        label="Page where the error occurred"
+                                        label={t("feedback.pageUrl")}
                                         value={formData.pageUrl}
                                         fullWidth
                                         InputProps={{ readOnly: true }}
-                                        helperText="This page address will be included with your report."
+                                        helperText={t(
+                                            "feedback.pageUrlHelper"
+                                        )}
                                     />
                                 )}
 
                                 <FormControl fullWidth>
                                     <InputLabel id="priority-label">
-                                        Priority
+                                        {t("feedback.priority")}
                                     </InputLabel>
 
                                     <Select
                                         labelId="priority-label"
                                         name="priority"
                                         value={formData.priority}
-                                        label="Priority"
+                                        label={t("feedback.priority")}
                                         onChange={handleChange}
                                     >
                                         {PRIORITIES.map((priority) => (
@@ -613,36 +622,20 @@ export default function FeedbackPage() {
                                                 key={priority.value}
                                                 value={priority.value}
                                             >
-                                                {priority.label}
+                                                {t(
+                                                    `feedback.${priority.labelKey}`
+                                                )}
                                             </MenuItem>
                                         ))}
                                     </Select>
 
                                     <FormHelperText>
-                                        Choose how urgently this issue needs
-                                        attention.
+                                        {t("feedback.priorityHelper")}
                                     </FormHelperText>
                                 </FormControl>
 
                                 <Divider />
 
-                                {/* <TextField
-                                    name="email"
-                                    label="Contact email (optional)"
-                                    type="email"
-                                    placeholder="you@example.com"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    error={Boolean(errors.email)}
-                                    helperText={
-                                        errors.email ||
-                                        "If provided, we may use this address to follow up on your report."
-                                    }
-                                    fullWidth
-                                /> */}
-
-                                {/* Attachment */}
-                                
                                 {/* Attachments */}
                                 <Box>
                                     <Button
@@ -656,7 +649,7 @@ export default function FeedbackPage() {
                                             py: 1.1,
                                         }}
                                     >
-                                        Attach screenshots or logs
+                                        {t("feedback.attachments.button")}
 
                                         <input
                                             ref={attachmentInputRef}
@@ -674,8 +667,7 @@ export default function FeedbackPage() {
                                         color="text.secondary"
                                         sx={{ mt: 1 }}
                                     >
-                                        Optional. PNG, JPG, WEBP, GIF, or TXT.
-                                        Maximum 5 files, 5 MB each.
+                                        {t("feedback.attachments.helper")}
                                     </Typography>
 
                                     {attachments.length > 0 && (
@@ -690,14 +682,15 @@ export default function FeedbackPage() {
                                                 <Chip
                                                     key={`${file.name}-${file.lastModified}-${index}`}
                                                     label={file.name}
-                                                    onDelete={() => handleRemoveAttachment(index)}
+                                                    onDelete={() =>
+                                                        handleRemoveAttachment(index)
+                                                    }
                                                     sx={{ maxWidth: "100%" }}
                                                 />
                                             ))}
                                         </Stack>
                                     )}
                                 </Box>
-
                             </Stack>
                         </CardContent>
                     </Card>
@@ -706,16 +699,16 @@ export default function FeedbackPage() {
                     <Alert
                         severity="info"
                         icon={<LightbulbOutlined />}
-                        sx={{ borderRadius: "16px", alignItems: "flex-start" }}
+                        sx={{
+                            borderRadius: "16px",
+                            alignItems: "flex-start",
+                        }}
                     >
                         <Typography fontWeight={700} sx={{ mb: 0.5 }}>
-                            A quick reminder
+                            {t("feedback.reminderTitle")}
                         </Typography>
 
-                        Please avoid including passwords, authentication
-                        tokens, payment details, or unnecessary personal
-                        information in your report. Reports involving another
-                        user should contain relevant facts and evidence.
+                        {t("feedback.reminderDescription")}
                     </Alert>
 
                     {/* Actions */}
@@ -736,7 +729,7 @@ export default function FeedbackPage() {
                                 py: 1.35,
                             }}
                         >
-                            Clear form
+                            {t("feedback.clearForm")}
                         </Button>
 
                         <Button
@@ -755,7 +748,9 @@ export default function FeedbackPage() {
                             disabled={loading}
                             sx={{ px: 4, py: 1.35 }}
                         >
-                            {loading ? "Submitting..." : "Submit report"}
+                            {loading
+                                ? t("feedback.submitting")
+                                : t("feedback.submit")}
                         </Button>
                     </Stack>
                 </Stack>
@@ -796,7 +791,7 @@ export default function FeedbackPage() {
                     icon={<TaskAlt />}
                     sx={{ mt: 3, borderRadius: 3 }}
                 >
-                    Your report has been submitted successfully.
+                    {t("feedback.success.confirmation")}
                 </Alert>
             )}
         </PageLayout>

@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import {
     Box,
@@ -26,7 +27,6 @@ import {
 
 import axiosInstance from "../api/axiosInstance";
 import getImageUrl from "../utils/getImageUrl";
-
 
 function InfoItem({ label, value }) {
     if (value === undefined || value === null || value === "") {
@@ -76,14 +76,12 @@ function getStatusStyles(status) {
             return {
                 bgcolor: "#dcfce7",
                 color: "#15803d",
-                label: status || "Available",
             };
 
         case "pending":
             return {
                 bgcolor: "#fef9c3",
                 color: "#a16207",
-                label: status || "Pending",
             };
 
         case "sold":
@@ -92,34 +90,41 @@ function getStatusStyles(status) {
             return {
                 bgcolor: "#fee2e2",
                 color: "#b91c1c",
-                label: status || "Unavailable",
             };
 
         case "inactive":
             return {
                 bgcolor: "#f1f5f9",
                 color: "#475569",
-                label: status || "Inactive",
             };
 
         default:
             return {
                 bgcolor: "#f1f5f9",
                 color: "#475569",
-                label: status || "Available",
             };
     }
 }
 
 export default function ProfilePropertyDetails() {
+    const { t } = useTranslation();
+
     const { id } = useParams();
-    const { state } = useLocation();
+    const location = useLocation();
     const navigate = useNavigate();
+
+    const state = location.state;
 
     const [property, setProperty] = useState(state?.property || null);
     const [activeImage, setActiveImage] = useState(0);
     const [loading, setLoading] = useState(!state?.property);
     const [error, setError] = useState("");
+
+    const handleBack = () => {
+        navigate(state?.from || "/mypublication", {
+            replace: true,
+        });
+    };
 
     useEffect(() => {
         window.scrollTo({
@@ -132,16 +137,20 @@ export default function ProfilePropertyDetails() {
         let cancelled = false;
 
         const fetchProperty = async () => {
-            // Use the property passed through navigation when available.
-            if (state?.property && String(state.property._id || state.property.id) === String(id)) {
-                setProperty(state.property);
+            const initialProperty = state?.property;
+
+            if (
+                initialProperty &&
+                String(initialProperty._id || initialProperty.id) ===
+                    String(id)
+            ) {
+                setProperty(initialProperty);
                 setActiveImage(0);
                 setLoading(false);
                 setError("");
                 return;
             }
 
-            // Fetch the property if the page was refreshed or opened directly.
             setLoading(true);
             setError("");
 
@@ -160,7 +169,7 @@ export default function ProfilePropertyDetails() {
                 if (!cancelled) {
                     setError(
                         err.response?.data?.message ||
-                            "Failed to load property details."
+                            t("properties.details.loadError")
                     );
                 }
             } finally {
@@ -174,29 +183,34 @@ export default function ProfilePropertyDetails() {
             fetchProperty();
         } else {
             setLoading(false);
-            setError("Property ID is missing.");
+            setError(t("properties.details.missingId"));
         }
 
         return () => {
             cancelled = true;
         };
-    }, [id, state]);
+    }, [id, state?.property, t]);
 
     const images = (property?.images || [])
         .map(getImageUrl)
         .filter(Boolean);
 
-    const title = property?.title || "Property details";
+    const title =
+        property?.title || t("properties.details.title");
+
     const city = property?.city || "";
     const neighborhood = property?.neighborhood || "";
-    const location = [neighborhood, city].filter(Boolean).join(", ");
+
+    const glocation = [neighborhood, city]
+        .filter(Boolean)
+        .join(", ");
 
     const price = Number(property?.price || 0).toLocaleString("en-US");
 
     const description =
         property?.description ||
         property?.details ||
-        "No description has been provided for this property.";
+        t("properties.details.noDescription");
 
     const googleMapLink =
         property?.googleMapLink ||
@@ -204,6 +218,59 @@ export default function ProfilePropertyDetails() {
         property?.locationUrl;
 
     const statusInfo = getStatusStyles(property?.status);
+
+    const getStatusLabel = (status) => {
+        const normalizedStatus = String(
+            status || "Available"
+        ).toLowerCase();
+
+        const statusKeys = {
+            available: "available",
+            active: "available",
+            pending: "pending",
+            sold: "sold",
+            rented: "rented",
+            unavailable: "unavailable",
+            inactive: "unavailable",
+        };
+
+        const key = statusKeys[normalizedStatus];
+
+        return key
+            ? t(`properties.details.status.${key}`)
+            : status;
+    };
+
+    const getListingTypeLabel = (listingType) => {
+        if (listingType === "For Sale") {
+            return t("properties.card.forSale");
+        }
+
+        if (listingType === "For Rent") {
+            return t("properties.card.forRent");
+        }
+
+        return listingType || "";
+    };
+
+    const getPropertyTypeLabel = (propertyType) => {
+        if (!propertyType) return "";
+
+        const normalizedType = propertyType.toLowerCase();
+
+        const categoryKey = {
+            "commercial space": "commercialSpace",
+            "commercial store": "commercialStore",
+        }[normalizedType] ||
+            normalizedType.replace(
+                /[^a-z0-9]+(.)/g,
+                (_, char) => char.toUpperCase()
+            );
+
+        return t(`properties.categories.${categoryKey}`, {
+            defaultValue: propertyType,
+        });
+    };
 
     const changeImage = (direction) => {
         if (!images.length) return;
@@ -241,7 +308,7 @@ export default function ProfilePropertyDetails() {
                 }}
             >
                 <Button
-                    onClick={() => navigate("/mypublication")}
+                    onClick={handleBack}
                     startIcon={<ArrowBack />}
                     sx={{
                         mb: 3,
@@ -249,11 +316,11 @@ export default function ProfilePropertyDetails() {
                         fontWeight: 700,
                     }}
                 >
-                    Back to My Publications
+                    {t("properties.details.backToMyPublications")}
                 </Button>
 
                 <Alert severity="error">
-                    {error || "Property not found."}
+                    {error || t("properties.details.propertyNotFound")}
                 </Alert>
             </Box>
         );
@@ -275,10 +342,9 @@ export default function ProfilePropertyDetails() {
                 minHeight: "calc(100vh - 64px)",
             }}
         >
-            {/* Back to My Publications */}
+            {/* Back button */}
             <Button
-                // onClick={() => navigate("/mypublication")}
-                onClick={() => navigate(-1)}
+                onClick={handleBack}
                 startIcon={<ArrowBack />}
                 sx={{
                     mb: 3,
@@ -287,7 +353,7 @@ export default function ProfilePropertyDetails() {
                     fontSize: "0.95rem",
                 }}
             >
-                Back
+                {t("properties.details.back")}
             </Button>
 
             {/* Image Gallery */}
@@ -328,7 +394,7 @@ export default function ProfilePropertyDetails() {
                                 sx={{ fontSize: 64, color: "#94a3b8" }}
                             />
                             <Typography sx={{ color: "#94a3b8" }}>
-                                No images available
+                                {t("properties.details.noImages")}
                             </Typography>
                         </Stack>
                     )}
@@ -336,7 +402,9 @@ export default function ProfilePropertyDetails() {
                     {images.length > 1 && (
                         <>
                             <IconButton
-                                aria-label="Previous image"
+                                aria-label={t(
+                                    "properties.details.previousImage"
+                                )}
                                 onClick={() => changeImage(-1)}
                                 sx={{
                                     position: "absolute",
@@ -352,7 +420,9 @@ export default function ProfilePropertyDetails() {
                             </IconButton>
 
                             <IconButton
-                                aria-label="Next image"
+                                aria-label={t(
+                                    "properties.details.nextImage"
+                                )}
                                 onClick={() => changeImage(1)}
                                 sx={{
                                     position: "absolute",
@@ -399,7 +469,10 @@ export default function ProfilePropertyDetails() {
                                 key={`${src}-${index}`}
                                 component="button"
                                 onClick={() => setActiveImage(index)}
-                                aria-label={`View image ${index + 1}`}
+                                aria-label={t(
+                                    "properties.details.viewImage",
+                                    { number: index + 1 }
+                                )}
                                 sx={{
                                     flex: "0 0 90px",
                                     height: 68,
@@ -460,14 +533,17 @@ export default function ProfilePropertyDetails() {
                             {title}
                         </Typography>
 
-                        {location && (
+                        {glocation && (
                             <Stack
                                 direction="row"
                                 spacing={0.5}
                                 alignItems="center"
                             >
                                 <LocationOn
-                                    sx={{ fontSize: 20, color: "#2563EB" }}
+                                    sx={{
+                                        fontSize: 20,
+                                        color: "#2563EB",
+                                    }}
                                 />
 
                                 <Typography
@@ -477,7 +553,7 @@ export default function ProfilePropertyDetails() {
                                         fontWeight: 600,
                                     }}
                                 >
-                                    {location}
+                                    {glocation}
                                 </Typography>
                             </Stack>
                         )}
@@ -506,7 +582,9 @@ export default function ProfilePropertyDetails() {
                             }}
                         >
                             <Chip
-                                label={property.listingType || "For Sale"}
+                                label={getListingTypeLabel(
+                                    property.listingType
+                                )}
                                 size="medium"
                                 sx={{
                                     bgcolor: "#EFF6FF",
@@ -517,7 +595,7 @@ export default function ProfilePropertyDetails() {
                             />
 
                             <Chip
-                                label={statusInfo.label}
+                                label={getStatusLabel(property.status)}
                                 size="medium"
                                 sx={{
                                     bgcolor: statusInfo.bgcolor,
@@ -536,43 +614,45 @@ export default function ProfilePropertyDetails() {
                 <Grid container spacing={2}>
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Surface (m²)"
+                            label={t("properties.details.surface")}
                             value={property.surface}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Rooms"
+                            label={t("properties.profileDetails.rooms")}
                             value={property.rooms}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Bathrooms"
+                            label={t("properties.card.bathrooms")}
                             value={property.bathrooms}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Salons"
+                            label={t("properties.card.salons")}
                             value={property.salons}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Floor"
+                            label={t("properties.details.floor")}
                             value={property.floor}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Property type"
-                            value={property.propertyType}
+                            label={t("properties.details.propertyType")}
+                            value={getPropertyTypeLabel(
+                                property.propertyType
+                            )}
                         />
                     </Grid>
                 </Grid>
@@ -592,15 +672,13 @@ export default function ProfilePropertyDetails() {
                                 fontWeight: 700,
                             }}
                         >
-                            View location on Google Maps
+                            {t("properties.details.viewOnMaps")}
                         </Button>
                     </Box>
                 )}
             </Paper>
 
             {/* Property Description */}
-
-            {/* Description Section */}
             <Paper
                 variant="outlined"
                 sx={{
@@ -618,7 +696,7 @@ export default function ProfilePropertyDetails() {
                         color: "#0f172a",
                     }}
                 >
-                    Property description
+                    {t("properties.details.description")}
                 </Typography>
 
                 <Typography
@@ -644,10 +722,11 @@ export default function ProfilePropertyDetails() {
                                 color: "#0F172A",
                             }}
                         >
-                            Syndicate fees:{" "}
+                            {t("properties.details.syndicateFees")}:{" "}
                             {Number(
                                 property.syndicateFees
-                            ).toLocaleString("en-US")} MAD
+                            ).toLocaleString("en-US")}{" "}
+                            MAD
                         </Typography>
                     )}
 
@@ -664,18 +743,24 @@ export default function ProfilePropertyDetails() {
                                 color: "#0f172a",
                             }}
                         >
-                            Rental Information
+                            {t("properties.details.rentalInformation")}
                         </Typography>
 
                         <Grid container spacing={2}>
                             {property.rentWithContract != null && (
                                 <Grid item xs={12} sm={6}>
                                     <InfoItem
-                                        label="Rental contract"
+                                        label={t(
+                                            "properties.details.rentalContract"
+                                        )}
                                         value={
                                             property.rentWithContract
-                                                ? "Contract available"
-                                                : "No contract"
+                                                ? t(
+                                                      "properties.details.contractAvailable"
+                                                  )
+                                                : t(
+                                                      "properties.details.noContract"
+                                                  )
                                         }
                                     />
                                 </Grid>
@@ -684,11 +769,17 @@ export default function ProfilePropertyDetails() {
                             {property.mortgageAgreement != null && (
                                 <Grid item xs={12} sm={6}>
                                     <InfoItem
-                                        label="Mortgage agreement"
+                                        label={t(
+                                            "properties.details.mortgageAgreement"
+                                        )}
                                         value={
                                             property.mortgageAgreement
-                                                ? "Accepted"
-                                                : "Not accepted"
+                                                ? t(
+                                                      "properties.details.accepted"
+                                                  )
+                                                : t(
+                                                      "properties.details.notAccepted"
+                                                  )
                                         }
                                     />
                                 </Grid>
@@ -698,7 +789,9 @@ export default function ProfilePropertyDetails() {
                                 property.deposit !== "" && (
                                     <Grid item xs={12} sm={6}>
                                         <InfoItem
-                                            label="Security deposit"
+                                            label={t(
+                                                "properties.details.securityDeposit"
+                                            )}
                                             value={`${Number(
                                                 property.deposit
                                             ).toLocaleString("en-US")} MAD`}
@@ -710,7 +803,9 @@ export default function ProfilePropertyDetails() {
                                 property.mediatorFee !== "" && (
                                     <Grid item xs={12} sm={6}>
                                         <InfoItem
-                                            label="Mediator fee"
+                                            label={t(
+                                                "properties.details.mediatorFee"
+                                            )}
                                             value={`${Number(
                                                 property.mediatorFee
                                             ).toLocaleString("en-US")} MAD`}
@@ -721,7 +816,6 @@ export default function ProfilePropertyDetails() {
                     </>
                 )}
             </Paper>
-
         </Box>
     );
 }

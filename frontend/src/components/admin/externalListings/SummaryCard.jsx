@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Card,
@@ -8,7 +10,24 @@ import {
 
 import { formatNumber } from "./externalClicksUtils";
 
-const SummaryCard = ({ title, value, icon, subtitle , color = "" }) => {
+const SummaryCard = ({
+    title,
+    value,
+    icon,
+    subtitle,
+    color = "",
+    locale,
+}) => {
+    const { i18n } = useTranslation();
+
+    const numberLocale =
+        locale ||
+        (i18n.language?.startsWith("ar")
+            ? "ar"
+            : i18n.language?.startsWith("fr")
+              ? "fr-FR"
+              : "en-US");
+
     return (
         <Card
             elevation={0}
@@ -50,7 +69,7 @@ const SummaryCard = ({ title, value, icon, subtitle , color = "" }) => {
                                 fontSize: { xs: "1.75rem", md: "2rem" },
                             }}
                         >
-                            {formatNumber(value)}
+                            {formatNumber(value, numberLocale)}
                         </Typography>
 
                         {subtitle && (
@@ -72,8 +91,6 @@ const SummaryCard = ({ title, value, icon, subtitle , color = "" }) => {
                             width: 52,
                             height: 52,
                             borderRadius: 2,
-                            // bgcolor: "primary.light",
-                            // color:  "primary.light",
                             bgcolor: `${color}15`,
                             color,
                             flexShrink: 0,

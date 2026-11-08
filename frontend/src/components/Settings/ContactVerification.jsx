@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Alert,
     Box,
@@ -9,6 +11,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+
 import CheckIcon from "@mui/icons-material/Check";
 import CircleIcon from "@mui/icons-material/Circle";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
@@ -16,11 +19,17 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PhoneAndroidOutlinedIcon from "@mui/icons-material/PhoneAndroidOutlined";
 
 function VerificationStatus({ verified }) {
+    const { t } = useTranslation();
+
     return (
         <Chip
             size="small"
             icon={verified ? <CheckIcon /> : <CircleIcon />}
-            label={verified ? "Verified" : "Not verified"}
+            label={
+                verified
+                    ? t("settings.verification.verified")
+                    : t("settings.verification.notVerified")
+            }
             color={verified ? "success" : "warning"}
             variant="outlined"
         />
@@ -35,6 +44,8 @@ function VerificationStep({
     onResendCode,
     onConfirmCode,
 }) {
+    const { t } = useTranslation();
+
     const [step, setStep] = useState("initial");
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
@@ -42,12 +53,15 @@ function VerificationStep({
     const [message, setMessage] = useState("");
 
     const isEmail = type === "email";
-    const label = isEmail ? "Email address" : "Phone number";
+
+    const label = isEmail
+        ? t("settings.verification.emailAddress")
+        : t("settings.verification.phoneNumber");
+
     const Icon = isEmail
         ? EmailOutlinedIcon
         : PhoneAndroidOutlinedIcon;
 
-    // Reset the verification form if the contact changes or becomes verified.
     useEffect(() => {
         setStep("initial");
         setCode("");
@@ -59,12 +73,16 @@ function VerificationStep({
         const callback = isResend ? onResendCode : onSendCode;
 
         if (!value) {
-            setError(`Please add your ${label.toLowerCase()} first.`);
+            setError(
+                t("settings.verification.addContact", {
+                    contact: label.toLowerCase(),
+                })
+            );
             return;
         }
 
         if (typeof callback !== "function") {
-            setError("This verification action is not configured yet.");
+            setError(t("settings.verification.actionNotConfigured"));
             return;
         }
 
@@ -76,20 +94,23 @@ function VerificationStep({
             const result = await callback();
 
             setStep("code");
+
             setMessage(
                 isEmail
-                    ? "Verification code sent to your email."
+                    ? t("settings.verification.emailCodeSent")
                     : result?.sandboxCode
-                      ? `Sandbox mode: use code ${result.sandboxCode}. No real SMS may be sent in sandbox mode.`
+                      ? t("settings.verification.sandboxCodeMessage", {
+                            code: result.sandboxCode,
+                        })
                       : isResend
-                        ? "A new SMS verification code has been requested."
-                        : "SMS verification code requested."
+                        ? t("settings.verification.smsCodeResent")
+                        : t("settings.verification.smsCodeSent")
             );
         } catch (err) {
             setError(
                 err?.response?.data?.message ||
-                err?.message ||
-                "Could not send the verification code. Please try again."
+                    err?.message ||
+                    t("settings.verification.sendCodeError")
             );
         } finally {
             setLoading(false);
@@ -98,12 +119,12 @@ function VerificationStep({
 
     async function handleConfirmCode() {
         if (!/^\d{6}$/.test(code)) {
-            setError("Enter the 6-digit verification code.");
+            setError(t("settings.verification.invalidCode"));
             return;
         }
 
         if (typeof onConfirmCode !== "function") {
-            setError("Code confirmation is not configured yet.");
+            setError(t("settings.verification.confirmNotConfigured"));
             return;
         }
 
@@ -115,12 +136,12 @@ function VerificationStep({
             await onConfirmCode(code);
             setStep("initial");
             setCode("");
-            setMessage("Your contact has been verified successfully.");
+            setMessage(t("settings.verification.contactVerified"));
         } catch (err) {
             setError(
                 err?.response?.data?.message ||
-                err?.message ||
-                "Invalid or expired code. Please try again."
+                    err?.message ||
+                    t("settings.verification.invalidOrExpiredCode")
             );
         } finally {
             setLoading(false);
@@ -166,11 +187,15 @@ function VerificationStep({
                         <Typography fontWeight={700}>
                             {label}
                         </Typography>
+
                         <Typography
                             color="text.secondary"
                             sx={{ overflowWrap: "anywhere" }}
                         >
-                            {value || `No ${label.toLowerCase()} added`}
+                            {value ||
+                                t("settings.verification.noContact", {
+                                    contact: label.toLowerCase(),
+                                })}
                         </Typography>
                     </Box>
                 </Stack>
@@ -200,8 +225,8 @@ function VerificationStep({
                                 sx={{ mb: 1.5 }}
                             >
                                 {isEmail
-                                    ? "Step 1: Send a verification code to your email address."
-                                    : "Step 1: Receive a verification code by SMS."}
+                                    ? t("settings.verification.emailStepOne")
+                                    : t("settings.verification.phoneStepOne")}
                             </Typography>
 
                             <Button
@@ -212,9 +237,9 @@ function VerificationStep({
                                 {loading ? (
                                     <CircularProgress size={20} />
                                 ) : isEmail ? (
-                                    "Send email code"
+                                    t("settings.verification.sendEmailCode")
                                 ) : (
-                                    "Send SMS code"
+                                    t("settings.verification.sendSmsCode")
                                 )}
                             </Button>
                         </>
@@ -224,11 +249,11 @@ function VerificationStep({
                                 variant="body2"
                                 color="text.secondary"
                             >
-                                Step 2: Enter the 6-digit code we sent you.
+                                {t("settings.verification.stepTwo")}
                             </Typography>
 
                             <TextField
-                                label="Verification code"
+                                label={t("settings.verification.codeLabel")}
                                 value={code}
                                 onChange={(event) =>
                                     setCode(
@@ -260,7 +285,7 @@ function VerificationStep({
                                             color="inherit"
                                         />
                                     ) : (
-                                        "Confirm code"
+                                        t("settings.verification.confirmCode")
                                     )}
                                 </Button>
 
@@ -274,7 +299,7 @@ function VerificationStep({
                                             sx={{ mr: 1 }}
                                         />
                                     )}
-                                    Resend code
+                                    {t("settings.verification.resendCode")}
                                 </Button>
 
                                 <Button
@@ -286,7 +311,7 @@ function VerificationStep({
                                     }}
                                     disabled={loading}
                                 >
-                                    Cancel
+                                    {t("settings.verification.cancel")}
                                 </Button>
                             </Stack>
                         </Stack>
@@ -308,6 +333,8 @@ export default function ContactVerification({
     onResendPhoneCode,
     onConfirmPhoneCode,
 }) {
+    const { t } = useTranslation();
+
     const allVerified = emailVerified && phoneVerified;
 
     return (
@@ -323,21 +350,21 @@ export default function ContactVerification({
                 <VerifiedUserOutlinedIcon
                     sx={{ color: "#1D4ED8", fontSize: 30 }}
                 />
+
                 <Typography variant="h6" fontWeight={700}>
-                    Contact verification
+                    {t("settings.verification.title")}
                 </Typography>
             </Stack>
-            
-            <Box sx={{ pt : 2 , pb: 2}}>
+
+            <Box sx={{ pt: 2, pb: 2 }}>
                 <Typography color="text.secondary" mb={3}>
-                    Verify your email and phone number to help secure
-                    your account and prepare to publish properties.
+                    {t("settings.verification.subtitle")}
                 </Typography>
             </Box>
 
             {allVerified && (
                 <Alert severity="success" sx={{ mb: 3 }}>
-                    Both contact methods are verified.
+                    {t("settings.verification.allVerified")}
                 </Alert>
             )}
 

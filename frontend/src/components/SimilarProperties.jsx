@@ -1,4 +1,7 @@
+
 import React, { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Typography,
@@ -13,6 +16,8 @@ export default function SimilarProperties({
     properties = [],
     onSelectProperty,
 }) {
+    const { t, i18n } = useTranslation();
+
     const [page, setPage] = useState(1);
     const itemsPerPage = 4;
 
@@ -68,7 +73,7 @@ export default function SimilarProperties({
                     color: "#0f172a",
                 }}
             >
-                Similar Properties
+                {t("properties.similar.title")}
             </Typography>
 
             <Box
@@ -100,7 +105,7 @@ export default function SimilarProperties({
                             property.price != null
                                 ? `${Number(
                                       property.price
-                                  ).toLocaleString()} MAD`
+                                  ).toLocaleString(i18n.language)} MAD`
                                 : "0 MAD",
                         image: fullImageUrl,
                         listingType: property.listingType,
@@ -117,7 +122,7 @@ export default function SimilarProperties({
                         createdDate: property.createdAt
                             ? new Date(
                                   property.createdAt
-                              ).toLocaleDateString("en-GB")
+                              ).toLocaleDateString(i18n.language)
                             : "",
                     };
 
@@ -159,6 +164,7 @@ export default function SimilarProperties({
                         onChange={handlePageChange}
                         color="primary"
                         size="medium"
+                        aria-label={t("properties.similar.pagination")}
                     />
                 </Box>
             )}

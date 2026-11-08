@@ -78,6 +78,19 @@ const propertySchema = new mongoose.Schema(
             trim: true,
             default: "",
         },
+
+        // Google Maps coordinates
+        location: {
+            lat: {
+                type: Number,
+                default: null,
+            },
+            lng: {
+                type: Number,
+                default: null,
+            },
+        },
+
         price: {
             type: Number,
             required: true,
@@ -113,8 +126,6 @@ const propertySchema = new mongoose.Schema(
             min: 0,
             default: 0,
         },
-
-        // Rental and agreement details
         rentWithContract: {
             type: Boolean,
             default: false,
@@ -137,7 +148,6 @@ const propertySchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-
         images: [
             {
                 filename: {

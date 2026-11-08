@@ -1,14 +1,14 @@
-
-
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { Alert, Stack } from "@mui/material";
+
 import axiosInstance from "../../api/axiosInstance";
 import { updateProfile } from "../../redux/actions/profile/profileAction";
 
 import PageLayout from "../PageLayout";
 import AccountProfile from "./AccountProfile";
-import EmailNotifications from "./EmailNotifications";
+import SettingEmailNotifications from "./SettingEmailNotifications";
 import WhatsappNotifications from "./WhatsappNotifications";
 import ChangePassword from "./ChangePassword";
 import DeleteAccount from "./DeleteAccount";
@@ -78,8 +78,6 @@ const normalizeWhatsApp = (data = {}) => ({
     propertyAlerts: data.propertyAlerts ?? false,
     phoneNumber: data.phoneNumber ?? "",
     verified: data.verified === true,
-
-    // These are temporary UI fields, not persisted preferences.
     verificationCodeSent: false,
     verificationCode: "",
     sandboxCode: "",
@@ -88,11 +86,29 @@ const normalizeWhatsApp = (data = {}) => ({
 });
 
 export default function SettingsPage() {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
 
     const authUser = useSelector(
         (state) => state.auth?.user ?? state.loginForm?.user ?? null
     );
+    const defaultPreferences = {
+        email: {
+            enabled: true,
+            propertyAlerts: true,
+        },
+        whatsapp: {
+            enabled: false,
+            propertyAlerts: false,
+            phoneNumber: "",
+            verified: false,
+            verificationCodeSent: false,
+            verificationCode: "",
+            sandboxCode: "",
+            resendAfterSeconds: 0,
+            verificationExpires: "",
+        },
+    };
 
     const [profile, setProfile] = useState(emptyProfile);
     const [savedProfile, setSavedProfile] = useState(null);
@@ -121,7 +137,6 @@ export default function SettingsPage() {
     const [passwordSuccess, setPasswordSuccess] = useState("");
     const [passwordLoading, setPasswordLoading] = useState(false);
 
-    // const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [deleteConfirmation, setDeleteConfirmation] = useState("");
     const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
     const [deletionLoading, setDeletionLoading] = useState(false);
@@ -133,7 +148,9 @@ export default function SettingsPage() {
         setDeletionError("");
 
         try {
-            const response = await axiosInstance.delete("/profile/me/account-deletion");
+            const response = await axiosInstance.delete(
+                "/profile/me/account-deletion"
+            );
 
             setScheduledDeletionAt(response.data.scheduledDeletionAt);
             setDeleteConfirmation("");
@@ -141,7 +158,7 @@ export default function SettingsPage() {
         } catch (error) {
             setDeletionError(
                 error.response?.data?.message ||
-                    "Could not schedule account deletion."
+                    t("settings.deletion.scheduleError")
             );
         } finally {
             setDeletionLoading(false);
@@ -157,9 +174,8 @@ export default function SettingsPage() {
         } catch (error) {
             setDeletionError(
                 error.response?.data?.message ||
-                    "Could not cancel account deletion."
+                    t("settings.deletion.cancelError")
             );
-
             throw error;
         }
     };
@@ -183,22 +199,23 @@ export default function SettingsPage() {
             const data = extractProfile(response.data);
 
             if (!data) {
-                throw new Error("The server returned an empty profile.");
+                throw new Error(t("settings.errors.emptyProfile"));
             }
 
             const normalized = normalizeProfile(data);
+
             setProfile(normalized);
             setSavedProfile(normalized);
             setProfileImageChanged(false);
         } catch (error) {
             setProfileError(
-                errorMessage(error, "Unable to load your saved profile.")
+                errorMessage(error, t("settings.errors.loadProfile"))
             );
             setProfile(normalizeProfile(authUser));
         } finally {
             setProfileLoading(false);
         }
-    }, [authUser]);
+    }, [authUser, t]);
 
     const loadPreferences = useCallback(async () => {
         setPreferencesLoading(true);
@@ -212,9 +229,7 @@ export default function SettingsPage() {
             const data = response.data?.preferences;
 
             if (!data) {
-                throw new Error(
-                    "The server did not return notification preferences."
-                );
+                throw new Error(t("settings.errors.emptyPreferences"));
             }
 
             setPreferences((previous) => ({
@@ -228,8 +243,6 @@ export default function SettingsPage() {
                 },
                 whatsapp: {
                     ...normalizeWhatsApp(data.whatsapp),
-                    // Preserve an active verification form if preferences
-                    // are refreshed while the user is working.
                     verificationCodeSent:
                         previous.whatsapp.verificationCodeSent,
                     verificationCode:
@@ -243,15 +256,12 @@ export default function SettingsPage() {
             }));
         } catch (error) {
             setPreferencesError(
-                errorMessage(
-                    error,
-                    "Unable to load notification preferences."
-                )
+                errorMessage(error, t("settings.errors.loadPreferences"))
             );
         } finally {
             setPreferencesLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         if (!authUser) {
@@ -284,6 +294,7 @@ export default function SettingsPage() {
                 "/profile/me/verification/email/confirm",
                 { code }
             );
+
             await loadProfile();
             return response.data;
         },
@@ -311,6 +322,7 @@ export default function SettingsPage() {
                 "/profile/me/verification/phone/confirm",
                 { code }
             );
+
             await loadProfile();
             return response.data;
         },
@@ -323,7 +335,7 @@ export default function SettingsPage() {
         setNotice(null);
 
         if (!savedProfile) {
-            setProfileError("Your saved profile has not loaded yet.");
+            setProfileError(t("settings.profile.notLoaded"));
             return;
         }
 
@@ -354,7 +366,7 @@ export default function SettingsPage() {
         }
 
         if (!Object.keys(payload).length) {
-            setProfileError("No changes to save.");
+            setProfileError(t("settings.profile.noChanges"));
             return;
         }
 
@@ -363,7 +375,7 @@ export default function SettingsPage() {
             (payload.email.length > 254 ||
                 !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email))
         ) {
-            setProfileError("Please enter a valid email address.");
+            setProfileError(t("settings.validation.email"));
             return;
         }
 
@@ -372,7 +384,7 @@ export default function SettingsPage() {
             (payload.firstName.length < 2 ||
                 payload.firstName.length > 50)
         ) {
-            setProfileError("First name must contain 2–50 characters.");
+            setProfileError(t("settings.validation.firstName"));
             return;
         }
 
@@ -381,7 +393,7 @@ export default function SettingsPage() {
             (payload.lastName.length < 2 ||
                 payload.lastName.length > 50)
         ) {
-            setProfileError("Last name must contain 2–50 characters.");
+            setProfileError(t("settings.validation.lastName"));
             return;
         }
 
@@ -390,19 +402,17 @@ export default function SettingsPage() {
             payload.phoneNumber &&
             !/^\+[1-9]\d{6,14}$/.test(payload.phoneNumber)
         ) {
-            setProfileError(
-                "Enter a valid international phone number, including its country code."
-            );
+            setProfileError(t("settings.validation.phoneNumber"));
             return;
         }
 
         if ("address" in payload && payload.address.length > 300) {
-            setProfileError("Address cannot exceed 300 characters.");
+            setProfileError(t("settings.validation.address"));
             return;
         }
 
         if ("bio" in payload && payload.bio.length > 1000) {
-            setProfileError("Biography cannot exceed 1000 characters.");
+            setProfileError(t("settings.validation.bio"));
             return;
         }
 
@@ -414,11 +424,11 @@ export default function SettingsPage() {
 
             setNotice({
                 type: "success",
-                message: "Profile updated successfully.",
+                message: t("settings.profile.updated"),
             });
         } catch (error) {
             setProfileError(
-                errorMessage(error, "Unable to update your profile.")
+                errorMessage(error, t("settings.errors.updateProfile"))
             );
         } finally {
             setProfileSaving(false);
@@ -452,13 +462,14 @@ export default function SettingsPage() {
                 type: "success",
                 message:
                     response.data?.message ||
-                    "Email preferences saved successfully.",
+                    t("settings.emailNotifications.saved"),
             });
         } catch (error) {
             const message = errorMessage(
                 error,
-                "Unable to save email preferences."
+                t("settings.emailNotifications.saveError")
             );
+
             setPreferencesError(message);
             setNotice({ type: "error", message });
         } finally {
@@ -471,9 +482,7 @@ export default function SettingsPage() {
         const phoneNumber = whatsapp.phoneNumber?.trim() ?? "";
 
         if (!/^\+[1-9]\d{6,14}$/.test(phoneNumber)) {
-            setPreferencesError(
-                "Enter a valid international number, such as +212612345678."
-            );
+            setPreferencesError(t("settings.validation.whatsappPhone"));
             return;
         }
 
@@ -497,8 +506,6 @@ export default function SettingsPage() {
                 propertyAlerts: false,
                 verificationCodeSent: true,
                 verificationCode: "",
-
-                // The backend should include this only for sandbox requests.
                 sandboxCode:
                     import.meta.env.DEV && data.sandbox
                         ? data.sandboxCode ?? ""
@@ -511,10 +518,9 @@ export default function SettingsPage() {
                 type: "success",
                 message:
                     data.message ||
-                    "Verification request accepted. Check WhatsApp if live delivery is enabled.",
+                    t("settings.whatsapp.verificationAccepted"),
             });
 
-            // Safe metadata only: never log phone numbers or verification codes.
             console.info("[WhatsApp UI] Verification request accepted", {
                 status: response.status,
                 sandbox: data.sandbox === true,
@@ -524,7 +530,7 @@ export default function SettingsPage() {
         } catch (error) {
             const message = errorMessage(
                 error,
-                "Unable to send the WhatsApp verification code."
+                t("settings.whatsapp.sendCodeError")
             );
 
             setPreferencesError(message);
@@ -538,7 +544,7 @@ export default function SettingsPage() {
         const code = preferences.whatsapp.verificationCode?.trim() ?? "";
 
         if (!/^\d{6}$/.test(code)) {
-            setPreferencesError("Enter the 6-digit verification code.");
+            setPreferencesError(t("settings.validation.verificationCode"));
             return;
         }
 
@@ -559,7 +565,7 @@ export default function SettingsPage() {
                 saved?.verified === false
             ) {
                 throw new Error(
-                    "The server did not confirm WhatsApp verification."
+                    t("settings.whatsapp.verificationNotConfirmed")
                 );
             }
 
@@ -576,13 +582,12 @@ export default function SettingsPage() {
 
             setNotice({
                 type: "success",
-                message:
-                    "WhatsApp number verified successfully. You can now enable notifications.",
+                message: t("settings.whatsapp.verified"),
             });
         } catch (error) {
             const message = errorMessage(
                 error,
-                "Unable to verify your WhatsApp number."
+                t("settings.whatsapp.verifyError")
             );
 
             setPreferencesError(message);
@@ -601,8 +606,7 @@ export default function SettingsPage() {
         ) {
             setNotice({
                 type: "error",
-                message:
-                    "Verify your WhatsApp number before enabling notifications.",
+                message: t("settings.whatsapp.verifyBeforeEnable"),
             });
             return;
         }
@@ -637,13 +641,14 @@ export default function SettingsPage() {
                 type: "success",
                 message:
                     response.data?.message ||
-                    "WhatsApp preferences saved successfully.",
+                    t("settings.whatsapp.saved"),
             });
         } catch (error) {
             const message = errorMessage(
                 error,
-                "Unable to save WhatsApp preferences."
+                t("settings.whatsapp.saveError")
             );
+
             setPreferencesError(message);
             setNotice({ type: "error", message });
         } finally {
@@ -663,26 +668,22 @@ export default function SettingsPage() {
         } = passwords;
 
         if (!currentPassword || !newPassword || !confirmPassword) {
-            setPasswordError("Please fill in all password fields.");
+            setPasswordError(t("settings.password.required"));
             return;
         }
 
         if (newPassword.length < 8) {
-            setPasswordError(
-                "Your new password must contain at least 8 characters."
-            );
+            setPasswordError(t("settings.password.minimumLength"));
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setPasswordError("The new passwords do not match.");
+            setPasswordError(t("settings.password.mismatch"));
             return;
         }
 
         if (newPassword === currentPassword) {
-            setPasswordError(
-                "Your new password must be different from your current password."
-            );
+            setPasswordError(t("settings.password.sameAsCurrent"));
             return;
         }
 
@@ -701,11 +702,12 @@ export default function SettingsPage() {
             });
 
             setPasswordSuccess(
-                response.data?.message || "Password updated successfully."
+                response.data?.message ||
+                    t("settings.password.updated")
             );
         } catch (error) {
             setPasswordError(
-                errorMessage(error, "Unable to update your password.")
+                errorMessage(error, t("settings.password.updateError"))
             );
         } finally {
             setPasswordLoading(false);
@@ -717,15 +719,15 @@ export default function SettingsPage() {
             type: deleteConfirmation === "DELETE" ? "warning" : "error",
             message:
                 deleteConfirmation === "DELETE"
-                    ? "Account deletion is not connected yet. Implement a secure backend deletion endpoint before enabling this action."
-                    : 'Type "DELETE" to confirm account deletion.',
+                    ? t("settings.deletion.notConnected")
+                    : t("settings.deletion.typeDelete"),
         });
     };
 
     return (
         <PageLayout
-            title="Settings"
-            subtitle="Manage your profile, notification preferences, and account security."
+            title={t("settings.title")}
+            subtitle={t("settings.subtitle")}
             maxWidth={900}
         >
             {notice && (
@@ -764,7 +766,7 @@ export default function SettingsPage() {
                     onConfirmPhoneCode={confirmPhoneVerificationCode}
                 />
 
-                <EmailNotifications
+                <SettingEmailNotifications
                     settings={preferences.email}
                     setSettings={(update) =>
                         setPreferences((previous) => ({
@@ -772,7 +774,10 @@ export default function SettingsPage() {
                             email:
                                 typeof update === "function"
                                     ? update(previous.email)
-                                    : update,
+                                    : {
+                                          ...previous.email,
+                                          ...update,
+                                      },
                         }))
                     }
                     loading={preferencesLoading}

@@ -1,5 +1,6 @@
-
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Alert,
     Box,
@@ -17,14 +18,16 @@ import axiosInstance from "../../../../api/axiosInstance";
 import PublicationReviewCard from "./PublicationReviewCard";
 
 const DATE_FILTERS = [
-    { value: "today", label: "Today" },
-    { value: "week", label: "Last 7 Days" },
-    { value: "month", label: "Last 30 Days" },
-    { value: "year", label: "Last Year" },
-    { value: "all", label: "All Time" },
+    { value: "today", label: "today" },
+    { value: "week", label: "week" },
+    { value: "month", label: "month" },
+    { value: "year", label: "year" },
+    { value: "all", label: "all" },
 ];
 
 export default function PublicationsReviewSection() {
+    const { t } = useTranslation();
+
     const [period, setPeriod] = useState("today");
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -65,7 +68,7 @@ export default function PublicationsReviewSection() {
 
                 setError(
                     err.response?.data?.message ||
-                        "Failed to load publications. Please try again."
+                        t("adminPublications.errors.load")
                 );
             } finally {
                 if (!controller.signal.aborted) {
@@ -77,7 +80,7 @@ export default function PublicationsReviewSection() {
         fetchPublications();
 
         return () => controller.abort();
-    }, [period]);
+    }, [period, t]);
 
     const handlePeriodChange = (event) => {
         setPeriod(event.target.value);
@@ -109,12 +112,12 @@ export default function PublicationsReviewSection() {
                             fontWeight={700}
                             color="#0F172A"
                         >
-                            Publications Review
+                            {t("adminPublications.title")}
                         </Typography>
                     </Stack>
 
                     <Typography variant="body2" color="#64748b">
-                        Review property publications submitted by users.
+                        {t("adminPublications.subtitle")}
                     </Typography>
                 </Box>
 
@@ -126,13 +129,13 @@ export default function PublicationsReviewSection() {
                     }}
                 >
                     <InputLabel id="publication-period-label">
-                        Date Range
+                        {t("adminPublications.dateRange")}
                     </InputLabel>
 
                     <Select
                         labelId="publication-period-label"
                         value={period}
-                        label="Date Range"
+                        label={t("adminPublications.dateRange")}
                         onChange={handlePeriodChange}
                         startAdornment={
                             <CalendarMonth
@@ -149,7 +152,7 @@ export default function PublicationsReviewSection() {
                                 key={filter.value}
                                 value={filter.value}
                             >
-                                {filter.label}
+                                {t(`adminPublications.periods.${filter.label}`)}
                             </MenuItem>
                         ))}
                     </Select>
@@ -176,7 +179,7 @@ export default function PublicationsReviewSection() {
                         color="#475569"
                         fontWeight={600}
                     >
-                        Publications
+                        {t("adminPublications.count")}
                     </Typography>
 
                     <Typography
@@ -184,9 +187,7 @@ export default function PublicationsReviewSection() {
                         color="#64748b"
                         sx={{ mt: 0.5 }}
                     >
-                        {DATE_FILTERS.find(
-                            (filter) => filter.value === period
-                        )?.label}
+                        {t(`adminPublications.periods.${period}`)}
                     </Typography>
                 </Box>
 
@@ -243,7 +244,7 @@ export default function PublicationsReviewSection() {
                         fontWeight={700}
                         color="#334155"
                     >
-                        No publications found
+                        {t("adminPublications.empty.title")}
                     </Typography>
 
                     <Typography
@@ -251,7 +252,7 @@ export default function PublicationsReviewSection() {
                         color="#64748b"
                         sx={{ mt: 0.5 }}
                     >
-                        There are no property publications for this date range.
+                        {t("adminPublications.empty.description")}
                     </Typography>
                 </Box>
             )}
@@ -264,7 +265,7 @@ export default function PublicationsReviewSection() {
                             key={property._id}
                             property={property}
                             onDeleted={() => fetchPublications()}
-                    />
+                        />
                     ))}
                 </Stack>
             )}

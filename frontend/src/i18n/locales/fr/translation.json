@@ -1,0 +1,1261 @@
+{
+    "topbar": {
+        "myProfile": "Mon profil",
+        "settings": "Paramètres",
+        "logout": "Déconnexion",
+        "member": "Membre",
+        "user": "Utilisateur"
+    },
+    "sidebar": {
+        "home": "Accueil",
+        "properties": "Propriétés",
+        "externalListing": "Annonces externes",
+        "findbymap": "Trouver sur la carte",
+        "publish": "Publier",
+        "myPublication": "Mes publications",
+        "saved": "Enregistrés",
+        "alert": "Alerte",
+        "notifications": "Notifications",
+        "feedback": "Commentaires",
+        "settings": "Paramètres",
+        "statistics": "Statistiques",
+        "addExternalListing": "Ajouter une annonce externe",
+        "systemsOnline": "Tous les systèmes sont opérationnels"
+    },
+    "middleContent": {
+        "overview": "Aperçu de {{section}}",
+        "subtitle": "Sélectionnez une catégorie de services ci-dessous pour gérer les annonces et les demandes.",
+        "comingSoon": "Bientôt disponible",
+        "services": {
+            "properties": {
+                "title": "Immobilier",
+                "description": "Acheter, vendre et louer des biens immobiliers",
+                "details": "Découvrez des milliers de biens immobiliers résidentiels et commerciaux vérifiés, disponibles à l'achat, à la vente ou à la location dans votre région."
+            },
+            "cars": {
+                "title": "Voitures",
+                "description": "Acheter, vendre et louer des véhicules",
+                "details": "Parcourez une large sélection de voitures, camions et SUV neufs ou d'occasion, avec des prix transparents et un contact direct avec les propriétaires."
+            },
+            "services": {
+                "title": "Services",
+                "description": "Trouver des entreprises et des bureaux",
+                "details": "Contactez des professionnels locaux qualifiés, des bureaux, des agences et des entreprises prêts à répondre aux besoins de vos projets."
+            },
+            "deliveryMan": {
+                "title": "Livreur",
+                "description": "Engager un livreur",
+                "details": "Réservez des coursiers et livreurs fiables pour transporter rapidement et en toute sécurité vos colis et effectuer vos courses locales."
+            },
+            "transporter": {
+                "title": "Transporteur",
+                "description": "Réserver un service de transport",
+                "details": "Trouvez des camions, des véhicules de déménagement et des prestataires logistiques pour faciliter vos déménagements et livraisons de marchandises."
+            },
+            "driver": {
+                "title": "Chauffeur",
+                "description": "Engager un chauffeur personnel",
+                "details": "Engagez des chauffeurs professionnels pour vos déplacements quotidiens, événements spéciaux, voyages ou trajets privés."
+            }
+        }
+    },
+    "login": {
+        "welcome": "Bienvenue sur votre application qui vous permet d'effectuer plusieurs tâches au même endroit.",
+        "findHouse": "Trouver une maison ...",
+        "bookTransport": "Réserver un transport ...",
+        "getWorker": "Trouver un professionnel pour un travail spécifique ...",
+        "andMore": "Et bien plus encore ...",
+        "magic": "Tout au même endroit, là où la magie opère"
+    },
+    "auth": {
+        "invalidState": "État d'authentification invalide : {{state}}",
+        "loginTitle": "Connexion",
+        "signupTitle": "Inscription",
+        "emailPlaceholder": "Entrez votre adresse e-mail",
+        "passwordPlaceholder": "Entrez votre mot de passe",
+        "createPasswordPlaceholder": "Créez un mot de passe",
+        "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+        "firstNamePlaceholder": "Entrez votre prénom",
+        "lastNamePlaceholder": "Entrez votre nom",
+        "showPassword": "Afficher le mot de passe",
+        "hidePassword": "Masquer le mot de passe",
+        "showConfirmPassword": "Afficher la confirmation du mot de passe",
+        "hideConfirmPassword": "Masquer la confirmation du mot de passe",
+        "loggingIn": "Connexion en cours. Veuillez patienter...",
+        "loginButton": "Se connecter",
+        "loginError": "Impossible de se connecter. Veuillez réessayer.",
+        "signupError": "Impossible de commencer l'inscription. Veuillez réessayer.",
+        "welcomeUser": "Bienvenue, {{name}} !",
+        "noAccount": "Vous n'avez pas de compte ?",
+        "signupLink": "S'inscrire",
+        "alreadyAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Se connecter",
+        "sendingVerification": "Envoi du code de vérification...",
+        "continue": "Continuer",
+        "validation": {
+        "firstName": "Le prénom doit contenir au moins 2 caractères.",
+        "lastName": "Le nom doit contenir au moins 2 caractères.",
+        "email": "Veuillez saisir une adresse e-mail valide.",
+        "password": "Le mot de passe doit contenir au moins 8 caractères.",
+        "confirmPassword": "Les mots de passe ne correspondent pas."
+        }
+    },
+    "properties": {
+        "banner": {
+        "back": "Retour",
+        "title": "Une plateforme immobilière complète\nPour acheter, vendre et louer des biens immobiliers\nDans toutes les villes du Maroc",
+        "description": "Des milliers d'annonces immobilières fiables, en toute simplicité et sécurité."
+        },
+        "categories": {
+        "title": "Explorer les catégories",
+        "all": "Tous les biens",
+        "apartment": "Appartement",
+        "house": "Maison",
+        "villa": "Villa",
+        "studio": "Studio",
+        "room": "Chambre",
+        "store": "Magasin",
+        "office": "Bureau",
+        "land": "Terrain",
+        "warehouse": "Entrepôt",
+        "commercialSpace": "Espace commercial",
+        "commercialStore": "Local commercial",
+        "garage": "Garage",
+        "other": "Autre"
+        },
+        "list": {
+            "loading": "Chargement des biens immobiliers...",
+            "fetchError": "Impossible de récupérer les biens immobiliers. Veuillez réessayer.",
+            "title": "Annonces immobilières",
+            "categoryTitle": "Annonces : {{category}}",
+            "propertyCount_one": "{{count}} bien immobilier",
+            "propertyCount_other": "{{count}} biens immobiliers",
+            "emptyTitle": "Aucun bien immobilier trouvé",
+            "emptyDescription": "Essayez de modifier le type de bien, le type de transaction ou la ville.",
+            "clearFilters": "Effacer les filtres",
+            "pagination": {
+                "first": "Aller à la première page",
+                "last": "Aller à la dernière page",
+                "next": "Aller à la page suivante",
+                "previous": "Aller à la page précédente",
+                "page": "Aller à la page {{page}} {{selected}}",
+                "current": "(page actuelle)"
+            }
+        },
+        "filter": {
+            "title": "Filtrer",
+            "categoriesAriaLabel": "Catégories de propriétés",
+            "transactionType": "Type de transaction",
+            "allTransactions": "Toutes les transactions",
+            "forSale": "À vendre",
+            "forRent": "À louer",
+            "city": "Ville",
+            "allCities": "Toutes les villes",
+            "searchCity": "Rechercher une ville",
+            "clearFilters": "Effacer les filtres"
+        },
+        "cities": {
+            "agadir": "Agadir",
+            "ain_harrouda": "Aïn Harrouda",
+            "ait_melloul": "Aït Melloul",
+            "ait_ourir": "Aït Ourir",
+            "al_hoceima": "Al Hoceïma",
+            "azrou": "Azrou",
+            "benguerir": "Benguerir",
+            "beni_ansar": "Béni Ansar",
+            "beni_mellal": "Béni Mellal",
+            "benslimane": "Benslimane",
+            "berrechid": "Berrechid",
+            "berkane": "Berkane",
+            "biougra": "Biougra",
+            "bni_yakhlef": "Bni Yakhlef",
+            "bouskoura": "Bouskoura",
+            "bouznika": "Bouznika",
+            "casablanca": "Casablanca",
+            "chefchaouen": "Chefchaouen",
+            "dakhla": "Dakhla",
+            "dar_bouazza_tamaris": "Dar Bouazza (Tamaris)",
+            "dcheira_el_jihadia": "Dcheira El Jihadia",
+            "drargua": "Drargua",
+            "ech_challalate": "Ech-challalate",
+            "el_jadida": "El Jadida",
+            "el_kelaa_des_sraghna": "El Kelaa des Sraghna",
+            "errachidia": "Errachidia",
+            "essaouira": "Essaouira",
+            "fez": "Fès",
+            "fnideq": "Fnideq",
+            "fquih_ben_salah": "Fquih Ben Salah",
+            "guelmim": "Guelmim",
+            "guercif": "Guercif",
+            "ifrane": "Ifrane",
+            "imzouren": "Imzouren",
+            "inezgane": "Inezgane",
+            "jerada": "Jerada",
+            "kenitra": "Kénitra",
+            "khemisset": "Khémisset",
+            "khenifra": "Khénifra",
+            "khouribga": "Khouribga",
+            "ksar_el_kebir": "Ksar El Kébir",
+            "laayoune": "Laâyoune",
+            "lahraouyine": "Lahraouyine",
+            "larache": "Larache",
+            "lqliaa": "Lqliaa",
+            "m_diq": "M'diq",
+            "marrakesh": "Marrakech",
+            "martil": "Martil",
+            "mehdya": "Mehdya",
+            "meknes": "Meknès",
+            "midelt": "Midelt",
+            "mohammedia": "Mohammedia",
+            "nador": "Nador",
+            "ouarzazate": "Ouarzazate",
+            "oued_zem": "Oued Zem",
+            "ouezzane": "Ouezzane",
+            "oujda": "Oujda",
+            "oulad_teima": "Oulad Teima",
+            "rabat": "Rabat",
+            "safi": "Safi",
+            "sale": "Salé",
+            "sefrou": "Sefrou",
+            "settat": "Settat",
+            "sidi_bennour": "Sidi Bennour",
+            "sidi_ifni": "Sidi Ifni",
+            "sidi_kacem": "Sidi Kacem",
+            "sidi_slimane": "Sidi Slimane",
+            "sidi_taibi": "Sidi Taibi",
+            "skhirat": "Skhirat",
+            "souk_el_arbaa": "Souk El Arbaa",
+            "souk_sebt_ouled_nemma": "Souk Sebt Ouled Nemma",
+            "taf rao ut": "Tafraout",
+            "tangier": "Tanger",
+            "tan_tan": "Tan-Tan",
+            "taounate": "Taounate",
+            "taourirt": "Taourirt",
+            "taroudant": "Taroudant",
+            "taza": "Taza",
+            "temara": "Témara",
+            "tetouan": "Tétouan",
+            "tifelt": "Tifelt",
+            "tinghir": "Tinghir",
+            "tiznit": "Tiznit",
+            "youssoufia": "Youssoufia",
+            "zagora": "Zagora"
+        },
+        "card": {
+            "reference": "RÉF",
+            "forSale": "À vendre",
+            "forRent": "À louer",
+            "available": "Disponible",
+            "rented": "Loué",
+            "sold": "Vendu",
+            "inactive": "Inactif",
+            "price": "Prix",
+            "surface": "Superficie",
+            "rooms": "Chambres",
+            "salons": "Salons",
+            "bathrooms": "Salles de bain"
+        },
+        "details": {
+            "title": "Détails du bien immobilier",
+            "back": "Retour",
+            "noImages": "Aucune image disponible",
+            "previousImage": "Image précédente",
+            "nextImage": "Image suivante",
+            "viewImage": "Voir l’image {{number}}",
+            "noDescription": "Aucune description n'a été fournie pour ce bien immobilier.",
+            "surface": "Superficie (m²)",
+            "floor": "Étage",
+            "propertyType": "Type de bien",
+            "listingBy": "Publié par",
+            "syndicateFees": "Frais de syndic",
+            "viewOnMaps": "Voir l'emplacement sur Google Maps",
+            "saving": "Enregistrement...",
+            "save": "Enregistrer le bien",
+            "unsave": "Retirer des favoris",
+            "contactEmail": "E-mail de contact",
+            "description": "Description du bien",
+            "rentalInformation": "Informations sur la location",
+            "rentalContract": "Contrat de location",
+            "contractAvailable": "Contrat disponible",
+            "noContract": "Sans contrat",
+            "mortgageAgreement": "Accord de crédit immobilier",
+            "accepted": "Accepté",
+            "notAccepted": "Non accepté",
+            "securityDeposit": "Dépôt de garantie",
+            "mediatorFee": "Frais d'intermédiaire",
+            "status": {
+                "available": "Disponible",
+                "pending": "En attente",
+                "sold": "Vendu",
+                "rented": "Loué",
+                "unavailable": "Indisponible"
+            },
+            "roles": {
+                "owner": "Propriétaire",
+                "realEstateAgent": "Agent immobilier",
+                "agency": "Agence"
+            },
+            "feedback": {
+                "saved": "Bien immobilier enregistré avec succès !",
+                "unsaved": "Bien immobilier retiré des favoris.",
+                "saveError": "Impossible de mettre à jour le bien enregistré. Veuillez réessayer."
+            }
+        },
+        "profileDetails": {
+            "backToMyPublications": "Retour à mes annonces",
+            "loadError": "Impossible de charger les détails du bien immobilier.",
+            "propertyNotFound": "Bien immobilier introuvable.",
+            "missingId": "L'identifiant du bien immobilier est manquant.",
+            "rooms": "Chambres"
+        },
+        "contactOwner": {
+            "title": "Intéressé par ce bien immobilier ?",
+            "subtitle": "Contactez directement le propriétaire par téléphone ou WhatsApp.",
+            "owner": "Propriétaire du bien",
+            "call": "Appeler le propriétaire",
+            "whatsapp": "WhatsApp",
+            "noPhone": "Le propriétaire n'a pas fourni de numéro de téléphone.",
+            "loginRequired": "Veuillez vous connecter pour contacter le propriétaire.",
+            "trackingError": "Impossible de traiter votre demande. Veuillez réessayer."
+        },
+        "similar": {
+            "title": "Biens immobiliers similaires",
+            "pagination": "Pages des biens immobiliers similaires"
+        },
+        "insert": {
+            "badge": "MARCHÉ IMMOBILIER",
+            "title": "Publier un bien immobilier",
+            "subtitle": "Ajoutez les détails de votre bien, fournissez des coordonnées exactes et présentez votre propriété aux acheteurs et locataires potentiels.",
+            "requiredFields": "Les champs marqués d'un * sont obligatoires",
+            "verification": {
+                "email": "adresse e-mail",
+                "whatsapp": "numéro WhatsApp"
+            },
+            "validation": {
+                "required": "Ce champ est obligatoire",
+                "nonNegativeNumber": "Saisissez un nombre valide positif ou nul",
+                "surfacePositive": "La superficie doit être supérieure à zéro",
+                "invalidEmail": "Saisissez une adresse e-mail valide",
+                "invalidMapUrl": "Saisissez une URL de carte valide",
+                "maxImages": "15 images maximum autorisées"
+            },
+            "notifications": {
+                "profileLoadError": "Impossible de charger votre profil. Veuillez réessayer.",
+                "profileVerifyError": "Impossible de vérifier votre profil. Veuillez recharger la page.",
+                "invalidImages": "Certaines images ont été refusées. Utilisez des images JPG, PNG ou WEBP de 5 Mo maximum chacune.",
+                "maxImages": "Vous pouvez téléverser un maximum de 15 images.",
+                "verifyBeforePublishing": "Veuillez vérifier votre {{items}} dans votre profil avant de publier un bien immobilier.",
+                "correctFields": "Veuillez corriger les champs signalés.",
+                "publishSuccess": "Bien immobilier publié avec succès !",
+                "publishError": "Échec de la publication du bien immobilier. Veuillez réessayer."
+            },
+            "description": {
+                "title": "Description du bien immobilier",
+                "subtitle": "Décrivez votre bien immobilier et mettez en avant ses principales caractéristiques.",
+                "label": "Description (facultative)",
+                "placeholder": "Décrivez le bien, son état, sa luminosité naturelle, les commodités à proximité et toute autre caractéristique importante...",
+                "helper": "Fournissez des informations utiles aux acheteurs et aux locataires."
+            },
+            "details": {
+                "title": "Détails du bien immobilier",
+                "subtitle": "Décrivez le bien immobilier que vous souhaitez publier.",
+                "listingTitle": "Titre de l'annonce *",
+                "listingTitlePlaceholder": "Ex. : Appartement moderne au centre-ville",
+                "transactionType": "Type de transaction *",
+                "propertyType": "Type de bien immobilier *",
+                "location": {
+                    "title": "Emplacement du bien",
+                    "subtitle": "Aidez les personnes à trouver votre bien plus facilement.",
+                    "city": "Ville *",
+                    "cityPlaceholder": "Rechercher ou sélectionner une ville",
+                    "neighborhood": "Quartier / Zone",
+                    "neighborhoodPlaceholder": "Ex. : Maarif",
+                    "fullAddress": "Adresse complète",
+                    "fullAddressPlaceholder": "Nom de la rue, bâtiment...",
+                    "mapLink": "Lien de localisation Google Maps"
+                },
+                "specifications": {
+                    "title": "Prix et caractéristiques",
+                    "subtitle": "Ajoutez le prix, la superficie et les caractéristiques du bien.",
+                    "price": "Prix (MAD) *",
+                    "surface": "Superficie (m²) *",
+                    "rooms": "Chambres",
+                    "salons": "Salons",
+                    "bathrooms": "Salles de bain",
+                    "floor": "Étage",
+                    "syndicateFees": "Frais de syndic (MAD/mois)"
+                },
+                "rental": {
+                    "title": "Conditions de location",
+                    "subtitle": "Précisez les conditions de location et les frais supplémentaires.",
+                    "contract": "Contrat de location disponible",
+                    "mortgage": "Accord de crédit immobilier",
+                    "deposit": "Dépôt de garantie (MAD)",
+                    "mediatorFee": "Frais d'intermédiaire (MAD)"
+                }
+            },
+            "images": {
+                "title": "Photos du bien immobilier",
+                "subtitle": "Mettez votre annonce en valeur avec des photos de qualité.",
+                "uploadTitle": "Cliquez pour téléverser les photos de votre bien",
+                "uploadDescription": "Sélectionnez jusqu'à 15 photos pour présenter votre bien immobilier.",
+                "browseFiles": "Parcourir les fichiers",
+                "fileRequirements": "JPG, JPEG, PNG ou WEBP · Maximum 5 Mo par image",
+                "selectedImages": "Photos sélectionnées",
+                "imageCount": "{{count}}/{{max}} photos",
+                "remove": "Supprimer",
+                "main": "Principale"
+            },
+            "publish": {
+                "title": "Prêt à publier ?",
+                "subtitle": "Vérifiez les informations avant de soumettre votre annonce.",
+                "loading": "Publication en cours...",
+                "button": "Publier l'annonce immobilière"
+            },
+            "ownerInfo": {
+                "title": "Informations sur le propriétaire",
+                "subtitle": "Qui publie ce bien immobilier ?",
+                "roleLabel": "Votre rôle concernant ce bien immobilier *",
+                "roles": {
+                    "owner": "Propriétaire du bien",
+                    "agent": "Agent immobilier",
+                    "agency": "Agence immobilière"
+                },
+                "firstName": "Prénom",
+                "lastName": "Nom",
+                "email": "Adresse e-mail",
+                "showEmail": "Afficher mon adresse e-mail publiquement",
+                "whatsapp": "Numéro WhatsApp",
+                "noWhatsapp": "Aucun numéro WhatsApp vérifié trouvé",
+                "whatsappVerified": "Votre numéro WhatsApp sera utilisé comme contact pour ce bien immobilier.",
+                "whatsappMissing": "Aucun numéro WhatsApp trouvé. Veuillez mettre à jour vos informations WhatsApp dans votre profil."
+            }
+        },
+        "profileList": {
+            "myPublications": "Mes annonces immobilières",
+            "categoryPublications": "Annonces : {{category}}",
+            "allProperties": "Tous les biens",
+            "property": "bien",
+            "properties": "biens",
+            "noProperties": "Aucun bien immobilier trouvé",
+            "noCategoryProperties": "Aucun bien de type {{category}} trouvé",
+            "emptySubtitle": "Vous n'avez encore publié aucune annonce dans cette catégorie.",
+            "viewAll": "Voir tous les biens",
+            "fetchError": "Impossible de récupérer vos biens immobiliers",
+            "deleteError": "Impossible de supprimer cette annonce immobilière."
+        },
+        "profileCard": {
+            "defaultTitle": "Titre du bien immobilier",
+            "publishedOn": "Publié le",
+            "editStatus": "Modifier le statut",
+            "updating": "Mise à jour...",
+            "viewDetails": "Voir les détails",
+            "delete": "Supprimer",
+            "confirmDeleteTitle": "Confirmer la suppression du bien",
+            "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer « {{title}} » ? Cette action est irréversible et supprimera définitivement votre annonce.",
+            "cancel": "Annuler",
+            "confirmDelete": "Oui, supprimer",
+            "status": {
+                "available": "Disponible",
+                "pending": "En attente",
+                "rented": "Loué",
+                "sold": "Vendu",
+                "inactive": "Inactif",
+                "unavailable": "Indisponible"
+            }
+        },
+        "savedList": {
+            "title": "Biens immobiliers enregistrés",
+            "categoryTitle": "Biens immobiliers {{category}} enregistrés",
+            "property": "bien immobilier",
+            "properties": "biens immobiliers",
+            "allProperties": "Tous les biens",
+            "emptyTitle": "Aucun bien immobilier enregistré",
+            "emptySubtitle": "Vous n'avez encore enregistré aucun bien immobilier. Explorez nos annonces et ajoutez vos biens préférés aux favoris.",
+            "explore": "Explorer les biens immobiliers",
+            "fetchError": "Impossible de charger les biens enregistrés. Veuillez réessayer.",
+            "removeError": "Impossible de retirer ce bien de votre liste de favoris.",
+            "retry": "Réessayer",
+            "noCategoryProperties": "Aucun bien enregistré dans cette catégorie",
+            "noCategorySubtitle": "Vous n'avez encore enregistré aucune annonce dans cette catégorie.",
+            "viewAll": "Voir tous les biens"
+        },
+        "savedCard": {
+            "defaultTitle": "Titre du bien immobilier",
+            "publishedOn": "Publié le",
+            "viewDetails": "Voir les détails",
+            "removing": "Suppression en cours...",
+            "removeSaved": "Retirer des favoris"
+        },
+        "alerts": {
+            "title": "Alertes immobilières",
+            "subtitle": "Recevez des notifications concernant les biens correspondant à vos préférences.",
+            "createTitle": "Créer une alerte",
+            "createSubtitle": "Sélectionnez une ville, un type de transaction et un ou plusieurs types de biens.",
+            "city": "Ville",
+            "cityPlaceholder": "Saisissez ou sélectionnez une ville",
+            "listingType": "Type de transaction",
+            "propertyTypes": "Types de biens immobiliers",
+            "selectedForAlert": "Sélectionnés pour cette alerte ({{count}})",
+            "anyCity": "Toutes les villes",
+            "noListingType": "Aucun type de transaction sélectionné",
+            "noPropertyTypes": "Aucun type de bien sélectionné. Choisissez-en au moins un ci-dessus.",
+            "saving": "Enregistrement...",
+            "save": "Enregistrer l'alerte",
+            "yourAlerts": "Vos alertes",
+            "activeCount_one": "{{count}} alerte active",
+            "activeCount_other": "{{count}} alertes actives",
+            "emptyTitle": "Aucune alerte enregistrée",
+            "emptySubtitle": "Créez votre première alerte pour suivre les biens immobiliers correspondants.",
+            "propertyTypeCount": "{{count}} types de biens",
+            "deleteAlert": "Supprimer l'alerte",
+            "deleteAlertForCity": "Supprimer l'alerte pour {{city}}",
+            "delete": "Supprimer",
+            "errors": {
+                "load": "Impossible de charger vos alertes immobilières.",
+                "cityRequired": "Veuillez saisir ou sélectionner une ville.",
+                "propertyTypeRequired": "Veuillez sélectionner au moins un type de bien.",
+                "listingTypeRequired": "Veuillez sélectionner À vendre, À louer ou les deux.",
+                "duplicate": "Cette alerte existe déjà.",
+                "missingCreatedAlert": "Le serveur n'a pas renvoyé l'alerte créée.",
+                "create": "Impossible de créer l'alerte immobilière.",
+                "delete": "Impossible de supprimer l'alerte immobilière."
+            },
+            "success": {
+                "created": "Alerte immobilière créée avec succès.",
+                "deleted": "Alerte immobilière supprimée avec succès."
+            },
+            "archive": "Archiver",
+            "archiving": "Archivage...",
+            "archiveAlert": "Archiver l'alerte",
+            "archiveAlertForCity": "Archiver l'alerte pour {{city}}",
+            "archivedAlerts": "Alertes archivées",
+            "archivedLabel": "Archivée",
+            "noArchivedAlerts": "Vous n'avez aucune alerte archivée.",
+            "restore": "Restaurer",
+            "restoring": "Restauration...",
+            "restoreAlert": "Restaurer l'alerte",
+            "successArchive": {
+                "archived": "Alerte archivée avec succès.",
+                "restored": "Alerte restaurée avec succès."
+            },
+            "errorsArcive": {
+                "archive": "Impossible d'archiver l'alerte.",
+                "restore": "Impossible de restaurer l'alerte."
+            }
+        }
+
+
+
+    },
+    "notifications": {
+        "title": "Notifications",
+        "subtitle": "Restez informé de vos alertes immobilières et de votre activité.",
+        "updating": "Mise à jour...",
+        "markAllRead": "Tout marquer comme lu",
+        "totalCount_one": "{{count}} notification",
+        "totalCount_other": "{{count}} notifications",
+        "unreadCount_one": "{{count}} non lue",
+        "unreadCount_other": "{{count}} non lues",
+        "retry": "Réessayer",
+        "emptyTitle": "Vous êtes à jour",
+        "emptySubtitle": "Les nouvelles notifications apparaîtront ici lorsqu'un bien correspondra à vos alertes.",
+        "refresh": "Actualiser les notifications",
+        "read": "Lu",
+        "new": "Nouveau",
+        "markRead": "Marquer comme lu",
+        "view": "Voir",
+        "delete": "Supprimer",
+        "errors": {
+            "load": "Impossible de charger les notifications.",
+            "markRead": "Impossible de marquer la notification comme lue.",
+            "markAllRead": "Impossible de marquer les notifications comme lues.",
+            "delete": "Impossible de supprimer la notification."
+        }
+    },
+    "feedback": {
+        "title": "Commentaires et signalements",
+        "subtitle": "Aidez-nous à améliorer votre expérience. Vous avez trouvé un bug, une idée à proposer ou rencontré un problème avec un autre utilisateur ? Expliquez-nous la situation afin que nous puissions l'examiner.",
+        "chooseType": "Que souhaitez-vous signaler ?",
+        "chooseTypeSubtitle": "Choisissez la catégorie qui décrit le mieux votre message.",
+        "types": {
+            "feedback": {
+                "label": "Commentaire général",
+                "description": "Partagez une idée ou proposez une amélioration."
+            },
+            "bug": {
+                "label": "Bug ou problème technique",
+                "description": "Signalez une erreur, une fonctionnalité défectueuse ou un comportement inattendu."
+            },
+            "userReport": {
+                "label": "Signaler un utilisateur",
+                "description": "Signalez un comportement suspect, du harcèlement ou une annonce problématique."
+            },
+            "other": {
+                "label": "Autre problème",
+                "description": "Informez-nous d'un autre problème concernant l'application."
+            }
+        },
+        "detailsTitle": "Donnez-nous plus de détails",
+        "detailsSubtitle": "Veuillez fournir suffisamment d'informations pour nous aider à comprendre la situation.",
+        "reportedUser": "Utilisateur signalé",
+        "reportedUserPlaceholder": "Identifiant, ID du profil ou adresse e-mail",
+        "reportedUserHelper": "Fournissez un identifiant si disponible. N'incluez aucun mot de passe ni identifiant confidentiel.",
+        "subject": "Sujet",
+        "subjectPlaceholders": {
+            "feedback": "Résumez brièvement votre message",
+            "bug": "Exemple : Impossible de publier un bien immobilier",
+            "user_report": "Exemple : Annonce immobilière suspecte",
+            "other": "Résumez brièvement votre message"
+        },
+        "description": "Description",
+        "descriptionPlaceholders": {
+            "feedback": "Rédigez votre commentaire ou expliquez le problème en détail...",
+            "bug": "Que s'est-il passé ? Que vous attendiez-vous à voir ? Décrivez les étapes pour reproduire le problème.",
+            "user_report": "Décrivez le comportement ou l'annonce que vous signalez. Ajoutez les détails pertinents sans partager d'informations personnelles sensibles.",
+            "other": "Rédigez votre commentaire ou expliquez le problème en détail..."
+        },
+        "characterCount": "{{current}}/{{max}} caractères",
+        "pageUrl": "Page où l'erreur s'est produite",
+        "pageUrlHelper": "L'adresse de cette page sera jointe à votre signalement.",
+        "priority": "Priorité",
+        "priorities": {
+            "low": "Faible",
+            "medium": "Moyenne",
+            "high": "Élevée"
+        },
+        "priorityHelper": "Indiquez le degré d'urgence de ce problème.",
+        "attachments": {
+            "button": "Joindre des captures d'écran ou des journaux",
+            "helper": "Facultatif. PNG, JPG, WEBP, GIF ou TXT. Maximum 5 fichiers de 5 Mo chacun.",
+            "unsupportedType": "{{name}} : type de fichier non pris en charge.",
+            "fileTooLarge": "{{name}} : le fichier dépasse la limite de 5 Mo.",
+            "maxFiles": "Vous pouvez joindre un maximum de 5 fichiers."
+        },
+        "reminderTitle": "Petit rappel",
+        "reminderDescription": "Évitez d'inclure des mots de passe, des jetons d'authentification, des informations de paiement ou des données personnelles inutiles dans votre signalement. Les signalements concernant un autre utilisateur doivent contenir des faits et des preuves pertinents.",
+        "clearForm": "Effacer le formulaire",
+        "submitting": "Envoi en cours...",
+        "submit": "Envoyer le signalement",
+        "validation": {
+            "subjectRequired": "Veuillez saisir un sujet.",
+            "subjectMin": "Le sujet doit contenir au moins 4 caractères.",
+            "subjectMax": "Le sujet ne peut pas dépasser 120 caractères.",
+            "descriptionRequired": "Veuillez décrire le problème.",
+            "descriptionMin": "Veuillez saisir au moins 10 caractères.",
+            "descriptionMax": "La description ne peut pas dépasser 5 000 caractères.",
+            "reportedUserRequired": "Saisissez l'adresse e-mail, l'identifiant ou l'ID du profil de l'utilisateur signalé."
+        },
+        "success": {
+            "submitted": "Votre commentaire a été envoyé avec succès.",
+            "confirmation": "Votre signalement a été envoyé avec succès."
+        },
+        "errors": {
+            "submit": "Impossible d'envoyer votre signalement. Veuillez réessayer."
+        }
+    },
+    "settings": {
+        "title": "Paramètres",
+        "subtitle": "Gérez votre profil, vos préférences de notification et la sécurité de votre compte.",
+        "errors": {
+            "emptyProfile": "Le serveur a renvoyé un profil vide.",
+            "loadProfile": "Impossible de charger votre profil enregistré.",
+            "emptyPreferences": "Le serveur n'a pas renvoyé les préférences de notification.",
+            "loadPreferences": "Impossible de charger les préférences de notification.",
+            "updateProfile": "Impossible de mettre à jour votre profil."
+        },
+        "profile": {
+            "notLoaded": "Votre profil enregistré n'a pas encore été chargé.",
+            "noChanges": "Aucune modification à enregistrer.",
+            "updated": "Profil mis à jour avec succès.",
+            "sectionTitle": "Compte et profil",
+            "sectionSubtitle": "Gérez vos informations personnelles.",
+            "loading": "Chargement de votre profil enregistré...",
+            "retry": "Réessayer",
+            "pictureTitle": "Photo de profil",
+            "pictureDescription": "Mettez à jour votre photo pour aider les autres à vous reconnaître.",
+            "uploadPicture": "Télécharger une photo",
+            "removePicture": "Supprimer la photo",
+            "imageRequirements": "JPG, PNG ou WEBP. Taille maximale : 2 Mo.",
+            "invalidImage": "Veuillez sélectionner une image JPG, PNG ou WEBP valide.",
+            "imageTooLarge": "La photo de profil doit faire moins de 2 Mo.",
+            "imageReadError": "Impossible de lire l'image sélectionnée.",
+            "firstName": "Prénom",
+            "lastName": "Nom",
+            "email": "Adresse e-mail",
+            "countryCode": "Indicatif du pays",
+            "phoneNumber": "Numéro de téléphone",
+            "address": "Adresse",
+            "biography": "Biographie",
+            "saving": "Enregistrement...",
+            "save": "Enregistrer le profil"
+        },
+        "validation": {
+            "email": "Veuillez saisir une adresse e-mail valide.",
+            "firstName": "Le prénom doit contenir entre 2 et 50 caractères.",
+            "lastName": "Le nom doit contenir entre 2 et 50 caractères.",
+            "phoneNumber": "Saisissez un numéro de téléphone international valide, avec son indicatif de pays.",
+            "address": "L'adresse ne peut pas dépasser 300 caractères.",
+            "bio": "La biographie ne peut pas dépasser 1 000 caractères.",
+            "whatsappPhone": "Saisissez un numéro international valide, par exemple +212612345678.",
+            "verificationCode": "Saisissez le code de vérification à 6 chiffres."
+        },
+        "emailPreferences": {
+            "saved": "Préférences e-mail enregistrées avec succès.",
+            "saveError": "Impossible d'enregistrer les préférences e-mail."
+        },
+        "whatsapp": {
+            "verificationAccepted": "Demande de vérification acceptée. Consultez WhatsApp si l'envoi réel est activé.",
+            "verified": "Numéro WhatsApp vérifié avec succès. Vous pouvez maintenant activer les notifications.",
+            "verificationNotConfirmed": "Le serveur n'a pas confirmé la vérification WhatsApp.",
+            "sendCodeError": "Impossible d'envoyer le code de vérification WhatsApp.",
+            "verifyError": "Impossible de vérifier votre numéro WhatsApp.",
+            "verifyBeforeEnable": "Vérifiez votre numéro WhatsApp avant d'activer les notifications.",
+            "saved": "Préférences WhatsApp enregistrées avec succès.",
+            "saveError": "Impossible d'enregistrer les préférences WhatsApp."
+        },
+        "password": {
+            "required": "Veuillez remplir tous les champs du mot de passe.",
+            "minimumLength": "Votre nouveau mot de passe doit contenir au moins 8 caractères.",
+            "mismatch": "Les nouveaux mots de passe ne correspondent pas.",
+            "sameAsCurrent": "Votre nouveau mot de passe doit être différent de votre mot de passe actuel.",
+            "updated": "Mot de passe mis à jour avec succès.",
+            "updateError": "Impossible de mettre à jour votre mot de passe.",
+            "sectionTitle": "Modifier le mot de passe",
+            "sectionSubtitle": "Utilisez un mot de passe fort et unique pour protéger votre compte.",
+            "currentPassword": "Mot de passe actuel",
+            "newPassword": "Nouveau mot de passe",
+            "confirmPassword": "Confirmer le nouveau mot de passe",
+            "minimumHint": "Utilisez au moins 8 caractères.",
+            "updating": "Mise à jour...",
+            "updateButton": "Mettre à jour le mot de passe"
+        },
+        "verification": {
+            "title": "Vérification des coordonnées",
+            "subtitle": "Vérifiez votre adresse e-mail et votre numéro de téléphone pour sécuriser votre compte et préparer la publication de vos annonces.",
+            "verified": "Vérifié",
+            "notVerified": "Non vérifié",
+            "emailAddress": "Adresse e-mail",
+            "phoneNumber": "Numéro de téléphone",
+            "addContact": "Veuillez d'abord ajouter votre {{contact}}.",
+            "noContact": "Aucun {{contact}} ajouté",
+            "actionNotConfigured": "Cette action de vérification n'est pas encore configurée.",
+            "emailCodeSent": "Code de vérification envoyé à votre adresse e-mail.",
+            "sandboxCodeMessage": "Mode sandbox : utilisez le code {{code}}. Aucun véritable SMS ne sera peut-être envoyé.",
+            "smsCodeResent": "Un nouveau code de vérification par SMS a été demandé.",
+            "smsCodeSent": "Code de vérification par SMS demandé.",
+            "sendCodeError": "Impossible d'envoyer le code de vérification. Veuillez réessayer.",
+            "invalidCode": "Saisissez le code de vérification à 6 chiffres.",
+            "confirmNotConfigured": "La confirmation du code n'est pas encore configurée.",
+            "contactVerified": "Vos coordonnées ont été vérifiées avec succès.",
+            "invalidOrExpiredCode": "Code invalide ou expiré. Veuillez réessayer.",
+            "emailStepOne": "Étape 1 : Envoyez un code de vérification à votre adresse e-mail.",
+            "phoneStepOne": "Étape 1 : Recevez un code de vérification par SMS.",
+            "stepTwo": "Étape 2 : Saisissez le code à 6 chiffres que nous vous avons envoyé.",
+            "sendEmailCode": "Envoyer le code par e-mail",
+            "sendSmsCode": "Envoyer le code par SMS",
+            "codeLabel": "Code de vérification",
+            "confirmCode": "Confirmer le code",
+            "resendCode": "Renvoyer le code",
+            "cancel": "Annuler",
+            "allVerified": "Les deux moyens de contact sont vérifiés."
+        },
+        "deleteAccount": {
+            "title": "Supprimer le compte",
+            "subtitle": "Programmez la suppression définitive de votre compte et des données associées.",
+            "pendingSubtitle": "La suppression de votre compte est programmée.",
+            "scheduledMessage": "La suppression de votre compte est programmée pour le",
+            "loginCancellation": "Si vous vous connectez avant cette date, votre demande de suppression sera automatiquement annulée.",
+            "permanentMessage": "Après cette date, votre compte et les données associées seront définitivement supprimés par le processus de nettoyage programmé.",
+            "cancelRequest": "Annuler la demande de suppression",
+            "warning": "Votre compte sera programmé pour une suppression définitive 30 jours après votre confirmation. Une connexion pendant cette période annulera la demande.",
+            "deleteButton": "Supprimer mon compte",
+            "confirmationWarning": "Cette action programme la suppression de votre compte et des données associées. Vous pouvez l'annuler en vous connectant dans les 30 jours.",
+            "typeToConfirm": "Pour confirmer votre demande, saisissez",
+            "below": "ci-dessous.",
+            "confirmLabel": "Saisissez « DELETE » pour confirmer",
+            "scheduling": "Programmation...",
+            "confirmButton": "Confirmer la demande de suppression",
+            "cancel": "Annuler",
+            "scheduleError": "Impossible de programmer la suppression du compte.",
+            "cancelError": "Impossible d'annuler la suppression du compte.",
+            "notConnected": "La fonctionnalité de suppression du compte n'est pas encore connectée au backend.",
+            "typeDelete": "Veuillez saisir DELETE pour confirmer."
+        },
+        "emailNotifications": {
+            "title": "Notifications par e-mail",
+            "subtitle": "Recevez directement dans votre boîte de réception des alertes immobilières.",
+            "loading": "Chargement de vos préférences de notification...",
+            "retry": "Réessayer",
+            "enable": "Activer les notifications par e-mail",
+            "enableDescription": "Autoriser la plateforme à vous envoyer des alertes par e-mail.",
+            "propertyAlerts": "Alertes immobilières correspondantes",
+            "propertyAlertsDescription": "Recevez un e-mail lorsqu'un nouveau bien correspond à vos alertes enregistrées.",
+            "saving": "Enregistrement...",
+            "save": "Enregistrer les préférences e-mail",
+            "saved": "Préférences e-mail enregistrées avec succès.",
+            "saveError": "Impossible d'enregistrer les préférences e-mail."
+        },
+        "whatsappNotifications": {
+            "title": "Notifications WhatsApp",
+            "subtitle": "Vérifiez votre numéro WhatsApp pour recevoir des alertes immobilières.",
+            "info": "Votre numéro WhatsApp est vérifié séparément du numéro de téléphone de votre compte. Vous devez le vérifier avant d'activer les notifications.",
+            "loading": "Chargement de vos préférences de notification...",
+            "phoneNumber": "Numéro WhatsApp",
+            "phoneHelper": "Incluez votre indicatif de pays, par exemple +212...",
+            "verified": "Ce numéro WhatsApp a été vérifié.",
+            "sendingCode": "Envoi du code...",
+            "sendCode": "Envoyer le code de vérification WhatsApp",
+            "verificationCode": "Code de vérification",
+            "codePlaceholder": "Saisissez le code à 6 chiffres",
+            "codeHelper": "Saisissez le code envoyé à votre numéro WhatsApp.",
+            "verifying": "Vérification...",
+            "verifyNumber": "Vérifier le numéro WhatsApp",
+            "enable": "Activer les notifications WhatsApp",
+            "enableDescription": "Recevez certaines alertes via WhatsApp.",
+            "propertyAlerts": "Alertes immobilières correspondantes",
+            "propertyAlertsDescription": "Recevez des messages lorsqu'un nouveau bien correspond à vos alertes enregistrées.",
+            "saving": "Enregistrement...",
+            "save": "Enregistrer les préférences WhatsApp",
+            "verificationAccepted": "Demande de code de vérification acceptée.",
+            "verifiedSuccess": "Numéro WhatsApp vérifié avec succès.",
+            "verificationNotConfirmed": "La vérification WhatsApp n'a pas été confirmée.",
+            "sendCodeError": "Impossible d'envoyer le code de vérification WhatsApp.",
+            "verifyError": "Impossible de vérifier le numéro WhatsApp.",
+            "verifyBeforeEnable": "Veuillez vérifier votre numéro WhatsApp avant d'activer les notifications.",
+            "saved": "Préférences WhatsApp enregistrées avec succès.",
+            "saveError": "Impossible d'enregistrer les préférences WhatsApp."
+        }
+
+    },
+    "adminDashboard": {
+        "title": "Tableau de bord administrateur",
+        "subtitle": "Suivez les utilisateurs et l’activité sur votre plateforme."
+    },
+    "adminFeedback": {
+        "title": "Avis des utilisateurs",
+        "subtitle": "Consultez les avis, les rapports de bugs et les messages des utilisateurs.",
+        "refresh": "Actualiser",
+        "empty": {
+            "title": "Aucun avis pour le moment",
+            "description": "Les avis des utilisateurs apparaîtront ici."
+        },
+        "list": {
+        "submissions": "Soumissions",
+            "all": "Tout"
+        },
+        "details": {
+            "selectSubmission": "Sélectionnez un avis pour afficher ses détails.",
+            "userUnavailable": "Informations utilisateur indisponibles",
+            "priorityLabel": "Priorité : {{priority}}",
+            "updating": "Mise à jour...",
+            "updateStatus": "Mettre à jour le statut",
+            "description": "Description",
+            "submissionInformation": "Informations de soumission",
+            "submittedBy": "Soumis par",
+            "email": "E-mail",
+            "createdAt": "Date de création",
+            "lastUpdated": "Dernière mise à jour",
+            "reportedUser": "Utilisateur signalé",
+            "pageUrl": "URL de la page"
+        },
+        "attachments": {
+            "title": "Pièces jointes ({{count}})",
+            "download": "Télécharger"
+        },
+        "notifications": {
+            "statusUpdated": "Le statut de l'avis a été mis à jour avec succès."
+        },
+        "errors": {
+            "load": "Impossible de charger les avis des utilisateurs.",
+            "updateStatus": "Impossible de mettre à jour le statut de l'avis.",
+            "statusSaveFailed": "Échec de la mise à jour du statut. Veuillez réessayer.",
+            "downloadAttachment": "Impossible de télécharger cette pièce jointe. Veuillez réessayer."
+        },
+        "common": {
+            "dateUnavailable": "Date indisponible"
+        },
+        "statuses": {
+            "open": "Ouvert",
+            "in_progress": "En cours",
+            "resolved": "Résolu",
+            "closed": "Fermé"
+        },
+        "priorities": {
+            "low": "Faible",
+            "medium": "Moyenne",
+            "high": "Élevée"
+        },
+        "types": {
+            "bug": "Bug",
+            "bug_report": "Rapport de bug",
+            "feature": "Fonctionnalité",
+            "feature_request": "Demande de fonctionnalité",
+            "suggestion": "Suggestion",
+            "complaint": "Réclamation",
+            "other": "Autre"
+        }
+    },
+    "adminPropertyClicks": {
+        "title": "Statistiques des clics sur les biens",
+            "subtitle": "Suivez les consultations des biens et comprenez comment les visiteurs interagissent avec vos annonces.",
+            "errors": {
+            "load": "Impossible de charger les statistiques des clics sur les biens."
+        },
+        "summary": {
+            "totalClicks": "Nombre total de clics",
+            "trackedProperties": "Biens suivis",
+            "cities": "Villes"
+        },
+        "charts": {
+            "title": "Statistiques des clics",
+            "propertyTypes": "Clics par type de bien",
+            "listingTypes": "Clics par type d'annonce",
+            "cities": "Clics par ville",
+            "clicks": "Clics",
+            "noData": "Aucune donnée statistique disponible pour le moment."
+        },
+        "properties": {
+            "title": "Tous les biens consultés",
+            "subtitle": "Tous les biens suivis, classés selon leur dernier clic.",
+            "untitled": "Bien sans titre",
+            "unknownType": "Type inconnu",
+            "locationUnavailable": "Emplacement indisponible",
+            "unknownListingType": "Type d'annonce inconnu",
+            "lastClicked": "Dernier clic : {{date}}",
+            "id": "ID : {{id}}",
+            "view": "Voir le bien",
+            "for_sale": "À vendre",
+            "for_rent": "À louer"
+        },
+        "pagination": {
+            "showing": "Affichage de {{from}} à {{to}} sur {{total}} biens suivis"
+        },
+        "empty": {
+            "title": "Aucun clic sur les biens pour le moment",
+            "description": "Les statistiques des clics apparaîtront ici lorsque les visiteurs commenceront à consulter vos annonces."
+        },
+        "propertyTypes": {
+            "apartment": "Appartement",
+            "house": "Maison",
+            "villa": "Villa",
+            "studio": "Studio",
+            "room": "Chambre",
+            "store": "Magasin",
+            "office": "Bureau",
+            "land": "Terrain",
+            "warehouse": "Entrepôt"
+        },
+        "listingTypes": {
+            "for_sale": "À vendre",
+            "for_rent": "À louer"
+        }
+    },
+    "adminPublications": {
+        "title": "Examen des annonces",
+        "subtitle": "Consultez les annonces immobilières publiées par les utilisateurs.",
+        "dateRange": "Période",
+        "count": "Annonces",
+        "periods": {
+        "today": "Aujourd'hui",
+        "week": "Les 7 derniers jours",
+        "month": "Les 30 derniers jours",
+        "year": "L'année dernière",
+        "all": "Depuis toujours"
+        },
+        "errors": {
+            "load": "Impossible de charger les annonces. Veuillez réessayer."
+        },
+        "empty": {
+            "title": "Aucune annonce trouvée",
+            "description": "Aucune annonce immobilière n'est disponible pour cette période."
+        },
+        "card": {
+            "untitled": "Bien sans titre",
+            "unknownUser": "Utilisateur inconnu",
+            "noEmail": "Adresse e-mail indisponible",
+            "dateUnavailable": "Date indisponible",
+            "surface": "Surface",
+            "rooms": "Pièces",
+            "bathrooms": "Salles de bain",
+            "viewDetails": "Voir les détails",
+            "delete": "Supprimer",
+            "cancel": "Annuler",
+            "deleting": "Suppression..."
+        },
+        "statuses": {
+            "available": "Disponible",
+            "active": "Actif",
+            "sold": "Vendu",
+            "rented": "Loué",
+            "inactive": "Inactif"
+        },
+        "listingTypes": {
+            "for_sale": "À vendre",
+            "for_rent": "À louer"
+        },
+        "propertyTypes": {
+            "apartment": "Appartement",
+            "house": "Maison",
+            "villa": "Villa",
+            "studio": "Studio",
+            "room": "Chambre",
+            "store": "Magasin",
+            "office": "Bureau",
+            "land": "Terrain",
+            "warehouse": "Entrepôt"
+        },
+        "dialog": {
+            "title": "Supprimer l'annonce ?",
+            "confirm": "Voulez-vous vraiment supprimer « {{title}} » ? Cette action est irréversible."
+        },
+        "notifications": {
+            "missingId": "L'identifiant du bien est manquant.",
+            "deleteSuccess": "L'annonce a été supprimée avec succès.",
+            "deleteError": "Impossible de supprimer l'annonce."
+        }
+    },
+    "adminExternalClicks": {
+        "title": "Statistiques des clics sur les annonces externes",
+        "subtitle": "Suivez l'engagement envers les annonces externes publiées sur votre plateforme.",
+        "errors": {
+        "load": "Impossible de charger les statistiques des clics externes."
+        },
+        "summary": {
+        "totalClicks": "Nombre total de clics",
+        "trackedListings": "Annonces suivies",
+        "websites": "Sites web",
+        "cities": "Villes"
+        },
+        "charts": {
+        "title": "Statistiques des clics",
+        "subtitle": "Découvrez les catégories de biens, les sites web et les emplacements qui attirent le plus l'attention.",
+        "propertyTypes": "Clics par type de bien",
+        "propertyTypesDescription": "Clics regroupés par catégorie de bien.",
+        "websites": "Clics par site web",
+        "websitesDescription": "Comparez l'engagement entre les différents sites web externes.",
+        "cities": "Clics par ville",
+        "citiesDescription": "Clics regroupés selon l'emplacement du bien.",
+        "clicks": "Clics",
+        "noData": "Aucune donnée de clic disponible pour le moment."
+        },
+        "listings": {
+        "title": "Annonces externes récemment consultées",
+        "subtitle": "Toutes les annonces externes suivies, classées selon leur dernier clic.",
+        "empty": "Aucun clic sur une annonce externe n'a encore été enregistré."
+        },
+        "pagination": {
+        "showing": "Affichage de {{from}} à {{to}} sur {{total}} annonces suivies"
+        },
+        "common": {
+        "unknown": "Inconnu"
+        },
+        "card": {
+        "propertyType": "Type de bien",
+        "listingType": "Type d'annonce",
+        "city": "Ville",
+        "neighborhood": "Quartier",
+        "sourceWebsite": "Site web source",
+        "firstClick": "Premier clic",
+        "lastClick": "Dernier clic",
+        "lastClickedBy": "Dernier clic effectué par",
+        "guest": "Invité / anonyme",
+        "untitled": "Annonce externe sans titre",
+        "unknownWebsite": "Site web inconnu",
+        "totalEngagement": "Engagement total",
+        "click": "Clic",
+        "clicks": "Clics",
+        "externalListingId": "ID de l'annonce externe",
+        "sourceDomain": "Domaine source",
+        "openOriginal": "Ouvrir l'annonce originale",
+        "sourceUnavailable": "URL source indisponible"
+        }
+    },
+    "externalSources": {
+        "title": "Sources des annonces externes",
+        "subtitle": "Gérez les sites web utilisés pour collecter des annonces immobilières externes.",
+        "form": {
+        "placeholder": "Collez une URL d'annonce Aqari, Mr Semsar ou 3a9arai",
+        "ariaLabel": "URL de l'annonce externe",
+        "addUrl": "Ajouter l'URL"
+        },
+        "supportedWebsites": "Sites pris en charge : Aqari Annonces, Mr Semsar et 3a9arai. De nouveaux sites peuvent également être enregistrés automatiquement.",
+        "registeredSources": "Sources enregistrées",
+        "sourceCount_one": "{{count}} source",
+        "sourceCount_other": "{{count}} sources",
+        "sourceCount": "{{count}} sources",
+        "loading": "Chargement des sources...",
+        "empty": {
+        "title": "Aucune source d'annonce externe n'a encore été ajoutée.",
+        "description": "Ajoutez une URL d'annonce immobilière prise en charge ci-dessus pour commencer."
+        },
+        "listingSource": "Source de l'annonce",
+        "actions": {
+        "import": "Importer de nouvelles annonces",
+        "importing": "Importation...",
+        "refresh": "Actualiser",
+        "refreshing": "Actualisation...",
+        "openLink": "Ouvrir le lien",
+        "delete": "Supprimer",
+        "deleting": "Suppression..."
+        },
+        "errors": {
+        "load": "Impossible de charger les sources des annonces.",
+        "refresh": "Impossible d'actualiser les annonces externes.",
+        "import": "Impossible d'importer de nouvelles annonces externes.",
+        "add": "Impossible d'ajouter la source de l'annonce.",
+        "delete": "Impossible de supprimer la source de l'annonce."
+        },
+        "messages": {
+        "refreshSuccess": "Les annonces externes ont été actualisées avec succès.",
+        "importSuccess": "Les nouvelles annonces externes ont été importées avec succès.",
+        "addSuccess": "La source de l'annonce a été ajoutée avec succès.",
+        "deleteSuccess": "La source de l'annonce a été supprimée avec succès."
+        }
+    },
+    "common": {
+        "retry": "Réessayer"
+    },
+    "analyticsPlaceholder": {
+        "clickTitle": "Statistiques des clics",
+        "visitTitle": "Statistiques des visites",
+        "clickDescription": "Le suivi des clics et les statistiques seront ajoutés ici.",
+        "visitDescription": "Les visites du site et les statistiques des pages seront ajoutées ici."
+    },
+    "dashboardNavigation": {
+        "users": "Utilisateurs",
+        "external listings clicks": "Clics sur les annonces externes",
+        "visits": "Visites",
+        "internal property clicks": "Clics sur les annonces internes",
+        "publications": "Examen des publications",
+        "feedback": "Commentaires",
+        "client call action": "Actions de contact des clients",
+        "property demand": "Demande immobilière"
+    },
+    "propertyDemand": {
+        "title": "Analyse de la demande immobilière",
+        "subtitle": "Découvrez les biens que vos utilisateurs souhaitent acheter ou louer.",
+        "totalAlerts": "Total des alertes",
+        "activeAlerts": "Demandes actives",
+        "uniqueUsers": "Utilisateurs intéressés",
+        "archivedAlerts": "Alertes archivées",
+        "trend": "Évolution de la demande",
+        "propertyTypes": "Types de biens les plus demandés",
+        "listingPreferences": "Achat ou location",
+        "topCities": "Villes les plus demandées",
+        "cityComparison": "Achat et location par ville",
+        "recentAlerts": "Alertes immobilières récentes",
+        "ranges": {
+            "7d": "7 derniers jours",
+            "30d": "30 derniers jours",
+            "90d": "90 derniers jours",
+            "all": "Depuis le début"
+        }
+    },
+    "userCard": {
+        "unnamedUser": "Utilisateur sans nom",
+        "active": "Actif",
+        "noEmail": "Aucun e-mail",
+        "noPhone": "Aucun numéro de téléphone",
+        "user": "Utilisateur",
+        "joined": "Inscrit le",
+        "unknown": "Inconnu",
+        "activity": "Activité de l'utilisateur",
+        "publishedProperties": "Biens publiés",
+        "savedProperties": "Biens enregistrés",
+        "submittedFeedback": "Commentaires envoyés"
+    },
+    "usersSection": {
+        "title": "Utilisateurs",
+        "subtitle": "Informations des comptes et activité sur la marketplace.",
+        "userCount": "{{count}} utilisateurs",
+        "loadError": "Impossible de charger les utilisateurs.",
+        "empty": "Aucun utilisateur trouvé."
+    },
+    "visitsSection": {
+        "title": "Visites du site",
+        "subtitle": "Suivez les sessions des visiteurs et leur temps d'activité estimé.",
+        "loadError": "Impossible de charger les statistiques des visites.",
+        "anonymousVisitor": "Visiteur anonyme",
+        "noAccountEmail": "Aucun e-mail associé au compte",
+        "userId": "ID utilisateur",
+        "anonymous": "Anonyme",
+        "activeTime": "Temps d'activité",
+        "pageViews": "{{count}} pages consultées",
+        "firstVisit": "Première visite",
+        "lastActivity": "Dernière activité",
+        "lastPage": "Dernière page",
+        "visitsToday": "Visites aujourd'hui",
+        "sessionsStartedToday": "Sessions commencées aujourd'hui (UTC)",
+        "totalVisits": "Total des visites",
+        "allRecordedSessions": "Toutes les sessions enregistrées",
+        "activeTimeToday": "Temps d'activité aujourd'hui",
+        "estimatedTodayTime": "Temps estimé pour les sessions d'aujourd'hui",
+        "totalActiveTime": "Temps d'activité total",
+        "estimatedAllTime": "Temps estimé pour toutes les sessions",
+        "recentVisitors": "Visiteurs récents",
+        "latestSessions": "Les 100 dernières sessions enregistrées.",
+        "empty": "Aucune visite n'a encore été enregistrée. Consultez votre application dans un autre onglet pour générer la première visite."
+    },
+    "footer": {
+        "description": "Une seule plateforme, des possibilités infinies. Découvrez des biens immobiliers, des véhicules, des services professionnels et des solutions du quotidien au même endroit.",
+        "socialProfile": "Visitez notre profil {{platform}}",
+        "explore": "Explorer",
+        "ourServices": "Nos services",
+        "accountSupport": "Compte et assistance",
+        "links": {
+            "dashboard": "Tableau de bord",
+            "browseProperties": "Parcourir les biens immobiliers",
+            "savedProperties": "Biens immobiliers enregistrés",
+            "myPublications": "Mes publications",
+            "publishAd": "Publier une annonce",
+            "myProfile": "Mon profil",
+            "settings": "Paramètres",
+            "sendFeedback": "Envoyer un avis"
+        },
+        "services": {
+            "realEstate": "Immobilier",
+            "cars": "Voitures",
+            "services": "Services",
+            "deliveryTransport": "Livraison et transport"
+        },
+        "location": "Maroc",
+        "rightsReserved": "Tous droits réservés.",
+        "motto": "Conçu pour faciliter le quotidien.",
+        "madeWithCare": "Fait avec soin ♥"
+    },
+    "adminContactActions": {
+        "title": "Actions de contact des clients",
+        "subtitle": "Suivez les interactions des clients avec les propriétaires.",
+        "refresh": "Actualiser",
+        "retry": "Réessayer",
+        "loadError": "Impossible de charger les statistiques de contact.",
+        "totalContacts": "Total des contacts",
+        "contactsToday": "Contacts aujourd'hui",
+        "phoneClicks": "Clics sur téléphone",
+        "whatsappClicks": "Clics WhatsApp",
+        "activityTitle": "Activité de contact",
+        "activitySubtitle": "Clics quotidiens sur téléphone et WhatsApp durant les 7 derniers jours",
+        "calls": "Appels téléphoniques",
+        "noActivity": "Aucune activité de contact.",
+        "breakdownTitle": "Répartition des contacts",
+        "breakdownSubtitle": "Comparaison des moyens de contact",
+        "total": "Total",
+        "topProperties": "Biens les plus contactés",
+        "topPropertiesSubtitle": "Les biens qui attirent le plus l'intérêt des clients",
+        "noProperties": "Aucun bien contacté.",
+        "unknownProperty": "Bien inconnu",
+        "property": "Bien immobilier",
+        "clicks": "clics",
+        "recentActivity": "Activité récente",
+        "recentActivitySubtitle": "Dernières interactions des clients inscrits",
+        "noRecentActivity": "Aucune activité récente.",
+        "unknownClient": "Client inconnu",
+        "unknownOwner": "Propriétaire inconnu",
+        "contacted": "A contacté",
+        "call": "Téléphone"
+    }
+
+
+
+}

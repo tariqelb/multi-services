@@ -1,4 +1,7 @@
+
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Typography,
@@ -16,34 +19,33 @@ import {
     MenuItem,
     CircularProgress,
 } from "@mui/material";
-import { LocationOn, Visibility, Delete, Edit } from "@mui/icons-material";
+
+import {
+    LocationOn,
+    Visibility,
+    Delete,
+    Edit,
+} from "@mui/icons-material";
+
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import getImageUrl from "../utils/getImageUrl";
 
-// const API_URL = "http://localhost:3000";
-
-// function getImageUrl(image) {
-//     const path = typeof image === "string" ? image : image?.path;
-
-//     if (!path) return "";
-//     if (/^https?:\/\//i.test(path)) return path;
-
-//     return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
-// }
-
-
-/**
- * Update property status API helper
- * @param {string} id - Property ID
- * @param {string} status - New status ("Available", "Rented", "Sold", "Inactive")
- */
 export const updatePropertyStatus = async (id, status) => {
-    const response = await axiosInstance.patch(`/property/editstatus/${id}`, { status });
+    const response = await axiosInstance.patch(
+        `/property/editstatus/${id}`,
+        { status }
+    );
+
     return response.data;
 };
 
-const STATUS_OPTIONS = ["Available", "Rented", "Sold", "Inactive"];
+const STATUS_OPTIONS = [
+    "Available",
+    "Rented",
+    "Sold",
+    "Inactive",
+];
 
 function getStatusStyles(status) {
     const normalizedStatus = String(status || "Available").toLowerCase();
@@ -54,14 +56,12 @@ function getStatusStyles(status) {
             return {
                 bgcolor: "#dcfce7",
                 color: "#15803d",
-                label: status || "Available",
             };
 
         case "pending":
             return {
                 bgcolor: "#fef9c3",
                 color: "#a16207",
-                label: status || "Pending",
             };
 
         case "sold":
@@ -70,21 +70,18 @@ function getStatusStyles(status) {
             return {
                 bgcolor: "#fee2e2",
                 color: "#b91c1c",
-                label: status || "Unavailable",
             };
 
         case "inactive":
             return {
                 bgcolor: "#f1f5f9",
                 color: "#475569",
-                label: status || "Inactive",
             };
 
         default:
             return {
                 bgcolor: "#f1f5f9",
                 color: "#475569",
-                label: status || "Available",
             };
     }
 }
@@ -95,13 +92,15 @@ export default function UserProfileCard({
     onDelete,
     onStatusChange,
 }) {
+    const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
+
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [anchorElStatus, setAnchorElStatus] = useState(null);
     const [updatingStatus, setUpdatingStatus] = useState(false);
-    const navigate = useNavigate();
 
     const {
-        title = "Property Title",
+        title = t("properties.profileCard.defaultTitle"),
         price = 0,
         images = [],
         listingType = "For Sale",
@@ -123,15 +122,75 @@ export default function UserProfileCard({
         ? getImageUrl(imagePath)
         : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500";
 
-    const locationText = [neighborhood, city].filter(Boolean).join(", ");
+    const locationText = [neighborhood, city]
+        .filter(Boolean)
+        .join(", ");
 
-    const formattedPrice = Number(price || 0).toLocaleString();
+    const formattedPrice = Number(price || 0).toLocaleString(
+        i18n.language === "ar" ? "ar-MA" : i18n.language === "fr" ? "fr-FR" : "en-US"
+    );
 
     const formattedDate = createdAt
-        ? new Date(createdAt).toLocaleDateString("en-GB")
+        ? new Date(createdAt).toLocaleDateString(
+            i18n.language === "ar"
+                ? "ar-MA"
+                : i18n.language === "fr"
+                    ? "fr-FR"
+                    : "en-GB"
+        )
         : "";
 
     const statusInfo = getStatusStyles(currentStatus);
+
+    const getStatusLabel = (status) => {
+        const normalizedStatus = String(status || "Available").toLowerCase();
+
+        const statusKeys = {
+            available: "available",
+            active: "available",
+            pending: "pending",
+            rented: "rented",
+            sold: "sold",
+            inactive: "inactive",
+            unavailable: "unavailable",
+        };
+
+        const key = statusKeys[normalizedStatus];
+
+        return key
+            ? t(`properties.profileCard.status.${key}`)
+            : status;
+    };
+
+    const getListingTypeLabel = (type) => {
+        if (type === "For Sale") {
+            return t("properties.card.forSale");
+        }
+
+        if (type === "For Rent") {
+            return t("properties.card.forRent");
+        }
+
+        return type;
+    };
+
+    const getPropertyTypeLabel = (type) => {
+        if (!type) return "";
+
+        const categoryKey = {
+            "commercial space": "commercialSpace",
+            "commercial store": "commercialStore",
+        }[type.toLowerCase()] ||
+            type
+                .toLowerCase()
+                .replace(/[^a-z0-9]+(.)/g, (_, char) =>
+                    char.toUpperCase()
+                );
+
+        return t(`properties.categories.${categoryKey}`, {
+            defaultValue: type,
+        });
+    };
 
     const handleDeleteConfirm = () => {
         onDelete?.(property._id || property.id);
@@ -157,7 +216,9 @@ export default function UserProfileCard({
 
         try {
             setUpdatingStatus(true);
+
             await updatePropertyStatus(propertyId, newStatus);
+
             setCurrentStatus(newStatus);
             onStatusChange?.(propertyId, newStatus);
         } catch (error) {
@@ -186,7 +247,6 @@ export default function UserProfileCard({
                     },
                 }}
             >
-                {/* Image Thumbnail */}
                 {/* Image Thumbnail */}
                 <Box
                     sx={{
@@ -243,8 +303,8 @@ export default function UserProfileCard({
                                     }}
                                 >
                                     {formattedDate &&
-                                        `Published on ${formattedDate}`}{" "}
-                                    • {propertyType}
+                                        `${t("properties.profileCard.publishedOn")} ${formattedDate}`}{" "}
+                                    • {getPropertyTypeLabel(propertyType)}
                                 </Typography>
 
                                 <Typography
@@ -257,6 +317,7 @@ export default function UserProfileCard({
                                 >
                                     {title}
                                 </Typography>
+
                                 <Typography
                                     variant="h6"
                                     sx={{
@@ -271,7 +332,7 @@ export default function UserProfileCard({
 
                             {/* Listing Type */}
                             <Chip
-                                label={listingType}
+                                label={getListingTypeLabel(listingType)}
                                 size="medium"
                                 sx={{
                                     height: 35,
@@ -290,7 +351,7 @@ export default function UserProfileCard({
 
                             {/* Listing Status */}
                             <Chip
-                                label={statusInfo.label}
+                                label={getStatusLabel(currentStatus)}
                                 size="medium"
                                 sx={{
                                     height: 35,
@@ -349,26 +410,27 @@ export default function UserProfileCard({
                         >
                             {surface !== "" && surface != null && (
                                 <Box>
-                                    Surface: <strong>{surface} m²</strong>
+                                    {t("properties.card.surface")}:{" "}
+                                    <strong>{surface} m²</strong>
                                 </Box>
                             )}
 
                             {rooms !== "" && rooms != null && (
                                 <Box>
-                                    Rooms: <strong>{rooms}</strong>
+                                    {t("properties.card.rooms")}:{" "}
+                                    <strong>{rooms}</strong>
                                 </Box>
                             )}
 
                             {bathrooms !== "" && bathrooms != null && (
                                 <Box>
-                                    Bathrooms: <strong>{bathrooms}</strong>
+                                    {t("properties.card.bathrooms")}:{" "}
+                                    <strong>{bathrooms}</strong>
                                 </Box>
                             )}
                         </Stack>
                     </Box>
 
-                    {/* Actions Toolbar: aligned to the far right */}
-                    
                     {/* Actions Toolbar */}
                     <Box
                         sx={{
@@ -424,7 +486,9 @@ export default function UserProfileCard({
                                     },
                                 }}
                             >
-                                {updatingStatus ? "Updating..." : "Edit Status"}
+                                {updatingStatus
+                                    ? t("properties.profileCard.updating")
+                                    : t("properties.profileCard.editStatus")}
                             </Button>
 
                             {/* Status Selection Menu */}
@@ -451,7 +515,7 @@ export default function UserProfileCard({
                                             fontSize: "0.875rem",
                                         }}
                                     >
-                                        {opt}
+                                        {getStatusLabel(opt)}
                                     </MenuItem>
                                 ))}
                             </Menu>
@@ -462,16 +526,24 @@ export default function UserProfileCard({
                                 size="small"
                                 startIcon={<Visibility />}
                                 onClick={() => {
-                                    const propertyId = property._id || property.id;
+                                    const propertyId =
+                                        property._id || property.id;
 
                                     if (!propertyId) {
-                                        console.error("Property ID is missing:", property);
+                                        console.error(
+                                            "Property ID is missing:",
+                                            property
+                                        );
                                         return;
                                     }
 
-                                    navigate(`/property/${propertyId}`, {
-                                        state: { property },
-                                    });
+                                    if (onViewDetails) {
+                                        onViewDetails(property);
+                                    } else {
+                                        navigate(`/property/${propertyId}`, {
+                                            state: { property },
+                                        });
+                                    }
                                 }}
                                 sx={{
                                     textTransform: "none",
@@ -491,7 +563,7 @@ export default function UserProfileCard({
                                     },
                                 }}
                             >
-                                View Details
+                                {t("properties.profileCard.viewDetails")}
                             </Button>
 
                             {/* Delete */}
@@ -517,11 +589,10 @@ export default function UserProfileCard({
                                     },
                                 }}
                             >
-                                Delete
+                                {t("properties.profileCard.delete")}
                             </Button>
                         </Stack>
                     </Box>
-
                 </Box>
             </Card>
 
@@ -531,14 +602,14 @@ export default function UserProfileCard({
                 onClose={() => setOpenDeleteModal(false)}
             >
                 <DialogTitle sx={{ fontWeight: 700 }}>
-                    Confirm Property Deletion
+                    {t("properties.profileCard.confirmDeleteTitle")}
                 </DialogTitle>
 
                 <DialogContent>
                     <DialogContentText>
-                        Are you sure you want to delete{" "}
-                        <strong>"{title}"</strong>? This action cannot be
-                        undone and will permanently remove your listing.
+                        {t("properties.profileCard.confirmDeleteMessage", {
+                            title,
+                        })}
                     </DialogContentText>
                 </DialogContent>
 
@@ -551,7 +622,7 @@ export default function UserProfileCard({
                             color: "#5B6577",
                         }}
                     >
-                        Cancel
+                        {t("properties.profileCard.cancel")}
                     </Button>
 
                     <Button
@@ -563,7 +634,7 @@ export default function UserProfileCard({
                             fontWeight: 700,
                         }}
                     >
-                        Yes, Delete
+                        {t("properties.profileCard.confirmDelete")}
                     </Button>
                 </DialogActions>
             </Dialog>

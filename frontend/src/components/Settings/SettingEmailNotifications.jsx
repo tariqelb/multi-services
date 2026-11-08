@@ -1,5 +1,6 @@
-
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Alert,
     Box,
@@ -12,10 +13,11 @@ import {
     Switch,
     Typography,
 } from "@mui/material";
+
 import { EmailOutlined } from "@mui/icons-material";
 
-export default function EmailNotifications({
-    settings,
+export default function SettingEmailNotifications({
+    settings = {},
     setSettings,
     loading,
     saving,
@@ -23,6 +25,11 @@ export default function EmailNotifications({
     onSave,
     onRetry,
 }) {
+    const { t } = useTranslation();
+
+    const enabled = settings?.enabled ?? true;
+    const propertyAlerts = settings?.propertyAlerts ?? true;
+
     const update = (field, value) => {
         setSettings((previous) => ({
             ...previous,
@@ -35,10 +42,15 @@ export default function EmailNotifications({
             variant="outlined"
             sx={{
                 borderRadius: "16px",
-                            }}
+            }}
         >
             <CardContent sx={{ p: { xs: 3, md: 4.5 } }}>
-                <Stack direction="row" spacing={2.5} alignItems="center" sx={{ mb: 4.5 }}>
+                <Stack
+                    direction="row"
+                    spacing={2.5}
+                    alignItems="center"
+                    sx={{ mb: 4.5 }}
+                >
                     <Box
                         sx={{
                             width: 52,
@@ -54,19 +66,25 @@ export default function EmailNotifications({
                     >
                         <EmailOutlined sx={{ fontSize: 26 }} />
                     </Box>
+
                     <Box>
-                        <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5 }}>
-                            Email Notifications
+                        <Typography
+                            variant="h6"
+                            fontWeight={700}
+                            sx={{ mb: 0.5 }}
+                        >
+                            {t("settings.emailNotifications.title")}
                         </Typography>
+
                         <Typography variant="body2" color="text.secondary">
-                            Receive property alerts directly in your inbox.
+                            {t("settings.emailNotifications.subtitle")}
                         </Typography>
                     </Box>
                 </Stack>
 
                 {loading && (
                     <Alert severity="info" sx={{ mb: 3 }}>
-                        Loading your notification preferences...
+                        {t("settings.emailNotifications.loading")}
                     </Alert>
                 )}
 
@@ -75,8 +93,12 @@ export default function EmailNotifications({
                         severity="error"
                         sx={{ mb: 3 }}
                         action={
-                            <Button color="inherit" size="small" onClick={onRetry}>
-                                Retry
+                            <Button
+                                color="inherit"
+                                size="small"
+                                onClick={onRetry}
+                            >
+                                {t("settings.emailNotifications.retry")}
                             </Button>
                         }
                     >
@@ -89,7 +111,7 @@ export default function EmailNotifications({
                         sx={{ alignItems: "flex-start", ml: 0 }}
                         control={
                             <Switch
-                                checked={settings.enabled}
+                                checked={enabled}
                                 disabled={loading}
                                 onChange={(event) =>
                                     update("enabled", event.target.checked)
@@ -100,11 +122,19 @@ export default function EmailNotifications({
                         }
                         label={
                             <Box>
-                                <Typography fontWeight={700} sx={{ fontSize: "1.05rem" }}>
-                                    Enable email notifications
+                                <Typography
+                                    fontWeight={700}
+                                    sx={{ fontSize: "1.05rem" }}
+                                >
+                                    {t("settings.emailNotifications.enable")}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                    Allow the platform to send you email alerts.
+
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mt: 0.5 }}
+                                >
+                                    {t("settings.emailNotifications.enableDescription")}
                                 </Typography>
                             </Box>
                         }
@@ -116,10 +146,13 @@ export default function EmailNotifications({
                         sx={{ alignItems: "flex-start", ml: 0 }}
                         control={
                             <Switch
-                                checked={settings.propertyAlerts}
-                                disabled={loading || !settings.enabled}
+                                checked={propertyAlerts}
+                                disabled={loading || !enabled}
                                 onChange={(event) =>
-                                    update("propertyAlerts", event.target.checked)
+                                    update(
+                                        "propertyAlerts",
+                                        event.target.checked
+                                    )
                                 }
                                 color="primary"
                                 sx={{ mt: 0.5, mr: 2 }}
@@ -127,11 +160,19 @@ export default function EmailNotifications({
                         }
                         label={
                             <Box>
-                                <Typography fontWeight={700} sx={{ fontSize: "1.05rem" }}>
-                                    Matching property alerts
+                                <Typography
+                                    fontWeight={700}
+                                    sx={{ fontSize: "1.05rem" }}
+                                >
+                                    {t("settings.emailNotifications.propertyAlerts")}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                    Get an email when a new property matches your saved alerts.
+
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mt: 0.5 }}
+                                >
+                                    {t("settings.emailNotifications.propertyAlertsDescription")}
                                 </Typography>
                             </Box>
                         }
@@ -151,7 +192,9 @@ export default function EmailNotifications({
                         borderRadius: "10px",
                     }}
                 >
-                    {saving ? "Saving..." : "Save email preferences"}
+                    {saving
+                        ? t("settings.emailNotifications.saving")
+                        : t("settings.emailNotifications.save")}
                 </Button>
             </CardContent>
         </Card>

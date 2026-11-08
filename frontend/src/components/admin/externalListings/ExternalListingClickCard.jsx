@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 
 import {
     Box,
@@ -13,39 +14,46 @@ import {
     formatNumber,
 } from "./externalClicksUtils";
 
-const ExternalListingClickCard = ({ listing , color = ""}) => {
+const ExternalListingClickCard = ({ listing, color = "", locale }) => {
+    const { t } = useTranslation();
+
     const details = [
         {
-            label: "Property type",
-            value: listing.propertyType || "Unknown",
+            label: t("adminExternalClicks.card.propertyType"),
+            value: listing.propertyType || t("adminExternalClicks.common.unknown"),
         },
         {
-            label: "Listing type",
-            value: listing.listingType || "Unknown",
+            label: t("adminExternalClicks.card.listingType"),
+            value: listing.listingType || t("adminExternalClicks.common.unknown"),
         },
         {
-            label: "City",
-            value: listing.city || "Unknown",
+            label: t("adminExternalClicks.card.city"),
+            value: listing.city || t("adminExternalClicks.common.unknown"),
         },
         {
-            label: "Neighborhood",
-            value: listing.neighborhood || "Unknown",
+            label: t("adminExternalClicks.card.neighborhood"),
+            value: listing.neighborhood || t("adminExternalClicks.common.unknown"),
         },
         {
-            label: "Source website",
-            value: listing.sourceName || listing.sourceDomain || "Unknown",
+            label: t("adminExternalClicks.card.sourceWebsite"),
+            value:
+                listing.sourceName ||
+                listing.sourceDomain ||
+                t("adminExternalClicks.common.unknown"),
         },
         {
-            label: "First click",
-            value: formatDate(listing.firstClickedAt),
+            label: t("adminExternalClicks.card.firstClick"),
+            value: formatDate(listing.firstClickedAt, locale),
         },
         {
-            label: "Last click",
-            value: formatDate(listing.lastClickedAt),
+            label: t("adminExternalClicks.card.lastClick"),
+            value: formatDate(listing.lastClickedAt, locale),
         },
         {
-            label: "Last clicked by",
-            value: listing.lastClickedBy || "Guest / anonymous",
+            label: t("adminExternalClicks.card.lastClickedBy"),
+            value:
+                listing.lastClickedBy ||
+                t("adminExternalClicks.card.guest"),
         },
     ];
 
@@ -74,7 +82,6 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                     "&:last-child": { pb: 3 },
                 }}
             >
-                {/* Header */}
                 <Stack direction="row" alignItems="center" spacing={2}>
                     <Box
                         sx={{
@@ -82,8 +89,6 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                             height: 48,
                             flexShrink: 0,
                             borderRadius: 2,
-                            // bgcolor: "primary.light",
-                            // color: "primary.main",
                             bgcolor: `${color}15`,
                             color,
                             display: "flex",
@@ -105,7 +110,8 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                                 lineHeight: 1.4,
                             }}
                         >
-                            {listing.title || "Untitled external listing"}
+                            {listing.title ||
+                                t("adminExternalClicks.card.untitled")}
                         </Typography>
 
                         <Typography
@@ -116,12 +122,11 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                         >
                             {listing.sourceName ||
                                 listing.sourceDomain ||
-                                "Unknown website"}
+                                t("adminExternalClicks.card.unknownWebsite")}
                         </Typography>
                     </Box>
                 </Stack>
 
-                {/* Click statistics */}
                 <Box
                     sx={{
                         mt: 3,
@@ -134,7 +139,7 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                         justifyContent: "space-between",
                     }}
                 >
-                    <Box >
+                    <Box>
                         <Typography
                             variant="caption"
                             color={`${color}10`}
@@ -144,7 +149,7 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                                 letterSpacing: 0.5,
                             }}
                         >
-                            Total engagement
+                            {t("adminExternalClicks.card.totalEngagement")}
                         </Typography>
 
                         <Typography
@@ -153,7 +158,7 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                             color="primary.main"
                             mt={0.5}
                         >
-                            {formatNumber(listing.clickCount)}
+                            {formatNumber(listing.clickCount, locale)}
                         </Typography>
                     </Box>
 
@@ -163,12 +168,11 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                         fontWeight={700}
                     >
                         {Number(listing.clickCount) === 1
-                            ? "Click"
-                            : "Clicks"}
+                            ? t("adminExternalClicks.card.click")
+                            : t("adminExternalClicks.card.clicks")}
                     </Typography>
                 </Box>
 
-                {/* Listing information */}
                 <Box
                     sx={{
                         mt: 3,
@@ -220,7 +224,6 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                     ))}
                 </Box>
 
-                {/* External identifiers */}
                 <Box
                     sx={{
                         mt: 3,
@@ -237,8 +240,9 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                         color="text.secondary"
                         sx={{ overflowWrap: "anywhere" }}
                     >
-                        External Listing ID:{" "}
-                        {listing.externalListingId || "Unknown"}
+                        {t("adminExternalClicks.card.externalListingId")}:{" "}
+                        {listing.externalListingId ||
+                            t("adminExternalClicks.common.unknown")}
                     </Typography>
 
                     <Typography
@@ -246,11 +250,12 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                         color="text.secondary"
                         sx={{ overflowWrap: "anywhere" }}
                     >
-                        Source domain: {listing.sourceDomain || "Unknown"}
+                        {t("adminExternalClicks.card.sourceDomain")}:{" "}
+                        {listing.sourceDomain ||
+                            t("adminExternalClicks.common.unknown")}
                     </Typography>
                 </Box>
 
-                {/* External link only */}
                 <Box display="flex" justifyContent="flex-end" mt={2}>
                     {listing.sourceUrl ? (
                         <Button
@@ -263,14 +268,14 @@ const ExternalListingClickCard = ({ listing , color = ""}) => {
                             onClick={(event) => event.stopPropagation()}
                             endIcon={<span>↗</span>}
                         >
-                            Open original listing
+                            {t("adminExternalClicks.card.openOriginal")}
                         </Button>
                     ) : (
                         <Typography
                             variant="body2"
                             color="text.secondary"
                         >
-                            Source URL unavailable
+                            {t("adminExternalClicks.card.sourceUnavailable")}
                         </Typography>
                     )}
                 </Box>

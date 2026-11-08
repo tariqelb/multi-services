@@ -1,6 +1,6 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import axiosInstance from "../api/axiosInstance";
 
 import {
@@ -102,6 +102,7 @@ const SectionPaper = ({ children }) => (
 );
 
 export default function PropertyInsertForm({ onAddProperty }) {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
 
     const formData = useSelector(
@@ -205,8 +206,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
 
                     setNotification({
                         open: true,
-                        message:
-                            "Unable to load your profile. Please try again.",
+                        message: t("properties.insert.notifications.profileLoadError"),
                         severity: "error",
                     });
                 }
@@ -222,7 +222,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
         return () => {
             cancelled = true;
         };
-    }, [dispatch]);
+    }, [dispatch, t]);
 
     // Set the email visibility default without overriding an existing choice.
     useEffect(() => {
@@ -245,6 +245,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
         });
     }, []);
 
+    // Keep these values unchanged because they are stored form values.
     const propertyTypes = [
         "Apartment",
         "House",
@@ -403,14 +404,13 @@ export default function PropertyInsertForm({ onAddProperty }) {
         if (selectedFiles.length !== validFiles.length) {
             setNotification({
                 open: true,
-                message:
-                    "Some images were rejected. Use JPG, PNG, or WEBP images up to 5 MB each.",
+                message: t("properties.insert.notifications.invalidImages"),
                 severity: "warning",
             });
         } else if (validFiles.length > remaining) {
             setNotification({
                 open: true,
-                message: "You can upload a maximum of 15 images.",
+                message: t("properties.insert.notifications.maxImages"),
                 severity: "warning",
             });
         }
@@ -447,8 +447,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
         if (!profile) {
             setNotification({
                 open: true,
-                message:
-                    "Unable to verify your profile. Please reload the page.",
+                message: t("properties.insert.notifications.profileVerifyError"),
                 severity: "error",
             });
 
@@ -464,21 +463,26 @@ export default function PropertyInsertForm({ onAddProperty }) {
             const missingVerification = [];
 
             if (!profile.emailVerified) {
-                missingVerification.push("email");
+                missingVerification.push(
+                    t("properties.insert.verification.email")
+                );
             }
 
             if (
                 !profile.whatsappPhoneNumber ||
                 !profile.whatsappVerified
             ) {
-                missingVerification.push("WhatsApp number");
+                missingVerification.push(
+                    t("properties.insert.verification.whatsapp")
+                );
             }
 
             setNotification({
                 open: true,
-                message: `Please verify your ${missingVerification.join(
-                    " and "
-                )} in your profile before publishing a property.`,
+                message: t(
+                    "properties.insert.notifications.verifyBeforePublishing",
+                    { items: missingVerification.join(" and ") }
+                ),
                 severity: "warning",
             });
 
@@ -501,7 +505,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
 
         requiredFields.forEach((key) => {
             if (!String(formData[key] ?? "").trim()) {
-                validationErrors[key] = "This field is required";
+                validationErrors[key] = t(
+                    "properties.insert.validation.required"
+                );
             }
         });
 
@@ -527,7 +533,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 value === undefined
             ) {
                 if (key === "price" || key === "surface") {
-                    validationErrors[key] = "This field is required";
+                    validationErrors[key] = t(
+                        "properties.insert.validation.required"
+                    );
                 }
 
                 return;
@@ -536,11 +544,13 @@ export default function PropertyInsertForm({ onAddProperty }) {
             const number = Number(value);
 
             if (!Number.isFinite(number) || number < 0) {
-                validationErrors[key] =
-                    "Enter a valid non-negative number";
+                validationErrors[key] = t(
+                    "properties.insert.validation.nonNegativeNumber"
+                );
             } else if (key === "surface" && number <= 0) {
-                validationErrors[key] =
-                    "Surface must be greater than zero";
+                validationErrors[key] = t(
+                    "properties.insert.validation.surfacePositive"
+                );
             }
         });
 
@@ -548,7 +558,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
             formData.email &&
             !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
         ) {
-            validationErrors.email = "Enter a valid email address";
+            validationErrors.email = t(
+                "properties.insert.validation.invalidEmail"
+            );
         }
 
         if (formData.mapLink) {
@@ -559,12 +571,16 @@ export default function PropertyInsertForm({ onAddProperty }) {
                     throw new Error("Invalid URL protocol");
                 }
             } catch {
-                validationErrors.mapLink = "Enter a valid map URL";
+                validationErrors.mapLink = t(
+                    "properties.insert.validation.invalidMapUrl"
+                );
             }
         }
 
         if ((formData.images || []).length > 15) {
-            validationErrors.images = "Maximum 15 images allowed";
+            validationErrors.images = t(
+                "properties.insert.validation.maxImages"
+            );
         }
 
         dispatch(setErrors(validationErrors));
@@ -572,7 +588,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
         if (Object.keys(validationErrors).length > 0) {
             setNotification({
                 open: true,
-                message: "Please correct the highlighted fields.",
+                message: t("properties.insert.notifications.correctFields"),
                 severity: "error",
             });
 
@@ -632,7 +648,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 open: true,
                 message:
                     response.data?.message ||
-                    "Property published successfully!",
+                    t("properties.insert.notifications.publishSuccess"),
                 severity: "success",
             });
 
@@ -653,7 +669,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 open: true,
                 message:
                     error.response?.data?.message ||
-                    "Failed to publish property. Please try again.",
+                    t("properties.insert.notifications.publishError"),
                 severity: "error",
             });
         } finally {
@@ -681,7 +697,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                         sx={{ mb: 1.5 }}
                     >
                         <Chip
-                            label="PROPERTY MARKETPLACE"
+                            label={t("properties.insert.badge")}
                             size="small"
                             sx={{
                                 bgcolor: "#EFF6FF",
@@ -704,7 +720,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                             mb: 1,
                         }}
                     >
-                        Publish a Property
+                        {t("properties.insert.title")}
                     </Typography>
 
                     <Typography
@@ -715,9 +731,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                             lineHeight: 1.8,
                         }}
                     >
-                        Add your property details, provide accurate
-                        contact information, and showcase your property
-                        to potential buyers and tenants.
+                        {t("properties.insert.subtitle")}
                     </Typography>
 
                     <Stack
@@ -741,7 +755,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                             variant="caption"
                             sx={{ color: "#5B6577" }}
                         >
-                            Fields marked with * are required
+                            {t("properties.insert.requiredFields")}
                         </Typography>
                     </Stack>
                 </Box>

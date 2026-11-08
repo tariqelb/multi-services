@@ -1,5 +1,7 @@
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Alert,
     Box,
@@ -11,6 +13,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+
 import {
     DeleteOutlineOutlined,
     CalendarMonthOutlined,
@@ -18,17 +21,19 @@ import {
 } from "@mui/icons-material";
 
 export default function DeleteAccount({
-    confirmation,
-    setConfirmation,
-    visible,
-    setVisible,
+    confirmation = "",
+    setConfirmation = () => {},
+    visible = false,
+    setVisible = () => {},
     onConfirm,
     onCancelDeletion,
     scheduledDeletionAt = null,
     loading = false,
     error = "",
 }) {
+    const { t } = useTranslation();
     const [cancelLoading, setCancelLoading] = useState(false);
+
     const isPending = Boolean(scheduledDeletionAt);
 
     const formattedDeletionDate = scheduledDeletionAt
@@ -68,7 +73,7 @@ export default function DeleteAccount({
             sx={{
                 borderRadius: "16px",
                 borderColor: isPending ? "#fcd34d" : "#fecaca",
-                            }}
+            }}
         >
             <CardContent sx={{ p: { xs: 3, md: 4.5 } }}>
                 <Stack
@@ -98,14 +103,20 @@ export default function DeleteAccount({
                     </Box>
 
                     <Box>
-                        <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5 }}>
-                            Delete Account
+                        <Typography
+                            variant="h6"
+                            fontWeight={700}
+                            sx={{ mb: 0.5 }}
+                        >
+                            {t("settings.deleteAccount.title")}
                         </Typography>
 
                         <Typography variant="body2" color="text.secondary">
-                            {isPending
-                                ? "Your account is scheduled for deletion."
-                                : "Schedule permanent removal of your account and associated data."}
+                            {t(
+                                isPending
+                                    ? "settings.deleteAccount.pendingSubtitle"
+                                    : "settings.deleteAccount.subtitle"
+                            )}
                         </Typography>
                     </Box>
                 </Stack>
@@ -119,16 +130,13 @@ export default function DeleteAccount({
                 {isPending ? (
                     <Stack spacing={3}>
                         <Alert severity="warning">
-                            Your account is scheduled for deletion on{" "}
-                            <strong>{formattedDeletionDate}</strong>.
-                            If you log in before this deadline, your deletion
-                            request will be cancelled automatically.
+                            {t("settings.deleteAccount.scheduledMessage", {
+                                date: formattedDeletionDate,
+                            })}
                         </Alert>
 
                         <Typography variant="body2" color="text.secondary">
-                            After the deadline, your account and associated
-                            data will be permanently deleted by the scheduled
-                            cleanup process.
+                            {t("settings.deleteAccount.permanentDeletionInfo")}
                         </Typography>
 
                         <Button
@@ -136,13 +144,18 @@ export default function DeleteAccount({
                             color="primary"
                             startIcon={
                                 cancelLoading ? (
-                                    <CircularProgress size={18} color="inherit" />
+                                    <CircularProgress
+                                        size={18}
+                                        color="inherit"
+                                    />
                                 ) : (
                                     <RestoreOutlined />
                                 )
                             }
                             onClick={handleCancelDeletion}
-                            disabled={cancelLoading || !onCancelDeletion}
+                            disabled={
+                                cancelLoading || !onCancelDeletion
+                            }
                             sx={{
                                 textTransform: "none",
                                 fontWeight: 700,
@@ -152,15 +165,15 @@ export default function DeleteAccount({
                                 alignSelf: "flex-start",
                             }}
                         >
-                            Cancel deletion request
+                            {cancelLoading
+                                ? t("settings.deleteAccount.cancelling")
+                                : t("settings.deleteAccount.cancelRequest")}
                         </Button>
                     </Stack>
                 ) : !visible ? (
                     <Stack spacing={2}>
                         <Alert severity="warning" sx={{ py: 1.5 }}>
-                            Your account will be scheduled for permanent
-                            deletion 30 days after you confirm. Logging in
-                            during this period cancels the request.
+                            {t("settings.deleteAccount.warning")}
                         </Alert>
 
                         <Button
@@ -177,24 +190,22 @@ export default function DeleteAccount({
                                 alignSelf: "flex-start",
                             }}
                         >
-                            Delete my account
+                            {t("settings.deleteAccount.deleteButton")}
                         </Button>
                     </Stack>
                 ) : (
                     <Stack spacing={3}>
                         <Alert severity="error">
-                            This action schedules the deletion of your account
-                            and associated data. You can cancel by logging in
-                            within 30 days.
+                            {t("settings.deleteAccount.confirmationWarning")}
                         </Alert>
 
                         <Typography variant="body1">
-                            To confirm your request, type{" "}
-                            <strong>DELETE</strong> below.
+                            {t("settings.deleteAccount.confirmationInstruction")}{" "}
+                            <strong>DELETE</strong>
                         </Typography>
 
                         <TextField
-                            label={'Type "DELETE" to confirm'}
+                            label={t("settings.deleteAccount.confirmationLabel")}
                             value={confirmation}
                             onChange={(event) =>
                                 setConfirmation(event.target.value)
@@ -235,8 +246,8 @@ export default function DeleteAccount({
                                 }}
                             >
                                 {loading
-                                    ? "Scheduling..."
-                                    : "Confirm deletion request"}
+                                    ? t("settings.deleteAccount.scheduling")
+                                    : t("settings.deleteAccount.confirmButton")}
                             </Button>
 
                             <Button
@@ -254,7 +265,7 @@ export default function DeleteAccount({
                                     borderRadius: "10px",
                                 }}
                             >
-                                Cancel
+                                {t("settings.deleteAccount.cancel")}
                             </Button>
                         </Stack>
                     </Stack>

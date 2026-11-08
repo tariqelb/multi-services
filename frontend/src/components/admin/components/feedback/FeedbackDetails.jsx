@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
     Box,
@@ -31,38 +32,11 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import axiosInstance from "../../../../api/axiosInstance";
 
 const STATUS_OPTIONS = [
-    { value: "open", label: "Open" },
-    { value: "in_progress", label: "In Progress" },
-    { value: "resolved", label: "Resolved" },
-    { value: "closed", label: "Closed" },
+    { value: "open", label: "open" },
+    { value: "in_progress", label: "in_progress" },
+    { value: "resolved", label: "resolved" },
+    { value: "closed", label: "closed" },
 ];
-
-const formatLabel = (value = "") =>
-    value.replaceAll("_", " ").replace(/\b\w/g, (char) =>
-        char.toUpperCase()
-    );
-
-const formatDate = (date) => {
-    if (!date) return "Date unavailable";
-
-    return new Date(date).toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-};
-
-const formatFileSize = (bytes = 0) => {
-    if (bytes < 1024) return `${bytes} B`;
-
-    if (bytes < 1024 * 1024) {
-        return `${(bytes / 1024).toFixed(1)} KB`;
-    }
-
-    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-};
 
 const statusStyles = {
     open: { bgcolor: "#dbeafe", color: "#1d4ed8" },
@@ -75,6 +49,17 @@ const priorityStyles = {
     low: { bgcolor: "#f1f5f9", color: "#475569" },
     medium: { bgcolor: "#fef3c7", color: "#92400e" },
     high: { bgcolor: "#fee2e2", color: "#b91c1c" },
+};
+
+const formatLabel = (value = "") =>
+    String(value).replaceAll("_", " ").replace(/\b\w/g, (char) =>
+        char.toUpperCase()
+    );
+
+const getLocale = (language) => {
+    if (language?.startsWith("ar")) return "ar";
+    if (language?.startsWith("fr")) return "fr-FR";
+    return "en-GB";
 };
 
 function DetailRow({ icon, label, children }) {
@@ -112,7 +97,18 @@ function AttachmentItem({
     onDownload,
     downloading,
 }) {
+    const { t } = useTranslation();
     const isImage = attachment.mimetype?.startsWith("image/");
+
+    const formatFileSize = (bytes = 0) => {
+        if (bytes < 1024) return `${bytes} B`;
+
+        if (bytes < 1024 * 1024) {
+            return `${(bytes / 1024).toFixed(1)} KB`;
+        }
+
+        return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    };
 
     return (
         <Box
@@ -204,7 +200,7 @@ function AttachmentItem({
                     },
                 }}
             >
-                Download
+                {t("adminFeedback.attachments.download")}
             </Button>
         </Box>
     );
@@ -214,6 +210,8 @@ export default function FeedbackDetails({
     feedback,
     onStatusUpdate,
 }) {
+    const { t, i18n } = useTranslation();
+
     const [downloadingId, setDownloadingId] = useState(null);
     const [downloadError, setDownloadError] = useState("");
 
@@ -223,6 +221,32 @@ export default function FeedbackDetails({
 
     const [savingStatus, setSavingStatus] = useState(false);
     const [statusError, setStatusError] = useState("");
+
+    const translateValue = (value, category) => {
+        if (!value) return "";
+
+        return t(
+            `adminFeedback.${category}.${value}`,
+            formatLabel(value)
+        );
+    };
+
+    const formatDate = (date) => {
+        if (!date) {
+            return t("adminFeedback.common.dateUnavailable");
+        }
+
+        return new Date(date).toLocaleString(
+            getLocale(i18n.language),
+            {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+            }
+        );
+    };
 
     useEffect(() => {
         setSelectedStatus(feedback?.status || "open");
@@ -272,7 +296,7 @@ export default function FeedbackDetails({
             );
 
             setDownloadError(
-                "Unable to download this attachment. Please try again."
+                t("adminFeedback.errors.downloadAttachment")
             );
         } finally {
             setDownloadingId(null);
@@ -299,13 +323,14 @@ export default function FeedbackDetails({
 
             if (!success) {
                 setStatusError(
-                    "Status update failed. Please try again."
+                    t("adminFeedback.errors.statusSaveFailed")
                 );
             }
         } catch (error) {
             console.error("Status update error:", error);
+
             setStatusError(
-                "Unable to update the feedback status."
+                t("adminFeedback.errors.updateStatus")
             );
         } finally {
             setSavingStatus(false);
@@ -324,7 +349,7 @@ export default function FeedbackDetails({
                 }}
             >
                 <Typography color="text.secondary">
-                    Select a feedback submission to view its details.
+                    {t("adminFeedback.details.selectSubmission")}
                 </Typography>
             </Card>
         );
@@ -340,7 +365,7 @@ export default function FeedbackDetails({
         ? [user.firstName, user.lastName]
             .filter(Boolean)
             .join(" ")
-        : "User information unavailable";
+        : t("adminFeedback.details.userUnavailable");
 
     const attachments = Array.isArray(feedback.attachments)
         ? feedback.attachments
@@ -384,7 +409,7 @@ export default function FeedbackDetails({
                                     lineHeight: 1.5,
                                 }}
                             >
-                                {formatLabel(feedback.type)}
+                                {translateValue(feedback.type, "types")}
                             </Typography>
 
                             <Typography
@@ -411,7 +436,12 @@ export default function FeedbackDetails({
 
                             <Chip
                                 icon={<FlagOutlinedIcon />}
-                                label={`${formatLabel(feedback.priority)} priority`}
+                                label={t("adminFeedback.details.priorityLabel", {
+                                    priority: translateValue(
+                                        feedback.priority,
+                                        "priorities"
+                                    ),
+                                })}
                                 size="small"
                                 sx={{
                                     mt: 1.5,
@@ -453,7 +483,10 @@ export default function FeedbackDetails({
                                             key={option.value}
                                             value={option.value}
                                         >
-                                            {option.label}
+                                            {translateValue(
+                                                option.value,
+                                                "statuses"
+                                            )}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -486,8 +519,8 @@ export default function FeedbackDetails({
                                 }}
                             >
                                 {savingStatus
-                                    ? "Updating..."
-                                    : "Update Status"}
+                                    ? t("adminFeedback.details.updating")
+                                    : t("adminFeedback.details.updateStatus")}
                             </Button>
                         </Stack>
                     </Stack>
@@ -512,7 +545,7 @@ export default function FeedbackDetails({
                         <SubjectOutlinedIcon color="primary" />
 
                         <Typography fontWeight={700} color="#334155">
-                            Description
+                            {t("adminFeedback.details.description")}
                         </Typography>
                     </Stack>
 
@@ -558,7 +591,9 @@ export default function FeedbackDetails({
                                     fontWeight={700}
                                     color="#334155"
                                 >
-                                    Attachments ({attachments.length})
+                                    {t("adminFeedback.attachments.title", {
+                                        count: attachments.length,
+                                    })}
                                 </Typography>
                             </Stack>
 
@@ -593,7 +628,7 @@ export default function FeedbackDetails({
 
                 {/* Submission information */}
                 <Typography fontWeight={700} color="#334155">
-                    Submission information
+                    {t("adminFeedback.details.submissionInformation")}
                 </Typography>
 
                 <Box
@@ -609,20 +644,20 @@ export default function FeedbackDetails({
                 >
                     <DetailRow
                         icon={<PersonIcon fontSize="small" />}
-                        label="Submitted by"
+                        label={t("adminFeedback.details.submittedBy")}
                     >
                         <Typography
                             variant="body2"
                             fontWeight={600}
                             sx={{ overflowWrap: "anywhere" }}
                         >
-                            {userName || "User information unavailable"}
+                            {userName}
                         </Typography>
                     </DetailRow>
 
                     <DetailRow
                         icon={<EmailOutlinedIcon fontSize="small" />}
-                        label="Email"
+                        label={t("adminFeedback.details.email")}
                     >
                         <Typography
                             variant="body2"
@@ -635,7 +670,7 @@ export default function FeedbackDetails({
 
                     <DetailRow
                         icon={<CalendarTodayOutlinedIcon fontSize="small" />}
-                        label="Created at"
+                        label={t("adminFeedback.details.createdAt")}
                     >
                         <Typography
                             variant="body2"
@@ -648,7 +683,7 @@ export default function FeedbackDetails({
 
                     <DetailRow
                         icon={<CalendarTodayOutlinedIcon fontSize="small" />}
-                        label="Last updated"
+                        label={t("adminFeedback.details.lastUpdated")}
                     >
                         <Typography
                             variant="body2"
@@ -662,7 +697,7 @@ export default function FeedbackDetails({
                     {feedback.reportedUser && (
                         <DetailRow
                             icon={<PersonIcon fontSize="small" />}
-                            label="Reported user"
+                            label={t("adminFeedback.details.reportedUser")}
                         >
                             <Typography
                                 variant="body2"
@@ -677,7 +712,7 @@ export default function FeedbackDetails({
                     {feedback.pageUrl && (
                         <DetailRow
                             icon={<LinkOutlinedIcon fontSize="small" />}
-                            label="Page URL"
+                            label={t("adminFeedback.details.pageUrl")}
                         >
                             <Typography
                                 component="a"

@@ -34,6 +34,7 @@ import VisitTracker from "./components/admin/components/VisitTracker";
 import ExternalListings from "./components/admin/externalListings/ExternalListings";
 import ExternalListingSources from "./components/admin/externalListings/ExternalListingSources";
 import Footer from "./components/Footer"
+import FindByMap from "./components/FindByMap/FindByMap";
 
 async function requireAuth() {
     try {
@@ -163,6 +164,10 @@ const router = createBrowserRouter([
             {
                 path: "/properties",
                 element: <Properties />,
+            },
+            {
+                path: "/findbymap",
+                element: <FindByMap />,
             },
             {
                 path: "/mypublication",

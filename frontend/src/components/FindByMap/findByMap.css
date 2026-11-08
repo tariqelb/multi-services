@@ -1,0 +1,118 @@
+
+.find-map-page {
+    width: 100%;
+    min-width: 0;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+}
+
+.find-map-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.find-map-count {
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #eaf1ff;
+    color: #1d4ed8;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+.find-map-filters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.property-map-wrapper {
+    position: relative;
+    width: 100%;
+    height: min(70vh, 750px);
+    min-height: 450px;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
+}
+
+.property-map-legend {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    z-index: 1;
+    padding: 8px 12px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.property-map-card {
+    width: 230px;
+    overflow: hidden;
+    color: #1f2937;
+}
+
+.property-map-card-image,
+.property-map-card-placeholder {
+    width: 100%;
+    height: 125px;
+    object-fit: cover;
+    display: block;
+    border-radius: 6px;
+}
+
+.property-map-card-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.find-map-loading,
+.find-map-message {
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .find-map-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .property-map-wrapper {
+        height: 65vh;
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 600px) {
+    .find-map-page {
+        padding: 14px;
+        gap: 15px;
+    }
+
+    .find-map-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .property-map-wrapper {
+        height: 65vh;
+        min-height: 350px;
+    }
+}

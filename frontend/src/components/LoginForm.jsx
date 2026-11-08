@@ -2,6 +2,8 @@
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import axiosInstance from "../api/axiosInstance";
@@ -21,6 +23,8 @@ function LoginForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const { t } = useTranslation();
+
     const emailRef = useRef("");
     const passwordRef = useRef(null);
 
@@ -35,6 +39,9 @@ function LoginForm() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        if (loading) return;
+
+        dispatch(clearLoginStatus());
         dispatch(loginRequest());
 
         try {
@@ -60,7 +67,7 @@ function LoginForm() {
             dispatch(
                 loginFailure(
                     error.response?.data?.message ||
-                    "Unable to log in. Please try again."
+                    t("auth.loginError")
                 )
             );
         }
@@ -73,8 +80,10 @@ function LoginForm() {
 
     return (
         <div className="mx-auto w-full min-w-0 max-w-lg rounded-2xl p-4 sm:p-6 md:p-10">
+
+            {/* Title */}
             <h2 className="mb-5 text-center text-xl font-bold text-black">
-                Login
+                {t("auth.loginTitle")}
             </h2>
 
             <form
@@ -84,11 +93,12 @@ function LoginForm() {
                 {/* Email */}
                 <input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t("auth.emailPlaceholder")}
                     autoComplete="email"
                     required
                     onChange={(event) => {
                         emailRef.current = event.target.value;
+
                         dispatch(setLoginEmail(event.target.value));
                     }}
                     className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 text-base text-black outline-none focus:border-blue-600"
@@ -99,7 +109,7 @@ function LoginForm() {
                     <input
                         ref={passwordRef}
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
+                        placeholder={t("auth.passwordPlaceholder")}
                         autoComplete="current-password"
                         required
                         onChange={(event) => {
@@ -115,8 +125,8 @@ function LoginForm() {
                         }
                         aria-label={
                             showPassword
-                                ? "Hide password"
-                                : "Show password"
+                                ? t("auth.hidePassword")
+                                : t("auth.showPassword")
                         }
                         aria-pressed={showPassword}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
@@ -129,20 +139,37 @@ function LoginForm() {
                     </button>
                 </div>
 
+                {/* Login status */}
+                {loading && (
+                    <div
+                        role="status"
+                        aria-live="polite"
+                        className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm font-medium text-blue-700"
+                    >
+                        <span className="h-5 w-5 animate-spin rounded-full border-2 border-blue-300 border-t-blue-700" />
+
+                        <span>
+                            {t("auth.loggingIn")}
+                        </span>
+                    </div>
+                )}
+
                 {/* Error */}
-                {error && (
-                    <p
+                {error && !loading && (
+                    <div
                         role="alert"
-                        className="break-words text-sm text-red-600"
+                        className="break-words rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
                     >
                         {error}
-                    </p>
+                    </div>
                 )}
 
                 {/* Logged-in user */}
                 {user && (
                     <p className="break-words text-sm text-green-700">
-                        Welcome, {user.firstName}!
+                        {t("auth.welcomeUser", {
+                            name: user.firstName,
+                        })}
                     </p>
                 )}
 
@@ -150,21 +177,28 @@ function LoginForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="h-13 w-full rounded-[10px] bg-blue-600 text-sm font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex h-13 w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 text-sm font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    {loading ? "Logging in..." : "Login"}
+                    {loading && (
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                    )}
+
+                    {loading
+                        ? t("auth.loggingIn")
+                        : t("auth.loginButton")}
                 </button>
             </form>
 
             {/* Signup */}
             <p className="mt-4 text-center text-sm text-black sm:text-base">
-                Don't have an account?{" "}
+                {t("auth.noAccount")}{" "}
+
                 <button
                     type="button"
                     onClick={handleSignup}
                     className="font-medium text-blue-600 hover:underline"
                 >
-                    Signup
+                    {t("auth.signupLink")}
                 </button>
             </p>
         </div>

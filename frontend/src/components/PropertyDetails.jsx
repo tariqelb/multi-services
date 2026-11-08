@@ -1,6 +1,8 @@
 
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Button,
@@ -14,6 +16,7 @@ import {
     Alert,
     Snackbar,
 } from "@mui/material";
+
 import {
     Bookmark,
     BookmarkAdded,
@@ -23,6 +26,7 @@ import {
     HomeWork,
     Map as MapIcon,
 } from "@mui/icons-material";
+
 import SimilarProperties from "./SimilarProperties";
 import PropertyContactOwner from "./PropertyContactOwner";
 import axiosInstance from "../api/axiosInstance";
@@ -67,7 +71,7 @@ function InfoItem({ label, value }) {
     );
 }
 
-function getStatusStyles(status) {
+function getStatusStyles(status, t) {
     const normalizedStatus = String(status || "").toLowerCase();
 
     switch (normalizedStatus) {
@@ -76,23 +80,35 @@ function getStatusStyles(status) {
             return {
                 bgcolor: "#dcfce7",
                 color: "#15803d",
-                label: status || "Available",
+                label: t("properties.details.status.available"),
             };
 
         case "pending":
             return {
                 bgcolor: "#fef9c3",
                 color: "#a16207",
-                label: status || "Pending",
+                label: t("properties.details.status.pending"),
             };
 
         case "sold":
+            return {
+                bgcolor: "#fee2e2",
+                color: "#b91c1c",
+                label: t("properties.details.status.sold"),
+            };
+
         case "rented":
+            return {
+                bgcolor: "#fee2e2",
+                color: "#b91c1c",
+                label: t("properties.details.status.rented"),
+            };
+
         case "unavailable":
             return {
                 bgcolor: "#fee2e2",
                 color: "#b91c1c",
-                label: status || "Unavailable",
+                label: t("properties.details.status.unavailable"),
             };
 
         default:
@@ -104,12 +120,48 @@ function getStatusStyles(status) {
     }
 }
 
-function formatPrice(value) {
+function formatPrice(value, language) {
     if (value === undefined || value === null || value === "") {
         return "";
     }
 
-    return Number(value).toLocaleString("en-US");
+    return Number(value).toLocaleString(language);
+}
+
+function getTranslatedPropertyValue(value, t, namespace) {
+    if (!value) return value;
+
+    const normalized = String(value)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "");
+
+    const keyMap = {
+        // Property types
+        apartment: "apartment",
+        house: "house",
+        villa: "villa",
+        studio: "studio",
+        room: "room",
+        store: "store",
+        office: "office",
+        land: "land",
+        warehouse: "warehouse",
+        commercialspace: "commercialSpace",
+        commercialstore: "commercialStore",
+        garage: "garage",
+        other: "other",
+
+        // Listing roles
+        owner: "owner",
+        realestateagent: "realEstateAgent",
+        agency: "agency",
+    };
+
+    const key = keyMap[normalized];
+
+    if (!key) return value;
+
+    return t(`${namespace}.${key}`, { defaultValue: value });
 }
 
 export default function PropertyDetails({
@@ -121,6 +173,8 @@ export default function PropertyDetails({
     onSaveProperty,
     isSaved = false,
 }) {
+    const { t, i18n } = useTranslation();
+
     const [property, setProperty] = useState(initialProperty || {});
     const [activeImage, setActiveImage] = useState(0);
     const [saved, setSaved] = useState(Boolean(isSaved));
@@ -152,7 +206,7 @@ export default function PropertyDetails({
         .map(getImageUrl)
         .filter(Boolean);
 
-    const title = property.title || "Property details";
+    const title = property.title || t("properties.details.title");
     const city = property.city || "";
     const neighborhood = property.neighborhood || "";
     const fullAddress = property.fullAddress || "";
@@ -161,12 +215,12 @@ export default function PropertyDetails({
         .filter(Boolean)
         .join(", ");
 
-    const price = formatPrice(property.price);
+    const price = formatPrice(property.price, i18n.language);
 
     const description =
         property.description ||
         property.details ||
-        "No description has been provided for this property.";
+        t("properties.details.noDescription");
 
     const googleMapLink =
         property.googleMapLink ||
@@ -174,10 +228,9 @@ export default function PropertyDetails({
         property.locationUrl;
 
     const statusInfo = property.status
-        ? getStatusStyles(property.status)
+        ? getStatusStyles(property.status, t)
         : null;
 
-    // Only display the email when the owner explicitly allows it.
     const ownerEmail =
         property.showEmail === true
             ? property.email || ""
@@ -215,8 +268,8 @@ export default function PropertyDetails({
             setFeedback({
                 open: true,
                 message: shouldSave
-                    ? "Property saved successfully!"
-                    : "Property removed from saved properties.",
+                    ? t("properties.details.feedback.saved")
+                    : t("properties.details.feedback.unsaved"),
                 severity: "success",
             });
         } catch (error) {
@@ -229,7 +282,7 @@ export default function PropertyDetails({
                 open: true,
                 message:
                     error.response?.data?.message ||
-                    "Unable to update saved property. Please try again.",
+                    t("properties.details.feedback.saveError"),
                 severity: "error",
             });
         } finally {
@@ -262,11 +315,11 @@ export default function PropertyDetails({
         >
             <Button
                 onClick={() => {
-                    if (onBack) {
-                        onBack();
-                    } else {
+                    // if (onBack) {
+                        // onBack();
+                    // } else {
                         navigate(-1);
-                    }
+                    // }
                 }}
                 startIcon={<ArrowBack />}
                 sx={{
@@ -276,7 +329,7 @@ export default function PropertyDetails({
                     fontSize: "0.95rem",
                 }}
             >
-                Back to properties
+                {t("properties.details.back")}
             </Button>
 
             {/* Image Gallery */}
@@ -317,7 +370,7 @@ export default function PropertyDetails({
                                 sx={{ fontSize: 64, color: "#94a3b8" }}
                             />
                             <Typography sx={{ color: "#94a3b8" }}>
-                                No images available
+                                {t("properties.details.noImages")}
                             </Typography>
                         </Stack>
                     )}
@@ -325,7 +378,7 @@ export default function PropertyDetails({
                     {images.length > 1 && (
                         <>
                             <IconButton
-                                aria-label="Previous image"
+                                aria-label={t("properties.details.previousImage")}
                                 onClick={() => changeImage(-1)}
                                 sx={{
                                     position: "absolute",
@@ -341,7 +394,7 @@ export default function PropertyDetails({
                             </IconButton>
 
                             <IconButton
-                                aria-label="Next image"
+                                aria-label={t("properties.details.nextImage")}
                                 onClick={() => changeImage(1)}
                                 sx={{
                                     position: "absolute",
@@ -388,7 +441,9 @@ export default function PropertyDetails({
                                 key={`${src}-${index}`}
                                 component="button"
                                 onClick={() => setActiveImage(index)}
-                                aria-label={`View image ${index + 1}`}
+                                aria-label={t("properties.details.viewImage", {
+                                    number: index + 1,
+                                })}
                                 sx={{
                                     flex: "0 0 90px",
                                     height: 68,
@@ -527,7 +582,11 @@ export default function PropertyDetails({
                             useFlexGap
                         >
                             <Chip
-                                label={property.listingType || "For Sale"}
+                                label={
+                                    property.listingType === "For Rent"
+                                        ? t("properties.card.forRent")
+                                        : t("properties.card.forSale")
+                                }
                                 size="medium"
                                 sx={{
                                     bgcolor: "#EFF6FF",
@@ -560,59 +619,68 @@ export default function PropertyDetails({
                 <Grid container spacing={2}>
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Surface (m²)"
+                            label={t("properties.details.surface")}
                             value={property.surface}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Rooms"
+                            label={t("properties.card.rooms")}
                             value={property.rooms}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Bathrooms"
+                            label={t("properties.card.bathrooms")}
                             value={property.bathrooms}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Salons"
+                            label={t("properties.card.salons")}
                             value={property.salons}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Floor"
+                            label={t("properties.details.floor")}
                             value={property.floor}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Property type"
-                            value={property.propertyType}
+                            label={t("properties.details.propertyType")}
+                            value={getTranslatedPropertyValue(
+                                property.propertyType,
+                                t,
+                                "properties.categories"
+                            )}
                         />
                     </Grid>
 
                     <Grid item xs={6} sm={4}>
                         <InfoItem
-                            label="Listing by"
-                            value={property.role}
+                            label={t("properties.details.listingBy")}
+                            value={getTranslatedPropertyValue(
+                                property.role,
+                                t,
+                                "properties.details.roles"
+                            )}
                         />
                     </Grid>
 
                     {property.syndicateFees != null && (
                         <Grid item xs={6} sm={4}>
                             <InfoItem
-                                label="Syndicate fees"
+                                label={t("properties.details.syndicateFees")}
                                 value={`${formatPrice(
-                                    property.syndicateFees
+                                    property.syndicateFees,
+                                    i18n.language
                                 )} MAD`}
                             />
                         </Grid>
@@ -652,7 +720,7 @@ export default function PropertyDetails({
                                     maxWidth: "100%",
                                 }}
                             >
-                                View location on Google Maps
+                                {t("properties.details.viewOnMaps")}
                             </Button>
                         </Box>
                     )}
@@ -702,15 +770,15 @@ export default function PropertyDetails({
                             }}
                         >
                             {saving
-                                ? "Saving..."
+                                ? t("properties.details.saving")
                                 : saved
-                                    ? "Unsave Property"
-                                    : "Save Property"}
+                                    ? t("properties.details.unsave")
+                                    : t("properties.details.save")}
                         </Button>
                     </Box>
                 </Box>
 
-                {/* Owner Email: only when the owner allows it */}
+                {/* Owner Email */}
                 {ownerEmail && (
                     <Box
                         sx={{
@@ -729,7 +797,7 @@ export default function PropertyDetails({
                                 mb: 0.5,
                             }}
                         >
-                            Contact email
+                            {t("properties.details.contactEmail")}
                         </Typography>
 
                         <Typography
@@ -769,7 +837,7 @@ export default function PropertyDetails({
                         color: "#0f172a",
                     }}
                 >
-                    Property description
+                    {t("properties.details.description")}
                 </Typography>
 
                 <Typography
@@ -797,18 +865,18 @@ export default function PropertyDetails({
                                 color: "#0f172a",
                             }}
                         >
-                            Rental Information
+                            {t("properties.details.rentalInformation")}
                         </Typography>
 
                         <Grid container spacing={2}>
                             {property.rentWithContract != null && (
                                 <Grid item xs={12} sm={6} md={4}>
                                     <InfoItem
-                                        label="Rental contract"
+                                        label={t("properties.details.rentalContract")}
                                         value={
                                             property.rentWithContract
-                                                ? "Contract available"
-                                                : "No contract"
+                                                ? t("properties.details.contractAvailable")
+                                                : t("properties.details.noContract")
                                         }
                                     />
                                 </Grid>
@@ -817,11 +885,11 @@ export default function PropertyDetails({
                             {property.mortgageAgreement != null && (
                                 <Grid item xs={12} sm={6} md={4}>
                                     <InfoItem
-                                        label="Mortgage agreement"
+                                        label={t("properties.details.mortgageAgreement")}
                                         value={
                                             property.mortgageAgreement
-                                                ? "Accepted"
-                                                : "Not accepted"
+                                                ? t("properties.details.accepted")
+                                                : t("properties.details.notAccepted")
                                         }
                                     />
                                 </Grid>
@@ -830,9 +898,10 @@ export default function PropertyDetails({
                             {property.deposit != null && (
                                 <Grid item xs={12} sm={6} md={4}>
                                     <InfoItem
-                                        label="Security deposit"
+                                        label={t("properties.details.securityDeposit")}
                                         value={`${formatPrice(
-                                            property.deposit
+                                            property.deposit,
+                                            i18n.language
                                         )} MAD`}
                                     />
                                 </Grid>
@@ -841,9 +910,10 @@ export default function PropertyDetails({
                             {property.mediatorFee != null && (
                                 <Grid item xs={12} sm={6} md={4}>
                                     <InfoItem
-                                        label="Mediator fee"
+                                        label={t("properties.details.mediatorFee")}
                                         value={`${formatPrice(
-                                            property.mediatorFee
+                                            property.mediatorFee,
+                                            i18n.language
                                         )} MAD`}
                                     />
                                 </Grid>

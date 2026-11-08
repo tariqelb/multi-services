@@ -3,6 +3,8 @@ import axiosInstance from "../api/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import {
     Menu,
     X,
@@ -10,20 +12,40 @@ import {
     Settings,
     LogOut,
     ChevronDown,
+    Languages,
+    Bell,
 } from "lucide-react";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import logo from "../assets/iconlogo.png";
 import { getProfile } from "../redux/actions/profile/profileAction";
 import NotificationMenu from "./NotificationMenu";
 import { connectSocket, disconnectSocket } from "../Socket/Socket";
+import NotificationsPage from "./NotificationPage";
 
 export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const [profileOpen, setProfileOpen] = useState(false);
+    const [languageOpen, setLanguageOpen] = useState(false);
     const [avatarError, setAvatarError] = useState(false);
+    const [languageSaving, setLanguageSaving] = useState(false);
 
     const profileRef = useRef(null);
+    const languageRef = useRef(null);
+    const languageManuallyChanged = useRef(false);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const { t, i18n } = useTranslation();
+
+    const currentLanguage = i18n.resolvedLanguage || "en";
+
+    const languages = [
+        { code: "en", label: "English" },
+        { code: "fr", label: "Français" },
+        { code: "ar", label: "العربية" },
+    ];
+
+    // Get authenticated user and profile from Redux.
     const user = useSelector(
         (state) => state.auth?.user ?? state.loginForm?.user ?? null
     );
@@ -38,6 +60,75 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             dispatch(getProfile());
         }
     }, [isAuthenticated, dispatch]);
+
+    // Apply the language saved in the user's profile.
+    // Apply the saved language when the profile is loaded or updated.
+    // Apply the saved language when the profile is loaded.
+    useEffect(() => {
+        if (!isAuthenticated || languageManuallyChanged.current) return;
+
+        const savedLanguage =
+            profile?.language ||
+            profile?.user?.language;
+
+        if (
+            savedLanguage &&
+            ["en", "fr", "ar"].includes(savedLanguage) &&
+            savedLanguage !== (i18n.resolvedLanguage || "en")
+        ) {
+            i18n.changeLanguage(savedLanguage);
+        }
+    }, [
+        isAuthenticated,
+        profile?.language,
+        profile?.user?.language,
+        i18n,
+    ]);
+
+    // Save language preference and update the interface.
+    const handleLanguageChange = async (language) => {
+        if (languageSaving || language === currentLanguage) {
+            setLanguageOpen(false);
+            return;
+        }
+
+        setLanguageSaving(true);
+
+        try {
+            // Change the interface immediately.
+            await i18n.changeLanguage(language);
+
+            // Prevent the old Redux profile language from overriding it.
+            languageManuallyChanged.current = true;
+
+            if (isAuthenticated) {
+                await axiosInstance.patch("/profile/me/language", {
+                    language,
+                });
+            }
+
+            setLanguageOpen(false);
+        } catch (error) {
+            console.error(
+                "Language preference update failed:",
+                error.response?.data?.message || error.message
+            );
+
+            // Restore the previous language if saving failed.
+            languageManuallyChanged.current = false;
+
+            if (isAuthenticated) {
+                const savedLanguage =
+                    profile?.language ||
+                    profile?.user?.language ||
+                    "en";
+
+                await i18n.changeLanguage(savedLanguage);
+            }
+        } finally {
+            setLanguageSaving(false);
+        }
+    };
 
     // Connect or disconnect the user's socket.
     useEffect(() => {
@@ -59,7 +150,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         [firstName, lastName].filter(Boolean).join(" ") ||
         user?.name ||
         user?.email ||
-        "User";
+        t("topbar.user");
 
     const initials =
         [firstName, lastName]
@@ -70,7 +161,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         displayName.charAt(0).toUpperCase();
 
     const email = profile?.email || user?.email || "";
-    const role = user?.role || profile?.role || "Member";
+    const role = user?.role || profile?.role || t("topbar.member");
 
     const avatar =
         profile?.profileImage ||
@@ -126,7 +217,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         setAvatarError(false);
     }, [avatarUrl]);
 
-    // Close profile menu when clicking outside or pressing Escape.
+    // Close menus when clicking outside or pressing Escape.
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -135,11 +226,19 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             ) {
                 setProfileOpen(false);
             }
+
+            if (
+                languageRef.current &&
+                !languageRef.current.contains(event.target)
+            ) {
+                setLanguageOpen(false);
+            }
         };
 
         const handleEscape = (event) => {
             if (event.key === "Escape") {
                 setProfileOpen(false);
+                setLanguageOpen(false);
             }
         };
 
@@ -170,12 +269,27 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     };
 
     const menuItems = [
-        { label: "My Profile", path: "/profile", icon: UserRound },
-        { label: "Settings", path: "/setting", icon: Settings },
+        {
+            label: t("topbar.myProfile"),
+            path: "/profile",
+            icon: UserRound,
+        },
+        
+        {
+            label: t("topbar.notification"),
+            path: "/notificationpage",
+            icon: Bell,
+        },
+        {
+            label: t("topbar.settings"),
+            path: "/setting",
+            icon: Settings,
+        },
     ];
 
     return (
         <header className="sticky top-0 z-[60] flex h-16 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2 sm:px-4 md:px-6">
+
             {/* Brand and mobile sidebar button */}
             <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
                 <button
@@ -209,10 +323,79 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                 </Link>
             </div>
 
-            {/* Notifications and user profile */}
+            {/* Language, notifications and user profile */}
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-3 md:gap-4">
+
+                {/* Language selector */}
+                <div
+                    ref={languageRef}
+                    className="relative"
+                >
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setProfileOpen(false);
+                            setLanguageOpen((open) => !open);
+                        }}
+                        aria-label="Change language"
+                        aria-expanded={languageOpen}
+                        aria-haspopup="menu"
+                        className="flex items-center gap-1.5 rounded-[10px] px-2 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 sm:gap-2"
+                    >
+                        <Languages size={19} />
+
+                        <span className="uppercase">
+                            {currentLanguage}
+                        </span>
+
+                        <ChevronDown
+                            size={14}
+                            className={`transition-transform ${
+                                languageOpen ? "rotate-180" : ""
+                            }`}
+                        />
+                    </button>
+
+                    {languageOpen && (
+                        <div
+                            role="menu"
+                            aria-label="Select language"
+                            className="absolute right-0 z-[70] mt-2 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
+                        >
+                            {languages.map((language) => (
+                                <button
+                                    key={language.code}
+                                    type="button"
+                                    role="menuitemradio"
+                                    aria-checked={
+                                        currentLanguage === language.code
+                                    }
+                                    disabled={languageSaving}
+                                    onClick={() =>
+                                        handleLanguageChange(language.code)
+                                    }
+                                    className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 disabled:cursor-wait disabled:opacity-50 ${
+                                        currentLanguage === language.code
+                                            ? "bg-blue-50 font-semibold text-blue-700"
+                                            : "text-gray-700"
+                                    }`}
+                                >
+                                    <span>{language.label}</span>
+
+                                    {currentLanguage === language.code && (
+                                        <span className="text-blue-600">
+                                            ✓
+                                        </span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
                 {isAuthenticated && <NotificationMenu />}
 
+                {/* User profile */}
                 <div
                     ref={profileRef}
                     className="relative border-l border-gray-200 pl-2 sm:pl-3 md:pl-4"
@@ -221,6 +404,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                         type="button"
                         onClick={() => {
                             setSidebarOpen(false);
+                            setLanguageOpen(false);
                             setProfileOpen((open) => !open);
                         }}
                         aria-expanded={profileOpen}
@@ -306,7 +490,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                     className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50"
                                 >
                                     <LogOut size={18} />
-                                    Logout
+                                    {t("topbar.logout")}
                                 </button>
                             </div>
                         </div>

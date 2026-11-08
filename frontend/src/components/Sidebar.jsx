@@ -26,6 +26,7 @@ import AddLinkIcon from "@mui/icons-material/AddLink";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 export default function Sidebar({
     sidebarOpen,
@@ -36,6 +37,8 @@ export default function Sidebar({
     const navigate = useNavigate();
     const location = useLocation();
     const sidebarRef = useRef(null);
+
+    const { t } = useTranslation();
 
     // Get the user's role from Redux.
     const role = useSelector((state) => state.profile?.role);
@@ -73,50 +76,71 @@ export default function Sidebar({
     }, [sidebarOpen, setSidebarOpen]);
 
     const navigationItems = [
-        { name: "Home", icon: HomeIcon, path: "/" },
-        { name: "Properties", icon: HomeWorkIcon, path: "/properties" },
         {
-            name: "External listing",
+            name: t("sidebar.home"),
+            icon: HomeIcon,
+            path: "/",
+        },
+        {
+            name: t("sidebar.properties"),
+            icon: HomeWorkIcon,
+            path: "/properties",
+        },
+        {
+            name: t("sidebar.externalListing"),
             icon: PublicIcon,
             path: "/externalListings",
         },
         {
-            name: "Publish",
+            name: t("sidebar.findbymap"),
+            icon: PublicIcon,
+            path: "/findbymap",
+        },
+        {
+            name: t("sidebar.publish"),
             icon: CloudUploadIcon,
             path: "/properties/publish",
         },
         {
-            name: "My Publication",
+            name: t("sidebar.myPublication"),
             icon: LibraryBooksIcon,
             path: "/mypublication",
         },
-        { name: "Saved", icon: BookmarkIcon, path: "/saved" },
         {
-            name: "Alert",
+            name: t("sidebar.saved"),
+            icon: BookmarkIcon,
+            path: "/saved",
+        },
+        {
+            name: t("sidebar.alert"),
             icon: NotificationsActiveIcon,
             path: "/alert",
         },
+        // {
+        //     name: t("sidebar.notifications"),
+        //     icon: NotificationsIcon,
+        //     path: "/notificationpage",
+        // },
         {
-            name: "Notifications",
-            icon: NotificationsIcon,
-            path: "/notificationpage",
-        },
-        {
-            name: "Feedback",
+            name: t("sidebar.feedback"),
             icon: RateReviewOutlinedIcon,
             path: "/feedback",
         },
-        { name: "Settings", icon: SettingsIcon, path: "/setting" },
+        {
+            name: t("sidebar.settings"),
+            icon: SettingsIcon,
+            path: "/setting",
+        },
 
         ...(isAdmin
             ? [
                   {
-                      name: "Statistic",
+                      name: t("sidebar.statistics"),
                       icon: DashboardOutlinedIcon,
                       path: "/dashboard",
                   },
                   {
-                      name: "Add External listing",
+                      name: t("sidebar.addExternalListing"),
                       icon: AddLinkIcon,
                       path: "/addexternalListings",
                   },
@@ -153,8 +177,8 @@ export default function Sidebar({
                 ref={sidebarRef}
                 component="aside"
                 sx={{
-                    width: "260px",
-                    minWidth: "260px",
+                    width: "290px",
+                    minWidth: "290px",
                     maxWidth: "85vw",
                     flex: "0 0 260px",
                     flexShrink: 0,
@@ -221,7 +245,7 @@ export default function Sidebar({
                         minHeight: 0,
                     }}
                 >
-                    <List sx={{ px: 2 }}>
+                    <List sx={{ px: 2 , py: 0}}>
                         {navigationItems.map((item) => {
                             const Icon = item.icon;
 
@@ -234,7 +258,7 @@ export default function Sidebar({
 
                             return (
                                 <ListItem
-                                    key={item.name}
+                                    key={item.path}
                                     disablePadding
                                     sx={{ mb: 1 }}
                                 >
@@ -267,7 +291,7 @@ export default function Sidebar({
                                         <ListItemText
                                             primary={item.name}
                                             primaryTypographyProps={{
-                                                fontSize: "0.95rem",
+                                                fontSize: "0.25rem",
                                                 fontWeight: isActive
                                                     ? 600
                                                     : 400,
@@ -316,10 +340,10 @@ export default function Sidebar({
                             variant="caption"
                             sx={{
                                 color: "#C9D6EA",
-                                fontWeight: 500,
+                                fontWeight: 300,
                             }}
                         >
-                            All systems online
+                            {t("sidebar.systemsOnline")}
                         </Typography>
                     </Box>
                 </Box>

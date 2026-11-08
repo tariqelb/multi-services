@@ -1,5 +1,6 @@
-
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Alert,
     Box,
@@ -10,6 +11,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+
 import { LockOutlined } from "@mui/icons-material";
 
 export default function ChangePassword({
@@ -20,6 +22,8 @@ export default function ChangePassword({
     loading,
     onSubmit,
 }) {
+    const { t } = useTranslation();
+
     const handleChange = (event) => {
         const { name, value } = event.target;
 
@@ -73,7 +77,7 @@ export default function ChangePassword({
             variant="outlined"
             sx={{
                 borderRadius: "16px",
-                            }}
+            }}
         >
             <CardContent sx={{ p: { xs: 3, md: 4.5 } }}>
                 <Stack
@@ -104,11 +108,11 @@ export default function ChangePassword({
                             fontWeight={700}
                             sx={{ mb: 0.5 }}
                         >
-                            Change Password
+                            {t("settings.password.sectionTitle")}
                         </Typography>
 
                         <Typography variant="body2" color="text.secondary">
-                            Use a strong, unique password to protect your account.
+                            {t("settings.password.sectionSubtitle")}
                         </Typography>
                     </Box>
                 </Stack>
@@ -116,7 +120,7 @@ export default function ChangePassword({
                 <form onSubmit={handleSubmit}>
                     <Stack spacing={2.5}>
                         <TextField
-                            label="Current password"
+                            label={t("settings.password.currentPassword")}
                             name="currentPassword"
                             type="password"
                             value={passwords.currentPassword}
@@ -127,7 +131,7 @@ export default function ChangePassword({
                         />
 
                         <TextField
-                            label="New password"
+                            label={t("settings.password.newPassword")}
                             name="newPassword"
                             type="password"
                             value={passwords.newPassword}
@@ -138,15 +142,15 @@ export default function ChangePassword({
                             error={newPasswordError || samePasswordError}
                             helperText={
                                 newPasswordError
-                                    ? "Password must be at least 8 characters long."
+                                    ? t("settings.password.minimumLength")
                                     : samePasswordError
-                                      ? "New password must differ from the current password."
-                                      : "Use at least 8 characters."
+                                      ? t("settings.password.sameAsCurrent")
+                                      : t("settings.password.minimumHint")
                             }
                         />
 
                         <TextField
-                            label="Confirm new password"
+                            label={t("settings.password.confirmPassword")}
                             name="confirmPassword"
                             type="password"
                             value={passwords.confirmPassword}
@@ -157,7 +161,7 @@ export default function ChangePassword({
                             error={confirmPasswordError}
                             helperText={
                                 confirmPasswordError
-                                    ? "Passwords do not match."
+                                    ? t("settings.password.mismatch")
                                     : ""
                             }
                         />
@@ -189,7 +193,9 @@ export default function ChangePassword({
                             borderRadius: "10px",
                         }}
                     >
-                        {loading ? "Updating..." : "Update password"}
+                        {loading
+                            ? t("settings.password.updating")
+                            : t("settings.password.updateButton")}
                     </Button>
                 </form>
             </CardContent>

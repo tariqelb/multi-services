@@ -1,5 +1,7 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
     Box,
     Container,
@@ -24,24 +26,24 @@ import {
 import logo from "../assets/iconlogo.png";
 
 const services = [
-    { label: "Real Estate", icon: <HomeRounded />, path: "/properties" },
-    { label: "Cars", icon: <DirectionsCarRounded />, path: "/cars" },
-    { label: "Services", icon: <HandymanRounded />, path: "/services" },
-    { label: "Delivery & Transport", icon: <LocalShippingRounded />, path: "/transport" },
+    { label: "realEstate", icon: <HomeRounded />, path: "/properties" },
+    { label: "cars", icon: <DirectionsCarRounded />, path: "/cars" },
+    { label: "services", icon: <HandymanRounded />, path: "/services" },
+    { label: "deliveryTransport", icon: <LocalShippingRounded />, path: "/transport" },
 ];
 
 const quickLinks = [
-    { label: "Dashboard", path: "/" },
-    { label: "Browse Properties", path: "/properties" },
-    { label: "Saved Properties", path: "/saved" },
-    { label: "My Publications", path: "/mypublication" },
-    { label: "Publish an Ad", path: "/properties/publish" },
+    { label: "dashboard", path: "/" },
+    { label: "browseProperties", path: "/properties" },
+    { label: "savedProperties", path: "/saved" },
+    { label: "myPublications", path: "/mypublication" },
+    { label: "publishAd", path: "/properties/publish" },
 ];
 
 const supportLinks = [
-    { label: "My Profile", path: "/profile" },
-    { label: "Settings", path: "/setting" },
-    { label: "Send Feedback", path: "/feedback" },
+    { label: "myProfile", path: "/profile" },
+    { label: "settings", path: "/setting" },
+    { label: "sendFeedback", path: "/feedback" },
 ];
 
 const socialLinks = [
@@ -89,23 +91,24 @@ function FooterLink({ to, children }) {
 }
 
 export default function Footer() {
-    return (
-<Box
-    component="footer"
-    sx={{
-        width: "100%",
-        mt: "auto",
-        position: "relative",
-        overflow: "hidden",
-        bgcolor: "#ffffff",
-        borderTop: "1px solid #E2E8F0",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
+    const { t } = useTranslation();
 
-        color: "text.primary",
-    }}
->
+    return (
+        <Box
+            component="footer"
+            sx={{
+                width: "100%",
+                mt: "auto",
+                position: "relative",
+                overflow: "hidden",
+                bgcolor: "#ffffff",
+                borderTop: "1px solid #E2E8F0",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                color: "text.primary",
+            }}
+        >
             <Container
                 maxWidth={false}
                 sx={{
@@ -179,9 +182,7 @@ export default function Footer() {
                                 lineHeight: 1.8,
                             }}
                         >
-                            One platform, endless possibilities. Discover properties,
-                            vehicles, professional services, and everyday solutions
-                            all in one place.
+                            {t("footer.description")}
                         </Typography>
 
                         {/* Social media */}
@@ -193,7 +194,9 @@ export default function Footer() {
                                     href={social.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label={`Visit our ${social.label} profile`}
+                                    aria-label={t("footer.socialProfile", {
+                                        platform: social.label,
+                                    })}
                                     title={social.label}
                                     sx={{
                                         width: 40,
@@ -222,11 +225,13 @@ export default function Footer() {
 
                     {/* Explore */}
                     <Box>
-                        <Typography sx={sectionTitle}>Explore</Typography>
+                        <Typography sx={sectionTitle}>
+                            {t("footer.explore")}
+                        </Typography>
                         <Stack spacing={1.5}>
                             {quickLinks.map((item) => (
                                 <FooterLink key={item.path} to={item.path}>
-                                    {item.label}
+                                    {t(`footer.links.${item.label}`)}
                                 </FooterLink>
                             ))}
                         </Stack>
@@ -234,7 +239,9 @@ export default function Footer() {
 
                     {/* Services */}
                     <Box>
-                        <Typography sx={sectionTitle}>Our Services</Typography>
+                        <Typography sx={sectionTitle}>
+                            {t("footer.ourServices")}
+                        </Typography>
                         <Stack spacing={1.5}>
                             {services.map((item) => (
                                 <Stack
@@ -253,7 +260,7 @@ export default function Footer() {
                                         {item.icon}
                                     </Box>
                                     <FooterLink to={item.path}>
-                                        {item.label}
+                                        {t(`footer.services.${item.label}`)}
                                     </FooterLink>
                                 </Stack>
                             ))}
@@ -263,13 +270,13 @@ export default function Footer() {
                     {/* Support */}
                     <Box>
                         <Typography sx={sectionTitle}>
-                            Account & Support
+                            {t("footer.accountSupport")}
                         </Typography>
 
                         <Stack spacing={1.5}>
                             {supportLinks.map((item) => (
                                 <FooterLink key={item.path} to={item.path}>
-                                    {item.label}
+                                    {t(`footer.links.${item.label}`)}
                                 </FooterLink>
                             ))}
                         </Stack>
@@ -309,7 +316,7 @@ export default function Footer() {
                             >
                                 <LocationOnOutlined sx={contactIcon} />
                                 <Typography sx={contactText}>
-                                    Morocco
+                                    {t("footer.location")}
                                 </Typography>
                             </Stack>
                         </Stack>
@@ -326,15 +333,15 @@ export default function Footer() {
                     spacing={2}
                 >
                     <Typography sx={bottomText}>
-                        © {new Date().getFullYear()} MultiService. All rights reserved.
+                        © {new Date().getFullYear()} MultiService. {t("footer.rightsReserved")}
                     </Typography>
 
                     <Typography sx={bottomText}>
-                        Built to make everyday life easier.
+                        {t("footer.motto")}
                     </Typography>
 
                     <Typography sx={bottomText}>
-                        Made with care ♥
+                        {t("footer.madeWithCare")}
                     </Typography>
                 </Stack>
             </Container>

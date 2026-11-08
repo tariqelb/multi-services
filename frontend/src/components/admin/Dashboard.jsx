@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box } from "@mui/material";
 
 import PageLayout from "./components/PageLayout";
@@ -10,15 +10,17 @@ import ExternalClicksSection from "./externalListings/ExternalClicksSection";
 import PropertyClicksSection from "./components/PropertyClicks/PropertyClicksSection";
 import PublicationsReviewSection from "./components/PublicationReviews/PublicationsReviewSection";
 import FeedbackSection from "./components/feedback/FeedbackSection";
-
+import PropertyDemandSection from "./components/PropertyDemand/PropertyDemandSection";
+import ClientContactActionsSection from "../ClientContactActions/ClientContactActionsSection";
 
 export default function Dashboard() {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState("users");
 
     return (
         <PageLayout
-            title="Admin Dashboard"
-            subtitle="Monitor users and activity across your marketplace."
+            title={t("adminDashboard.title")}
+            subtitle={t("adminDashboard.subtitle")}
         >
             <DashboardNavigation
                 activeTab={activeTab}
@@ -42,7 +44,15 @@ export default function Dashboard() {
 
                 {activeTab === "visits" && <VisitsSection />}
 
+                {activeTab === "property demand" && (
+                    <PropertyDemandSection />
+                )}
+
                 {activeTab === "feedback" && <FeedbackSection />}
+
+                {activeTab === "client call action" && (
+                    <ClientContactActionsSection />
+                )}
             </Box>
         </PageLayout>
     );

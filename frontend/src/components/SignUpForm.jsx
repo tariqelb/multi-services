@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 import axiosInstance from "../api/axiosInstance";
 import { activeFormAction } from "../redux/actions/activeFormAction";
@@ -17,10 +18,12 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function SignUpForm() {
     const dispatch = useDispatch();
+    const { t } = useTranslation();
 
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [validation, setValidation] = useState({});
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -40,26 +43,23 @@ function SignUpForm() {
         const errors = {};
 
         if (firstName.trim().length < 2) {
-            errors.firstName =
-                "First name must contain at least 2 characters.";
+            errors.firstName = t("auth.validation.firstName");
         }
 
         if (lastName.trim().length < 2) {
-            errors.lastName =
-                "Last name must contain at least 2 characters.";
+            errors.lastName = t("auth.validation.lastName");
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-            errors.email = "Please enter a valid email address.";
+            errors.email = t("auth.validation.email");
         }
 
         if (password.length < 8) {
-            errors.password =
-                "Password must contain at least 8 characters.";
+            errors.password = t("auth.validation.password");
         }
 
         if (password !== confirmPassword) {
-            errors.confirmPassword = "Passwords do not match.";
+            errors.confirmPassword = t("auth.validation.confirmPassword");
         }
 
         setValidation(errors);
@@ -69,6 +69,8 @@ function SignUpForm() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (loading) return;
 
         setError("");
 
@@ -97,7 +99,7 @@ function SignUpForm() {
 
             setError(
                 error.response?.data?.message ||
-                "Unable to start registration. Please try again."
+                t("auth.signupError")
             );
         } finally {
             setLoading(false);
@@ -119,7 +121,7 @@ function SignUpForm() {
 
             {/* Title */}
             <h2 className="mb-5 text-center text-2xl font-bold text-black">
-                Signup
+                {t("auth.signupTitle")}
             </h2>
 
             <form
@@ -131,7 +133,7 @@ function SignUpForm() {
                 <div className="flex min-w-0 flex-col gap-1">
                     <input
                         type="text"
-                        placeholder="Enter your first name"
+                        placeholder={t("auth.firstNamePlaceholder")}
                         value={firstName}
                         required
                         minLength={2}
@@ -158,7 +160,7 @@ function SignUpForm() {
                 <div className="flex min-w-0 flex-col gap-1">
                     <input
                         type="text"
-                        placeholder="Enter your last name"
+                        placeholder={t("auth.lastNamePlaceholder")}
                         value={lastName}
                         required
                         minLength={2}
@@ -185,7 +187,7 @@ function SignUpForm() {
                 <div className="flex min-w-0 flex-col gap-1">
                     <input
                         type="email"
-                        placeholder="Enter your email"
+                        placeholder={t("auth.emailPlaceholder")}
                         value={email}
                         required
                         autoComplete="email"
@@ -212,7 +214,7 @@ function SignUpForm() {
                     <div className="relative w-full">
                         <input
                             type={showPassword ? "text" : "password"}
-                            placeholder="Create a password"
+                            placeholder={t("auth.createPasswordPlaceholder")}
                             value={password}
                             required
                             minLength={8}
@@ -238,8 +240,8 @@ function SignUpForm() {
                             }
                             aria-label={
                                 showPassword
-                                    ? "Hide password"
-                                    : "Show password"
+                                    ? t("auth.hidePassword")
+                                    : t("auth.showPassword")
                             }
                             aria-pressed={showPassword}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
@@ -266,7 +268,7 @@ function SignUpForm() {
                                     ? "text"
                                     : "password"
                             }
-                            placeholder="Confirm your password"
+                            placeholder={t("auth.confirmPasswordPlaceholder")}
                             value={confirmPassword}
                             required
                             autoComplete="new-password"
@@ -294,8 +296,8 @@ function SignUpForm() {
                             }
                             aria-label={
                                 showConfirmPassword
-                                    ? "Hide confirm password"
-                                    : "Show confirm password"
+                                    ? t("auth.hideConfirmPassword")
+                                    : t("auth.showConfirmPassword")
                             }
                             aria-pressed={showConfirmPassword}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
@@ -317,7 +319,7 @@ function SignUpForm() {
                 {error && (
                     <p
                         role="alert"
-                        className="break-words text-sm text-red-600"
+                        className="break-words rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
                     >
                         {error}
                     </p>
@@ -327,23 +329,28 @@ function SignUpForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="h-13 w-full rounded-[10px] bg-blue-600 text-base font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex h-13 w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 text-base font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
+                    {loading && (
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                    )}
+
                     {loading
-                        ? "Sending verification code..."
-                        : "Continue"}
+                        ? t("auth.sendingVerification")
+                        : t("auth.continue")}
                 </button>
             </form>
 
             {/* Login link */}
             <p className="mt-4 text-center text-base text-black">
-                Already have an account?{" "}
+                {t("auth.alreadyAccount")}{" "}
+
                 <button
                     type="button"
                     onClick={handleLogin}
                     className="text-blue-600 hover:underline"
                 >
-                    Login
+                    {t("auth.loginLink")}
                 </button>
             </p>
         </div>

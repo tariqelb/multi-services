@@ -28,6 +28,14 @@ const userSchema = new mongoose.Schema(
             trim: true,
             required: true,
         },
+        language: {
+            type: String,
+            enum: ["en", "fr", "ar"],
+            default: "en",
+            lowercase: true,
+            trim: true,
+            required: true,
+        },
         emailVerified: {
             type: Boolean,
             default: false,

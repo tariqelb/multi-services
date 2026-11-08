@@ -1,4 +1,6 @@
+
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import {
     Typography,
@@ -20,14 +22,16 @@ export default function PropertyInsertFormOwnerInfo({
     SectionHeader,
     errors = {},
 }) {
+    const { t } = useTranslation();
+
     const whatsappNumber = formData.whatsappPhoneNumber || "";
 
     return (
         <SectionPaper>
             <SectionHeader
                 icon="👤"
-                title="Owner Information"
-                subtitle="Who is listing this property?"
+                title={t("properties.insert.ownerInfo.title")}
+                subtitle={t("properties.insert.ownerInfo.subtitle")}
                 number={1}
             />
 
@@ -39,14 +43,14 @@ export default function PropertyInsertFormOwnerInfo({
                     mb: 1.5,
                 }}
             >
-                Your role regarding this property *
+                {t("properties.insert.ownerInfo.roleLabel")}
             </Typography>
 
             <ToggleButtonGroup
                 value={formData.role || "Owner"}
                 exclusive
                 onChange={handleRoleChange}
-                aria-label="property role"
+                aria-label={t("properties.insert.ownerInfo.roleLabel")}
                 fullWidth
                 sx={{
                     display: "flex",
@@ -76,15 +80,15 @@ export default function PropertyInsertFormOwnerInfo({
                 }}
             >
                 <ToggleButton value="Owner">
-                    Property Owner
+                    {t("properties.insert.ownerInfo.roles.owner")}
                 </ToggleButton>
 
                 <ToggleButton value="Real Estate Agent">
-                    Real Estate Agent
+                    {t("properties.insert.ownerInfo.roles.agent")}
                 </ToggleButton>
 
                 <ToggleButton value="Agency">
-                    Real Estate Agency
+                    {t("properties.insert.ownerInfo.roles.agency")}
                 </ToggleButton>
             </ToggleButtonGroup>
 
@@ -94,7 +98,7 @@ export default function PropertyInsertFormOwnerInfo({
                         fullWidth
                         size="medium"
                         sx={fieldSx}
-                        label="First Name"
+                        label={t("properties.insert.ownerInfo.firstName")}
                         value={formData.firstName || ""}
                         slotProps={{
                             input: { readOnly: true },
@@ -107,7 +111,7 @@ export default function PropertyInsertFormOwnerInfo({
                         fullWidth
                         size="medium"
                         sx={fieldSx}
-                        label="Last Name"
+                        label={t("properties.insert.ownerInfo.lastName")}
                         value={formData.lastName || ""}
                         slotProps={{
                             input: { readOnly: true },
@@ -121,7 +125,7 @@ export default function PropertyInsertFormOwnerInfo({
                         size="medium"
                         sx={fieldSx}
                         type="email"
-                        label="Email Address"
+                        label={t("properties.insert.ownerInfo.email")}
                         value={formData.email || ""}
                         slotProps={{
                             input: { readOnly: true },
@@ -143,7 +147,7 @@ export default function PropertyInsertFormOwnerInfo({
                                     variant="body2"
                                     sx={{ color: "#475467" }}
                                 >
-                                    Display my email publicly
+                                    {t("properties.insert.ownerInfo.showEmail")}
                                 </Typography>
                             }
                         />
@@ -155,9 +159,9 @@ export default function PropertyInsertFormOwnerInfo({
                         fullWidth
                         size="medium"
                         sx={fieldSx}
-                        label="WhatsApp Number"
+                        label={t("properties.insert.ownerInfo.whatsapp")}
                         value={whatsappNumber}
-                        placeholder="No verified WhatsApp number found"
+                        placeholder={t("properties.insert.ownerInfo.noWhatsapp")}
                         slotProps={{
                             input: { readOnly: true },
                         }}
@@ -174,8 +178,8 @@ export default function PropertyInsertFormOwnerInfo({
                         }}
                     >
                         {whatsappNumber
-                            ? "Your WhatsApp number will be used as the property contact."
-                            : "No WhatsApp number found. Please update your WhatsApp information in your profile."}
+                            ? t("properties.insert.ownerInfo.whatsappVerified")
+                            : t("properties.insert.ownerInfo.whatsappMissing")}
                     </Typography>
                 </Grid>
             </Grid>

@@ -1,7 +1,7 @@
 // /home/tariq/multi-services/app/frontend/src/components/admin/externalListings/ExternalClicksSection.jsx
 // /home/tariq/multi-services/app/frontend/src/components/admin/Dashboard.jsx
-
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
     Alert,
@@ -20,16 +20,23 @@ import ExternalListingClickCard from "./ExternalListingClickCard";
 
 import { formatNumber } from "./externalClicksUtils";
 
-// This must match the path where the analytics router is mounted.
 const API_URL = "/external-listings/analytics";
-
 const ITEMS_PER_PAGE = 6;
 
 const ExternalClicksSection = () => {
+    const { t, i18n } = useTranslation();
+
     const [data, setData] = useState(null);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const locale =
+        i18n.language?.startsWith("ar")
+            ? "ar"
+            : i18n.language?.startsWith("fr")
+              ? "fr-FR"
+              : "en-US";
 
     const fetchAnalytics = useCallback(async () => {
         try {
@@ -37,24 +44,21 @@ const ExternalClicksSection = () => {
             setError("");
 
             const response = await axiosInstance.get(API_URL, {
-                params: {
-                    page,
-                },
+                params: { page },
             });
 
-            console.log("response : ", response.data)
             setData(response.data);
         } catch (err) {
             console.error("External click analytics error:", err);
 
             setError(
                 err.response?.data?.message ||
-                "Unable to load external click analytics."
+                    t("adminExternalClicks.errors.load")
             );
         } finally {
             setLoading(false);
         }
-    }, [page]);
+    }, [page, t]);
 
     useEffect(() => {
         fetchAnalytics();
@@ -68,7 +72,6 @@ const ExternalClicksSection = () => {
     };
 
     const charts = data?.charts || {};
-
     const listings = data?.listings || [];
 
     const pagination = data?.pagination || {
@@ -106,10 +109,9 @@ const ExternalClicksSection = () => {
                 pb: 4,
             }}
         >
-            {/* Header */}
             <Box mb={1}>
                 <Typography variant="h5" fontWeight={700}>
-                    External Listings Click Analytics
+                    {t("adminExternalClicks.title")}
                 </Typography>
 
                 <Typography
@@ -117,59 +119,55 @@ const ExternalClicksSection = () => {
                     color="text.secondary"
                     mt={0.5}
                 >
-                    Track engagement with external listings published
-                    on your platform.
+                    {t("adminExternalClicks.subtitle")}
                 </Typography>
             </Box>
 
-            {/* Error */}
-            {error && (
-                <Alert severity="error">
-                    {error}
-                </Alert>
-            )}
+            {error && <Alert severity="error">{error}</Alert>}
 
-            {/* Summary */}
             <Grid container spacing={2.5}>
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <SummaryCard
-                        title="Total Clicks"
+                        title={t("adminExternalClicks.summary.totalClicks")}
                         value={summary.totalClicks}
                         icon="↗"
+                        locale={locale}
                     />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <SummaryCard
-                        title="Tracked Listings"
+                        title={t("adminExternalClicks.summary.trackedListings")}
                         value={summary.totalListings}
                         icon="⌂"
+                        locale={locale}
                     />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <SummaryCard
-                        title="Websites"
+                        title={t("adminExternalClicks.summary.websites")}
                         value={summary.totalWebsites}
                         icon="🌐"
+                        locale={locale}
                     />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <SummaryCard
-                        title="Cities"
+                        title={t("adminExternalClicks.summary.cities")}
                         value={summary.totalCities}
                         icon="📍"
                         color="#2563EB"
+                        locale={locale}
                     />
                 </Grid>
             </Grid>
 
-            {/* Charts */}
             <Box mt={2}>
                 <Box mb={3}>
                     <Typography variant="h6" fontWeight={700}>
-                        Click Statistics
+                        {t("adminExternalClicks.charts.title")}
                     </Typography>
 
                     <Typography
@@ -177,43 +175,41 @@ const ExternalClicksSection = () => {
                         color="text.secondary"
                         mt={0.5}
                     >
-                        Understand which property categories,
-                        websites, and locations attract the most attention.
+                        {t("adminExternalClicks.charts.subtitle")}
                     </Typography>
                 </Box>
 
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, lg: 6 }}>
                         <AnalyticsChart
-                            title="Clicks by Property Type"
-                            description="Clicks grouped by property category."
+                            title={t("adminExternalClicks.charts.propertyTypes")}
+                            description={t("adminExternalClicks.charts.propertyTypesDescription")}
                             data={charts.propertyTypes || []}
                         />
                     </Grid>
 
                     <Grid size={{ xs: 12, lg: 6 }}>
                         <AnalyticsChart
-                            title="Clicks by Website"
-                            description="Compare engagement across external websites."
+                            title={t("adminExternalClicks.charts.websites")}
+                            description={t("adminExternalClicks.charts.websitesDescription")}
                             data={charts.websites || []}
                         />
                     </Grid>
 
                     <Grid size={{ xs: 12 }}>
                         <AnalyticsChart
-                            title="Clicks by City"
-                            description="Clicks grouped by property location."
+                            title={t("adminExternalClicks.charts.cities")}
+                            description={t("adminExternalClicks.charts.citiesDescription")}
                             data={charts.cities || []}
                         />
                     </Grid>
                 </Grid>
             </Box>
 
-            {/* External listings */}
             <Box mt={2}>
                 <Box mb={3}>
                     <Typography variant="h6" fontWeight={700}>
-                        Recently Clicked External Listings
+                        {t("adminExternalClicks.listings.title")}
                     </Typography>
 
                     <Typography
@@ -221,33 +217,22 @@ const ExternalClicksSection = () => {
                         color="text.secondary"
                         mt={0.5}
                     >
-                        All tracked external listings, ordered by their
-                        latest click.
+                        {t("adminExternalClicks.listings.subtitle")}
                     </Typography>
                 </Box>
 
-                {/* Loading during page changes */}
                 {loading && (
-                    <Box
-                        display="flex"
-                        justifyContent="center"
-                        py={4}
-                    >
-                        <CircularProgress
-                            size={30}
-                            color="primary"
-                        />
+                    <Box display="flex" justifyContent="center" py={4}>
+                        <CircularProgress size={30} color="primary" />
                     </Box>
                 )}
 
-                {/* Empty state */}
                 {!loading && listings.length === 0 && (
                     <Alert severity="info">
-                        No external listing clicks have been recorded yet.
+                        {t("adminExternalClicks.listings.empty")}
                     </Alert>
                 )}
 
-                {/* Listing cards */}
                 {!loading && listings.length > 0 && (
                     <>
                         <Grid container spacing={2.5}>
@@ -264,12 +249,12 @@ const ExternalClicksSection = () => {
                                     <ExternalListingClickCard
                                         listing={listing}
                                         color="#2563EB"
+                                        locale={locale}
                                     />
                                 </Grid>
                             ))}
                         </Grid>
 
-                        {/* Pagination */}
                         <Box
                             sx={{
                                 mt: 5,
@@ -286,14 +271,13 @@ const ExternalClicksSection = () => {
                                 variant="body2"
                                 color="text.secondary"
                             >
-                                Showing{" "}
-                                {(page - 1) * ITEMS_PER_PAGE + 1}
-                                {" – "}
-                                {(page - 1) * ITEMS_PER_PAGE +
-                                    listings.length}
-                                {" of "}
-                                {formatNumber(pagination.total)}
-                                {" tracked listings"}
+                                {t("adminExternalClicks.pagination.showing", {
+                                    from: (page - 1) * ITEMS_PER_PAGE + 1,
+                                    to:
+                                        (page - 1) * ITEMS_PER_PAGE +
+                                        listings.length,
+                                    total: formatNumber(pagination.total, locale),
+                                })}
                             </Typography>
 
                             {pagination.totalPages > 1 && (

@@ -433,6 +433,7 @@ export async function getMyProfile(req, res) {
                     "firstName",
                     "lastName",
                     "email",
+                    "language",
                     "emailVerified",
                     "phoneNumber",
                     "phoneVerified",
@@ -466,7 +467,7 @@ export async function getMyProfile(req, res) {
                 firstName: user.firstName || "",
                 lastName: user.lastName || "",
                 email: user.email || "",
-
+                language: user.language || "en",
                 emailVerified: user.emailVerified ?? false,
 
                 phoneNumber: user.phoneNumber || "",
@@ -819,6 +820,61 @@ export async function updateMyNotificationPreferences(req, res) {
 
         return res.status(500).json({
             message: "Unable to update notification preferences.",
+        });
+    }
+}
+
+export async function updateMyLanguage(req, res) {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({
+                message: "Authentication required.",
+            });
+        }
+
+        const { language } = req.body;
+
+        const supportedLanguages = ["en", "fr", "ar"];
+
+        if (
+            typeof language !== "string" ||
+            !supportedLanguages.includes(language.trim().toLowerCase())
+        ) {
+            return res.status(400).json({
+                message: "Language must be en, fr, or ar.",
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                $set: {
+                    language: language.trim().toLowerCase(),
+                },
+            },
+            {
+                new: true,
+                runValidators: true,
+            }
+        ).select("language");
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                message: "User not found.",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Language preference updated successfully.",
+            language: updatedUser.language,
+        });
+    } catch (error) {
+        console.error("Update language error:", error);
+
+        return res.status(500).json({
+            message: "Unable to update language preference.",
         });
     }
 }

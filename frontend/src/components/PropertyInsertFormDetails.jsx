@@ -1,6 +1,6 @@
-
-
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Autocomplete,
     Box,
@@ -14,84 +14,36 @@ import {
     FormControlLabel,
     Checkbox,
 } from "@mui/material";
+import cities from "../data/moroccanCities"
 
-const moroccanCities = [
-    "Agadir",
-    "Ain Harrouda",
-    "Aït Melloul",
-    "Ait Ourir",
-    "Al Hoceima",
-    "Azrou",
-    "Benguerir",
-    "Beni Ansar",
-    "Beni Mellal",
-    "Benslimane",
-    "Berrechid",
-    "Berkane",
-    "Biougra",
-    "Bni Yakhlef",
-    "Bouskoura",
-    "Bouznika",
-    "Casablanca",
-    "Dcheira El Jihadia",
-    "Dar Bouazza (Tamaris)",
-    "Drargua",
-    "Ech-challalate",
-    "El Jadida",
-    "El Kelaa Des Sraghna",
-    "Essaouira",
-    "Errachidia",
-    "Fez",
-    "Fquih Ben Salah",
-    "Fnideq",
-    "Guelmim",
-    "Guercif",
-    "Inezgane",
-    "Kenitra",
-    "Khemisset",
-    "Khenifra",
-    "Khouribga",
-    "Ksar El Kebir",
-    "Lahraouyine",
-    "Larache",
-    "Lqliaa",
-    "M'diq",
-    "Marrakesh",
-    "Martil",
-    "Mehdya",
-    "Meknes",
-    "Midelt",
-    "Mohammedia",
-    "Nador",
-    "Ouarzazate",
-    "Oued Zem",
-    "Oujda",
-    "Oulad Teima",
-    "Ouazzane",
-    "Rabat",
-    "Salé",
-    "Safi",
-    "Sefrou",
-    "Settat",
-    "Skhirat",
-    "Sidi Bennour",
-    "Sidi Kacem",
-    "Sidi Slimane",
-    "Sidi Taibi",
-    "Souk El Arbaa",
-    "Souk Sebt Ouled Nemma",
-    "Taourirt",
-    "Tamensourte",
-    "Tan-Tan",
-    "Tanger",
-    "Taza",
-    "Temara",
-    "Tetouan",
-    "Tifelt",
-    "Tit Mellil",
-    "Tiznit",
-    "Youssoufia",
-].sort((a, b) => a.localeCompare(b, "en"));
+const moroccanCities = cities
+// Keep English names as the values saved in the database.
+
+const propertyTypeKeys = {
+    apartment: "apartment",
+    house: "house",
+    villa: "villa",
+    studio: "studio",
+    room: "room",
+    store: "store",
+    office: "office",
+    land: "land",
+    warehouse: "warehouse",
+    commercialspace: "commercialSpace",
+    commercialstore: "commercialStore",
+    garage: "garage",
+    other: "other",
+};
+
+const getPropertyTypeLabel = (type, t) => {
+    const normalized = String(type)
+        .toLowerCase()
+        .replace(/[^a-z]/g, "");
+
+    const key = propertyTypeKeys[normalized];
+
+    return key ? t(`properties.categories.${key}`) : type;
+};
 
 export default function PropertyInsertFormDetails({
     formData,
@@ -103,6 +55,8 @@ export default function PropertyInsertFormDetails({
     SectionHeader,
     errors = {},
 }) {
+    const { t } = useTranslation();
+
     const renderField = (name, label, options = {}) => (
         <TextField
             fullWidth
@@ -120,17 +74,18 @@ export default function PropertyInsertFormDetails({
 
     const isForRent = formData.listingType === "For Rent";
 
-    const selectedCity = moroccanCities.find(
-        (city) =>
-            city.toLowerCase() ===
-            String(formData.city ?? "").trim().toLowerCase()
-    ) || null;
+    const selectedCity =
+        moroccanCities.find(
+            (city) =>
+                city.en.toLowerCase() ===
+                String(formData.city ?? "").trim().toLowerCase()
+        ) || null;
 
     const handleCityChange = (_event, newCity) => {
         handleChange({
             target: {
                 name: "city",
-                value: newCity ?? "",
+                value: newCity?.en ?? "",
             },
         });
     };
@@ -139,17 +94,22 @@ export default function PropertyInsertFormDetails({
         <SectionPaper>
             <SectionHeader
                 icon="🏠"
-                title="Property Details"
-                subtitle="Describe the property you want to publish."
+                title={t("properties.insert.details.title")}
+                subtitle={t("properties.insert.details.subtitle")}
                 number={2}
             />
 
             <Grid container spacing={2.5}>
                 <Grid size={{ xs: 12 }}>
-                    {renderField("title", "Listing Title *", {
-                        placeholder:
-                            "e.g. Modern Apartment in the City Center",
-                    })}
+                    {renderField(
+                        "title",
+                        t("properties.insert.details.listingTitle"),
+                        {
+                            placeholder: t(
+                                "properties.insert.details.listingTitlePlaceholder"
+                            ),
+                        }
+                    )}
                 </Grid>
 
                 <Grid size={{ xs: 12 }}>
@@ -161,14 +121,16 @@ export default function PropertyInsertFormDetails({
                             color: "#344054",
                         }}
                     >
-                        Transaction Type *
+                        {t("properties.insert.details.transactionType")}
                     </Typography>
 
                     <ToggleButtonGroup
                         value={formData.listingType}
                         exclusive
                         onChange={handleListingTypeChange}
-                        aria-label="transaction type"
+                        aria-label={t(
+                            "properties.insert.details.transactionType"
+                        )}
                         sx={{
                             display: "flex",
                             width: "100%",
@@ -201,38 +163,43 @@ export default function PropertyInsertFormDetails({
                         }}
                     >
                         <ToggleButton value="For Sale">
-                            For Sale
+                            {t("properties.card.forSale")}
                         </ToggleButton>
+
                         <ToggleButton value="For Rent">
-                            For Rent
+                            {t("properties.card.forRent")}
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                    {renderField("propertyType", "Property Type *", {
-                        select: true,
-                        children: propertyTypes.map((type) => (
-                            <MenuItem key={type} value={type}>
-                                {type}
-                            </MenuItem>
-                        )),
-                    })}
+                    {renderField(
+                        "propertyType",
+                        t("properties.insert.details.propertyType"),
+                        {
+                            select: true,
+                            children: propertyTypes.map((type) => (
+                                <MenuItem key={type} value={type}>
+                                    {getPropertyTypeLabel(type, t)}
+                                </MenuItem>
+                            )),
+                        }
+                    )}
                 </Grid>
             </Grid>
 
+            {/* Property location */}
             <Box sx={{ mt: 4, mb: 2 }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography
-                        sx={{ color: "#2563EB", fontWeight: 700 }}
-                    >
+                    <Typography sx={{ color: "#2563EB", fontWeight: 700 }}>
                         📍
                     </Typography>
+
                     <Typography
                         variant="subtitle1"
                         sx={{ fontWeight: 600, color: "#0F172A" }}
                     >
-                        Property Location
+                        {t("properties.insert.details.location.title")}
                     </Typography>
                 </Stack>
 
@@ -240,7 +207,7 @@ export default function PropertyInsertFormDetails({
                     variant="body2"
                     sx={{ color: "#5B6577", mt: 0.5 }}
                 >
-                    Help people find your property more easily.
+                    {t("properties.insert.details.location.subtitle")}
                 </Typography>
             </Box>
 
@@ -252,14 +219,41 @@ export default function PropertyInsertFormDetails({
                         value={selectedCity}
                         onChange={handleCityChange}
                         isOptionEqualToValue={(option, value) =>
-                            option === value
+                            option.en === value.en
                         }
-                        getOptionLabel={(option) => option}
+                        getOptionLabel={(option) => option.en}
+                        renderOption={(props, option) => (
+                            <Box
+                                component="li"
+                                {...props}
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: 2,
+                                }}
+                            >
+                                <Typography variant="body2">
+                                    {option.en}
+                                </Typography>
+
+                                <Typography
+                                    variant="body2"
+                                    dir="rtl"
+                                    sx={{ color: "text.secondary" }}
+                                >
+                                    {option.ar}
+                                </Typography>
+                            </Box>
+                        )}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="City *"
-                                placeholder="Search or select a city"
+                                label={t(
+                                    "properties.insert.details.location.city"
+                                )}
+                                placeholder={t(
+                                    "properties.insert.details.location.cityPlaceholder"
+                                )}
                                 size="medium"
                                 sx={fieldSx}
                                 error={Boolean(errors.city)}
@@ -272,39 +266,51 @@ export default function PropertyInsertFormDetails({
                 <Grid size={{ xs: 12, sm: 6 }}>
                     {renderField(
                         "neighborhood",
-                        "Neighborhood / Area",
+                        t("properties.insert.details.location.neighborhood"),
                         {
-                            placeholder: "e.g. Maarif",
+                            placeholder: t(
+                                "properties.insert.details.location.neighborhoodPlaceholder"
+                            ),
                         }
                     )}
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                    {renderField("fullAddress", "Full Address", {
-                        placeholder: "Street name, building...",
-                    })}
+                    {renderField(
+                        "fullAddress",
+                        t("properties.insert.details.location.fullAddress"),
+                        {
+                            placeholder: t(
+                                "properties.insert.details.location.fullAddressPlaceholder"
+                            ),
+                        }
+                    )}
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                    {renderField("mapLink", "Google Maps Location Link", {
-                        placeholder: "https://maps.google.com/...",
-                        type: "url",
-                    })}
+                    {renderField(
+                        "mapLink",
+                        t("properties.insert.details.location.mapLink"),
+                        {
+                            placeholder: "https://maps.google.com/...",
+                            type: "url",
+                        }
+                    )}
                 </Grid>
             </Grid>
 
+            {/* Price and specifications */}
             <Box sx={{ mt: 4, mb: 2 }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography
-                        sx={{ color: "#2563EB", fontWeight: 700 }}
-                    >
+                    <Typography sx={{ color: "#2563EB", fontWeight: 700 }}>
                         💳
                     </Typography>
+
                     <Typography
                         variant="subtitle1"
                         sx={{ fontWeight: 600, color: "#0F172A" }}
                     >
-                        Price and Specifications
+                        {t("properties.insert.details.specifications.title")}
                     </Typography>
                 </Stack>
 
@@ -312,70 +318,97 @@ export default function PropertyInsertFormDetails({
                     variant="body2"
                     sx={{ color: "#5B6577", mt: 0.5 }}
                 >
-                    Add the price, surface area, and property
-                    characteristics.
+                    {t("properties.insert.details.specifications.subtitle")}
                 </Typography>
             </Box>
 
             <Grid container spacing={2.5}>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderField("price", "Price (MAD) *", {
-                        type: "number",
-                        slotProps: {
-                            htmlInput: { min: 0 },
-                        },
-                    })}
+                    {renderField(
+                        "price",
+                        t("properties.insert.details.specifications.price"),
+                        {
+                            type: "number",
+                            slotProps: {
+                                htmlInput: { min: 0 },
+                            },
+                        }
+                    )}
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderField("surface", "Surface (m²) *", {
-                        type: "number",
-                        slotProps: {
-                            htmlInput: { min: 1 },
-                        },
-                    })}
+                    {renderField(
+                        "surface",
+                        t("properties.insert.details.specifications.surface"),
+                        {
+                            type: "number",
+                            slotProps: {
+                                htmlInput: { min: 1 },
+                            },
+                        }
+                    )}
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderField("rooms", "Rooms / Bedrooms", {
-                        type: "number",
-                        slotProps: {
-                            htmlInput: { min: 0 },
-                        },
-                    })}
+                    {renderField(
+                        "rooms",
+                        t("properties.insert.details.specifications.rooms"),
+                        {
+                            type: "number",
+                            slotProps: {
+                                htmlInput: { min: 0 },
+                            },
+                        }
+                    )}
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderField("salons", "Salons", {
-                        type: "number",
-                        slotProps: {
-                            htmlInput: { min: 0 },
-                        },
-                    })}
+                    {renderField(
+                        "salons",
+                        t("properties.insert.details.specifications.salons"),
+                        {
+                            type: "number",
+                            slotProps: {
+                                htmlInput: { min: 0 },
+                            },
+                        }
+                    )}
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                    {renderField("bathrooms", "Bathrooms", {
-                        type: "number",
-                        slotProps: {
-                            htmlInput: { min: 0 },
-                        },
-                    })}
+                    {renderField(
+                        "bathrooms",
+                        t(
+                            "properties.insert.details.specifications.bathrooms"
+                        ),
+                        {
+                            type: "number",
+                            slotProps: {
+                                htmlInput: { min: 0 },
+                            },
+                        }
+                    )}
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                    {renderField("floor", "Floor Level", {
-                        type: "number",
-                        slotProps: {
-                            htmlInput: { min: 0 },
-                        },
-                    })}
+                    {renderField(
+                        "floor",
+                        t("properties.insert.details.specifications.floor"),
+                        {
+                            type: "number",
+                            slotProps: {
+                                htmlInput: { min: 0 },
+                            },
+                        }
+                    )}
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     {renderField(
                         "syndicateFees",
-                        "Syndicate Fees (MAD/month)",
+                        t(
+                            "properties.insert.details.specifications.syndicateFees"
+                        ),
                         {
                             type: "number",
                             slotProps: {
@@ -386,6 +419,7 @@ export default function PropertyInsertFormDetails({
                 </Grid>
             </Grid>
 
+            {/* Rental terms */}
             {isForRent && (
                 <>
                     <Box sx={{ mt: 4, mb: 2 }}>
@@ -395,21 +429,16 @@ export default function PropertyInsertFormDetails({
                             spacing={1}
                         >
                             <Typography
-                                sx={{
-                                    color: "#2563EB",
-                                    fontWeight: 700,
-                                }}
+                                sx={{ color: "#2563EB", fontWeight: 700 }}
                             >
                                 📝
                             </Typography>
+
                             <Typography
                                 variant="subtitle1"
-                                sx={{
-                                    fontWeight: 600,
-                                    color: "#0F172A",
-                                }}
+                                sx={{ fontWeight: 600, color: "#0F172A" }}
                             >
-                                Rental Terms
+                                {t("properties.insert.details.rental.title")}
                             </Typography>
                         </Stack>
 
@@ -417,8 +446,7 @@ export default function PropertyInsertFormDetails({
                             variant="body2"
                             sx={{ color: "#5B6577", mt: 0.5 }}
                         >
-                            Specify the rental conditions and additional
-                            costs.
+                            {t("properties.insert.details.rental.subtitle")}
                         </Typography>
                     </Box>
 
@@ -448,7 +476,9 @@ export default function PropertyInsertFormDetails({
                                             onChange={handleChange}
                                         />
                                     }
-                                    label="Rental contract available"
+                                    label={t(
+                                        "properties.insert.details.rental.contract"
+                                    )}
                                 />
                             </Box>
                         </Grid>
@@ -478,27 +508,39 @@ export default function PropertyInsertFormDetails({
                                             onChange={handleChange}
                                         />
                                     }
-                                    label="Mortgage agreement"
+                                    label={t(
+                                        "properties.insert.details.rental.mortgage"
+                                    )}
                                 />
                             </Box>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            {renderField("deposit", "Deposit (MAD)", {
-                                type: "number",
-                                slotProps: {
-                                    htmlInput: { min: 0 },
-                                },
-                            })}
+                            {renderField(
+                                "deposit",
+                                t("properties.insert.details.rental.deposit"),
+                                {
+                                    type: "number",
+                                    slotProps: {
+                                        htmlInput: { min: 0 },
+                                    },
+                                }
+                            )}
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            {renderField("mediatorFee", "Mediator Fee (MAD)", {
-                                type: "number",
-                                slotProps: {
-                                    htmlInput: { min: 0 },
-                                },
-                            })}
+                            {renderField(
+                                "mediatorFee",
+                                t(
+                                    "properties.insert.details.rental.mediatorFee"
+                                ),
+                                {
+                                    type: "number",
+                                    slotProps: {
+                                        htmlInput: { min: 0 },
+                                    },
+                                }
+                            )}
                         </Grid>
                     </Grid>
                 </>

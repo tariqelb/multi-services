@@ -1,5 +1,8 @@
 
 import React from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 import {
     Box,
     Typography,
@@ -10,23 +13,14 @@ import {
     Stack,
     CircularProgress,
 } from "@mui/material";
+
 import {
     LocationOn,
     Visibility,
     BookmarkRemove,
 } from "@mui/icons-material";
+
 import getImageUrl from "../utils/getImageUrl";
-// const API_URL = "http://localhost:3000";
-
-// function getImageUrl(image) {
-//     const path = typeof image === "string" ? image : image?.path;
-
-//     if (!path) return "";
-
-//     if (/^https?:\/\//i.test(path)) return path;
-
-//     return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
-// }
 
 function getStatusStyles(status) {
     const normalizedStatus = String(status || "Available").toLowerCase();
@@ -53,10 +47,12 @@ export default function SavedPropertyCard({
     onRemove,
     removing = false,
 }) {
+    const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const {
         _id,
         id,
-        title = "Property Title",
+        title = t("properties.savedCard.defaultTitle"),
         price = 0,
         images = [],
         listingType = "For Sale",
@@ -70,8 +66,6 @@ export default function SavedPropertyCard({
         status = "Available",
     } = property;
 
-    const propertyId = _id || id;
-
     const imagePath = images?.[0]?.path || images?.[0];
 
     const fullImageUrl =
@@ -82,13 +76,76 @@ export default function SavedPropertyCard({
         .filter(Boolean)
         .join(", ");
 
-    const formattedPrice = Number(price || 0).toLocaleString();
+    const locale =
+        i18n.language === "ar"
+            ? "ar-MA"
+            : i18n.language === "fr"
+                ? "fr-FR"
+                : "en-US";
+
+    const formattedPrice = Number(price || 0).toLocaleString(locale);
 
     const formattedDate = createdAt
-        ? new Date(createdAt).toLocaleDateString("en-GB")
+        ? new Date(createdAt).toLocaleDateString(
+            i18n.language === "ar"
+                ? "ar-MA"
+                : i18n.language === "fr"
+                    ? "fr-FR"
+                    : "en-GB"
+        )
         : "";
 
     const statusInfo = getStatusStyles(status);
+
+    const getStatusLabel = (value) => {
+        const normalizedStatus = String(value || "Available").toLowerCase();
+
+        const statusKeys = {
+            available: "available",
+            active: "available",
+            pending: "pending",
+            sold: "sold",
+            rented: "rented",
+            inactive: "inactive",
+            unavailable: "unavailable",
+        };
+
+        const key = statusKeys[normalizedStatus];
+
+        return key
+            ? t(`properties.profileCard.status.${key}`)
+            : value;
+    };
+
+    const getListingTypeLabel = (type) => {
+        if (type === "For Sale") {
+            return t("properties.card.forSale");
+        }
+
+        if (type === "For Rent") {
+            return t("properties.card.forRent");
+        }
+
+        return type;
+    };
+
+    const getPropertyTypeLabel = (type) => {
+        if (!type) return "";
+
+        const categoryKey = {
+            "commercial space": "commercialSpace",
+            "commercial store": "commercialStore",
+        }[type.toLowerCase()] ||
+            type
+                .toLowerCase()
+                .replace(/[^a-z0-9]+(.)/g, (_, char) =>
+                    char.toUpperCase()
+                );
+
+        return t(`properties.categories.${categoryKey}`, {
+            defaultValue: type,
+        });
+    };
 
     return (
         <Card
@@ -111,7 +168,7 @@ export default function SavedPropertyCard({
             }}
         >
             {/* Image Thumbnail */}
-           <Box
+            <Box
                 sx={{
                     width: { xs: "100%", sm: 300 },
                     height: { xs: 180, sm: 280 },
@@ -164,8 +221,8 @@ export default function SavedPropertyCard({
                                 }}
                             >
                                 {formattedDate &&
-                                    `Published on ${formattedDate}`}{" "}
-                                • {propertyType}
+                                    `${t("properties.savedCard.publishedOn")} ${formattedDate}`}{" "}
+                                • {getPropertyTypeLabel(propertyType)}
                             </Typography>
 
                             <Typography
@@ -199,7 +256,7 @@ export default function SavedPropertyCard({
                             useFlexGap
                         >
                             <Chip
-                                label={listingType}
+                                label={getListingTypeLabel(listingType)}
                                 size="medium"
                                 sx={{
                                     height: 35,
@@ -216,7 +273,7 @@ export default function SavedPropertyCard({
                             />
 
                             <Chip
-                                label={status || "Available"}
+                                label={getStatusLabel(status)}
                                 size="medium"
                                 sx={{
                                     height: 35,
@@ -275,19 +332,22 @@ export default function SavedPropertyCard({
                     >
                         {surface !== "" && surface != null && (
                             <Box>
-                                Surface: <strong>{surface} m²</strong>
+                                {t("properties.card.surface")}:{" "}
+                                <strong>{surface} m²</strong>
                             </Box>
                         )}
 
                         {rooms !== "" && rooms != null && (
                             <Box>
-                                Rooms: <strong>{rooms}</strong>
+                                {t("properties.card.rooms")}:{" "}
+                                <strong>{rooms}</strong>
                             </Box>
                         )}
 
                         {bathrooms !== "" && bathrooms != null && (
                             <Box>
-                                Bathrooms: <strong>{bathrooms}</strong>
+                                {t("properties.card.bathrooms")}:{" "}
+                                <strong>{bathrooms}</strong>
                             </Box>
                         )}
                     </Stack>
@@ -318,16 +378,27 @@ export default function SavedPropertyCard({
                             variant="outlined"
                             size="small"
                             startIcon={<Visibility />}
-                            onClick={() => onViewDetails?.(property)}
-                            sx={{
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderColor: "#D5DCE8",
-                                color: "#334155",
-                                whiteSpace: "nowrap",
+                            onClick={() => {
+                                const propertyId = property._id || property.id;
+
+                                if (!propertyId) {
+                                    console.error("Property ID is missing:", property);
+                                    return;
+                                }
+
+                                if (onViewDetails) {
+                                    onViewDetails(property);
+                                } else {
+                                    navigate(`/properties/${propertyId}`, {
+                                        state: {
+                                            property,
+                                            from: "/saved",
+                                        },
+                                    });
+                                }
                             }}
                         >
-                            View Details
+                            {t("properties.savedCard.viewDetails")}
                         </Button>
 
                         <Button
@@ -349,7 +420,9 @@ export default function SavedPropertyCard({
                                 whiteSpace: "nowrap",
                             }}
                         >
-                            {removing ? "Removing..." : "Remove Saved"}
+                            {removing
+                                ? t("properties.savedCard.removing")
+                                : t("properties.savedCard.removeSaved")}
                         </Button>
                     </Stack>
                 </Box>

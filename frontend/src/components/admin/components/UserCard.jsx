@@ -1,4 +1,3 @@
-
 import {
     Avatar,
     Box,
@@ -9,6 +8,7 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
@@ -21,9 +21,11 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import UserStatistic from "./UserStatistic";
 
 export default function UserCard({ user }) {
+    const { t } = useTranslation();
+
     const fullName =
         `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-        "Unnamed User";
+        t("userCard.unnamedUser");
 
     const initials = fullName
         .split(/\s+/)
@@ -76,7 +78,7 @@ export default function UserCard({ user }) {
                             </Typography>
 
                             <Chip
-                                label={user.status || "Active"}
+                                label={user.status || t("userCard.active")}
                                 size="small"
                                 color={
                                     user.status === "Inactive"
@@ -95,21 +97,21 @@ export default function UserCard({ user }) {
                                     color="text.secondary"
                                     sx={{ overflowWrap: "anywhere" }}
                                 >
-                                    {user.email || "No email"}
+                                    {user.email || t("userCard.noEmail")}
                                 </Typography>
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <PhoneOutlinedIcon fontSize="small" color="action" />
                                 <Typography variant="body2" color="text.secondary">
-                                    {user.phoneNumber || "No phone number"}
+                                    {user.phoneNumber || t("userCard.noPhone")}
                                 </Typography>
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <PersonOutlineOutlinedIcon fontSize="small" color="action" />
                                 <Typography variant="body2" color="text.secondary">
-                                    {user.role || "User"}
+                                    {user.role || t("userCard.user")}
                                     {user.address ? ` · ${user.address}` : ""}
                                 </Typography>
                             </Stack>
@@ -117,10 +119,10 @@ export default function UserCard({ user }) {
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <CalendarMonthOutlinedIcon fontSize="small" color="action" />
                                 <Typography variant="body2" color="text.secondary">
-                                    Joined{" "}
+                                    {t("userCard.joined")}{" "}
                                     {user.createdAt
                                         ? new Date(user.createdAt).toLocaleDateString()
-                                        : "Unknown"}
+                                        : t("userCard.unknown")}
                                 </Typography>
                             </Stack>
                         </Stack>
@@ -130,7 +132,7 @@ export default function UserCard({ user }) {
                 <Divider sx={{ my: 2.5 }} />
 
                 <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
-                    User Activity
+                    {t("userCard.activity")}
                 </Typography>
 
                 <Box
@@ -145,19 +147,19 @@ export default function UserCard({ user }) {
                 >
                     <UserStatistic
                         icon={<HomeWorkOutlinedIcon />}
-                        label="Published Properties"
+                        label={t("userCard.publishedProperties")}
                         value={user.publishedProperties ?? 0}
                     />
 
                     <UserStatistic
                         icon={<BookmarkBorderOutlinedIcon />}
-                        label="Saved Properties"
+                        label={t("userCard.savedProperties")}
                         value={user.savedProperties ?? 0}
                     />
 
                     <UserStatistic
                         icon={<ReportProblemOutlinedIcon />}
-                        label="Submitted Feedback"
+                        label={t("userCard.submittedFeedback")}
                         value={user.reports ?? 0}
                     />
                 </Box>

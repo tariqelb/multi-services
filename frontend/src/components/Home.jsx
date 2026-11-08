@@ -58,10 +58,6 @@ export default function Home() {
                     <MiddleContent activeNav={activeNav} />
                 </main>
             </div>
-
-            {/* Floating publish button */}
-            {/* <PublishFab /> */}
-            {/* <Footer/> */}
         </div>
     );
 }

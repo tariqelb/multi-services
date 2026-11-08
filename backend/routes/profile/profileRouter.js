@@ -3,7 +3,7 @@ import { Router } from "express";
 import authMiddleware from "../../middleware/authMiddleware.js";
 import { updateMyProfile } from "../../controllers/profile/profileController.js";
 import { getMyProfile , updateMyPassword} from "../../controllers/profile/profileController.js";
-import {    getMyNotificationPreferences, updateMyNotificationPreferences, } from "../../controllers/profile/profileController.js";
+import { getMyNotificationPreferences, updateMyNotificationPreferences, updateMyLanguage } from "../../controllers/profile/profileController.js";
 
 const router = Router();
 
@@ -20,6 +20,10 @@ router.get( "/me/notification-preferences",
 router.patch("/me/notification-preferences",
     authMiddleware,
     updateMyNotificationPreferences
+);
+router.patch("/me/language",
+    authMiddleware,
+    updateMyLanguage
 );
 
 export default router;

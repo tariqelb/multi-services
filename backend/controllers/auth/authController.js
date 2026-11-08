@@ -380,7 +380,7 @@ export const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.userId)
             .select(
-                "firstName lastName email phoneNumber emailVerified phoneVerified notificationPreferences role address bio profileImage createdAt"
+                "firstName lastName email language phoneNumber emailVerified phoneVerified notificationPreferences role address bio profileImage createdAt"
             );
 
         if (!user) {
@@ -397,6 +397,7 @@ export const getMe = async (req, res) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
+                language: user.language || "en",
                 phoneNumber: user.phoneNumber,
                 emailVerified: user.emailVerified,
                 phoneVerified: user.phoneVerified,

@@ -1,19 +1,19 @@
-export const formatNumber = (value) => {
-    return Number(value || 0).toLocaleString();
+export const formatNumber = (value, locale = "en-US") => {
+    return Number(value || 0).toLocaleString(locale);
 };
 
-export const formatDate = (date) => {
-    if (!date) return "Unknown";
+export const formatDate = (date, locale = "en-US") => {
+    if (!date) return "—";
 
     const parsedDate = new Date(date);
 
     return Number.isNaN(parsedDate.getTime())
-        ? "Unknown"
-        : parsedDate.toLocaleString();
+        ? "—"
+        : parsedDate.toLocaleString(locale);
 };
 
-export const formatPrice = (price) => {
-    if (price == null) return "Not specified";
+export const formatPrice = (price, locale = "en-US") => {
+    if (price == null) return "—";
 
-    return `${Number(price).toLocaleString()} MAD`;
+    return `${Number(price).toLocaleString(locale)} MAD`;
 };

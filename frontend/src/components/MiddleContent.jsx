@@ -1,6 +1,7 @@
 
 import React from "react";
 import PageLayout from "./PageLayout";
+
 import {
     Box,
     Typography,
@@ -11,7 +12,9 @@ import {
     CardMedia,
     Chip,
 } from "@mui/material";
+
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import propertiesImage from "../assets/properties.jpg";
 import carsImage from "../assets/cars.jpg";
@@ -22,54 +25,37 @@ import driverImage from "../assets/driver.jpg";
 
 export default function MiddleContent({ activeNav }) {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const services = [
         {
-            title: "Properties",
-            description: "Buy, Sell & Rent Properties",
-            details:
-                "Explore thousands of verified residential and commercial properties available for immediate purchase, sale, or lease in your area.",
+            key: "properties",
             image: propertiesImage,
             path: "/properties",
             available: true,
         },
         {
-            title: "Cars",
-            description: "Buy, Sell & Rent Vehicles",
-            details:
-                "Browse a wide selection of brand new and pre-owned cars, trucks, and SUVs with transparent pricing and direct owner contacts.",
+            key: "cars",
             image: carsImage,
             available: false,
         },
         {
-            title: "Services",
-            description: "Find Companies & Offices",
-            details:
-                "Connect with certified local professionals, corporate offices, agencies, and businesses ready to cater to your project requirements.",
+            key: "services",
             image: servicesImage,
             available: false,
         },
         {
-            title: "Delivery Man",
-            description: "Hire a Delivery Person",
-            details:
-                "Book reliable on-demand couriers and delivery riders for fast, secure package transport and local errand execution.",
+            key: "deliveryMan",
             image: deliveryManImage,
             available: false,
         },
         {
-            title: "Transporter",
-            description: "Book Transport Services",
-            details:
-                "Access heavy-duty trucks, moving vans, and logistics transport providers for smooth relocation and cargo delivery.",
+            key: "transporter",
             image: transporterImage,
             available: false,
         },
         {
-            title: "Driver",
-            description: "Hire a Personal Driver",
-            details:
-                "Hire professional, vetted private drivers for daily commutes, special occasions, out-of-town trips, or personal chauffeuring.",
+            key: "driver",
             image: driverImage,
             available: false,
         },
@@ -83,11 +69,12 @@ export default function MiddleContent({ activeNav }) {
 
     return (
         <PageLayout
-            title={`${activeNav} Overview`}
-            subtitle="Select a service category below to manage listings and requests."
+            title={t("middleContent.overview", {
+                section: activeNav,
+            })}
+            subtitle={t("middleContent.subtitle")}
             maxWidth={1280}
         >
-            {/* Responsive Services Grid */}
             <Grid
                 container
                 spacing={{
@@ -102,9 +89,9 @@ export default function MiddleContent({ activeNav }) {
                     alignItems: "stretch",
                 }}
             >
-                {services.map((service, index) => (
+                {services.map((service) => (
                     <Grid
-                        key={index}
+                        key={service.key}
                         size={{
                             xs: 12,
                             sm: 6,
@@ -126,10 +113,12 @@ export default function MiddleContent({ activeNav }) {
                                 display: "flex",
                                 flexDirection: "column",
                                 position: "relative",
+
                                 "&:hover .hover-media": {
                                     filter: "blur(4px) brightness(0.4)",
                                     transform: "scale(1.05)",
                                 },
+
                                 "&:hover .hover-details": {
                                     opacity: 1,
                                     transform: "translateY(0)",
@@ -146,6 +135,7 @@ export default function MiddleContent({ activeNav }) {
                                     alignItems: "stretch",
                                     justifyContent: "flex-start",
                                     minWidth: 0,
+
                                     "&.Mui-disabled": {
                                         opacity: 1,
                                     },
@@ -169,7 +159,9 @@ export default function MiddleContent({ activeNav }) {
                                     <CardMedia
                                         component="img"
                                         image={service.image}
-                                        alt={service.title}
+                                        alt={t(
+                                            `middleContent.services.${service.key}.title`
+                                        )}
                                         className="hover-media"
                                         sx={{
                                             height: "100%",
@@ -183,7 +175,7 @@ export default function MiddleContent({ activeNav }) {
                                     {/* Coming Soon Badge */}
                                     {!service.available && (
                                         <Chip
-                                            label="Coming Soon"
+                                            label={t("middleContent.comingSoon")}
                                             size="small"
                                             sx={{
                                                 position: "absolute",
@@ -240,7 +232,9 @@ export default function MiddleContent({ activeNav }) {
                                                 },
                                             }}
                                         >
-                                            {service.details}
+                                            {t(
+                                                `middleContent.services.${service.key}.details`
+                                            )}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -265,6 +259,7 @@ export default function MiddleContent({ activeNav }) {
                                         flexDirection: "column",
                                         justifyContent: "center",
                                         boxSizing: "border-box",
+
                                         "&:last-child": {
                                             pb: {
                                                 xs: 2,
@@ -287,7 +282,9 @@ export default function MiddleContent({ activeNav }) {
                                             overflowWrap: "anywhere",
                                         }}
                                     >
-                                        {service.title}
+                                        {t(
+                                            `middleContent.services.${service.key}.title`
+                                        )}
                                     </Typography>
 
                                     <Typography
@@ -302,7 +299,9 @@ export default function MiddleContent({ activeNav }) {
                                             overflowWrap: "anywhere",
                                         }}
                                     >
-                                        {service.description}
+                                        {t(
+                                            `middleContent.services.${service.key}.description`
+                                        )}
                                     </Typography>
                                 </CardContent>
                             </CardActionArea>

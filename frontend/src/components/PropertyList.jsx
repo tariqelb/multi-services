@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Typography,
@@ -30,6 +32,25 @@ const normalizeCity = (value) => {
     return city;
 };
 
+// Keep internal category values unchanged.
+// Only their displayed labels are translated.
+const categoryTranslationKeys = {
+    "All Properties": "all",
+    Apartment: "apartment",
+    House: "house",
+    Villa: "villa",
+    Studio: "studio",
+    Room: "room",
+    Store: "store",
+    Office: "office",
+    Land: "land",
+    Warehouse: "warehouse",
+    "Commercial space": "commercialSpace",
+    "Commercial store": "commercialStore",
+    Garage: "garage",
+    other: "other",
+};
+
 export default function PropertyList({
     refreshTrigger = 0,
     onSelectProperty,
@@ -39,6 +60,7 @@ export default function PropertyList({
 }) {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t, i18n } = useTranslation();
 
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -61,6 +83,27 @@ export default function PropertyList({
         externalCategory !== undefined
             ? externalCategory
             : internalCategory;
+
+    // Resolve the category's translated display label.
+    const categoryKey =
+        categoryTranslationKeys[selectedCategory];
+
+    const translatedCategory = categoryKey
+        ? t(`properties.categories.${categoryKey}`)
+        : selectedCategory;
+
+    // Locale used for prices and dates.
+    const currentLanguage =
+        i18n.resolvedLanguage || "en";
+
+    const localeMap = {
+        en: "en-GB",
+        fr: "fr-FR",
+        ar: "ar-MA",
+    };
+
+    const currentLocale =
+        localeMap[currentLanguage] || "en-GB";
 
     // Handle navigation back to the top of the listing page.
     useEffect(() => {
@@ -107,7 +150,7 @@ export default function PropertyList({
                     setError(
                         err.response?.data?.message ||
                             err.message ||
-                            "Failed to fetch properties"
+                            null
                     );
                 }
             } finally {
@@ -208,12 +251,16 @@ export default function PropertyList({
         handleCityChange("All Cities");
     };
 
+    // Loading state.
     if (loading) {
         return (
             <Box
                 sx={{
                     display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                     justifyContent: "center",
+                    gap: 2,
                     py: { xs: 5, sm: 8 },
                     width: "100%",
                     minWidth: 0,
@@ -221,11 +268,16 @@ export default function PropertyList({
                 }}
             >
                 <CircularProgress />
+
+                <Typography variant="body2" color="text.secondary">
+                    {t("properties.list.loading")}
+                </Typography>
             </Box>
         );
     }
 
-    if (error) {
+    // Error state.
+    if (error !== null) {
         return (
             <Box
                 sx={{
@@ -235,7 +287,9 @@ export default function PropertyList({
                     boxSizing: "border-box",
                 }}
             >
-                <Alert severity="error">{error}</Alert>
+                <Alert severity="error">
+                    {error || t("properties.list.fetchError")}
+                </Alert>
             </Box>
         );
     }
@@ -305,8 +359,10 @@ export default function PropertyList({
                     }}
                 >
                     {selectedCategory === "All Properties"
-                        ? "Property Listings"
-                        : `${selectedCategory} Listings`}
+                        ? t("properties.list.title")
+                        : t("properties.list.categoryTitle", {
+                              category: translatedCategory,
+                          })}
                 </Typography>
 
                 <Typography
@@ -316,10 +372,9 @@ export default function PropertyList({
                         flexShrink: 0,
                     }}
                 >
-                    {filteredProperties.length}{" "}
-                    {filteredProperties.length === 1
-                        ? "property"
-                        : "properties"}
+                    {t("properties.list.propertyCount", {
+                        count: filteredProperties.length,
+                    })}
                 </Typography>
             </Box>
 
@@ -350,7 +405,7 @@ export default function PropertyList({
                             },
                         }}
                     >
-                        No properties found
+                        {t("properties.list.emptyTitle")}
                     </Typography>
 
                     <Typography
@@ -360,8 +415,7 @@ export default function PropertyList({
                             mb: 2,
                         }}
                     >
-                        Try changing the property type, transaction
-                        type, or city.
+                        {t("properties.list.emptyDescription")}
                     </Typography>
 
                     {hasActiveFilters && (
@@ -370,7 +424,7 @@ export default function PropertyList({
                             onClick={clearFilters}
                             sx={{ textTransform: "none" }}
                         >
-                            Clear Filters
+                            {t("properties.list.clearFilters")}
                         </Button>
                     )}
                 </Box>
@@ -420,7 +474,7 @@ export default function PropertyList({
                                     property.price != null
                                         ? `${Number(
                                               property.price
-                                          ).toLocaleString()} MAD`
+                                          ).toLocaleString(currentLocale)} MAD`
                                         : "0 MAD",
                                 image: fullImageUrl,
                                 listingType: property.listingType,
@@ -437,7 +491,7 @@ export default function PropertyList({
                                 createdDate: property.createdAt
                                     ? new Date(
                                           property.createdAt
-                                      ).toLocaleDateString("en-GB")
+                                      ).toLocaleDateString(currentLocale)
                                     : "",
                             };
 
@@ -497,6 +551,30 @@ export default function PropertyList({
                                 showLastButton
                                 siblingCount={0}
                                 boundaryCount={1}
+                                getItemAriaLabel={(type, pageNumber, selected) => {
+                                    if (type === "first") {
+                                        return t("properties.list.pagination.first");
+                                    }
+
+                                    if (type === "last") {
+                                        return t("properties.list.pagination.last");
+                                    }
+
+                                    if (type === "next") {
+                                        return t("properties.list.pagination.next");
+                                    }
+
+                                    if (type === "previous") {
+                                        return t("properties.list.pagination.previous");
+                                    }
+
+                                    return t("properties.list.pagination.page", {
+                                        page: pageNumber,
+                                        selected: selected
+                                            ? t("properties.list.pagination.current")
+                                            : "",
+                                    });
+                                }}
                             />
                         </Box>
                     )}

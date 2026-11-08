@@ -1,8 +1,11 @@
-
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import axiosInstance from "../../../api/axiosInstance";
 
 export default function ExternalListingSources() {
+    const { t } = useTranslation();
+
     const [urls, setUrls] = useState([]);
     const [url, setUrl] = useState("");
     const [loading, setLoading] = useState(false);
@@ -26,9 +29,7 @@ export default function ExternalListingSources() {
             setUrls(
                 sources
                     .map((source) =>
-                        typeof source === "string"
-                            ? source
-                            : source.url
+                        typeof source === "string" ? source : source.url
                     )
                     .filter(Boolean)
                     .reverse()
@@ -36,7 +37,7 @@ export default function ExternalListingSources() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Failed to load listing sources."
+                    t("externalSources.errors.load")
             );
         } finally {
             setLoading(false);
@@ -59,12 +60,12 @@ export default function ExternalListingSources() {
 
             setMessage(
                 response.data.message ||
-                    "External listings refreshed successfully."
+                    t("externalSources.messages.refreshSuccess")
             );
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Failed to refresh external listings."
+                    t("externalSources.errors.refresh")
             );
         } finally {
             setRefreshing(false);
@@ -83,12 +84,12 @@ export default function ExternalListingSources() {
 
             setMessage(
                 response.data.message ||
-                    "New external listings imported successfully."
+                    t("externalSources.messages.importSuccess")
             );
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Failed to import new external listings."
+                    t("externalSources.errors.import")
             );
         } finally {
             setImporting(false);
@@ -110,21 +111,20 @@ export default function ExternalListingSources() {
 
             setMessage(
                 response.data.message ||
-                    "Listing source added successfully."
+                    t("externalSources.messages.addSuccess")
             );
 
             setUrl("");
 
             await loadSources();
 
-            // Run the collector after adding a new source.
             if (response.data.added) {
                 await handleRefresh();
             }
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Failed to add listing source."
+                    t("externalSources.errors.add")
             );
         }
     }
@@ -144,11 +144,11 @@ export default function ExternalListingSources() {
                 current.filter((item) => item !== sourceUrl)
             );
 
-            setMessage("Listing source deleted successfully.");
+            setMessage(t("externalSources.messages.deleteSuccess"));
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Failed to delete listing source."
+                    t("externalSources.errors.delete")
             );
         } finally {
             setRemovingUrl("");
@@ -157,19 +157,16 @@ export default function ExternalListingSources() {
 
     return (
         <section className="mx-auto box-border w-full min-w-0 max-w-[1120px] overflow-x-clip px-4 py-6 sm:px-6 md:px-8 md:py-8">
-            {/* Page Header */}
             <div className="mb-6">
                 <h1 className="text-[1.875rem] font-bold leading-tight text-slate-900">
-                    External Listing Sources
+                    {t("externalSources.title")}
                 </h1>
 
                 <p className="mt-1.5 max-w-3xl text-base text-[#5B6577]">
-                    Manage the websites used to collect external
-                    property listings.
+                    {t("externalSources.subtitle")}
                 </p>
             </div>
 
-            {/* Add Source Form */}
             <form
                 onSubmit={handleAdd}
                 className="mb-6 flex w-full min-w-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:p-4"
@@ -178,9 +175,9 @@ export default function ExternalListingSources() {
                     type="url"
                     value={url}
                     onChange={(event) => setUrl(event.target.value)}
-                    placeholder="Paste an Aqari, Mr Semsar, or 3a9arai listing URL"
+                    placeholder={t("externalSources.form.placeholder")}
                     required
-                    aria-label="External listing URL"
+                    aria-label={t("externalSources.form.ariaLabel")}
                     className="box-border h-12 w-full min-w-0 flex-1 rounded-[10px] border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-base"
                 />
 
@@ -189,17 +186,14 @@ export default function ExternalListingSources() {
                     disabled={refreshing || importing}
                     className="h-12 w-full shrink-0 rounded-[10px] bg-blue-600 px-5 font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
-                    Add URL
+                    {t("externalSources.form.addUrl")}
                 </button>
             </form>
 
-            {/* Supported Websites */}
             <p className="mb-5 text-sm text-slate-500">
-                Supported websites: Aqari Annonces, Mr Semsar, and
-                3a9arai. New websites can also be registered automatically.
+                {t("externalSources.supportedWebsites")}
             </p>
 
-            {/* Feedback Messages */}
             {error && (
                 <div
                     role="alert"
@@ -212,7 +206,7 @@ export default function ExternalListingSources() {
                         onClick={loadSources}
                         className="shrink-0 font-semibold underline underline-offset-2 hover:text-red-900"
                     >
-                        Retry
+                        {t("common.retry")}
                     </button>
                 </div>
             )}
@@ -226,19 +220,19 @@ export default function ExternalListingSources() {
                 </p>
             )}
 
-            {/* Saved Sources */}
             <div className="w-full min-w-0">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
-                        Registered Sources
+                        {t("externalSources.registeredSources")}
                     </h2>
 
                     <div className="flex flex-wrap items-center gap-2">
                         <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
-                            {urls.length} {urls.length === 1 ? "source" : "sources"}
+                            {t("externalSources.sourceCount", {
+                                count: urls.length,
+                            })}
                         </span>
 
-                        {/* Import New Listings */}
                         <button
                             type="button"
                             onClick={handleImport}
@@ -265,10 +259,11 @@ export default function ExternalListingSources() {
                                 />
                             </svg>
 
-                            {importing ? "Importing..." : "Import New Listings"}
+                            {importing
+                                ? t("externalSources.actions.importing")
+                                : t("externalSources.actions.import")}
                         </button>
 
-                        {/* Refresh Existing Listings */}
                         <button
                             type="button"
                             onClick={handleRefresh}
@@ -295,7 +290,9 @@ export default function ExternalListingSources() {
                                 />
                             </svg>
 
-                            {refreshing ? "Refreshing..." : "Refresh"}
+                            {refreshing
+                                ? t("externalSources.actions.refreshing")
+                                : t("externalSources.actions.refresh")}
                         </button>
                     </div>
                 </div>
@@ -303,18 +300,17 @@ export default function ExternalListingSources() {
                 {loading ? (
                     <div className="flex min-h-40 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white p-6">
                         <p className="text-sm text-slate-500">
-                            Loading sources...
+                            {t("externalSources.loading")}
                         </p>
                     </div>
                 ) : urls.length === 0 ? (
                     <div className="flex min-h-40 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center sm:py-12">
                         <p className="font-semibold text-slate-700">
-                            No external listing sources added yet.
+                            {t("externalSources.empty.title")}
                         </p>
 
                         <p className="mt-2 text-sm text-slate-500">
-                            Add a supported property listing URL above
-                            to get started.
+                            {t("externalSources.empty.description")}
                         </p>
                     </div>
                 ) : (
@@ -324,15 +320,13 @@ export default function ExternalListingSources() {
                                 key={sourceUrl}
                                 className="flex w-full min-w-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-blue-300 sm:flex-row sm:items-center sm:gap-4 sm:p-4 lg:p-5"
                             >
-                                {/* Source Number */}
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-blue-50 text-sm font-bold text-blue-700">
                                     {String(index + 1).padStart(2, "0")}
                                 </div>
 
-                                {/* Clickable URL */}
                                 <div className="min-w-0 flex-1">
                                     <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                        Listing source
+                                        {t("externalSources.listingSource")}
                                     </p>
 
                                     <a
@@ -346,7 +340,6 @@ export default function ExternalListingSources() {
                                     </a>
                                 </div>
 
-                                {/* Actions */}
                                 <div className="flex w-full shrink-0 items-center sm:w-auto">
                                     <a
                                         href={sourceUrl}
@@ -354,7 +347,7 @@ export default function ExternalListingSources() {
                                         rel="noopener noreferrer"
                                         className="mr-2 flex h-10 min-w-0 flex-1 items-center justify-center rounded-[10px] border border-slate-300 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none"
                                     >
-                                        Open link
+                                        {t("externalSources.actions.openLink")}
                                     </a>
 
                                     <button
@@ -364,8 +357,8 @@ export default function ExternalListingSources() {
                                         className="h-10 shrink-0 rounded-[10px] border border-red-200 px-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
                                     >
                                         {removingUrl === sourceUrl
-                                            ? "Deleting..."
-                                            : "Delete"}
+                                            ? t("externalSources.actions.deleting")
+                                            : t("externalSources.actions.delete")}
                                     </button>
                                 </div>
                             </article>

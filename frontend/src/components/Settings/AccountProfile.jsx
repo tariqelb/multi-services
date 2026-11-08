@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getCountries, getCountryCallingCode } from "libphonenumber-js";
+import { useTranslation } from "react-i18next";
 
 import {
     Alert,
@@ -77,17 +78,14 @@ function splitPhoneNumber(value = "") {
 function getProfileImageUrl(image) {
     if (!image) return undefined;
 
-    // Temporary preview while the image is being uploaded.
     if (image.startsWith("data:image/")) {
         return image;
     }
 
-    // Absolute URL.
     if (/^https?:\/\//i.test(image)) {
         return image;
     }
 
-    // Backend uploaded image.
     if (image.startsWith("/uploads/")) {
         return `${BACKEND_URL}${image}`;
     }
@@ -106,6 +104,8 @@ export default function AccountProfile({
     onRetry,
     onImageChanged,
 }) {
+    const { t } = useTranslation();
+
     const imageInputRef = useRef(null);
 
     const [countryCode, setCountryCode] = useState("+212");
@@ -157,12 +157,12 @@ export default function AccountProfile({
         if (!file) return;
 
         if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-            alert("Please select a valid JPG, PNG, or WEBP image.");
+            alert(t("settings.profile.invalidImage"));
             return;
         }
 
         if (file.size > MAX_IMAGE_SIZE) {
-            alert("The profile image must be smaller than 2 MB.");
+            alert(t("settings.profile.imageTooLarge"));
             return;
         }
 
@@ -180,7 +180,7 @@ export default function AccountProfile({
         };
 
         reader.onerror = () => {
-            alert("Unable to read the selected image.");
+            alert(t("settings.profile.imageReadError"));
         };
 
         reader.readAsDataURL(file);
@@ -242,18 +242,18 @@ export default function AccountProfile({
                             fontWeight={700}
                             sx={{ mb: 0.5 }}
                         >
-                            Account &amp; Profile
+                            {t("settings.profile.sectionTitle")}
                         </Typography>
 
                         <Typography variant="body2" color="text.secondary">
-                            Manage your personal information.
+                            {t("settings.profile.sectionSubtitle")}
                         </Typography>
                     </Box>
                 </Stack>
 
                 {profileLoading && (
                     <Alert severity="info" sx={{ mb: 3 }}>
-                        Loading your saved profile...
+                        {t("settings.profile.loading")}
                     </Alert>
                 )}
 
@@ -267,7 +267,7 @@ export default function AccountProfile({
                                 size="small"
                                 onClick={onRetry}
                             >
-                                Retry
+                                {t("settings.profile.retry")}
                             </Button>
                         }
                     >
@@ -306,7 +306,7 @@ export default function AccountProfile({
                                     mb: 0.5,
                                 }}
                             >
-                                Profile picture
+                                {t("settings.profile.pictureTitle")}
                             </Typography>
 
                             <Typography
@@ -314,8 +314,7 @@ export default function AccountProfile({
                                 color="text.secondary"
                                 sx={{ mb: 2 }}
                             >
-                                Update your picture to help others recognize
-                                you.
+                                {t("settings.profile.pictureDescription")}
                             </Typography>
 
                             <Stack
@@ -337,7 +336,7 @@ export default function AccountProfile({
                                         borderRadius: 2,
                                     }}
                                 >
-                                    Upload picture
+                                    {t("settings.profile.uploadPicture")}
 
                                     <input
                                         ref={imageInputRef}
@@ -354,7 +353,7 @@ export default function AccountProfile({
                                         onClick={handleRemoveImage}
                                         sx={{ textTransform: "none" }}
                                     >
-                                        Remove picture
+                                        {t("settings.profile.removePicture")}
                                     </Button>
                                 )}
                             </Stack>
@@ -364,7 +363,7 @@ export default function AccountProfile({
                                 color="text.secondary"
                                 display="block"
                             >
-                                JPG, PNG, or WEBP. Maximum size: 2 MB.
+                                {t("settings.profile.imageRequirements")}
                             </Typography>
                         </Box>
                     </Stack>
@@ -384,7 +383,7 @@ export default function AccountProfile({
                         }}
                     >
                         <TextField
-                            label="First name"
+                            label={t("settings.profile.firstName")}
                             name="firstName"
                             value={profile.firstName}
                             onChange={handleChange}
@@ -393,7 +392,7 @@ export default function AccountProfile({
                         />
 
                         <TextField
-                            label="Last name"
+                            label={t("settings.profile.lastName")}
                             name="lastName"
                             value={profile.lastName}
                             onChange={handleChange}
@@ -402,7 +401,7 @@ export default function AccountProfile({
                         />
 
                         <TextField
-                            label="Email address"
+                            label={t("settings.profile.email")}
                             name="email"
                             type="email"
                             value={profile.email}
@@ -425,7 +424,7 @@ export default function AccountProfile({
                         >
                             <TextField
                                 select
-                                label="Country code"
+                                label={t("settings.profile.countryCode")}
                                 value={
                                     COUNTRY_CODES.find(
                                         (country) =>
@@ -460,7 +459,7 @@ export default function AccountProfile({
                             </TextField>
 
                             <TextField
-                                label="Phone number"
+                                label={t("settings.profile.phoneNumber")}
                                 type="tel"
                                 value={localNumber}
                                 onChange={handlePhoneNumberChange}
@@ -471,7 +470,7 @@ export default function AccountProfile({
                         </Box>
 
                         <TextField
-                            label="Address"
+                            label={t("settings.profile.address")}
                             name="address"
                             value={profile.address}
                             onChange={handleChange}
@@ -480,7 +479,7 @@ export default function AccountProfile({
                         />
 
                         <TextField
-                            label="Biography"
+                            label={t("settings.profile.biography")}
                             name="bio"
                             value={profile.bio}
                             onChange={handleChange}
@@ -518,7 +517,9 @@ export default function AccountProfile({
                                 minHeight: 48,
                             }}
                         >
-                            {profileSaving ? "Saving..." : "Save profile"}
+                            {profileSaving
+                                ? t("settings.profile.saving")
+                                : t("settings.profile.save")}
                         </Button>
                     </Stack>
                 </form>

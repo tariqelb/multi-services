@@ -11,6 +11,7 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import TodayOutlinedIcon from "@mui/icons-material/TodayOutlined";
@@ -107,7 +108,8 @@ function SummaryCard({ title, value, icon, description }) {
 }
 
 function VisitorCard({ visitor }) {
-    const name = visitor.fullName || "Anonymous visitor";
+    const { t } = useTranslation();
+    const name = visitor.fullName || t("visitsSection.anonymousVisitor");
 
     const initials = name
         .split(/\s+/)
@@ -157,7 +159,7 @@ function VisitorCard({ visitor }) {
                             color="text.secondary"
                             sx={{ overflowWrap: "anywhere" }}
                         >
-                            {visitor.email || "No account email"}
+                            {visitor.email || t("visitsSection.noAccountEmail")}
                         </Typography>
 
                         <Typography
@@ -165,7 +167,7 @@ function VisitorCard({ visitor }) {
                             color="text.secondary"
                             sx={{ overflowWrap: "anywhere" }}
                         >
-                            User ID: {visitor.userId || "Anonymous"}
+                            {t("visitsSection.userId")}: {visitor.userId || t("visitsSection.anonymous")}
                         </Typography>
                     </Box>
 
@@ -174,7 +176,7 @@ function VisitorCard({ visitor }) {
                             variant="body2"
                             fontWeight={700}
                         >
-                            Active time
+                            {t("visitsSection.activeTime")}
                         </Typography>
 
                         <Typography color="text.secondary">
@@ -185,7 +187,9 @@ function VisitorCard({ visitor }) {
                             variant="caption"
                             color="text.secondary"
                         >
-                            {visitor.pageViews || 0} page views
+                            {t("visitsSection.pageViews", {
+                                count: visitor.pageViews || 0,
+                            })}
                         </Typography>
                     </Box>
                 </Stack>
@@ -209,7 +213,7 @@ function VisitorCard({ visitor }) {
                             variant="caption"
                             color="text.secondary"
                         >
-                            First visit
+                            {t("visitsSection.firstVisit")}
                         </Typography>
 
                         <Typography variant="body2" fontWeight={600}>
@@ -222,7 +226,7 @@ function VisitorCard({ visitor }) {
                             variant="caption"
                             color="text.secondary"
                         >
-                            Last activity
+                            {t("visitsSection.lastActivity")}
                         </Typography>
 
                         <Typography variant="body2" fontWeight={600}>
@@ -236,7 +240,7 @@ function VisitorCard({ visitor }) {
                                 variant="caption"
                                 color="text.secondary"
                             >
-                                Last page
+                                {t("visitsSection.lastPage")}
                             </Typography>
 
                             <Typography
@@ -254,6 +258,8 @@ function VisitorCard({ visitor }) {
 }
 
 export default function VisitsSection() {
+    const { t } = useTranslation();
+
     const [analytics, setAnalytics] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -277,7 +283,7 @@ export default function VisitsSection() {
                 if (!cancelled) {
                     setError(
                         err.response?.data?.message ||
-                            "Failed to load visit analytics."
+                            t("visitsSection.loadError")
                     );
                 }
             } finally {
@@ -301,7 +307,7 @@ export default function VisitsSection() {
         <Box>
             <Box mb={3}>
                 <Typography variant="h5" fontWeight={700}>
-                    Website Visits
+                    {t("visitsSection.title")}
                 </Typography>
 
                 <Typography
@@ -309,7 +315,7 @@ export default function VisitsSection() {
                     color="text.secondary"
                     mt={0.5}
                 >
-                    Monitor visitor sessions and estimated active time.
+                    {t("visitsSection.subtitle")}
                 </Typography>
             </Box>
 
@@ -324,48 +330,48 @@ export default function VisitsSection() {
                     <Grid container spacing={2} mb={4}>
                         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                             <SummaryCard
-                                title="Visits Today"
+                                title={t("visitsSection.visitsToday")}
                                 value={summary?.dailyVisits ?? 0}
                                 icon={<TodayOutlinedIcon />}
-                                description="Sessions started today (UTC)"
+                                description={t("visitsSection.sessionsStartedToday")}
                             />
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                             <SummaryCard
-                                title="Total Visits"
+                                title={t("visitsSection.totalVisits")}
                                 value={summary?.totalVisits ?? 0}
                                 icon={<PeopleAltOutlinedIcon />}
-                                description="All recorded sessions"
+                                description={t("visitsSection.allRecordedSessions")}
                             />
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                             <SummaryCard
-                                title="Active Time Today"
+                                title={t("visitsSection.activeTimeToday")}
                                 value={formatDuration(
                                     summary?.dailyActiveSeconds
                                 )}
                                 icon={<AccessTimeOutlinedIcon />}
-                                description="Estimated time across today's sessions"
+                                description={t("visitsSection.estimatedTodayTime")}
                             />
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                             <SummaryCard
-                                title="Total Active Time"
+                                title={t("visitsSection.totalActiveTime")}
                                 value={formatDuration(
                                     summary?.totalActiveSeconds
                                 )}
                                 icon={<HistoryOutlinedIcon />}
-                                description="Estimated time across all sessions"
+                                description={t("visitsSection.estimatedAllTime")}
                             />
                         </Grid>
                     </Grid>
 
                     <Box mb={2}>
                         <Typography variant="h6" fontWeight={700}>
-                            Recent Visitors
+                            {t("visitsSection.recentVisitors")}
                         </Typography>
 
                         <Typography
@@ -373,15 +379,13 @@ export default function VisitsSection() {
                             color="text.secondary"
                             mt={0.5}
                         >
-                            Latest 100 recorded sessions.
+                            {t("visitsSection.latestSessions")}
                         </Typography>
                     </Box>
 
                     {visitors.length === 0 ? (
                         <Alert severity="info">
-                            No visits have been recorded yet. Browse your
-                            application in another tab to generate the first
-                            visit.
+                            {t("visitsSection.empty")}
                         </Alert>
                     ) : (
                         <Stack spacing={2}>

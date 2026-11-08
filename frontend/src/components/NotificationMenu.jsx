@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect, useState } from "react";
 import {
     Badge,
@@ -180,34 +181,50 @@ export default function NotificationMenu() {
         <>
             {/* Notification button */}
             <Tooltip title="Notifications">
-                <IconButton
+                <Button
                     color="inherit"
                     onClick={handleOpen}
                     aria-label={`Notifications, ${unreadCount} unread`}
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
+                    startIcon={
+                        <Badge
+                            badgeContent={unreadCount}
+                            color="error"
+                            max={99}
+                            overlap="circular"
+                        >
+                            {unreadCount > 0 ? (
+                                <NotificationsActive />
+                            ) : (
+                                <NotificationsNone />
+                            )}
+                        </Badge>
+                    }
                     sx={{
-                        width: 40,
+                        minWidth: "auto",
+                        width: "auto",
                         height: 40,
-                        minWidth: 40,
-                        flexShrink: 0,
-                        p: 1,
+                        px: 2,
                         borderRadius: "10px",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                        gap: 0.5,
                     }}
                 >
-                    <Badge
-                        badgeContent={unreadCount}
-                        color="error"
-                        max={99}
-                        overlap="circular"
+                    <Box
+                        sx={{
+                            display: {
+                                xs: "none",
+                                sm: "block",
+                            },
+                        }}
                     >
-                        {unreadCount > 0 ? (
-                            <NotificationsActive />
-                        ) : (
-                            <NotificationsNone />
-                        )}
-                    </Badge>
-                </IconButton>
+                        Notifications
+                    </Box>
+                </Button>
             </Tooltip>
 
             {/* Notifications dropdown */}
@@ -269,14 +286,27 @@ export default function NotificationMenu() {
 
                     <Tooltip title="Mark all as read">
                         <span>
-                            <IconButton
+                            <Button
                                 size="small"
+                                variant="outlined"
+                                startIcon={<DoneAll />}
                                 onClick={handleMarkAllAsRead}
                                 disabled={unreadCount === 0}
-                                aria-label="Mark all notifications as read"
+                                sx={{
+                                    width: "auto",
+                                    minWidth: 0,
+                                    height: 34,
+                                    px: 1.5,
+                                    borderRadius: "8px",
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                    fontSize: "0.78rem",
+                                    whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                }}
                             >
-                                <DoneAll fontSize="small" />
-                            </IconButton>
+                                Mark all as read
+                            </Button>
                         </span>
                     </Tooltip>
                 </Box>

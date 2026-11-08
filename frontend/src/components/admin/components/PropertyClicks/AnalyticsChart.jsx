@@ -1,9 +1,12 @@
+
 import {
     Card,
     CardContent,
     Box,
     Typography,
 } from "@mui/material";
+
+import { useTranslation } from "react-i18next";
 
 import {
     ResponsiveContainer,
@@ -16,6 +19,8 @@ import {
 } from "recharts";
 
 const AnalyticsChart = ({ title, data = [] }) => {
+    const { t } = useTranslation();
+
     const hasData = Array.isArray(data) && data.length > 0;
 
     return (
@@ -75,11 +80,15 @@ const AnalyticsChart = ({ title, data = [] }) => {
 
                                 <Tooltip
                                     cursor={{ fill: "#2563EB", opacity: 0.08 }}
+                                    formatter={(value) => [
+                                        value,
+                                        t("adminPropertyClicks.charts.clicks"),
+                                    ]}
                                 />
 
                                 <Bar
                                     dataKey="clicks"
-                                    name="Clicks"
+                                    name={t("adminPropertyClicks.charts.clicks")}
                                     fill="#2563EB"
                                     radius={[6, 6, 0, 0]}
                                     maxBarSize={55}
@@ -100,7 +109,7 @@ const AnalyticsChart = ({ title, data = [] }) => {
                             color="text.secondary"
                             variant="body2"
                         >
-                            No analytics data available yet.
+                            {t("adminPropertyClicks.charts.noData")}
                         </Typography>
                     </Box>
                 )}

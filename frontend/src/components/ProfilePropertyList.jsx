@@ -1,4 +1,7 @@
+
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Typography,
@@ -18,6 +21,8 @@ export default function ProfilePropertyList({
     onSelectProperty,
     listRef,
 }) {
+    const { t } = useTranslation();
+
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -28,8 +33,7 @@ export default function ProfilePropertyList({
     const [page, setPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Fetch properties from the backend.
-    // Fetch properties published by the logged-in user from the backend.
+    // Fetch properties published by the logged-in user.
     useEffect(() => {
         let cancelled = false;
 
@@ -38,7 +42,6 @@ export default function ProfilePropertyList({
             setError(null);
 
             try {
-                // Updated endpoint to fetch only the logged-in user's properties
                 const response = await axiosInstance.get(
                     "/property/user-listings"
                 );
@@ -60,7 +63,7 @@ export default function ProfilePropertyList({
                     setError(
                         err.response?.data?.message ||
                         err.message ||
-                        "Failed to fetch your properties"
+                        t("properties.profileList.fetchError")
                     );
                 }
             } finally {
@@ -75,14 +78,13 @@ export default function ProfilePropertyList({
         return () => {
             cancelled = true;
         };
-    }, [refreshTrigger]);
+    }, [refreshTrigger, t]);
 
     const handleDeleteProperty = async (propertyId) => {
         try {
-            // Matches the router.delete("/:id", ...) route
-            await axiosInstance.delete(`/property/deleteProperty/${propertyId}`);
-
-            // Or if using Option B: await axiosInstance.delete(`/property/deleteProperty/${propertyId}`);
+            await axiosInstance.delete(
+                `/property/deleteProperty/${propertyId}`
+            );
 
             setProperties((prev) =>
                 prev.filter((p) => (p._id || p.id) !== propertyId)
@@ -90,12 +92,12 @@ export default function ProfilePropertyList({
         } catch (err) {
             alert(
                 err.response?.data?.message ||
-                "Failed to delete the property publication."
+                t("properties.profileList.deleteError")
             );
         }
     };
 
-    // Filter properties by category.
+    // Filter properties using the original category values.
     const filteredProperties =
         selectedCategory === "All Properties"
             ? properties
@@ -105,17 +107,13 @@ export default function ProfilePropertyList({
                     selectedCategory.toLowerCase()
             );
 
-    // Change category and reset pagination WITHOUT jumping to top
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);
         setPage(1);
-        // Removed scrollIntoView call to keep screen position locked
     };
 
-    // Handle pagination WITHOUT jumping to top
     const handlePageChange = (event, value) => {
         setPage(value);
-        // Removed scrollIntoView call to prevent page snapping to top
     };
 
     const totalPages = Math.ceil(
@@ -126,6 +124,27 @@ export default function ProfilePropertyList({
         (page - 1) * itemsPerPage,
         page * itemsPerPage
     );
+
+    // Translate category labels without changing their stored values.
+    const getCategoryLabel = (category) => {
+        if (category === "All Properties") {
+            return t("properties.profileList.allProperties");
+        }
+
+        const categoryKey = {
+            "commercial space": "commercialSpace",
+            "commercial store": "commercialStore",
+        }[category.toLowerCase()] ||
+            category
+                .toLowerCase()
+                .replace(/[^a-z0-9]+(.)/g, (_, char) =>
+                    char.toUpperCase()
+                );
+
+        return t(`properties.categories.${categoryKey}`, {
+            defaultValue: category,
+        });
+    };
 
     if (loading) {
         return (
@@ -149,6 +168,8 @@ export default function ProfilePropertyList({
         );
     }
 
+    const categoryLabel = getCategoryLabel(selectedCategory);
+
     return (
         <Box
             ref={listRef}
@@ -158,10 +179,8 @@ export default function ProfilePropertyList({
                 maxWidth: "100%",
                 mx: "auto",
                 p: { xs: 2, md: 4 },
-                // mx: "auto",
             }}
         >
-            {/* Property category filter */}
             <PropertyCategoryBar
                 properties={properties}
                 selectedCategory={selectedCategory}
@@ -187,8 +206,10 @@ export default function ProfilePropertyList({
                     }}
                 >
                     {selectedCategory === "All Properties"
-                        ? "My Property Publications"
-                        : `${selectedCategory} Publications`}
+                        ? t("properties.profileList.myPublications")
+                        : t("properties.profileList.categoryPublications", {
+                            category: categoryLabel,
+                        })}
                 </Typography>
 
                 <Typography
@@ -197,8 +218,8 @@ export default function ProfilePropertyList({
                 >
                     {filteredProperties.length}{" "}
                     {filteredProperties.length === 1
-                        ? "property"
-                        : "properties"}
+                        ? t("properties.profileList.property")
+                        : t("properties.profileList.properties")}
                 </Typography>
             </Box>
 
@@ -221,18 +242,18 @@ export default function ProfilePropertyList({
                             mb: 1,
                         }}
                     >
-                        No{" "}
                         {selectedCategory === "All Properties"
-                            ? ""
-                            : `${selectedCategory.toLowerCase()} `}
-                        properties found
+                            ? t("properties.profileList.noProperties")
+                            : t("properties.profileList.noCategoryProperties", {
+                                category: categoryLabel.toLowerCase(),
+                            })}
                     </Typography>
 
                     <Typography
                         variant="body2"
                         sx={{ color: "#5B6577", mb: 2 }}
                     >
-                        You haven't published any listings in this category yet.
+                        {t("properties.profileList.emptySubtitle")}
                     </Typography>
 
                     {selectedCategory !== "All Properties" && (
@@ -243,20 +264,21 @@ export default function ProfilePropertyList({
                             }
                             sx={{ textTransform: "none" }}
                         >
-                            View all properties
+                            {t("properties.profileList.viewAll")}
                         </Button>
                     )}
                 </Box>
             ) : (
                 <>
-                    {/* Vertical Column Stack of Horizontal User Profile Cards */}
                     <Stack spacing={2.5}>
                         {displayedProperties.map((property) => (
                             <UserProfilePropertyCard
                                 key={property._id || property.id}
                                 property={property}
-                                onViewDetails={(prop) =>
-                                    onSelectProperty?.(prop)
+                                onViewDetails={
+                                    onSelectProperty
+                                        ? (prop) => onSelectProperty(prop)
+                                        : undefined
                                 }
                                 onDelete={handleDeleteProperty}
                             />

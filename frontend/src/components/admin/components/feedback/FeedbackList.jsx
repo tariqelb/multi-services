@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import {
     Box,
@@ -28,20 +29,16 @@ const priorityStyles = {
     high: { bgcolor: "#fee2e2", color: "#b91c1c" },
 };
 
-const formatDate = (date) => {
-    if (!date) return "Date unavailable";
-
-    return new Date(date).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    });
-};
-
 const formatLabel = (value = "") =>
-    value.replaceAll("_", " ").replace(/\b\w/g, (char) =>
+    String(value).replaceAll("_", " ").replace(/\b\w/g, (char) =>
         char.toUpperCase()
     );
+
+const getLocale = (language) => {
+    if (language?.startsWith("ar")) return "ar";
+    if (language?.startsWith("fr")) return "fr-FR";
+    return "en-GB";
+};
 
 export default function FeedbackList({
     feedbacks = [],
@@ -51,6 +48,32 @@ export default function FeedbackList({
     onLimitChange,
     total = 0,
 }) {
+    const { t, i18n } = useTranslation();
+
+    const translateValue = (value, category) => {
+        if (!value) return "";
+
+        return t(
+            `adminFeedback.${category}.${value}`,
+            formatLabel(value)
+        );
+    };
+
+    const formatDate = (date) => {
+        if (!date) {
+            return t("adminFeedback.common.dateUnavailable");
+        }
+
+        return new Date(date).toLocaleDateString(
+            getLocale(i18n.language),
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            }
+        );
+    };
+
     return (
         <Box
             sx={{
@@ -80,7 +103,7 @@ export default function FeedbackList({
                     alignItems="center"
                 >
                     <Typography fontWeight={700} color="#0f172a">
-                        Submissions
+                        {t("adminFeedback.list.submissions")}
                     </Typography>
 
                     <Chip
@@ -109,7 +132,9 @@ export default function FeedbackList({
                     >
                         <MenuItem value="10">10</MenuItem>
                         <MenuItem value="50">50</MenuItem>
-                        <MenuItem value="all">All</MenuItem>
+                        <MenuItem value="all">
+                            {t("adminFeedback.list.all")}
+                        </MenuItem>
                     </Select>
                 </FormControl>
             </Box>
@@ -243,13 +268,19 @@ export default function FeedbackList({
                                         useFlexGap
                                     >
                                         <Chip
-                                            label={formatLabel(feedback.type)}
+                                            label={translateValue(
+                                                feedback.type,
+                                                "types"
+                                            )}
                                             size="small"
                                             variant="outlined"
                                         />
 
                                         <Chip
-                                            label={formatLabel(feedback.priority)}
+                                            label={translateValue(
+                                                feedback.priority,
+                                                "priorities"
+                                            )}
                                             size="small"
                                             sx={{
                                                 ...priorityStyles[feedback.priority],
@@ -258,7 +289,10 @@ export default function FeedbackList({
                                         />
 
                                         <Chip
-                                            label={formatLabel(feedback.status)}
+                                            label={translateValue(
+                                                feedback.status,
+                                                "statuses"
+                                            )}
                                             size="small"
                                             sx={{
                                                 ...statusStyles[feedback.status],

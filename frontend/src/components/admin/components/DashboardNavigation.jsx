@@ -1,12 +1,15 @@
 
-import { Card, Tab, Tabs } from "@mui/material";
+import { Box, Card, Tab, Tabs } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import MouseOutlinedIcon from "@mui/icons-material/MouseOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
-import ArticleIcon from "@mui/icons-material/Article";
+import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
+import PhoneInTalkOutlinedIcon from "@mui/icons-material/PhoneInTalkOutlined";
+import QueryStatsOutlinedIcon from "@mui/icons-material/QueryStatsOutlined";
 
 const navigationItems = [
     {
@@ -30,98 +33,136 @@ const navigationItems = [
         icon: <HomeWorkOutlinedIcon />,
     },
     {
+        label: "Property Demand",
+        value: "property demand",
+        icon: <QueryStatsOutlinedIcon />,
+    },
+    {
         label: "Publications Review",
         value: "publications",
-        icon: <ArticleIcon />,
+        icon: <ArticleOutlinedIcon />,
     },
     {
         label: "Feedback",
         value: "feedback",
         icon: <FeedbackOutlinedIcon />,
-    }
+    },
+    {
+        label: "Client Call Actions",
+        value: "client call action",
+        icon: <PhoneInTalkOutlinedIcon />,
+    },
 ];
 
 export default function DashboardNavigation({
     activeTab,
     setActiveTab,
 }) {
+    const { t } = useTranslation();
+
     return (
         <Card
+            elevation={0}
             sx={{
                 width: "100%",
                 minWidth: 0,
+                mb: 3,
+                p: { xs: 0.75, sm: 1 },
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 3,
+                backgroundColor: "background.paper",
                 overflow: "hidden",
-                borderRadius: 2,
-                mb: 5,
             }}
         >
-            <Tabs
-                value={activeTab}
-                onChange={(_, value) => setActiveTab(value)}
-                variant="scrollable"
-                scrollButtons={false}
-                allowScrollButtonsMobile={false}
+            <Box
                 sx={{
                     width: "100%",
-                    minHeight: 64,
-
-                    "& .MuiTabs-scroller": {
-                        overflowX: "auto !important",
-                        scrollbarWidth: "none",
-                        "&::-webkit-scrollbar": {
-                            display: "none",
-                        },
-                    },
-
-                    "& .MuiTabs-flexContainer": {
-                        width: { xs: "max-content", sm: "100%" },
-                    },
-
-                    "& .MuiTab-root": {
-                        flex: { xs: "0 0 auto", sm: 1 },
-                        minWidth: { xs: 145, sm: 0 },
-                        minHeight: 64,
-                        px: { xs: 2, sm: 1.5, md: 2 },
-                        py: 1.5,
-                        fontSize: {
-                            xs: "0.75rem",
-                            sm: "0.8rem",
-                            md: "0.9rem",
-                        },
-                        fontWeight: 600,
-                        gap: 1,
-                        whiteSpace: "normal",
-                        lineHeight: 1.3,
-                        transition: "background-color 0.2s ease",
-                    },
-
-                    "& .MuiTab-iconWrapper": {
-                        fontSize: { xs: 19, sm: 21 },
-                        marginBottom: "0 !important",
-                    },
-
-                    "& .Mui-selected": {
-                        color: "#1D4ED8",
-                        backgroundColor: "#EFF6FF",
-                    },
-
-                    "& .MuiTabs-indicator": {
-                        height: 3,
-                        backgroundColor: "#2563EB",
-                        borderRadius: "3px 3px 0 0",
+                    overflowX: "auto",
+                    scrollbarWidth: "none",
+                    "&::-webkit-scrollbar": {
+                        display: "none",
                     },
                 }}
             >
-                {navigationItems.map((item) => (
-                    <Tab
-                        key={item.value}
-                        value={item.value}
-                        label={item.label}
-                        icon={item.icon}
-                        iconPosition="start"
-                    />
-                ))}
-            </Tabs>
+                <Tabs
+                    value={activeTab}
+                    onChange={(_, value) => setActiveTab(value)}
+                    variant="scrollable"
+                    scrollButtons={false}
+                    allowScrollButtonsMobile={false}
+                    sx={{
+                        minHeight: "auto",
+                        width: "100%",
+
+                        "& .MuiTabs-scroller": {
+                            overflow: "visible !important",
+                        },
+
+                        "& .MuiTabs-flexContainer": {
+                            display: "flex",
+                            gap: { xs: 0.5, sm: 0.75 },
+                            width: { xs: "max-content", md: "100%" },
+                        },
+
+                        "& .MuiTabs-indicator": {
+                            display: "none",
+                        },
+
+                        "& .MuiTab-root": {
+                            flex: { xs: "0 0 105px", sm: "1 1 0" },
+                            minWidth: { xs: 105, sm: 0 },
+                            maxWidth: { md: "none" },
+                            minHeight: { xs: 76, sm: 82 },
+                            px: { xs: 0.75, sm: 1 },
+                            py: 1.25,
+                            gap: 0.75,
+                            borderRadius: 2,
+                            color: "text.secondary",
+                            fontSize: {
+                                xs: "0.68rem",
+                                sm: "0.7rem",
+                                md: "0.74rem",
+                            },
+                            fontWeight: 600,
+                            lineHeight: 1.25,
+                            textTransform: "none",
+                            whiteSpace: "normal",
+                            textAlign: "center",
+                            transition: "all 0.2s ease",
+
+                            "& .MuiTab-iconWrapper": {
+                                mb: 0,
+                                fontSize: { xs: 21, sm: 23 },
+                                color: "inherit",
+                            },
+
+                            "&:hover": {
+                                backgroundColor: "action.hover",
+                                color: "primary.main",
+                            },
+
+                            "&.Mui-selected": {
+                                color: "primary.main",
+                                backgroundColor: "action.selected",
+                            },
+                        },
+                    }}
+                >
+                    {navigationItems.map((item) => (
+                        <Tab
+                            key={item.value}
+                            value={item.value}
+                            label={t(
+                                `dashboardNavigation.${item.value}`,
+                                item.label
+                            )}
+                            icon={item.icon}
+                            iconPosition="top"
+                        />
+                    ))}
+                </Tabs>
+            </Box>
         </Card>
     );
 }

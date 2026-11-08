@@ -3,6 +3,7 @@ import Property from "../../DatabaseModels/Schema/Property.js";
 // @route   GET /api/property
 // @access  Public
 export const getProperties = async (req, res) => {
+    console.log("called getProperties")
     try {
         // Fetch all properties, sorted by newest first
         const properties = await Property.find().sort({ createdAt: -1 });

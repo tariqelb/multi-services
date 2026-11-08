@@ -1,8 +1,7 @@
-
 import mongoose from "mongoose";
 import PropertyAlert from "../../DatabaseModels/Schema/PropertyAlert.js";
 
-// Create a property alert
+// Create a property alert.
 export const createPropertyAlert = async (req, res) => {
     try {
         const userId = req.user?.userId;
@@ -14,28 +13,19 @@ export const createPropertyAlert = async (req, res) => {
             });
         }
 
-        if (
-            typeof city !== "string" ||
-            !city.trim()
-        ) {
+        if (typeof city !== "string" || !city.trim()) {
             return res.status(400).json({
                 message: "City is required.",
             });
         }
 
-        if (
-            !Array.isArray(propertyTypes) ||
-            propertyTypes.length === 0
-        ) {
+        if (!Array.isArray(propertyTypes) || propertyTypes.length === 0) {
             return res.status(400).json({
                 message: "Select at least one property type.",
             });
         }
 
-        if (
-            !Array.isArray(listingTypes) ||
-            listingTypes.length === 0
-        ) {
+        if (!Array.isArray(listingTypes) || listingTypes.length === 0) {
             return res.status(400).json({
                 message: "Select For Sale, For Rent, or both.",
             });
@@ -67,7 +57,8 @@ export const createPropertyAlert = async (req, res) => {
     }
 };
 
-// Get the logged-in user's property alerts
+// Get the logged-in user's active alerts by default.
+// Pass ?includeArchived=true to retrieve archived alerts too.
 export const getMyPropertyAlerts = async (req, res) => {
     try {
         const userId = req.user?.userId;
@@ -78,9 +69,16 @@ export const getMyPropertyAlerts = async (req, res) => {
             });
         }
 
-        const propertyAlerts = await PropertyAlert.find({
-            user: userId,
-        })
+        const includeArchived =
+            req.query.includeArchived === "true";
+
+        const filter = { user: userId };
+
+        if (!includeArchived) {
+           filter.isArchived = { $ne: true };
+        }
+
+        const propertyAlerts = await PropertyAlert.find(filter)
             .sort({ createdAt: -1 })
             .lean();
 
@@ -97,8 +95,9 @@ export const getMyPropertyAlerts = async (req, res) => {
     }
 };
 
-// Delete a property alert owned by the logged-in user
-export const deletePropertyAlert = async (req, res) => {
+// Archive an alert instead of permanently deleting it.
+// Kept under the existing DELETE route for frontend compatibility.
+export const archivePropertyAlert = async (req, res) => {
     try {
         const userId = req.user?.userId;
         const { id } = req.params;
@@ -115,27 +114,95 @@ export const deletePropertyAlert = async (req, res) => {
             });
         }
 
-        const propertyAlert =
-            await PropertyAlert.findOneAndDelete({
+        const propertyAlert = await PropertyAlert.findOneAndUpdate(
+            {
                 _id: id,
                 user: userId,
-            });
+                isArchived: { $ne: true },
+            },
+            {
+                $set: {
+                    isArchived: true,
+                    archivedAt: new Date(),
+                },
+            },
+            {
+                new: true,
+            }
+        );
 
         if (!propertyAlert) {
             return res.status(404).json({
-                message: "Property alert not found.",
+                message: "Active property alert not found.",
             });
         }
 
         return res.status(200).json({
-            message: "Property alert deleted successfully.",
-            propertyAlertId: id,
+            message: "Property alert archived successfully.",
+            propertyAlert,
         });
     } catch (error) {
-        console.error("Delete property alert error:", error);
+        console.error("Archive property alert error:", error);
 
         return res.status(500).json({
-            message: "Failed to delete property alert.",
+            message: "Failed to archive property alert.",
         });
     }
 };
+
+// Restore an archived alert.
+export const restorePropertyAlert = async (req, res) => {
+    try {
+        const userId = req.user?.userId;
+        const { id } = req.params;
+
+        if (!userId) {
+            return res.status(401).json({
+                message: "Authentication required.",
+            });
+        }
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                message: "Invalid property alert ID.",
+            });
+        }
+
+        const propertyAlert = await PropertyAlert.findOneAndUpdate(
+            {
+                _id: id,
+                user: userId,
+                isArchived: true,
+            },
+            {
+                $set: {
+                    isArchived: false,
+                    archivedAt: null,
+                },
+            },
+            {
+                new: true,
+            }
+        );
+
+        if (!propertyAlert) {
+            return res.status(404).json({
+                message: "Archived property alert not found.",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Property alert restored successfully.",
+            propertyAlert,
+        });
+    } catch (error) {
+        console.error("Restore property alert error:", error);
+
+        return res.status(500).json({
+            message: "Failed to restore property alert.",
+        });
+    }
+};
+
+// Backward-compatible export if another file still imports this name.
+export const deletePropertyAlert = archivePropertyAlert;
