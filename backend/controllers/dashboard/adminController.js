@@ -6,6 +6,262 @@ import Property from "../../DatabaseModels/Schema/Property.js";
 import SavedProperty from "../../DatabaseModels/Schema/SavedProperty.js";
 import Feedback from "../../DatabaseModels/Schema/Feedback.js";
 import PropertyAlert from "../../DatabaseModels/Schema/PropertyAlert.js";
+
+
+const getValidUserId = (userId) =>
+    mongoose.Types.ObjectId.isValid(userId);
+
+const getAdminUserOrRespond = async (userId, res) => {
+    if (!getValidUserId(userId)) {
+        res.status(400).json({
+            success: false,
+            message: "Invalid user ID.",
+        });
+        return null;
+    }
+
+    const user = await User.findById(userId)
+        .select(
+            [
+                "firstName",
+                "lastName",
+                "email",
+                "role",
+                "accountStatus",
+                "language",
+                "emailVerified",
+                "phoneNumber",
+                "phoneVerified",
+                "address",
+                "bio",
+                "profileImage",
+                "notificationPreferences",
+                "deletionRequestedAt",
+                "scheduledDeletionAt",
+                "createdAt",
+                "updatedAt",
+            ].join(" ")
+        )
+        .lean();
+
+    if (!user) {
+        res.status(404).json({
+            success: false,
+            message: "User not found.",
+        });
+        return null;
+    }
+
+    return user;
+};
+
+// GET /dashboard/users/:userId
+export const getAdminUserDetails = async (req, res) => {
+    try {
+        const user = await getAdminUserOrRespond(
+            req.params.userId,
+            res
+        );
+
+        if (!user) return;
+
+        const userId = new mongoose.Types.ObjectId(req.params.userId);
+
+        const [
+            totalPublications,
+            availablePublications,
+            activeAlerts,
+            archivedAlerts,
+            savedProperties,
+            totalFeedback,
+            openFeedback,
+            inProgressFeedback,
+            resolvedFeedback,
+            closedFeedback,
+        ] = await Promise.all([
+            Property.countDocuments({ userId }),
+            Property.countDocuments({
+                userId,
+                status: "Available",
+            }),
+            PropertyAlert.countDocuments({
+                user: userId,
+                isArchived: false,
+            }),
+            PropertyAlert.countDocuments({
+                user: userId,
+                isArchived: true,
+            }),
+            SavedProperty.countDocuments({
+                userId,
+                isSaved: true,
+            }),
+            Feedback.countDocuments({ userId }),
+            Feedback.countDocuments({ userId, status: "open" }),
+            Feedback.countDocuments({ userId, status: "in_progress" }),
+            Feedback.countDocuments({ userId, status: "resolved" }),
+            Feedback.countDocuments({ userId, status: "closed" }),
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            user,
+            statistics: {
+                totalPublications,
+                availablePublications,
+                activeAlerts,
+                archivedAlerts,
+                savedProperties,
+                totalFeedback,
+                feedbackByStatus: {
+                    open: openFeedback,
+                    inProgress: inProgressFeedback,
+                    resolved: resolvedFeedback,
+                    closed: closedFeedback,
+                },
+            },
+        });
+    } catch (error) {
+        console.error("Get admin user details error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve user details.",
+        });
+    }
+};
+
+// GET /dashboard/users/:userId/publications
+export const getAdminUserPublications = async (req, res) => {
+    try {
+        const user = await getAdminUserOrRespond(
+            req.params.userId,
+            res
+        );
+
+        if (!user) return;
+
+        const publications = await Property.find({
+            userId: req.params.userId,
+        })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        return res.status(200).json({
+            success: true,
+            count: publications.length,
+            publications,
+        });
+    } catch (error) {
+        console.error("Get admin user publications error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve user publications.",
+        });
+    }
+};
+
+// GET /dashboard/users/:userId/alerts
+export const getAdminUserAlerts = async (req, res) => {
+    try {
+        const user = await getAdminUserOrRespond(
+            req.params.userId,
+            res
+        );
+
+        if (!user) return;
+
+        const alerts = await PropertyAlert.find({
+            user: req.params.userId,
+        })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        return res.status(200).json({
+            success: true,
+            count: alerts.length,
+            alerts,
+        });
+    } catch (error) {
+        console.error("Get admin user alerts error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve user alerts.",
+        });
+    }
+};
+
+// GET /dashboard/users/:userId/saved-properties
+export const getAdminUserSavedProperties = async (req, res) => {
+    try {
+        const user = await getAdminUserOrRespond(
+            req.params.userId,
+            res
+        );
+
+        if (!user) return;
+
+        const savedProperties = await SavedProperty.find({
+            userId: req.params.userId,
+            isSaved: true,
+        })
+            .populate({
+                path: "propertyId",
+                select: "title price listingType propertyType city neighborhood status images",
+            })
+            .sort({ savedAt: -1 })
+            .lean();
+
+        return res.status(200).json({
+            success: true,
+            count: savedProperties.length,
+            savedProperties,
+        });
+    } catch (error) {
+        console.error("Get admin user saved properties error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve saved properties.",
+        });
+    }
+};
+
+// GET /dashboard/users/:userId/feedback
+export const getAdminUserFeedback = async (req, res) => {
+    try {
+        const user = await getAdminUserOrRespond(
+            req.params.userId,
+            res
+        );
+
+        if (!user) return;
+
+        const feedback = await Feedback.find({
+            userId: req.params.userId,
+        })
+            .select(
+                "email type subject description priority reportedUser pageUrl status attachments createdAt updatedAt"
+            )
+            .sort({ createdAt: -1 })
+            .lean();
+
+        return res.status(200).json({
+            success: true,
+            count: feedback.length,
+            feedback,
+        });
+    } catch (error) {
+        console.error("Get admin user feedback error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve user feedback.",
+        });
+    }
+};
 // GET /api/admin/users
 export const getAdminUsers = async (req, res) => {
     try {
@@ -18,15 +274,24 @@ export const getAdminUsers = async (req, res) => {
                         {
                             $match: {
                                 $expr: {
-                                    $eq: [
-                                        "$userId",
-                                        "$$userId",
-                                    ],
+                                    $eq: ["$userId", "$$userId"],
                                 },
                             },
                         },
                         {
-                            $count: "count",
+                            $group: {
+                                _id: null,
+                                total: { $sum: 1 },
+                                available: {
+                                    $sum: {
+                                        $cond: [
+                                            { $eq: ["$status", "Available"] },
+                                            1,
+                                            0,
+                                        ],
+                                    },
+                                },
+                            },
                         },
                     ],
                     as: "propertyStats",
@@ -40,16 +305,14 @@ export const getAdminUsers = async (req, res) => {
                         {
                             $match: {
                                 $expr: {
-                                    $eq: [
-                                        "$userId",
-                                        "$$userId",
+                                    $and: [
+                                        { $eq: ["$userId", "$$userId"] },
+                                        { $eq: ["$isSaved", true] },
                                     ],
                                 },
                             },
                         },
-                        {
-                            $count: "count",
-                        },
+                        { $count: "count" },
                     ],
                     as: "savedStats",
                 },
@@ -62,52 +325,38 @@ export const getAdminUsers = async (req, res) => {
                         {
                             $match: {
                                 $expr: {
-                                    $eq: [
-                                        "$userId",
-                                        "$$userId",
-                                    ],
+                                    $eq: ["$userId", "$$userId"],
                                 },
                             },
                         },
-                        {
-                            $count: "count",
-                        },
+                        { $count: "count" },
                     ],
-                    as: "reportStats",
+                    as: "feedbackStats",
                 },
             },
             {
                 $addFields: {
                     publishedProperties: {
                         $ifNull: [
-                            {
-                                $arrayElemAt: [
-                                    "$propertyStats.count",
-                                    0,
-                                ],
-                            },
+                            { $arrayElemAt: ["$propertyStats.total", 0] },
+                            0,
+                        ],
+                    },
+                    activeProperties: {
+                        $ifNull: [
+                            { $arrayElemAt: ["$propertyStats.available", 0] },
                             0,
                         ],
                     },
                     savedProperties: {
                         $ifNull: [
-                            {
-                                $arrayElemAt: [
-                                    "$savedStats.count",
-                                    0,
-                                ],
-                            },
+                            { $arrayElemAt: ["$savedStats.count", 0] },
                             0,
                         ],
                     },
                     reports: {
                         $ifNull: [
-                            {
-                                $arrayElemAt: [
-                                    "$reportStats.count",
-                                    0,
-                                ],
-                            },
+                            { $arrayElemAt: ["$feedbackStats.count", 0] },
                             0,
                         ],
                     },
@@ -116,16 +365,19 @@ export const getAdminUsers = async (req, res) => {
             {
                 $project: {
                     password: 0,
+                    emailVerificationCodeHash: 0,
+                    emailVerificationExpires: 0,
+                    phoneVerificationSessionId: 0,
+                    phoneVerificationExpires: 0,
+                    "notificationPreferences.whatsapp.verificationSessionId": 0,
+                    "notificationPreferences.whatsapp.verificationExpires": 0,
                     propertyStats: 0,
                     savedStats: 0,
-                    reportStats: 0,
+                    feedbackStats: 0,
+                    profileImagePublicId: 0,
                 },
             },
-            {
-                $sort: {
-                    createdAt: -1,
-                },
-            },
+            { $sort: { createdAt: -1 } },
         ]);
 
         return res.status(200).json({

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+
 import {
     Alert,
     Box,
@@ -12,8 +13,6 @@ import {
     Pagination,
     Stack,
     Typography,
-} from "@mui/material";
-import {
     TextField,
     MenuItem,
     InputAdornment,
@@ -22,19 +21,58 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import BedOutlinedIcon from "@mui/icons-material/BedOutlined";
 import BathtubOutlinedIcon from "@mui/icons-material/BathtubOutlined";
 import SquareFootOutlinedIcon from "@mui/icons-material/SquareFootOutlined";
+
+import { useTranslation } from "react-i18next";
+
 import axiosInstance from "../../../api/axiosInstance";
 import PageLayout from "../../PageLayout";
-import cities from "../../../data/moroccanCities"
-
+import cities from "../../../data/moroccanCities";
 
 const API_URL = "/external-listings";
 const ITEMS_PER_PAGE = 9;
+
+const initialFilters = {
+    search: "",
+    listingType: "All",
+    propertyType: "All",
+    city: "All",
+    source: "All",
+    minPrice: "",
+    maxPrice: "",
+};
+
+const propertyTypeKeys = {
+    Apartment: "apartment",
+    House: "house",
+    Villa: "villa",
+    Studio: "studio",
+    Room: "room",
+    Store: "store",
+    Office: "office",
+    Land: "land",
+    Warehouse: "warehouse",
+    "Commercial space": "commercialSpace",
+    "Commercial store": "commercialStore",
+    Garage: "garage",
+    Other: "other",
+};
+
+function getLocale(language) {
+    const lang = (language || "en").split("-")[0].split("_")[0];
+
+    const locales = {
+        en: "en-GB",
+        fr: "fr-FR",
+        ar: "ar-MA",
+    };
+
+    return locales[lang] || "en-GB";
+}
 
 function getListings(data) {
     if (Array.isArray(data)) return data;
@@ -42,6 +80,7 @@ function getListings(data) {
     if (Array.isArray(data?.data?.listings)) return data.data.listings;
     if (Array.isArray(data?.data)) return data.data;
     if (Array.isArray(data?.results)) return data.results;
+
     return [];
 }
 
@@ -56,6 +95,14 @@ function cleanText(value) {
         .replace(/&#39;|&apos;/gi, "'")
         .replace(/\s+/g, " ")
         .trim();
+}
+
+function normalizeFilter(value) {
+    return String(value ?? "")
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
 }
 
 function getPropertyImage(listing) {
@@ -94,15 +141,15 @@ function getPropertyImage(listing) {
     return "";
 }
 
-function formatPrice(listing) {
+function formatPrice(listing, locale, t) {
     if (listing.price == null || listing.price === "") {
-        return "Price on request";
+        return t("externalListings.priceOnRequest");
     }
 
     const price = Number(listing.price);
 
     const formatted = Number.isFinite(price)
-        ? price.toLocaleString(undefined, {
+        ? price.toLocaleString(locale, {
               maximumFractionDigits: 2,
           })
         : cleanText(String(listing.price));
@@ -111,9 +158,9 @@ function formatPrice(listing) {
 
     const suffix =
         listing.priceUnit === "monthly"
-            ? " / month"
+            ? ` ${t("externalListings.priceUnits.month")}`
             : listing.priceUnit === "per_m2"
-              ? " / m²"
+              ? ` ${t("externalListings.priceUnits.perSquareMeter")}`
               : "";
 
     return `${formatted} ${currency}${suffix}`;
@@ -128,16 +175,35 @@ function getLocation(listing) {
         .join(", ");
 }
 
-function getListingType(listing) {
-    if (["For Sale", "For Rent"].includes(listing.listingType)) {
-        return listing.listingType;
+function getListingType(listing, t) {
+    if (listing.listingType === "For Sale") {
+        return t("externalListings.listingTypes.forSale");
     }
 
-    return "Property";
+    if (listing.listingType === "For Rent") {
+        return t("externalListings.listingTypes.forRent");
+    }
+
+    return t("externalListings.listingTypes.property");
 }
 
-function PropertyImage({ listing }) {
+function getPropertyTypeLabel(propertyType, t) {
+    const value = cleanText(propertyType);
+
+    const key = propertyTypeKeys[value];
+
+    return key
+        ? t(`externalListings.propertyTypes.${key}`)
+        : value;
+}
+
+/* -------------------------------------------------------
+   Property image
+------------------------------------------------------- */
+
+function PropertyImage({ listing, t }) {
     const [failed, setFailed] = useState(false);
+
     const image = getPropertyImage(listing);
 
     useEffect(() => {
@@ -157,7 +223,7 @@ function PropertyImage({ listing }) {
                 <Box
                     component="img"
                     src={image}
-                    alt={cleanText(listing.title) || "Property"}
+                    alt={cleanText(listing.title) || t("externalListings.property")}
                     loading="lazy"
                     onError={() => setFailed(true)}
                     sx={{
@@ -198,13 +264,13 @@ function PropertyImage({ listing }) {
                     </Box>
 
                     <Typography variant="body2">
-                        Property image unavailable
+                        {t("externalListings.imageUnavailable")}
                     </Typography>
                 </Stack>
             )}
 
             <Chip
-                label={getListingType(listing)}
+                label={getListingType(listing, t)}
                 size="small"
                 color={
                     listing.listingType === "For Rent"
@@ -214,7 +280,7 @@ function PropertyImage({ listing }) {
                 sx={{
                     position: "absolute",
                     top: 12,
-                    left: 12,
+                    insetInlineStart: 12,
                     fontWeight: 700,
                     boxShadow: 1,
                 }}
@@ -222,8 +288,15 @@ function PropertyImage({ listing }) {
         </Box>
     );
 }
-function PropertyCard({ listing, onTrackClick }) {
-    const title = cleanText(listing.title) || "Property listing";
+
+/* -------------------------------------------------------
+   Property card
+------------------------------------------------------- */
+
+function PropertyCard({ listing, onTrackClick, t, locale }) {
+    const title =
+        cleanText(listing.title) || t("externalListings.propertyListing");
+
     const description = cleanText(listing.description);
     const location = getLocation(listing);
     const sourceUrl = listing.sourceUrl;
@@ -232,19 +305,27 @@ function PropertyCard({ listing, onTrackClick }) {
         listing.surface != null && listing.surface !== ""
             ? {
                   icon: <SquareFootOutlinedIcon fontSize="small" />,
-                  label: `${listing.surface} m²`,
+                  label: t("externalListings.details.surface", {
+                      value: listing.surface,
+                  }),
               }
             : null,
+
         listing.rooms != null && listing.rooms !== ""
             ? {
                   icon: <BedOutlinedIcon fontSize="small" />,
-                  label: `${listing.rooms} rooms`,
+                  label: t("externalListings.details.rooms", {
+                      value: listing.rooms,
+                  }),
               }
             : null,
+
         listing.bathrooms != null && listing.bathrooms !== ""
             ? {
                   icon: <BathtubOutlinedIcon fontSize="small" />,
-                  label: `${listing.bathrooms} bathrooms`,
+                  label: t("externalListings.details.bathrooms", {
+                      value: listing.bathrooms,
+                  }),
               }
             : null,
     ].filter(Boolean);
@@ -266,7 +347,7 @@ function PropertyCard({ listing, onTrackClick }) {
                 },
             }}
         >
-            <PropertyImage listing={listing} />
+            <PropertyImage listing={listing} t={t} />
 
             <CardContent
                 sx={{
@@ -288,6 +369,7 @@ function PropertyCard({ listing, onTrackClick }) {
                         WebkitBoxOrient: "vertical",
                         WebkitLineClamp: 2,
                         overflow: "hidden",
+                        textAlign: "start",
                     }}
                     title={title}
                 >
@@ -300,12 +382,17 @@ function PropertyCard({ listing, onTrackClick }) {
                         fontWeight: 700,
                         color: "success.dark",
                         fontSize: "1.3rem",
+                        textAlign: "start",
                     }}
                 >
-                    {formatPrice(listing)}
+                    {formatPrice(listing, locale, t)}
                 </Typography>
 
-                <Stack direction="row" spacing={0.75} alignItems="center">
+                <Stack
+                    direction="row"
+                    spacing={0.75}
+                    alignItems="center"
+                >
                     <LocationOnOutlinedIcon
                         fontSize="small"
                         color="action"
@@ -322,7 +409,7 @@ function PropertyCard({ listing, onTrackClick }) {
                             overflow: "hidden",
                         }}
                     >
-                        {location || "Location not specified"}
+                        {location || t("externalListings.locationNotSpecified")}
                     </Typography>
                 </Stack>
 
@@ -360,7 +447,10 @@ function PropertyCard({ listing, onTrackClick }) {
                         <Chip
                             size="small"
                             variant="outlined"
-                            label={cleanText(listing.propertyType)}
+                            label={getPropertyTypeLabel(
+                                listing.propertyType,
+                                t
+                            )}
                         />
                     </Box>
                 )}
@@ -388,7 +478,8 @@ function PropertyCard({ listing, onTrackClick }) {
                 <Divider />
 
                 <Typography variant="caption" color="text.secondary">
-                    Source: {listing.sourceName || "External listing"}
+                    {t("externalListings.source")}:{" "}
+                    {listing.sourceName || t("externalListings.externalListing")}
                 </Typography>
 
                 {sourceUrl && (
@@ -402,7 +493,7 @@ function PropertyCard({ listing, onTrackClick }) {
                         endIcon={<OpenInNewIcon />}
                         onClick={() => onTrackClick(listing)}
                     >
-                        View original listing
+                        {t("externalListings.viewOriginal")}
                     </Button>
                 )}
             </CardContent>
@@ -410,84 +501,9 @@ function PropertyCard({ listing, onTrackClick }) {
     );
 }
 
-const moroccanCities = cities
-// const moroccanCities = [
-//     { en: "Agadir", ar: "أكادير" },
-//     { en: "Ain Harrouda", ar: "عين حرودة" },
-//     { en: "Aït Melloul", ar: "أيت ملول" },
-//     { en: "Ait Ourir", ar: "أيت أورير" },
-//     { en: "Al Hoceima", ar: "الحسيمة" },
-//     { en: "Azrou", ar: "أزرو" },
-//     { en: "Benguerir", ar: "بن جرير" },
-//     { en: "Beni Ansar", ar: "بني أنصار" },
-//     { en: "Beni Mellal", ar: "بني ملال" },
-//     { en: "Benslimane", ar: "بن سليمان" },
-//     { en: "Berrechid", ar: "برشيد" },
-//     { en: "Berkane", ar: "بركان" },
-//     { en: "Biougra", ar: "بيوكرى" },
-//     { en: "Bni Yakhlef", ar: "بني يخلف" },
-//     { en: "Bouskoura", ar: "بوسكورة" },
-//     { en: "Bouznika", ar: "بوزنيقة" },
-//     { en: "Casablanca", ar: "الدار البيضاء" },
-//     { en: "Dcheira El Jihadia", ar: "الدشيرة الجهادية" },
-//     { en: "Dar Bouazza (Tamaris)", ar: "دار بوعزة" },
-//     { en: "Drargua", ar: "الدراركة" },
-//     { en: "Ech-challalate", ar: "الشلالات" },
-//     { en: "El Jadida", ar: "الجديدة" },
-//     { en: "El Kelaa Des Sraghna", ar: "قلعة السراغنة" },
-//     { en: "Essaouira", ar: "الصويرة" },
-//     { en: "Errachidia", ar: "الرشيدية" },
-//     { en: "Fez", ar: "فاس" },
-//     { en: "Fquih Ben Salah", ar: "الفقيه بن صالح" },
-//     { en: "Fnideq", ar: "الفنيدق" },
-//     { en: "Guelmim", ar: "كلميم" },
-//     { en: "Guercif", ar: "جرسيف" },
-//     { en: "Inezgane", ar: "إنزكان" },
-//     { en: "Kenitra", ar: "القنيطرة" },
-//     { en: "Khemisset", ar: "الخميسات" },
-//     { en: "Khenifra", ar: "خنيفرة" },
-//     { en: "Khouribga", ar: "خريبكة" },
-//     { en: "Ksar El Kebir", ar: "القصر الكبير" },
-//     { en: "Lahraouyine", ar: "الهراويين" },
-//     { en: "Larache", ar: "العرائش" },
-//     { en: "Lqliaa", ar: "القليعة" },
-//     { en: "M'diq", ar: "المضيق" },
-//     { en: "Marrakesh", ar: "مراكش" },
-//     { en: "Martil", ar: "مرتيل" },
-//     { en: "Mehdya", ar: "المهدية" },
-//     { en: "Meknes", ar: "مكناس" },
-//     { en: "Midelt", ar: "ميدلت" },
-//     { en: "Mohammedia", ar: "المحمدية" },
-//     { en: "Nador", ar: "الناظور" },
-//     { en: "Ouarzazate", ar: "ورزازات" },
-//     { en: "Oued Zem", ar: "وادي زم" },
-//     { en: "Oujda", ar: "وجدة" },
-//     { en: "Oulad Teima", ar: "أولاد تايمة" },
-//     { en: "Ouazzane", ar: "وزان" },
-//     { en: "Rabat", ar: "الرباط" },
-//     { en: "Salé", ar: "سلا" },
-//     { en: "Safi", ar: "آسفي" },
-//     { en: "Sefrou", ar: "صفرو" },
-//     { en: "Settat", ar: "سطات" },
-//     { en: "Skhirat", ar: "الصخيرات" },
-//     { en: "Sidi Bennour", ar: "سيدي بنور" },
-//     { en: "Sidi Kacem", ar: "سيدي قاسم" },
-//     { en: "Sidi Slimane", ar: "سيدي سليمان" },
-//     { en: "Sidi Taibi", ar: "سيدي الطيبي" },
-//     { en: "Souk El Arbaa", ar: "سوق الأربعاء" },
-//     { en: "Souk Sebt Ouled Nemma", ar: "سوق السبت أولاد النمة" },
-//     { en: "Taourirt", ar: "تاوريرت" },
-//     { en: "Tamensourte", ar: "تامنصورت" },
-//     { en: "Tan-Tan", ar: "طانطان" },
-//     { en: "Tanger", ar: "طنجة" },
-//     { en: "Taza", ar: "تازة" },
-//     { en: "Temara", ar: "تمارة" },
-//     { en: "Tetouan", ar: "تطوان" },
-//     { en: "Tifelt", ar: "تيفلت" },
-//     { en: "Tit Mellil", ar: "تيط مليل" },
-//     { en: "Tiznit", ar: "تيزنيت" },
-//     { en: "Youssoufia", ar: "اليوسفية" },
-// ].sort((a, b) => a.en.localeCompare(b.en, "en"));
+/* -------------------------------------------------------
+   Filters
+------------------------------------------------------- */
 
 function ExternalListingFilters({
     listings,
@@ -495,9 +511,8 @@ function ExternalListingFilters({
     onFilterChange,
     onClear,
     activeFilterCount,
+    t,
 }) {
-   const cities = moroccanCities;
-
     const propertyTypes = [
         ...new Set(
             listings
@@ -524,6 +539,18 @@ function ExternalListingFilters({
         onFilterChange(field, event.target.value);
     };
 
+    const getListingTypeLabel = (type) => {
+        if (type === "For Sale") {
+            return t("externalListings.listingTypes.forSale");
+        }
+
+        if (type === "For Rent") {
+            return t("externalListings.listingTypes.forRent");
+        }
+
+        return t("externalListings.listingTypes.unknown");
+    };
+
     return (
         <Box
             sx={{
@@ -545,16 +572,22 @@ function ExternalListingFilters({
                 gap={1}
                 sx={{ mb: 2.5 }}
             >
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    alignItems="center"
+                >
                     <FilterAltOutlinedIcon color="action" />
 
                     <Typography fontWeight={750}>
-                        Filter Properties
+                        {t("externalListings.filters.title")}
                     </Typography>
 
                     {activeFilterCount > 0 && (
                         <Chip
-                            label={`${activeFilterCount} active`}
+                            label={t("externalListings.filters.active", {
+                                count: activeFilterCount,
+                            })}
                             color="primary"
                             size="small"
                         />
@@ -569,7 +602,7 @@ function ExternalListingFilters({
                         onClick={onClear}
                         sx={{ textTransform: "none" }}
                     >
-                        Clear filters
+                        {t("externalListings.filters.clear")}
                     </Button>
                 )}
             </Stack>
@@ -578,7 +611,7 @@ function ExternalListingFilters({
             <TextField
                 fullWidth
                 size="small"
-                placeholder="Search by title, description, or neighborhood..."
+                placeholder={t("externalListings.filters.searchPlaceholder")}
                 value={filters.search}
                 onChange={handleChange("search")}
                 sx={{ mb: 2 }}
@@ -598,17 +631,17 @@ function ExternalListingFilters({
                         select
                         fullWidth
                         size="small"
-                        label="Listing Type"
+                        label={t("externalListings.filters.listingType")}
                         value={filters.listingType}
                         onChange={handleChange("listingType")}
                     >
                         <MenuItem value="All">
-                            All Listing Types
+                            {t("externalListings.filters.allListingTypes")}
                         </MenuItem>
 
                         {listingTypes.map((type) => (
                             <MenuItem key={type} value={type}>
-                                {type}
+                                {getListingTypeLabel(type)}
                             </MenuItem>
                         ))}
                     </TextField>
@@ -619,70 +652,73 @@ function ExternalListingFilters({
                         select
                         fullWidth
                         size="small"
-                        label="Property Type"
+                        label={t("externalListings.filters.propertyType")}
                         value={filters.propertyType}
                         onChange={handleChange("propertyType")}
                     >
                         <MenuItem value="All">
-                            All Property Types
+                            {t("externalListings.filters.allPropertyTypes")}
                         </MenuItem>
 
                         {propertyTypes.map((type) => (
                             <MenuItem key={type} value={type}>
-                                {type}
+                                {getPropertyTypeLabel(type, t)}
                             </MenuItem>
                         ))}
                     </TextField>
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <TextField
-                    select
-                    fullWidth
-                    size="small"
-                    label="City"
-                    value={filters.city}
-                    onChange={handleChange("city")}
-                >
-                    <MenuItem value="All">
-                        All Cities / جميع المدن
-                    </MenuItem>
-
-                    {cities.map((city) => (
-                        <MenuItem key={city.en} value={city.en}>
-                            <Stack
-                                direction="row"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                sx={{ width: "100%" , columnGap: 2}}
-                            >
-                                <span>{city.en}</span>
-
-                                <Typography
-                                    component="span"
-                                    variant="body2"
-                                    color="text.secondary"
-                                    dir="rtl"
-                                >
-                                    {city.ar}
-                                </Typography>
-                            </Stack>
+                    <TextField
+                        select
+                        fullWidth
+                        size="small"
+                        label={t("externalListings.filters.city")}
+                        value={filters.city}
+                        onChange={handleChange("city")}
+                    >
+                        <MenuItem value="All">
+                            {t("externalListings.filters.allCities")}
                         </MenuItem>
-                    ))}
-                </TextField>
-            </Grid>
+
+                        {cities.map((city) => (
+                            <MenuItem key={city.en} value={city.en}>
+                                <Stack
+                                    direction="row"
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                    sx={{
+                                        width: "100%",
+                                        columnGap: 2,
+                                    }}
+                                >
+                                    <span>{city.en}</span>
+
+                                    <Typography
+                                        component="span"
+                                        variant="body2"
+                                        color="text.secondary"
+                                        dir="rtl"
+                                    >
+                                        {city.ar}
+                                    </Typography>
+                                </Stack>
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <TextField
                         select
                         fullWidth
                         size="small"
-                        label="Source Website"
+                        label={t("externalListings.filters.source")}
                         value={filters.source}
                         onChange={handleChange("source")}
                     >
                         <MenuItem value="All">
-                            All Sources
+                            {t("externalListings.filters.allSources")}
                         </MenuItem>
 
                         {sources.map((source) => (
@@ -699,7 +735,7 @@ function ExternalListingFilters({
                         fullWidth
                         size="small"
                         type="number"
-                        label="Minimum Price (MAD)"
+                        label={t("externalListings.filters.minimumPrice")}
                         value={filters.minPrice}
                         onChange={handleChange("minPrice")}
                         slotProps={{
@@ -713,7 +749,7 @@ function ExternalListingFilters({
                         fullWidth
                         size="small"
                         type="number"
-                        label="Maximum Price (MAD)"
+                        label={t("externalListings.filters.maximumPrice")}
                         value={filters.maxPrice}
                         onChange={handleChange("maxPrice")}
                         slotProps={{
@@ -726,25 +762,28 @@ function ExternalListingFilters({
     );
 }
 
+/* -------------------------------------------------------
+   Main component
+------------------------------------------------------- */
 
 export default function ExternalListings() {
+    const { t, i18n } = useTranslation();
+
+    const currentLanguage = (
+        i18n.resolvedLanguage ||
+        i18n.language ||
+        "en"
+    )
+        .split("-")[0]
+        .split("_")[0];
+
+    const isRTL = currentLanguage === "ar";
+    const locale = getLocale(currentLanguage);
+
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [page, setPage] = useState(1);
-
-    const ITEMS_PER_PAGE = 9;
-
-    const initialFilters = {
-        search: "",
-        listingType: "All",
-        propertyType: "All",
-        city: "All",
-        source: "All",
-        minPrice: "",
-        maxPrice: "",
-    };
-
     const [filters, setFilters] = useState(initialFilters);
 
     const handleTrackClick = useCallback(async (listing) => {
@@ -762,64 +801,67 @@ export default function ExternalListings() {
         }
     }, []);
 
+    const loadListings = useCallback(async () => {
+        setLoading(true);
+        setError("");
 
- const loadListings = useCallback(async () => {
-    setLoading(true);
-    setError("");
+        try {
+            const firstResponse = await axiosInstance.get(API_URL, {
+                params: {
+                    page: 1,
+                    limit: 50,
+                },
+            });
 
-    try {
-        const firstResponse = await axiosInstance.get(API_URL, {
-            params: {
-                page: 1,
-                limit: 50,
-            },
-        });
+            const firstListings = getListings(firstResponse.data);
 
-        const firstListings = getListings(firstResponse.data);
+            const pagination =
+                firstResponse.data?.pagination ||
+                firstResponse.data?.data?.pagination;
 
-        const pagination =
-            firstResponse.data?.pagination ||
-            firstResponse.data?.data?.pagination;
+            const totalPages = pagination?.totalPages || 1;
 
-        const totalPages = pagination?.totalPages || 1;
+            let allListings = [...firstListings];
 
-        let allListings = [...firstListings];
+            // Fetch remaining backend pages.
+            if (totalPages > 1) {
+                const requests = [];
 
-        // Fetch remaining backend pages.
-        if (totalPages > 1) {
-            const requests = [];
+                for (
+                    let currentPage = 2;
+                    currentPage <= totalPages;
+                    currentPage++
+                ) {
+                    requests.push(
+                        axiosInstance.get(API_URL, {
+                            params: {
+                                page: currentPage,
+                                limit: 50,
+                            },
+                        })
+                    );
+                }
 
-            for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-                requests.push(
-                    axiosInstance.get(API_URL, {
-                        params: {
-                            page: currentPage,
-                            limit: 50,
-                        },
-                    })
-                );
+                const responses = await Promise.all(requests);
+
+                responses.forEach((response) => {
+                    allListings.push(...getListings(response.data));
+                });
             }
 
-            const responses = await Promise.all(requests);
+            setListings(allListings);
+            setPage(1);
+        } catch (err) {
+            console.error("Failed to load external listings:", err);
 
-            responses.forEach((response) => {
-                allListings.push(...getListings(response.data));
-            });
+            setError(
+                err.response?.data?.message ||
+                    t("externalListings.errors.loadFailed")
+            );
+        } finally {
+            setLoading(false);
         }
-
-        setListings(allListings);
-        setPage(1);
-    } catch (err) {
-        console.error("Failed to load external listings:", err);
-
-        setError(
-            err.response?.data?.message ||
-                "Unable to load property listings. Please try again later."
-        );
-    } finally {
-        setLoading(false);
-    }
-}, []);
+    }, [t]);
 
     useEffect(() => {
         loadListings();
@@ -841,9 +883,10 @@ export default function ExternalListings() {
 
     const activeFilterCount = Object.entries(filters).filter(
         ([key, value]) => {
-            return value !== "" &&
-                value !== "All" &&
-                value !== "All Cities";
+            return (
+                value !== "" &&
+                value !== "All"
+            );
         }
     ).length;
 
@@ -851,14 +894,16 @@ export default function ExternalListings() {
     const filteredListings = listings.filter((listing) => {
         const search = normalizeFilter(filters.search);
 
-        const searchableText = normalizeFilter([
-            listing.title,
-            listing.description,
-            listing.city,
-            listing.neighborhood,
-            listing.propertyType,
-            listing.sourceName,
-        ].join(" "));
+        const searchableText = normalizeFilter(
+            [
+                listing.title,
+                listing.description,
+                listing.city,
+                listing.neighborhood,
+                listing.propertyType,
+                listing.sourceName,
+            ].join(" ")
+        );
 
         const matchesSearch =
             !search || searchableText.includes(search);
@@ -873,14 +918,16 @@ export default function ExternalListings() {
             normalizeFilter(listing.propertyType) ===
                 normalizeFilter(filters.propertyType);
 
-        const selectedCity = moroccanCities.find(
+        const selectedCity = cities.find(
             (city) => city.en === filters.city
         );
-            
+
         const matchesCity =
             filters.city === "All" ||
-            normalizeFilter(listing.city) === normalizeFilter(selectedCity?.en) ||
-            normalizeFilter(listing.city) === normalizeFilter(selectedCity?.ar);
+            normalizeFilter(listing.city) ===
+                normalizeFilter(selectedCity?.en) ||
+            normalizeFilter(listing.city) ===
+                normalizeFilter(selectedCity?.ar);
 
         const matchesSource =
             filters.source === "All" ||
@@ -938,176 +985,172 @@ export default function ExternalListings() {
     };
 
     return (
-        <PageLayout
-            title="Discover Properties"
-            subtitle="Explore properties published on external real estate websites."
-            maxWidth={1280}
-        >
-            {error && (
-                <Alert
-                    severity="error"
-                    sx={{ mb: 3 }}
-                    action={
-                        <Button
-                            color="inherit"
-                            size="small"
-                            onClick={loadListings}
-                        >
-                            Retry
-                        </Button>
-                    }
-                >
-                    {error}
-                </Alert>
-            )}
-
-            {loading ? (
-                <Stack
-                    alignItems="center"
-                    justifyContent="center"
-                    spacing={2}
-                    sx={{ py: 10 }}
-                >
-                    <CircularProgress />
-
-                    <Typography color="text.secondary">
-                        Loading properties...
-                    </Typography>
-                </Stack>
-            ) : (
-                <>
-                    {/* Property filters */}
-                    <ExternalListingFilters
-                        listings={listings}
-                        filters={filters}
-                        onFilterChange={handleFilterChange}
-                        onClear={clearFilters}
-                        activeFilterCount={activeFilterCount}
-                    />
-
-                    {/* Results heading */}
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        flexWrap="wrap"
-                        gap={1}
+        <Box dir={isRTL ? "rtl" : "ltr"} sx={{ width: "100%" }}>
+            <PageLayout
+                title={t("externalListings.title")}
+                subtitle={t("externalListings.subtitle")}
+                maxWidth={1280}
+            >
+                {error && (
+                    <Alert
+                        severity="error"
                         sx={{ mb: 3 }}
+                        action={
+                            <Button
+                                color="inherit"
+                                size="small"
+                                onClick={loadListings}
+                            >
+                                {t("externalListings.retry")}
+                            </Button>
+                        }
                     >
-                        <Typography
-                            variant="h6"
-                            fontWeight={750}
-                        >
-                            {filters.search ||
-                            activeFilterCount > 0
-                                ? "Filtered Properties"
-                                : "Property Listings"}
-                        </Typography>
+                        {error}
+                    </Alert>
+                )}
 
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                        >
-                            {filteredListings.length}{" "}
-                            {filteredListings.length === 1
-                                ? "property"
-                                : "properties"}
-                            {" "}found
+                {loading ? (
+                    <Stack
+                        alignItems="center"
+                        justifyContent="center"
+                        spacing={2}
+                        sx={{ py: 10 }}
+                    >
+                        <CircularProgress />
+
+                        <Typography color="text.secondary">
+                            {t("externalListings.loading")}
                         </Typography>
                     </Stack>
+                ) : (
+                    <>
+                        {/* Property filters */}
+                        <ExternalListingFilters
+                            listings={listings}
+                            filters={filters}
+                            onFilterChange={handleFilterChange}
+                            onClear={clearFilters}
+                            activeFilterCount={activeFilterCount}
+                            t={t}
+                        />
 
-                    {/* Empty state */}
-                    {filteredListings.length === 0 ? (
-                        <Box
-                            sx={{
-                                py: 8,
-                                px: 2,
-                                textAlign: "center",
-                                border: 1,
-                                borderColor: "divider",
-                                borderRadius: "16px",
-                            }}
+                        {/* Results heading */}
+                        <Stack
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            flexWrap="wrap"
+                            gap={1}
+                            sx={{ mb: 3 }}
                         >
                             <Typography
                                 variant="h6"
-                                fontWeight={700}
+                                fontWeight={750}
                             >
-                                No properties found
+                                {filters.search || activeFilterCount > 0
+                                    ? t("externalListings.filteredProperties")
+                                    : t("externalListings.propertyListings")}
                             </Typography>
 
                             <Typography
+                                variant="body2"
                                 color="text.secondary"
-                                sx={{ mt: 1, mb: 2 }}
                             >
-                                Try changing your search or filters.
+                                {t("externalListings.resultsCount", {
+                                    count: filteredListings.length,
+                                })}
                             </Typography>
+                        </Stack>
 
-                            {activeFilterCount > 0 && (
-                                <Button
-                                    variant="outlined"
-                                    onClick={clearFilters}
-                                    sx={{ textTransform: "none" }}
+                        {/* Empty state */}
+                        {filteredListings.length === 0 ? (
+                            <Box
+                                sx={{
+                                    py: 8,
+                                    px: 2,
+                                    textAlign: "center",
+                                    border: 1,
+                                    borderColor: "divider",
+                                    borderRadius: "16px",
+                                }}
+                            >
+                                <Typography
+                                    variant="h6"
+                                    fontWeight={700}
                                 >
-                                    Clear Filters
-                                </Button>
-                            )}
-                        </Box>
-                    ) : (
-                        <>
-                            <Grid container spacing={3}>
-                                {paginatedListings.map((listing, index) => (
-                                    <Grid
-                                        key={
-                                            listing._id ||
-                                            listing.sourceUrl ||
-                                            index
-                                        }
-                                        size={{
-                                            xs: 12,
-                                            sm: 6,
-                                            lg: 4,
+                                    {t("externalListings.empty.title")}
+                                </Typography>
+
+                                <Typography
+                                    color="text.secondary"
+                                    sx={{ mt: 1, mb: 2 }}
+                                >
+                                    {t("externalListings.empty.description")}
+                                </Typography>
+
+                                {activeFilterCount > 0 && (
+                                    <Button
+                                        variant="outlined"
+                                        onClick={clearFilters}
+                                        sx={{ textTransform: "none" }}
+                                    >
+                                        {t("externalListings.filters.clear")}
+                                    </Button>
+                                )}
+                            </Box>
+                        ) : (
+                            <>
+                                <Grid container spacing={3}>
+                                    {paginatedListings.map(
+                                        (listing, index) => (
+                                            <Grid
+                                                key={
+                                                    listing._id ||
+                                                    listing.sourceUrl ||
+                                                    index
+                                                }
+                                                size={{
+                                                    xs: 12,
+                                                    sm: 6,
+                                                    lg: 4,
+                                                }}
+                                            >
+                                                <PropertyCard
+                                                    listing={listing}
+                                                    onTrackClick={handleTrackClick}
+                                                    t={t}
+                                                    locale={locale}
+                                                />
+                                            </Grid>
+                                        )
+                                    )}
+                                </Grid>
+
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            mt: 5,
                                         }}
                                     >
-                                        <PropertyCard
-                                            listing={listing} onTrackClick={handleTrackClick}
+                                        <Pagination
+                                            count={totalPages}
+                                            page={Math.min(page, totalPages)}
+                                            onChange={handlePageChange}
+                                            color="primary"
+                                            size="large"
+                                            showFirstButton
+                                            showLastButton
                                         />
-                                    </Grid>
-                                ))}
-                            </Grid>
-
-                            {/* Pagination */}
-                            {totalPages > 1 && (
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        mt: 5,
-                                    }}
-                                >
-                                    <Pagination
-                                        count={totalPages}
-                                        page={Math.min(page, totalPages)}
-                                        onChange={handlePageChange}
-                                        color="primary"
-                                        size="large"
-                                        showFirstButton
-                                        showLastButton
-                                    />
-                                </Box>
-                            )}
-                        </>
-                    )}
-                </>
-            )}
-        </PageLayout>
+                                    </Box>
+                                )}
+                            </>
+                        )}
+                    </>
+                )}
+            </PageLayout>
+        </Box>
     );
-}
-
-// Normalize text for consistent filtering.
-function normalizeFilter(value) {
-    return String(value ?? "")
-        .trim()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
 }

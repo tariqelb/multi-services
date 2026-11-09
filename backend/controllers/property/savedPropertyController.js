@@ -3,13 +3,12 @@ import mongoose from "mongoose";
 import SavedProperty from "../../DatabaseModels/Schema/SavedProperty.js";
 import Property from "../../DatabaseModels/Schema/Property.js";
 
-// Save a property
+// Save or restore a property
 export const saveProperty = async (req, res) => {
     try {
-
         const userId = req.user.userId;
         const { propertyId } = req.params;
-        console.log("user get saved prop : ", userId, propertyId)
+
         if (!mongoose.isValidObjectId(propertyId)) {
             return res.status(400).json({
                 success: false,
@@ -39,20 +38,33 @@ export const saveProperty = async (req, res) => {
                     : property.images?.[0]?.path || "",
         };
 
-        // Return the existing save if it already exists.
+        const now = new Date();
+
         const savedProperty = await SavedProperty.findOneAndUpdate(
             { userId, propertyId },
             {
+                $set: {
+                    propertyInfo,
+                    isSaved: true,
+                    savedAt: now,
+                    unsavedAt: null,
+                },
                 $setOnInsert: {
                     userId,
                     propertyId,
-                    propertyInfo,
+                },
+                $push: {
+                    activityHistory: {
+                        action: "saved",
+                        at: now,
+                    },
                 },
             },
             {
                 new: true,
                 upsert: true,
                 runValidators: true,
+                setDefaultsOnInsert: true,
             }
         );
 
@@ -71,7 +83,7 @@ export const saveProperty = async (req, res) => {
     }
 };
 
-// Unsave a property
+// Unsave a property without deleting its history
 export const unsaveProperty = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -84,12 +96,32 @@ export const unsaveProperty = async (req, res) => {
             });
         }
 
-        const deletedProperty = await SavedProperty.findOneAndDelete({
-            userId,
-            propertyId,
-        });
+        const now = new Date();
 
-        if (!deletedProperty) {
+        const savedProperty = await SavedProperty.findOneAndUpdate(
+            {
+                userId,
+                propertyId,
+                isSaved: { $ne: false },
+            },
+            {
+                $set: {
+                    isSaved: false,
+                    unsavedAt: now,
+                },
+                $push: {
+                    activityHistory: {
+                        action: "unsaved",
+                        at: now,
+                    },
+                },
+            },
+            {
+                new: true,
+            }
+        );
+
+        if (!savedProperty) {
             return res.status(404).json({
                 success: false,
                 message: "Saved property not found",
@@ -115,9 +147,11 @@ export const getSavedProperties = async (req, res) => {
     try {
         const userId = req.user.userId;
 
-        console.log ("saved property called");
-        const savedProperties = await SavedProperty.find({ userId })
-            .sort({ createdAt: -1 })
+        const savedProperties = await SavedProperty.find({
+            userId,
+            isSaved: { $ne: false },
+        })
+            .sort({ savedAt: -1 })
             .populate(
                 "propertyId",
                 "title price listingType propertyType city neighborhood images status surface rooms bathrooms createdAt"

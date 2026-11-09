@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 
 import {
@@ -13,7 +12,6 @@ import {
 
 import HomeIcon from "@mui/icons-material/Home";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
@@ -38,10 +36,25 @@ export default function Sidebar({
     const location = useLocation();
     const sidebarRef = useRef(null);
 
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+
+    const currentLanguage = (
+        i18n.resolvedLanguage ||
+        i18n.language ||
+        "en"
+    )
+        .split("-")[0]
+        .split("_")[0];
+
+    const isRTL = currentLanguage === "ar";
 
     // Get the user's role from Redux.
-    const role = useSelector((state) => state.profile?.role);
+    const role = useSelector(
+        (state) =>
+            state.profile?.role ||
+            state.auth?.user?.role ||
+            state.loginForm?.user?.role
+    );
 
     const isAdmin = role?.toLowerCase() === "admin";
 
@@ -116,11 +129,6 @@ export default function Sidebar({
             icon: NotificationsActiveIcon,
             path: "/alert",
         },
-        // {
-        //     name: t("sidebar.notifications"),
-        //     icon: NotificationsIcon,
-        //     path: "/notificationpage",
-        // },
         {
             name: t("sidebar.feedback"),
             icon: RateReviewOutlinedIcon,
@@ -155,199 +163,193 @@ export default function Sidebar({
     };
 
     return (
-        <>
-            {/* Mobile backdrop */}
-            {sidebarOpen && (
-                <Box
-                    onClick={() => setSidebarOpen(false)}
-                    sx={{
-                        display: { xs: "block", md: "none" },
-                        position: "fixed",
-                        top: "4rem",
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        bgcolor: "rgba(15, 23, 42, 0.35)",
-                        zIndex: 40,
-                    }}
-                />
-            )}
+        <Box
+            ref={sidebarRef}
+            component="aside"
+            dir={isRTL ? "rtl" : "ltr"}
+            sx={{
+                width: "290px",
+                minWidth: "290px",
+                maxWidth: "85vw",
+                flex: "0 0 290px",
+                flexShrink: 0,
 
+                bgcolor: "#0B2E5C",
+                color: "#ffffff",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+
+                position: {
+                    xs: "fixed",
+                    md: "sticky",
+                },
+                top: "4rem",
+
+                left: {
+                    xs: isRTL ? "auto" : 0,
+                    md: "auto",
+                },
+                right: {
+                    xs: isRTL ? 0 : "auto",
+                    md: "auto",
+                },
+
+                height: {
+                    xs: "calc(100dvh - 4rem)",
+                    md: "calc(100vh - 4rem)",
+                },
+
+                transform: {
+                    xs: sidebarOpen
+                        ? "translateX(0)"
+                        : isRTL
+                          ? "translateX(100%)"
+                          : "translateX(-100%)",
+                    md: "translateX(0)",
+                },
+
+                visibility: {
+                    xs: sidebarOpen ? "visible" : "hidden",
+                    md: "visible",
+                },
+
+                zIndex: {
+                    xs: 50,
+                    md: 20,
+                },
+
+                boxShadow: {
+                    xs: sidebarOpen
+                        ? isRTL
+                            ? "-2px 0 15px rgba(0,0,0,0.25)"
+                            : "2px 0 15px rgba(0,0,0,0.25)"
+                        : "none",
+                    md: isRTL
+                        ? "-2px 0 5px rgba(0,0,0,0.1)"
+                        : "2px 0 5px rgba(0,0,0,0.1)",
+                },
+
+                transition: {
+                    xs: "transform 300ms ease, visibility 300ms ease",
+                    md: "none",
+                },
+
+                boxSizing: "border-box",
+                overflow: "hidden",
+            }}
+        >
+            {/* Navigation items */}
             <Box
-                ref={sidebarRef}
-                component="aside"
                 sx={{
-                    width: "290px",
-                    minWidth: "290px",
-                    maxWidth: "85vw",
-                    flex: "0 0 260px",
-                    flexShrink: 0,
-
-                    bgcolor: "#0B2E5C",
-                    color: "#ffffff",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-
-                    position: {
-                        xs: "fixed",
-                        md: "sticky",
-                    },
-                    top: "4rem",
-                    left: {
-                        xs: 0,
-                        md: "auto",
-                    },
-                    height: {
-                        xs: "calc(100dvh - 4rem)",
-                        md: "calc(100vh - 4rem)",
-                    },
-
-                    transform: {
-                        xs: sidebarOpen
-                            ? "translateX(0)"
-                            : "translateX(-100%)",
-                        md: "translateX(0)",
-                    },
-                    visibility: {
-                        xs: sidebarOpen ? "visible" : "hidden",
-                        md: "visible",
-                    },
-
-                    zIndex: {
-                        xs: 50,
-                        md: 20,
-                    },
-
-                    boxShadow: {
-                        xs: sidebarOpen
-                            ? "2px 0 15px rgba(0,0,0,0.25)"
-                            : "none",
-                        md: "2px 0 5px rgba(0,0,0,0.1)",
-                    },
-
-                    transition: {
-                        xs: "transform 300ms ease, visibility 300ms ease",
-                        md: "none",
-                    },
-
-                    boxSizing: "border-box",
-                    overflow: "hidden",
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    py: 2,
+                    flex: 1,
+                    minHeight: 0,
                 }}
             >
-                {/* Navigation items */}
-                <Box
-                    sx={{
-                        overflowY: "auto",
-                        overflowX: "hidden",
-                        py: 2,
-                        flex: 1,
-                        minHeight: 0,
-                    }}
-                >
-                    <List sx={{ px: 2 , py: 0}}>
-                        {navigationItems.map((item) => {
-                            const Icon = item.icon;
+                <List sx={{ px: 2, py: 0 }}>
+                    {navigationItems.map((item) => {
+                        const Icon = item.icon;
 
-                            const isActive =
-                                location.pathname === item.path ||
-                                (item.path !== "/" &&
-                                    location.pathname.startsWith(
-                                        `${item.path}/`
-                                    ));
+                        const isActive =
+                            location.pathname === item.path ||
+                            (item.path !== "/" &&
+                                location.pathname.startsWith(
+                                    `${item.path}/`
+                                ));
 
-                            return (
-                                <ListItem
-                                    key={item.path}
-                                    disablePadding
-                                    sx={{ mb: 1 }}
+                        return (
+                            <ListItem
+                                key={item.path}
+                                disablePadding
+                                sx={{ mb: 1 }}
+                            >
+                                <ListItemButton
+                                    onClick={() =>
+                                        handleNavigation(item)
+                                    }
+                                    sx={{
+                                        borderRadius: "10px",
+                                        bgcolor: isActive
+                                            ? "#2563EB"
+                                            : "transparent",
+                                        "&:hover": {
+                                            bgcolor:
+                                                "rgba(255,255,255,0.08)",
+                                        },
+                                        py: 1.5,
+                                        minWidth: 0,
+                                    }}
                                 >
-                                    <ListItemButton
-                                        onClick={() =>
-                                            handleNavigation(item)
-                                        }
+                                    <ListItemIcon
                                         sx={{
-                                            borderRadius: "10px",
-                                            bgcolor: isActive
-                                                ? "#2563EB"
-                                                : "transparent",
-                                            "&:hover": {
-                                                bgcolor:
-                                                    "rgba(255,255,255,0.08)",
-                                            },
-                                            py: 1.5,
-                                            minWidth: 0,
+                                            color: "#ffffff",
+                                            minWidth: "40px",
                                         }}
                                     >
-                                        <ListItemIcon
-                                            sx={{
-                                                color: "#ffffff",
-                                                minWidth: "40px",
-                                            }}
-                                        >
-                                            <Icon />
-                                        </ListItemIcon>
+                                        <Icon />
+                                    </ListItemIcon>
 
-                                        <ListItemText
-                                            primary={item.name}
-                                            primaryTypographyProps={{
-                                                fontSize: "0.25rem",
-                                                fontWeight: isActive
-                                                    ? 600
-                                                    : 400,
-                                                sx: {
-                                                    overflowWrap: "anywhere",
-                                                },
-                                            }}
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                            );
-                        })}
-                    </List>
-                </Box>
+                                    <ListItemText
+                                        primary={item.name}
+                                        primaryTypographyProps={{
+                                            fontSize: "0.875rem",
+                                            fontWeight: isActive ? 600 : 400,
+                                            sx: {
+                                                overflowWrap: "anywhere",
+                                                textAlign: "start",
+                                            },
+                                        }}
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                        );
+                    })}
+                </List>
+            </Box>
 
-                {/* Sidebar footer */}
+            {/* Sidebar footer */}
+            <Box
+                sx={{
+                    p: 2,
+                    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                    flexShrink: 0,
+                }}
+            >
                 <Box
                     sx={{
-                        p: 2,
-                        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        px: 2,
+                        py: 1,
+                        bgcolor: "rgba(0, 0, 0, 0.2)",
+                        borderRadius: "8px",
                     }}
                 >
                     <Box
                         sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1.5,
-                            px: 2,
-                            py: 1,
-                            bgcolor: "rgba(0, 0, 0, 0.2)",
-                            borderRadius: "8px",
+                            width: 10,
+                            height: 10,
+                            flexShrink: 0,
+                            bgcolor: "#10b981",
+                            borderRadius: "50%",
+                        }}
+                    />
+
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            color: "#C9D6EA",
+                            fontWeight: 300,
                         }}
                     >
-                        <Box
-                            sx={{
-                                width: 10,
-                                height: 10,
-                                flexShrink: 0,
-                                bgcolor: "#10b981",
-                                borderRadius: "50%",
-                            }}
-                        />
-
-                        <Typography
-                            variant="caption"
-                            sx={{
-                                color: "#C9D6EA",
-                                fontWeight: 300,
-                            }}
-                        >
-                            {t("sidebar.systemsOnline")}
-                        </Typography>
-                    </Box>
+                        {t("sidebar.systemsOnline")}
+                    </Typography>
                 </Box>
             </Box>
-        </>
+        </Box>
     );
 }

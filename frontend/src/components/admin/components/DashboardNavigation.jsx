@@ -78,8 +78,12 @@ export default function DashboardNavigation({
             <Box
                 sx={{
                     width: "100%",
+                    minWidth: 0,
                     overflowX: "auto",
+                    overflowY: "hidden",
+                    WebkitOverflowScrolling: "touch",
                     scrollbarWidth: "none",
+
                     "&::-webkit-scrollbar": {
                         display: "none",
                     },
@@ -96,11 +100,13 @@ export default function DashboardNavigation({
                         width: "100%",
 
                         "& .MuiTabs-scroller": {
-                            overflow: "visible !important",
+                            overflowX: "auto !important",
+                            overflowY: "hidden !important",
                         },
 
                         "& .MuiTabs-flexContainer": {
                             display: "flex",
+                            flexWrap: "nowrap",
                             gap: { xs: 0.5, sm: 0.75 },
                             width: { xs: "max-content", md: "100%" },
                         },

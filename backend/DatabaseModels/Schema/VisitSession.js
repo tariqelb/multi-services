@@ -56,6 +56,31 @@ const visitSessionSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        pageHistory: {
+            type: [
+                {
+                    path: {
+                        type: String,
+                        required: true,
+                        maxlength: 300,
+                    },
+                    visitedAt: {
+                        type: Date,
+                        required: true,
+                    },
+                    lastSeenAt: {
+                        type: Date,
+                        required: true,
+                    },
+                    durationSeconds: {
+                        type: Number,
+                        default: 0,
+                        min: 0,
+                    },
+                },
+            ],
+            default: [],
+        },
     },
     {
         timestamps: true,

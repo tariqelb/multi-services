@@ -293,61 +293,57 @@ export const resendVerificationCode = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        console.log(email, password)
+        const { email, password } = req.body || {};
+
+        // 400 - Missing credentials
         if (!email?.trim() || !password) {
             return res.status(400).json({
-                message: "Email and password are required",
+                success: false,
+                code: "MISSING_CREDENTIALS",
+                message: "Email and password are required.",
             });
         }
 
-        console.log("1", email, password, "[", email.trim().toLowerCase(), "]")
-        console.log("2", email, password)
+        // Find user.
         const user = await User.findOne({
             email: email.trim().toLowerCase(),
         }).select("+password");
 
-        console.log("3", email, password)
+        // 401 - Invalid credentials
         if (!user) {
             return res.status(401).json({
-                message: "Invalid email or password",
+                success: false,
+                code: "INVALID_CREDENTIALS",
+                message: "Invalid email or password.",
             });
         }
-        console.log("4",email, password)
 
+        // Compare password.
         const isPasswordValid = await bcrypt.compare(
             password,
             user.password
         );
-        console.log(email, password, user.password, "is pass valid : [" , isPasswordValid, "]")
+
         if (!isPasswordValid) {
             return res.status(401).json({
-                message: "Invalid email or password",
+                success: false,
+                code: "INVALID_CREDENTIALS",
+                message: "Invalid email or password.",
             });
         }
-        console.log(email, password)
 
+        // Check JWT configuration.
         if (!process.env.JWT_SECRET) {
-            throw new Error("JWT_SECRET is not configured");
+            console.error("[LOGIN] JWT_SECRET is not configured.");
+
+            return res.status(500).json({
+                success: false,
+                code: "SERVER_CONFIGURATION_ERROR",
+                message: "Login is temporarily unavailable.",
+            });
         }
-        console.log(email, password)
 
-        // Generate token using the full user object.
-        const token = generateToken(user);
-
-        // Store the token in an HTTP-only cookie.
-        // res.cookie("token", token, {
-        //     httpOnly: true,
-        //     secure: process.env.NODE_ENV === "production",
-        //     sameSite: "lax",
-        //     maxAge: 48 * 60 * 60 * 1000,
-        //     path: "/",
-        // });
-        res.cookie("token", token, {
-            ...authCookieOptions,
-            maxAge: 48 * 60 * 60 * 1000,
-        });
-
+        // Cancel scheduled account deletion after successful authentication.
         if (user.scheduledDeletionAt) {
             user.deletionRequestedAt = null;
             user.scheduledDeletionAt = null;
@@ -355,8 +351,19 @@ export const login = async (req, res) => {
             await user.save();
         }
 
+        // Generate authentication token.
+        const token = generateToken(user);
+
+        // Set HTTP-only authentication cookie.
+        res.cookie("token", token, {
+            ...authCookieOptions,
+            maxAge: 48 * 60 * 60 * 1000,
+        });
+
         return res.status(200).json({
-            message: "Login successful",
+            success: true,
+            code: "LOGIN_SUCCESS",
+            message: "Login successful.",
             user: {
                 id: user._id,
                 firstName: user.firstName,
@@ -364,13 +371,30 @@ export const login = async (req, res) => {
                 email: user.email,
                 createdAt: user.createdAt,
             },
-            token: token,
+            token,
         });
-    } catch (error) {
-        console.error("Login error:", error.message);
 
+    } catch (error) {
+        console.error("[LOGIN] Authentication error:", error);
+
+        // Database connection problems.
+        if (
+            error.name === "MongooseServerSelectionError" ||
+            error.name === "MongoNetworkError" ||
+            error.name === "MongoNetworkTimeoutError"
+        ) {
+            return res.status(503).json({
+                success: false,
+                code: "DATABASE_UNAVAILABLE",
+                message: "The authentication service is temporarily unavailable. Please try again later.",
+            });
+        }
+
+        // Unexpected server error.
         return res.status(500).json({
-            message: "Internal server error",
+            success: false,
+            code: "INTERNAL_SERVER_ERROR",
+            message: "An unexpected server error occurred during login.",
         });
     }
 };

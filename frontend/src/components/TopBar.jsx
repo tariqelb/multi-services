@@ -15,12 +15,14 @@ import {
     Languages,
     Bell,
 } from "lucide-react";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+
 import logo from "../assets/iconlogo.png";
 import { getProfile } from "../redux/actions/profile/profileAction";
 import NotificationMenu from "./NotificationMenu";
-import { connectSocket, disconnectSocket } from "../Socket/Socket";
-import NotificationsPage from "./NotificationPage";
+import {
+    connectSocket,
+    disconnectSocket,
+} from "../Socket/Socket";
 
 export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const [profileOpen, setProfileOpen] = useState(false);
@@ -37,7 +39,14 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
 
     const { t, i18n } = useTranslation();
 
-    const currentLanguage = i18n.resolvedLanguage || "en";
+    // Normalize language codes such as en-US and fr-FR.
+    const currentLanguage = (
+        i18n.resolvedLanguage ||
+        i18n.language ||
+        "en"
+    )
+        .split("-")[0]
+        .split("_")[0];
 
     const languages = [
         { code: "en", label: "English" },
@@ -45,16 +54,19 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         { code: "ar", label: "العربية" },
     ];
 
-    // Get authenticated user and profile from Redux.
+    // Authenticated user and profile.
     const user = useSelector(
-        (state) => state.auth?.user ?? state.loginForm?.user ?? null
+        (state) =>
+            state.auth?.user ??
+            state.loginForm?.user ??
+            null
     );
 
     const profile = useSelector((state) => state.profile);
 
     const isAuthenticated = Boolean(user);
 
-    // Load the profile as soon as the user is authenticated.
+    // Load profile when authenticated.
     useEffect(() => {
         if (isAuthenticated) {
             dispatch(getProfile());
@@ -62,10 +74,10 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     }, [isAuthenticated, dispatch]);
 
     // Apply the language saved in the user's profile.
-    // Apply the saved language when the profile is loaded or updated.
-    // Apply the saved language when the profile is loaded.
     useEffect(() => {
-        if (!isAuthenticated || languageManuallyChanged.current) return;
+        if (!isAuthenticated || languageManuallyChanged.current) {
+            return;
+        }
 
         const savedLanguage =
             profile?.language ||
@@ -74,7 +86,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         if (
             savedLanguage &&
             ["en", "fr", "ar"].includes(savedLanguage) &&
-            savedLanguage !== (i18n.resolvedLanguage || "en")
+            savedLanguage !== currentLanguage
         ) {
             i18n.changeLanguage(savedLanguage);
         }
@@ -82,55 +94,67 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         isAuthenticated,
         profile?.language,
         profile?.user?.language,
+        currentLanguage,
         i18n,
     ]);
 
-    // Save language preference and update the interface.
+    // Change language immediately and save it to the backend.
     const handleLanguageChange = async (language) => {
-        if (languageSaving || language === currentLanguage) {
+        if (languageSaving) return;
+
+        if (language === currentLanguage) {
             setLanguageOpen(false);
             return;
         }
 
+        const previousLanguage = currentLanguage;
+
+        // Prevent the profile effect from restoring an old language.
+        languageManuallyChanged.current = true;
+
         setLanguageSaving(true);
+        setLanguageOpen(false);
 
         try {
-            // Change the interface immediately.
+            // Update translations immediately.
             await i18n.changeLanguage(language);
 
-            // Prevent the old Redux profile language from overriding it.
-            languageManuallyChanged.current = true;
-
+            // Persist the selected language.
             if (isAuthenticated) {
-                await axiosInstance.patch("/profile/me/language", {
-                    language,
-                });
+                try {
+                    await axiosInstance.patch(
+                        "/profile/me/language",
+                        { language }
+                    );
+                } catch (error) {
+                    console.error(
+                        "Could not save language preference:",
+                        error.response?.data?.message ||
+                        error.message
+                    );
+
+                    // Keep the selected language even if saving fails.
+                }
             }
-
-            setLanguageOpen(false);
         } catch (error) {
-            console.error(
-                "Language preference update failed:",
-                error.response?.data?.message || error.message
-            );
+            console.error("Language change failed:", error);
 
-            // Restore the previous language if saving failed.
             languageManuallyChanged.current = false;
 
-            if (isAuthenticated) {
-                const savedLanguage =
-                    profile?.language ||
-                    profile?.user?.language ||
-                    "en";
-
-                await i18n.changeLanguage(savedLanguage);
+            try {
+                await i18n.changeLanguage(previousLanguage);
+            } catch (restoreError) {
+                console.error(
+                    "Could not restore previous language:",
+                    restoreError
+                );
             }
         } finally {
             setLanguageSaving(false);
         }
     };
 
-    // Connect or disconnect the user's socket.
+    // Socket connection.
     useEffect(() => {
         if (isAuthenticated) {
             connectSocket();
@@ -143,11 +167,21 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         };
     }, [isAuthenticated]);
 
-    const firstName = profile?.firstName || user?.firstName || "";
-    const lastName = profile?.lastName || user?.lastName || "";
+    // User information.
+    const firstName =
+        profile?.firstName ||
+        user?.firstName ||
+        "";
+
+    const lastName =
+        profile?.lastName ||
+        user?.lastName ||
+        "";
 
     const displayName =
-        [firstName, lastName].filter(Boolean).join(" ") ||
+        [firstName, lastName]
+            .filter(Boolean)
+            .join(" ") ||
         user?.name ||
         user?.email ||
         t("topbar.user");
@@ -161,7 +195,11 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         displayName.charAt(0).toUpperCase();
 
     const email = profile?.email || user?.email || "";
-    const role = user?.role || profile?.role || t("topbar.member");
+
+    const role =
+        user?.role ||
+        profile?.role ||
+        t("topbar.member");
 
     const avatar =
         profile?.profileImage ||
@@ -170,7 +208,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         user?.profilePicture ||
         "";
 
-    // Support Base64, Blob, external URLs and relative backend paths.
+    // Support Base64, Blob, external URLs and backend paths.
     const getAvatarUrl = (image) => {
         if (!image) return "";
 
@@ -205,32 +243,46 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
 
             return `${backendOrigin}/${imagePath.replace(/^\/+/, "")}`;
         } catch (error) {
-            console.error("Invalid profile image URL:", error);
+            console.error(
+                "Invalid profile image URL:",
+                error
+            );
+
             return "";
         }
     };
 
     const avatarUrl = getAvatarUrl(avatar);
 
-    // Reset image error when the image changes.
+    // Reset avatar error when the image changes.
     useEffect(() => {
         setAvatarError(false);
     }, [avatarUrl]);
 
     // Close menus when clicking outside or pressing Escape.
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
+        const handlePointerDown = (event) => {
+            const path = event.composedPath?.() || [];
+
+            const clickedInsideProfile =
                 profileRef.current &&
-                !profileRef.current.contains(event.target)
-            ) {
+                (
+                    profileRef.current.contains(event.target) ||
+                    path.includes(profileRef.current)
+                );
+
+            const clickedInsideLanguage =
+                languageRef.current &&
+                (
+                    languageRef.current.contains(event.target) ||
+                    path.includes(languageRef.current)
+                );
+
+            if (!clickedInsideProfile) {
                 setProfileOpen(false);
             }
 
-            if (
-                languageRef.current &&
-                !languageRef.current.contains(event.target)
-            ) {
+            if (!clickedInsideLanguage) {
                 setLanguageOpen(false);
             }
         };
@@ -242,15 +294,30 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             }
         };
 
-        document.addEventListener("mousedown", handleClickOutside);
-        document.addEventListener("keydown", handleEscape);
+        document.addEventListener(
+            "pointerdown",
+            handlePointerDown
+        );
+
+        document.addEventListener(
+            "keydown",
+            handleEscape
+        );
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            document.removeEventListener("keydown", handleEscape);
+            document.removeEventListener(
+                "pointerdown",
+                handlePointerDown
+            );
+
+            document.removeEventListener(
+                "keydown",
+                handleEscape
+            );
         };
     }, []);
 
+    // Logout.
     const handleLogout = async () => {
         setProfileOpen(false);
 
@@ -259,22 +326,25 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         } catch (error) {
             console.error(
                 "Logout request failed:",
-                error.response?.data?.message || error.message
+                error.response?.data?.message ||
+                error.message
             );
         } finally {
             disconnectSocket();
+
             dispatch({ type: "LOGOUT" });
+
             navigate("/login", { replace: true });
         }
     };
 
+    // Profile menu items.
     const menuItems = [
         {
             label: t("topbar.myProfile"),
             path: "/profile",
             icon: UserRound,
         },
-        
         {
             label: t("topbar.notification"),
             path: "/notificationpage",
@@ -295,14 +365,22 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                 <button
                     type="button"
                     data-sidebar-toggle
-                    onClick={() => setSidebarOpen((open) => !open)}
+                    onClick={() =>
+                        setSidebarOpen((open) => !open)
+                    }
                     aria-label={
-                        sidebarOpen ? "Close sidebar" : "Open sidebar"
+                        sidebarOpen
+                            ? "Close sidebar"
+                            : "Open sidebar"
                     }
                     aria-expanded={sidebarOpen}
                     className="shrink-0 rounded-[10px] p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 md:hidden"
                 >
-                    {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                    {sidebarOpen ? (
+                        <X size={20} />
+                    ) : (
+                        <Menu size={20} />
+                    )}
                 </button>
 
                 <Link
@@ -360,39 +438,50 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                         <div
                             role="menu"
                             aria-label="Select language"
+                            onPointerDown={(event) =>
+                                event.stopPropagation()
+                            }
                             className="absolute right-0 z-[70] mt-2 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
                         >
-                            {languages.map((language) => (
-                                <button
-                                    key={language.code}
-                                    type="button"
-                                    role="menuitemradio"
-                                    aria-checked={
-                                        currentLanguage === language.code
-                                    }
-                                    disabled={languageSaving}
-                                    onClick={() =>
-                                        handleLanguageChange(language.code)
-                                    }
-                                    className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 disabled:cursor-wait disabled:opacity-50 ${
-                                        currentLanguage === language.code
-                                            ? "bg-blue-50 font-semibold text-blue-700"
-                                            : "text-gray-700"
-                                    }`}
-                                >
-                                    <span>{language.label}</span>
+                            {languages.map((language) => {
+                                const selected =
+                                    currentLanguage === language.code;
 
-                                    {currentLanguage === language.code && (
-                                        <span className="text-blue-600">
-                                            ✓
+                                return (
+                                    <button
+                                        key={language.code}
+                                        type="button"
+                                        role="menuitemradio"
+                                        aria-checked={selected}
+                                        disabled={languageSaving}
+                                        onClick={() =>
+                                            handleLanguageChange(
+                                                language.code
+                                            )
+                                        }
+                                        className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 disabled:cursor-wait disabled:opacity-50 ${
+                                            selected
+                                                ? "bg-blue-50 font-semibold text-blue-700"
+                                                : "text-gray-700"
+                                        }`}
+                                    >
+                                        <span>
+                                            {language.label}
                                         </span>
-                                    )}
-                                </button>
-                            ))}
+
+                                        {selected && (
+                                            <span className="text-blue-600">
+                                                ✓
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
 
+                {/* Notifications */}
                 {isAuthenticated && <NotificationMenu />}
 
                 {/* User profile */}
@@ -421,6 +510,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                         "Failed to load profile image:",
                                         avatarUrl
                                     );
+
                                     setAvatarError(true);
                                 }}
                             />
@@ -465,7 +555,11 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
 
                             <div className="py-2">
                                 {menuItems.map(
-                                    ({ label, path, icon: Icon }) => (
+                                    ({
+                                        label,
+                                        path,
+                                        icon: Icon,
+                                    }) => (
                                         <Link
                                             key={path}
                                             to={path}

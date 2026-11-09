@@ -1,15 +1,26 @@
 import React, { useState } from "react";
 import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
+
 import TopBar from "./TopBar";
 import Sidebar from "./Sidebar";
 import MiddleContent from "./MiddleContent";
-import PublishFab from "./PublishFab";
-import Footer from "./Footer"
-
 
 export default function Home() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [activeNav, setActiveNav] = useState("Dashboard");
+
+    const { i18n } = useTranslation();
+
+    const currentLanguage = (
+        i18n.resolvedLanguage ||
+        i18n.language ||
+        "en"
+    )
+        .split("-")[0]
+        .split("_")[0];
+
+    const isRTL = currentLanguage === "ar";
 
     const user = {
         name: "Alex Morgan",
@@ -18,7 +29,10 @@ export default function Home() {
     };
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col overflow-x-clip bg-[#F4F7FB] font-sans text-gray-800">
+        <div
+            dir={isRTL ? "rtl" : "ltr"}
+            className="relative flex min-h-screen w-full flex-col overflow-x-clip bg-[#F4F7FB] font-sans text-gray-800"
+        >
             {/* Top navigation */}
             <TopBar
                 sidebarOpen={sidebarOpen}
@@ -33,7 +47,10 @@ export default function Home() {
                     <Box
                         onClick={() => setSidebarOpen(false)}
                         sx={{
-                            display: { xs: "block", md: "none" },
+                            display: {
+                                xs: "block",
+                                md: "none",
+                            },
                             position: "fixed",
                             top: "4rem",
                             left: 0,

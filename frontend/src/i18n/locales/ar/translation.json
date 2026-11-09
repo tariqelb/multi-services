@@ -2,6 +2,7 @@
     "topbar": {
         "myProfile": "ملفي الشخصي",
         "settings": "الإعدادات",
+        "notification": "إشعارات",
         "logout": "تسجيل الخروج",
         "member": "عضو",
         "user": "مستخدم"
@@ -551,9 +552,7 @@
                 "archive": "تعذرت أرشفة التنبيه.",
                 "restore": "تعذرت استعادة التنبيه."
             }
-
         }
-
     },
     "notifications": {
         "title": "الإشعارات",
@@ -1129,7 +1128,9 @@
         }
     },
     "common": {
-        "retry": "إعادة المحاولة"
+        "retry": "إعادة المحاولة",
+        "yes": "نعم",
+        "no": "لا"
     },
     "analyticsPlaceholder": {
         "clickTitle": "إحصائيات النقرات",
@@ -1167,25 +1168,33 @@
             "all": "كل الفترات"
         }
     },
-    "userCard": {
-        "unnamedUser": "مستخدم بدون اسم",
-        "active": "نشط",
-        "noEmail": "لا يوجد بريد إلكتروني",
-        "noPhone": "لا يوجد رقم هاتف",
-        "user": "مستخدم",
-        "joined": "تاريخ الانضمام",
-        "unknown": "غير معروف",
-        "activity": "نشاط المستخدم",
-        "publishedProperties": "العقارات المنشورة",
-        "savedProperties": "العقارات المحفوظة",
-        "submittedFeedback": "الملاحظات المرسلة"
-    },
     "usersSection": {
         "title": "المستخدمون",
-        "subtitle": "معلومات الحسابات ونشاط المستخدمين في المنصة.",
+        "subtitle": "معلومات الحسابات والنشاط على المنصة.",
         "userCount": "{{count}} مستخدم",
         "loadError": "تعذر تحميل المستخدمين.",
-        "empty": "لم يتم العثور على مستخدمين."
+        "empty": "لم يتم العثور على أي مستخدم.",
+        "totalUsers": "إجمالي عدد المستخدمين",
+        "activeUsers": "المستخدمون النشطون",
+        "inactiveUsers": "المستخدمون غير النشطين",
+        "suspendedUsers": "المستخدمون الموقوفون",
+        "searchPlaceholder": "البحث بالاسم أو البريد الإلكتروني أو رقم الهاتف...",
+        "role": "الدور",
+        "allRoles": "جميع الأدوار",
+        "client": "عميل",
+        "admin": "مسؤول",
+        "status": "الحالة",
+        "allStatuses": "جميع الحالات",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "sortBy": "ترتيب حسب",
+        "newestFirst": "الأحدث أولاً",
+        "oldestFirst": "الأقدم أولاً",
+        "name": "الاسم",
+        "filteredCount": "تم العثور على {{count}} مستخدم",
+        "clearFilters": "مسح عوامل التصفية",
+        "refresh": "تحديث",
+        "noMatchingUsers": "لا يوجد مستخدمون يطابقون بحثك أو عوامل التصفية المحددة."
     },
     "visitsSection": {
         "title": "زيارات الموقع",
@@ -1269,6 +1278,210 @@
         "unknownOwner": "مالك غير معروف",
         "contacted": "تواصل مع",
         "call": "هاتف"
+    },
+    "savedDemand": {
+        "title": "إحصائيات العقارات المحفوظة",
+        "subtitle": "اكتشف الإعلانات العقارية التي تحظى بأكبر اهتمام من المستخدمين.",
+        "dateRange": "الفترة الزمنية للإحصائيات",
+        "loadError": "تعذر تحميل إحصائيات العقارات المحفوظة.",
+        "ranges": {
+        "last7Days": "آخر 7 أيام",
+        "last30Days": "آخر 30 يومًا",
+        "last90Days": "آخر 90 يومًا",
+        "allTime": "كل الفترات"
+        },
+        "totalSaves": "إجمالي مرات الحفظ",
+        "totalSavesDescription": "جميع عمليات حفظ العقارات",
+        "uniqueUsers": "المستخدمون المهتمون",
+        "uniqueUsersDescription": "المستخدمون الذين حفظوا عقارات",
+        "uniqueProperties": "الإعلانات المحفوظة",
+        "uniquePropertiesDescription": "عدد العقارات المختلفة المحفوظة",
+        "alertsVsSaves": "طلبات البحث مقابل الاهتمام بالإعلانات",
+        "alertsVsSavesDescription": "مقارنة تنبيهات العقارات النشطة والإعلانات المحفوظة حسب المدينة",
+        "activeAlerts": "التنبيهات النشطة",
+        "savedListings": "الإعلانات المحفوظة",
+        "trend": "نشاط حفظ العقارات بمرور الوقت",
+        "trendDescription": "عدد عمليات الحفظ خلال الفترة المحددة",
+        "saves": "عمليات الحفظ",
+        "propertyTypes": "أنواع العقارات الأكثر حفظًا",
+        "propertyTypesDescription": "فئات العقارات التي تجذب أكبر عدد من عمليات الحفظ",
+        "listingTypes": "الاهتمام بالشراء أو الإيجار",
+        "listingTypesDescription": "أنواع الإعلانات التي يحفظها المستخدمون غالبًا",
+        "forSale": "للبيع",
+        "forRent": "للكراء",
+        "topProperties": "العقارات الأكثر حفظًا",
+        "topPropertiesDescription": "الإعلانات التي جذبت أكبر اهتمام من المستخدمين",
+        "saveCount": "{{count}} عملية حفظ",
+        "noTopProperties": "لا توجد عقارات محفوظة خلال هذه الفترة.",
+        "recentSaves": "العقارات المحفوظة مؤخرًا",
+        "unknownUser": "مستخدم غير معروف",
+        "currency": "درهم",
+        "priceUnavailable": "السعر غير متوفر",
+        "noRecentSaves": "لا يوجد نشاط لحفظ العقارات خلال هذه الفترة.",
+        "unknown": "غير معروف"
+    },
+    "notificationsMenu": {
+        "title": "الإشعارات",
+        "buttonAriaLabel": "الإشعارات، {{count}} غير مقروءة",
+        "unreadCount_zero": "لا توجد إشعارات غير مقروءة",
+        "unreadCount_one": "إشعار واحد غير مقروء",
+        "unreadCount_two": "إشعاران غير مقروءين",
+        "unreadCount_few": "{{count}} إشعارات غير مقروءة",
+        "unreadCount_many": "{{count}} إشعارًا غير مقروء",
+        "unreadCount_other": "{{count}} إشعار غير مقروء",
+        "markAllAsRead": "تحديد الكل كمقروء",
+        "delete": "حذف الإشعار",
+        "emptyTitle": "أنت على اطلاع بكل جديد",
+        "emptyDescription": "ستظهر الإشعارات الجديدة هنا.",
+        "errors": {
+            "load": "تعذر تحميل الإشعارات.",
+            "updateOne": "تعذر تحديث الإشعار.",
+            "updateAll": "تعذر تحديث الإشعارات.",
+            "delete": "تعذر حذف الإشعار."
+        }
+    },
+    "externalListings": {
+        "title": "اكتشف العقارات",
+        "subtitle": "استكشف العقارات المنشورة على مواقع العقارات الخارجية.",
+        "retry": "إعادة المحاولة",
+        "loading": "جاري تحميل العقارات...",
+        "property": "عقار",
+        "propertyListing": "إعلان عقاري",
+        "imageUnavailable": "صورة العقار غير متوفرة",
+        "priceOnRequest": "السعر عند الطلب",
+        "locationNotSpecified": "الموقع غير محدد",
+        "source": "المصدر",
+        "externalListing": "إعلان خارجي",
+        "viewOriginal": "عرض الإعلان الأصلي",
+        "filteredProperties": "العقارات المصفاة",
+        "propertyListings": "الإعلانات العقارية",
+        "resultsCount_zero": "لم يتم العثور على عقارات",
+        "resultsCount_one": "تم العثور على عقار واحد",
+        "resultsCount_two": "تم العثور على عقارين",
+        "resultsCount_few": "تم العثور على {{count}} عقارات",
+        "resultsCount_many": "تم العثور على {{count}} عقارًا",
+        "resultsCount_other": "تم العثور على {{count}} عقار",
+        "priceUnits": {
+            "month": "/ الشهر",
+            "perSquareMeter": "/ م²"
+        },
+        "listingTypes": {
+            "forSale": "للبيع",
+            "forRent": "للكراء",
+            "property": "عقار",
+            "unknown": "غير معروف"
+        },
+        "propertyTypes": {
+            "apartment": "شقة",
+            "house": "منزل",
+            "villa": "فيلا",
+            "studio": "استوديو",
+            "room": "غرفة",
+            "store": "متجر",
+            "office": "مكتب",
+            "land": "أرض",
+            "warehouse": "مستودع",
+            "commercialSpace": "محل تجاري",
+            "commercialStore": "متجر تجاري",
+            "garage": "مرآب",
+            "other": "أخرى"
+        },
+        "details": {
+            "surface": "{{value}} م²",
+            "rooms_one": "{{value}} غرفة",
+            "rooms_two": "{{value}} غرفتان",
+            "rooms_few": "{{value}} غرف",
+            "rooms_many": "{{value}} غرفة",
+            "rooms_other": "{{value}} غرفة",
+            "bathrooms_one": "{{value}} حمام",
+            "bathrooms_two": "{{value}} حمامان",
+            "bathrooms_few": "{{value}} حمامات",
+            "bathrooms_many": "{{value}} حمامًا",
+            "bathrooms_other": "{{value}} حمام"
+        },
+        "filters": {
+            "title": "تصفية العقارات",
+            "active_one": "فلتر نشط واحد",
+            "active_two": "فلتران نشطان",
+            "active_few": "{{count}} فلاتر نشطة",
+            "active_many": "{{count}} فلترًا نشطًا",
+            "active_other": "{{count}} فلتر نشط",
+            "clear": "مسح الفلاتر",
+            "searchPlaceholder": "ابحث حسب العنوان أو الوصف أو الحي...",
+            "listingType": "نوع الإعلان",
+            "allListingTypes": "جميع أنواع الإعلانات",
+            "propertyType": "نوع العقار",
+            "allPropertyTypes": "جميع أنواع العقارات",
+            "city": "المدينة",
+            "allCities": "جميع المدن",
+            "source": "الموقع المصدر",
+            "allSources": "جميع المصادر",
+            "minimumPrice": "الحد الأدنى للسعر (درهم)",
+            "maximumPrice": "الحد الأقصى للسعر (درهم)"
+        },
+        "empty": {
+            "title": "لم يتم العثور على عقارات",
+            "description": "حاول تغيير البحث أو الفلاتر."
+        },
+        "errors": {
+            "loadFailed": "تعذر تحميل الإعلانات العقارية. يرجى المحاولة مرة أخرى لاحقًا."
+        }
+    },
+    "userCard": {
+        "viewProfile": "عرض الملف الشخصي",
+        "unnamedUser": "مستخدم بدون اسم",
+        "active": "نشط",
+        "noEmail": "لا يوجد بريد إلكتروني",
+        "noPhone": "لا يوجد رقم هاتف",
+        "user": "مستخدم",
+        "joined": "تاريخ التسجيل",
+        "unknown": "غير معروف",
+        "activity": "نشاط المستخدم",
+        "publishedProperties": "العقارات المنشورة",
+        "savedProperties": "العقارات المحفوظة",
+        "submittedFeedback": "التعليقات المرسلة",
+        "noAddress": "لم يتم تقديم عنوان",
+        "suspended": "موقوف"
+    },
+    "userDetails": {
+        "loadError": "تعذر تحميل معلومات المستخدم.",
+        "tabLoadError": "تعذر تحميل هذه المعلومات.",
+        "noRecords": "لم يتم العثور على أي سجلات.",
+        "backToDashboard": "العودة إلى لوحة التحكم",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الهاتف",
+        "phoneVerified": "تم التحقق من رقم الهاتف",
+        "address": "العنوان",
+        "language": "اللغة",
+        "joined": "تاريخ التسجيل",
+        "emailVerified": "تم التحقق من البريد الإلكتروني",
+        "emailNotVerified": "لم يتم التحقق من البريد الإلكتروني",
+        "totalPublications": "إجمالي المنشورات",
+        "availablePublications": "المنشورات المتاحة",
+        "activeAlerts": "التنبيهات النشطة",
+        "archivedAlerts": "التنبيهات المؤرشفة",
+        "savedProperties": "العقارات المحفوظة",
+        "totalFeedback": "إجمالي التعليقات",
+        "accountOverview": "نظرة عامة على الحساب",
+        "noBio": "لم تتم إضافة نبذة شخصية.",
+        "accountCreated": "تاريخ إنشاء الحساب",
+        "lastUpdated": "آخر تحديث",
+        "feedbackByStatus": "التعليقات حسب الحالة",
+        "createdAt": "تاريخ الإنشاء",
+        "active": "نشط",
+        "archived": "مؤرشف",
+        "tabs": {
+            "overview": "نظرة عامة",
+            "publications": "المنشورات",
+            "alerts": "التنبيهات",
+            "savedProperties": "العقارات المحفوظة",
+            "feedback": "التعليقات"
+        },
+        "feedbackStatuses": {
+            "open": "مفتوح",
+            "inProgress": "قيد المعالجة",
+            "resolved": "تم الحل",
+            "closed": "مغلق"
+        }
     }
-
 }

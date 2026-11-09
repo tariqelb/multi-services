@@ -1,5 +1,7 @@
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import SavedPropertyDemandSection from "./SavedPropertyDemandSection";
 
 import {
     Alert,
@@ -143,13 +145,32 @@ function ChartCard({ title, subtitle, children, minHeight = 330 }) {
             elevation={0}
             sx={{
                 height: "100%",
+                width: "100%",
+                minWidth: 0,
+                boxSizing: "border-box",
                 border: "1px solid",
                 borderColor: "divider",
                 borderRadius: 3,
             }}
         >
-            <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <Typography variant="h6" fontWeight={750}>
+            <CardContent
+                sx={{
+                    p: { xs: 2, md: 2.5 },
+                    width: "100%",
+                    minWidth: 0,
+                    boxSizing: "border-box",
+                    "&:last-child": {
+                        pb: { xs: 2, md: 2.5 },
+                    },
+                }}
+            >
+                <Typography
+                    variant="h6"
+                    fontWeight={750}
+                    sx={{
+                        overflowWrap: "anywhere",
+                    }}
+                >
                     {title}
                 </Typography>
 
@@ -157,13 +178,24 @@ function ChartCard({ title, subtitle, children, minHeight = 330 }) {
                     <Typography
                         variant="body2"
                         color="text.secondary"
-                        sx={{ mt: 0.5, mb: 2 }}
+                        sx={{
+                            mt: 0.5,
+                            mb: 2,
+                            overflowWrap: "anywhere",
+                        }}
                     >
                         {subtitle}
                     </Typography>
                 )}
 
-                <Box sx={{ width: "100%", height: minHeight }}>
+                <Box
+                    sx={{
+                        width: "100%",
+                        minWidth: 0,
+                        height: minHeight,
+                        position: "relative",
+                    }}
+                >
                     {children}
                 </Box>
             </CardContent>
@@ -445,8 +477,24 @@ export default function PropertyDemandSection() {
             </ChartCard>
 
             {/* Property type and listing preferences */}
-            <Grid container spacing={2}>
-                <Grid item xs={12} lg={7}>
+            {/* Property type and listing preferences */}
+
+            {/* Property type and listing preferences */}
+            <Box
+                sx={{
+                    width: "100%",
+                    minWidth: 0,
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "minmax(0, 1fr)",
+                        lg: "minmax(0, 7fr) minmax(0, 5fr)",
+                    },
+                    gap: 2,
+                    alignItems: "stretch",
+                }}
+            >
+                {/* Most requested property types */}
+                <Box sx={{ minWidth: 0, display: "flex" }}>
                     <ChartCard
                         title={t(
                             "propertyDemand.propertyTypes",
@@ -495,9 +543,10 @@ export default function PropertyDemandSection() {
                             </BarChart>
                         </ResponsiveContainer>
                     </ChartCard>
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} lg={5}>
+                {/* Buy vs rent preferences */}
+                <Box sx={{ minWidth: 0, display: "flex" }}>
                     <ChartCard
                         title={t(
                             "propertyDemand.listingPreferences",
@@ -523,7 +572,9 @@ export default function PropertyDemandSection() {
                                         <Cell
                                             key={item.type}
                                             fill={
-                                                CHART_COLORS[index % CHART_COLORS.length]
+                                                CHART_COLORS[
+                                                    index % CHART_COLORS.length
+                                                ]
                                             }
                                         />
                                     ))}
@@ -534,8 +585,9 @@ export default function PropertyDemandSection() {
                             </PieChart>
                         </ResponsiveContainer>
                     </ChartCard>
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
+
 
             {/* City demand */}
             <ChartCard
@@ -642,6 +694,8 @@ export default function PropertyDemandSection() {
                     </BarChart>
                 </ResponsiveContainer>
             </ChartCard>
+
+
 
             {/* Recent alerts */}
             <Card
@@ -777,6 +831,9 @@ export default function PropertyDemandSection() {
                     </Box>
                 </CardContent>
             </Card>
+
+            <SavedPropertyDemandSection alertCities={cityData} />
+
         </Stack>
     );
 }

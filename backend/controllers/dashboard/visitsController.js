@@ -37,7 +37,7 @@ export const trackVisit = async (req, res) => {
             ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
             : "";
 
-        const lastPage =
+        const currentPage =
             typeof page === "string" &&
             page.startsWith("/") &&
             !page.startsWith("//")
@@ -54,6 +54,7 @@ export const trackVisit = async (req, res) => {
             },
         }).sort({ startedAt: -1 });
 
+        // Start a new session.
         if (!session) {
             session = await VisitSession.create({
                 visitorId,
@@ -65,10 +66,21 @@ export const trackVisit = async (req, res) => {
                 lastHeartbeatAt: now,
                 activeSeconds: 0,
                 pageViews: 1,
-                lastPage,
+                lastPage: currentPage,
+                pageHistory: currentPage
+                    ? [
+                        {
+                            path: currentPage,
+                            visitedAt: now,
+                            lastSeenAt: now,
+                            durationSeconds: 0,
+                        },
+                    ]
+                    : [],
             });
         } else {
             const previousHeartbeat = session.lastHeartbeatAt;
+
             let elapsedSeconds = 0;
 
             if (previousHeartbeat) {
@@ -79,24 +91,74 @@ export const trackVisit = async (req, res) => {
                 );
             }
 
-            // Count only recent intervals, not long idle periods.
-            if (
+            const isCountedInterval =
                 elapsedSeconds > 0 &&
-                elapsedSeconds <= MAX_COUNTED_INTERVAL_SECONDS
-            ) {
+                elapsedSeconds <= MAX_COUNTED_INTERVAL_SECONDS;
+
+            if (isCountedInterval) {
                 session.activeSeconds += elapsedSeconds;
             }
 
+            // Associate anonymous browsing with the authenticated user.
             if (user) {
-                // Associate anonymous browsing with the authenticated user.
                 session.userId = user._id;
                 session.fullName = fullName;
                 session.email = user.email || "";
             }
 
-            if (lastPage && lastPage !== session.lastPage) {
+            if (!session.pageHistory) {
+                session.pageHistory = [];
+            }
+
+            const lastHistoryEntry =
+                session.pageHistory[
+                    session.pageHistory.length - 1
+                ];
+
+            if (currentPage && currentPage !== session.lastPage) {
+                // Finish the previous page's recorded activity.
+                if (lastHistoryEntry) {
+                    lastHistoryEntry.lastSeenAt =
+                        previousHeartbeat || now;
+
+                    if (isCountedInterval) {
+                        lastHistoryEntry.durationSeconds +=
+                            elapsedSeconds;
+                    }
+                }
+
+                // Record the newly visited page.
+                session.pageHistory.push({
+                    path: currentPage,
+                    visitedAt: now,
+                    lastSeenAt: now,
+                    durationSeconds: 0,
+                });
+
                 session.pageViews += 1;
-                session.lastPage = lastPage;
+                session.lastPage = currentPage;
+            } else if (lastHistoryEntry) {
+                // Same page: update its last activity and duration.
+                lastHistoryEntry.lastSeenAt = now;
+
+                if (isCountedInterval) {
+                    lastHistoryEntry.durationSeconds +=
+                        elapsedSeconds;
+                }
+            } else if (currentPage) {
+                session.pageHistory.push({
+                    path: currentPage,
+                    visitedAt: now,
+                    lastSeenAt: now,
+                    durationSeconds: 0,
+                });
+
+                session.pageViews = Math.max(
+                    session.pageViews || 0,
+                    1
+                );
+
+                session.lastPage = currentPage;
             }
 
             session.lastActivityAt = now;
@@ -222,7 +284,7 @@ export const getVisitAnalytics = async (req, res) => {
                 .sort({ startedAt: -1 })
                 .limit(100)
                 .select(
-                    "visitorId userId fullName email startedAt lastActivityAt activeSeconds pageViews lastPage"
+                    "visitorId userId fullName email startedAt lastActivityAt activeSeconds pageViews lastPage pageHistory"
                 )
                 .lean(),
         ]);
@@ -233,6 +295,17 @@ export const getVisitAnalytics = async (req, res) => {
         const dailyTime =
             dailyActiveSeconds[0]?.total || 0;
 
+        const activeThreshold = new Date(
+            now.getTime() - 90 * 1000
+        );
+
+        const formattedVisitors = visitors.map((visitor) => ({
+            ...visitor,
+            isActive:
+                visitor.lastActivityAt >= activeThreshold,
+            pageHistory: visitor.pageHistory || [],
+        }));
+
         return res.status(200).json({
             success: true,
             summary: {
@@ -241,7 +314,7 @@ export const getVisitAnalytics = async (req, res) => {
                 totalActiveSeconds: totalTime,
                 dailyActiveSeconds: dailyTime,
             },
-            visitors,
+            visitors: formattedVisitors,
         });
     } catch (error) {
         console.error("Get visit analytics error:", error);

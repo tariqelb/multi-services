@@ -22,24 +22,31 @@ import { activeFormAction } from "../redux/actions/activeFormAction";
 function LoginForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
     const { t } = useTranslation();
 
     const emailRef = useRef("");
     const passwordRef = useRef(null);
 
     const [showPassword, setShowPassword] = useState(false);
+    const [loginStatus, setLoginStatus] = useState(null);
 
     const { loading, error } = useSelector(
         (state) => state.loginForm
     );
 
-    const user = useSelector((state) => state.auth.user);
+    const user = useSelector(
+        (state) =>
+            state.auth?.user ??
+            state.loginForm?.user ??
+            null
+    );
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         if (loading) return;
+
+        setLoginStatus(null);
 
         dispatch(clearLoginStatus());
         dispatch(loginRequest());
@@ -47,36 +54,132 @@ function LoginForm() {
         try {
             const response = await axiosInstance.post("/auth/login", {
                 email: emailRef.current.trim(),
-                password: passwordRef.current.value,
+                password: passwordRef.current?.value || "",
             });
+
+            const loggedInUser = response.data.user;
 
             dispatch(
                 loginSuccess({
-                    user: response.data.user,
+                    user: loggedInUser,
                     token: response.data.token,
                 })
             );
 
-            passwordRef.current.value = "";
-            passwordRef.current.blur();
+            setLoginStatus({
+                type: "success",
+                code: `HTTP ${response.status}`,
+                title: "Login successful",
+                message: `Welcome ${loggedInUser.firstName || "back"}! You are now logged in.`,
+            });
+
+            if (passwordRef.current) {
+                passwordRef.current.value = "";
+                passwordRef.current.blur();
+            }
 
             dispatch(setLoginPassword(""));
 
             navigate("/");
-        } catch (error) {
-            dispatch(
-                loginFailure(
-                    error.response?.data?.message ||
-                    t("auth.loginError")
-                )
-            );
+        } catch (requestError) {
+            const status = requestError.response?.status;
+            const backendMessage =
+                requestError.response?.data?.message;
+
+            let code;
+            let title;
+            let message;
+
+            if (requestError.response) {
+                code = `HTTP ${status}`;
+
+                if (status === 400) {
+                    title = "Invalid request";
+                    message =
+                        backendMessage ||
+                        "Please check the information you entered.";
+                } else if (status === 401) {
+                    title = "Authentication failed";
+                    message =
+                        backendMessage ||
+                        "Your email or password is incorrect.";
+                } else if (status === 403) {
+                    title = "Access denied";
+                    message =
+                        backendMessage ||
+                        "You are not allowed to log in.";
+                } else if (status === 404) {
+                    title = "Service not found";
+                    message =
+                        backendMessage ||
+                        "The login endpoint could not be found.";
+                } else if (status >= 500) {
+                    title = "Server error";
+                    message =
+                        backendMessage ||
+                        "Something went wrong on the server. Please try again later.";
+                } else {
+                    title = "Login failed";
+                    message =
+                        backendMessage ||
+                        "The login request could not be completed.";
+                }
+            } else if (requestError.request) {
+                code = "NETWORK ERROR";
+                title = "Connection problem";
+                message =
+                    "Unable to connect to the server. Check your internet connection or try again later.";
+            } else {
+                code = "REQUEST ERROR";
+                title = "Unexpected error";
+                message =
+                    requestError.message ||
+                    "An unexpected error occurred.";
+            }
+
+            setLoginStatus({
+                type: "error",
+                code,
+                title,
+                message,
+            });
+
+            dispatch(loginFailure(message));
+
+            console.error("Login failed:", {
+                status,
+                message,
+                error: requestError.message,
+            });
         }
     };
 
     const handleSignup = () => {
+        setLoginStatus(null);
         dispatch(clearLoginStatus());
         dispatch(activeFormAction("signup"));
     };
+
+    const statusStyles = {
+        success: {
+            container: "border-green-200 bg-green-50",
+            badge: "bg-green-100 text-green-700",
+            title: "text-green-800",
+            message: "text-green-700",
+            icon: "✓",
+        },
+        error: {
+            container: "border-red-200 bg-red-50",
+            badge: "bg-red-100 text-red-700",
+            title: "text-red-800",
+            message: "text-red-700",
+            icon: "!",
+        },
+    };
+
+    const statusStyle = loginStatus
+        ? statusStyles[loginStatus.type]
+        : null;
 
     return (
         <div className="mx-auto w-full min-w-0 max-w-lg rounded-2xl p-4 sm:p-6 md:p-10">
@@ -96,12 +199,13 @@ function LoginForm() {
                     placeholder={t("auth.emailPlaceholder")}
                     autoComplete="email"
                     required
+                    disabled={loading}
+                    value={undefined}
                     onChange={(event) => {
                         emailRef.current = event.target.value;
-
                         dispatch(setLoginEmail(event.target.value));
                     }}
-                    className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 text-base text-black outline-none focus:border-blue-600"
+                    className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 text-base text-black outline-none transition-colors focus:border-blue-600 disabled:bg-gray-100"
                 />
 
                 {/* Password */}
@@ -112,10 +216,13 @@ function LoginForm() {
                         placeholder={t("auth.passwordPlaceholder")}
                         autoComplete="current-password"
                         required
+                        disabled={loading}
                         onChange={(event) => {
-                            dispatch(setLoginPassword(event.target.value));
+                            dispatch(
+                                setLoginPassword(event.target.value)
+                            );
                         }}
-                        className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 pr-12 text-base text-black outline-none focus:border-blue-600"
+                        className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 pr-12 text-base text-black outline-none transition-colors focus:border-blue-600 disabled:bg-gray-100"
                     />
 
                     <button
@@ -139,7 +246,7 @@ function LoginForm() {
                     </button>
                 </div>
 
-                {/* Login status */}
+                {/* Loading status */}
                 {loading && (
                     <div
                         role="status"
@@ -154,23 +261,37 @@ function LoginForm() {
                     </div>
                 )}
 
-                {/* Error */}
-                {error && !loading && (
+                {/* Login result status */}
+                {loginStatus && !loading && (
                     <div
-                        role="alert"
-                        className="break-words rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                        role={loginStatus.type === "error" ? "alert" : "status"}
+                        aria-live="polite"
+                        className={`rounded-lg border p-3 ${statusStyle.container}`}
                     >
-                        {error}
-                    </div>
-                )}
+                        <div className="flex items-start gap-3">
 
-                {/* Logged-in user */}
-                {user && (
-                    <p className="break-words text-sm text-green-700">
-                        {t("auth.welcomeUser", {
-                            name: user.firstName,
-                        })}
-                    </p>
+                            {/* Status icon */}
+                            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${statusStyle.badge}`}>
+                                {statusStyle.icon}
+                            </span>
+
+                            <div className="min-w-0 flex-1">
+                                <div className="mb-1 flex flex-wrap items-center gap-2">
+                                    <p className={`text-sm font-semibold ${statusStyle.title}`}>
+                                        {loginStatus.title}
+                                    </p>
+
+                                    <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide ${statusStyle.badge}`}>
+                                        {loginStatus.code}
+                                    </span>
+                                </div>
+
+                                <p className={`break-words text-sm ${statusStyle.message}`}>
+                                    {loginStatus.message}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {/* Submit */}

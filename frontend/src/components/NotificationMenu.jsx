@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useState } from "react";
 import {
     Badge,
@@ -21,6 +20,8 @@ import Delete from "@mui/icons-material/Delete";
 import Circle from "@mui/icons-material/Circle";
 
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import axiosInstance from "../api/axiosInstance";
 import { socket } from "../Socket/Socket";
 
@@ -28,6 +29,7 @@ const API_URL = "/notifications";
 
 export default function NotificationMenu() {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [notifications, setNotifications] = useState([]);
@@ -36,6 +38,35 @@ export default function NotificationMenu() {
     const [error, setError] = useState("");
 
     const open = Boolean(anchorEl);
+
+    const currentLanguage = (
+        i18n.resolvedLanguage ||
+        i18n.language ||
+        "en"
+    )
+        .split("-")[0]
+        .split("_")[0];
+
+    const isRTL = currentLanguage === "ar";
+
+    const dateLocale = {
+        en: "en-GB",
+        fr: "fr-FR",
+        ar: "ar-MA",
+    }[currentLanguage] || "en-GB";
+
+    const formatDate = (date) => {
+        if (!date) return "";
+
+        const parsedDate = new Date(date);
+
+        if (Number.isNaN(parsedDate.getTime())) return "";
+
+        return new Intl.DateTimeFormat(dateLocale, {
+            dateStyle: "medium",
+            timeStyle: "short",
+        }).format(parsedDate);
+    };
 
     const fetchNotifications = useCallback(async () => {
         setLoading(true);
@@ -49,12 +80,12 @@ export default function NotificationMenu() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Unable to load notifications."
+                    t("notifications.errors.load")
             );
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         fetchNotifications();
@@ -113,7 +144,7 @@ export default function NotificationMenu() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Unable to update notification."
+                    t("notificationsMenu.errors.updateOne")
             );
         }
     };
@@ -134,7 +165,7 @@ export default function NotificationMenu() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Unable to update notifications."
+                    t("notificationsMenu.errors.updateAll")
             );
         }
     };
@@ -163,7 +194,7 @@ export default function NotificationMenu() {
         } catch (err) {
             setError(
                 err.response?.data?.message ||
-                    "Unable to delete notification."
+                    t("notificationsMenu.errors.delete")
             );
         }
     };
@@ -180,11 +211,13 @@ export default function NotificationMenu() {
     return (
         <>
             {/* Notification button */}
-            <Tooltip title="Notifications">
+            <Tooltip title={t("notificationsMenu.title")}>
                 <Button
                     color="inherit"
                     onClick={handleOpen}
-                    aria-label={`Notifications, ${unreadCount} unread`}
+                    aria-label={t("notificationsMenu.buttonAriaLabel", {
+                        count: unreadCount,
+                    })}
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
                     startIcon={
@@ -222,7 +255,7 @@ export default function NotificationMenu() {
                             },
                         }}
                     >
-                        Notifications
+                        {t("notificationsMenu.title")}
                     </Box>
                 </Button>
             </Tooltip>
@@ -235,14 +268,15 @@ export default function NotificationMenu() {
                 disableScrollLock
                 anchorOrigin={{
                     vertical: "bottom",
-                    horizontal: "right",
+                    horizontal: isRTL ? "left" : "right",
                 }}
                 transformOrigin={{
                     vertical: "top",
-                    horizontal: "right",
+                    horizontal: isRTL ? "left" : "right",
                 }}
                 slotProps={{
                     paper: {
+                        dir: isRTL ? "rtl" : "ltr",
                         sx: {
                             width: {
                                 xs: "min(340px, calc(100vw - 16px))",
@@ -273,18 +307,20 @@ export default function NotificationMenu() {
                 >
                     <Box sx={{ minWidth: 0 }}>
                         <Typography fontWeight={700}>
-                            Notifications
+                            {t("notificationsMenu.title")}
                         </Typography>
 
                         <Typography
                             variant="caption"
                             color="text.secondary"
                         >
-                            {unreadCount} unread
+                            {t("notificationsMenu.unreadCount", {
+                                count: unreadCount,
+                            })}
                         </Typography>
                     </Box>
 
-                    <Tooltip title="Mark all as read">
+                    <Tooltip title={t("notificationsMenu.markAllAsRead")}>
                         <span>
                             <Button
                                 size="small"
@@ -305,7 +341,7 @@ export default function NotificationMenu() {
                                     flexShrink: 0,
                                 }}
                             >
-                                Mark all as read
+                                {t("notificationsMenu.markAllAsRead")}
                             </Button>
                         </span>
                     </Tooltip>
@@ -324,7 +360,7 @@ export default function NotificationMenu() {
                             size="small"
                             onClick={fetchNotifications}
                         >
-                            Retry
+                            {t("common.retry")}
                         </Button>
                     </Box>
                 )}
@@ -355,7 +391,7 @@ export default function NotificationMenu() {
                         />
 
                         <Typography fontWeight={600}>
-                            You're all caught up
+                            {t("notificationsMenu.emptyTitle")}
                         </Typography>
 
                         <Typography
@@ -363,7 +399,7 @@ export default function NotificationMenu() {
                             color="text.secondary"
                             textAlign="center"
                         >
-                            New notifications will appear here.
+                            {t("notificationsMenu.emptyDescription")}
                         </Typography>
                     </Stack>
                 ) : (
@@ -441,16 +477,18 @@ export default function NotificationMenu() {
                                             mt: 0.75,
                                         }}
                                     >
-                                        {new Date(
-                                            notification.createdAt
-                                        ).toLocaleString()}
+                                        {formatDate(notification.createdAt)}
                                     </Typography>
                                 </Box>
 
-                                <Tooltip title="Delete notification">
+                                <Tooltip
+                                    title={t("notificationsMenu.delete")}
+                                >
                                     <IconButton
                                         size="small"
-                                        aria-label="Delete notification"
+                                        aria-label={t(
+                                            "notificationsMenu.delete"
+                                        )}
                                         onClick={(event) =>
                                             handleDelete(
                                                 event,

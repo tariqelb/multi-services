@@ -13,9 +13,11 @@
     "minimatch": "^11.0.1"
   },
   "dependencies": {
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",
+    "@mui/lab": "^9.0.0-beta.10",
     "@mui/material": "^9.5.0",
     "@react-google-maps/api": "^2.20.8",
     "@reduxjs/toolkit": "^2.13.0",
@@ -35,6 +37,7 @@
     "recharts": "^3.10.1",
     "redux": "^5.0.1",
     "socket.io-client": "^4.8.4",
+    "stylis-plugin-rtl": "^2.1.1",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@
     "topbar": {
         "myProfile": "Mon profil",
         "settings": "Paramètres",
+        "notification": "Notifications",
         "logout": "Déconnexion",
         "member": "Membre",
         "user": "Utilisateur"
@@ -1114,7 +1115,9 @@
         }
     },
     "common": {
-        "retry": "Réessayer"
+        "retry": "Réessayer",
+        "yes": "Oui",
+        "no": "Non"
     },
     "analyticsPlaceholder": {
         "clickTitle": "Statistiques des clics",
@@ -1152,25 +1155,33 @@
             "all": "Depuis le début"
         }
     },
-    "userCard": {
-        "unnamedUser": "Utilisateur sans nom",
-        "active": "Actif",
-        "noEmail": "Aucun e-mail",
-        "noPhone": "Aucun numéro de téléphone",
-        "user": "Utilisateur",
-        "joined": "Inscrit le",
-        "unknown": "Inconnu",
-        "activity": "Activité de l'utilisateur",
-        "publishedProperties": "Biens publiés",
-        "savedProperties": "Biens enregistrés",
-        "submittedFeedback": "Commentaires envoyés"
-    },
     "usersSection": {
         "title": "Utilisateurs",
         "subtitle": "Informations des comptes et activité sur la marketplace.",
         "userCount": "{{count}} utilisateurs",
         "loadError": "Impossible de charger les utilisateurs.",
-        "empty": "Aucun utilisateur trouvé."
+        "empty": "Aucun utilisateur trouvé.",
+        "totalUsers": "Nombre total d'utilisateurs",
+        "activeUsers": "Utilisateurs actifs",
+        "inactiveUsers": "Utilisateurs inactifs",
+        "suspendedUsers": "Suspendus",
+        "searchPlaceholder": "Rechercher par nom, e-mail ou téléphone...",
+        "role": "Rôle",
+        "allRoles": "Tous les rôles",
+        "client": "Client",
+        "admin": "Administrateur",
+        "status": "Statut",
+        "allStatuses": "Tous les statuts",
+        "active": "Actif",
+        "inactive": "Inactif",
+        "sortBy": "Trier par",
+        "newestFirst": "Plus récents",
+        "oldestFirst": "Plus anciens",
+        "name": "Nom",
+        "filteredCount": "{{count}} utilisateurs trouvés",
+        "clearFilters": "Effacer les filtres",
+        "refresh": "Actualiser",
+        "noMatchingUsers": "Aucun utilisateur ne correspond à votre recherche ou à vos filtres."
     },
     "visitsSection": {
         "title": "Visites du site",
@@ -1254,8 +1265,193 @@
         "unknownOwner": "Propriétaire inconnu",
         "contacted": "A contacté",
         "call": "Téléphone"
+    },
+    "savedDemand": {
+        "title": "Statistiques des propriétés enregistrées",
+        "subtitle": "Découvrez les annonces qui suscitent le plus d'intérêt.",
+        "dateRange": "Période des statistiques",
+        "loadError": "Impossible de charger les statistiques des propriétés enregistrées.",
+        "ranges": {
+        "last7Days": "7 derniers jours",
+        "last30Days": "30 derniers jours",
+        "last90Days": "90 derniers jours",
+        "allTime": "Toute la période"
+        },
+        "totalSaves": "Total des enregistrements",
+        "totalSavesDescription": "Toutes les actions d'enregistrement",
+        "uniqueUsers": "Utilisateurs intéressés",
+        "uniqueUsersDescription": "Utilisateurs ayant enregistré des propriétés",
+        "uniqueProperties": "Annonces enregistrées",
+        "uniquePropertiesDescription": "Nombre de propriétés différentes enregistrées",
+        "alertsVsSaves": "Demande de recherche vs intérêt pour les annonces",
+        "alertsVsSavesDescription": "Comparez les alertes actives et les annonces enregistrées par ville",
+        "activeAlerts": "Alertes actives",
+        "savedListings": "Annonces enregistrées",
+        "trend": "Activité des propriétés enregistrées",
+        "trendDescription": "Nombre d'actions d'enregistrement pendant la période sélectionnée",
+        "saves": "Enregistrements",
+        "propertyTypes": "Types de propriétés les plus enregistrés",
+        "propertyTypesDescription": "Catégories de propriétés qui attirent le plus d'enregistrements",
+        "listingTypes": "Intérêt pour l'achat et la location",
+        "listingTypesDescription": "Types d'annonces les plus souvent enregistrés",
+        "forSale": "À vendre",
+        "forRent": "À louer",
+        "topProperties": "Propriétés les plus enregistrées",
+        "topPropertiesDescription": "Annonces ayant suscité le plus d'intérêt",
+        "saveCount": "{{count}} enregistrements",
+        "noTopProperties": "Aucune propriété enregistrée pour cette période.",
+        "recentSaves": "Propriétés récemment enregistrées",
+        "unknownUser": "Utilisateur inconnu",
+        "currency": "MAD",
+        "priceUnavailable": "Prix indisponible",
+        "noRecentSaves": "Aucune activité d'enregistrement pour cette période.",
+        "unknown": "Inconnu"
+    },
+    "notificationsMenu": {
+        "title": "Notifications",
+        "buttonAriaLabel": "Notifications, {{count}} non lues",
+        "unreadCount_one": "{{count}} non lue",
+        "unreadCount_other": "{{count}} non lues",
+        "markAllAsRead": "Tout marquer comme lu",
+        "delete": "Supprimer la notification",
+        "emptyTitle": "Vous êtes à jour",
+        "emptyDescription": "Les nouvelles notifications apparaîtront ici.",
+        "errors": {
+            "load": "Impossible de charger les notifications.",
+            "updateOne": "Impossible de mettre à jour la notification.",
+            "updateAll": "Impossible de mettre à jour les notifications.",
+            "delete": "Impossible de supprimer la notification."
+        }
+    },
+    "externalListings": {
+        "title": "Découvrir des biens immobiliers",
+        "subtitle": "Explorez les biens publiés sur des sites immobiliers externes.",
+        "retry": "Réessayer",
+        "loading": "Chargement des biens immobiliers...",
+        "property": "Bien immobilier",
+        "propertyListing": "Annonce immobilière",
+        "imageUnavailable": "Image du bien indisponible",
+        "priceOnRequest": "Prix sur demande",
+        "locationNotSpecified": "Emplacement non précisé",
+        "source": "Source",
+        "externalListing": "Annonce externe",
+        "viewOriginal": "Voir l'annonce originale",
+        "filteredProperties": "Biens filtrés",
+        "propertyListings": "Annonces immobilières",
+        "resultsCount_one": "{{count}} bien trouvé",
+        "resultsCount_other": "{{count}} biens trouvés",
+        "priceUnits": {
+            "month": "/ mois",
+            "perSquareMeter": "/ m²"
+        },
+        "listingTypes": {
+            "forSale": "À vendre",
+            "forRent": "À louer",
+            "property": "Bien immobilier",
+            "unknown": "Inconnu"
+        },
+        "propertyTypes": {
+            "apartment": "Appartement",
+            "house": "Maison",
+            "villa": "Villa",
+            "studio": "Studio",
+            "room": "Chambre",
+            "store": "Magasin",
+            "office": "Bureau",
+            "land": "Terrain",
+            "warehouse": "Entrepôt",
+            "commercialSpace": "Local commercial",
+            "commercialStore": "Magasin commercial",
+            "garage": "Garage",
+            "other": "Autre"
+        },
+        "details": {
+            "surface": "{{value}} m²",
+            "rooms_one": "{{value}} pièce",
+            "rooms_other": "{{value}} pièces",
+            "bathrooms_one": "{{value}} salle de bain",
+            "bathrooms_other": "{{value}} salles de bain"
+        },
+        "filters": {
+            "title": "Filtrer les biens",
+            "active_one": "{{count}} filtre actif",
+            "active_other": "{{count}} filtres actifs",
+            "clear": "Effacer les filtres",
+            "searchPlaceholder": "Rechercher par titre, description ou quartier...",
+            "listingType": "Type d'annonce",
+            "allListingTypes": "Tous les types d'annonces",
+            "propertyType": "Type de bien",
+            "allPropertyTypes": "Tous les types de biens",
+            "city": "Ville",
+            "allCities": "Toutes les villes",
+            "source": "Site source",
+            "allSources": "Toutes les sources",
+            "minimumPrice": "Prix minimum (MAD)",
+            "maximumPrice": "Prix maximum (MAD)"
+        },
+        "empty": {
+            "title": "Aucun bien trouvé",
+            "description": "Essayez de modifier votre recherche ou vos filtres."
+        },
+        "errors": {
+            "loadFailed": "Impossible de charger les annonces immobilières. Veuillez réessayer plus tard."
+        }
+    },
+    "userCard": {
+        "viewProfile": "Voir le profil",
+        "unnamedUser": "Utilisateur sans nom",
+        "active": "Actif",
+        "noEmail": "Aucune adresse e-mail",
+        "noPhone": "Aucun numéro de téléphone",
+        "user": "Utilisateur",
+        "joined": "Inscrit le",
+        "unknown": "Inconnu",
+        "activity": "Activité de l'utilisateur",
+        "publishedProperties": "Biens publiés",
+        "savedProperties": "Biens enregistrés",
+        "submittedFeedback": "Commentaires envoyés",
+        "noAddress": "Aucune adresse renseignée",
+        "suspended": "Suspendu"
+    },
+    "userDetails": {
+        "loadError": "Impossible de charger les informations de l'utilisateur.",
+        "tabLoadError": "Impossible de charger ces informations.",
+        "noRecords": "Aucun résultat trouvé.",
+        "backToDashboard": "Retour au tableau de bord",
+        "email": "Adresse e-mail",
+        "phone": "Numéro de téléphone",
+        "phoneVerified": "Téléphone vérifié",
+        "address": "Adresse",
+        "language": "Langue",
+        "joined": "Inscrit le",
+        "emailVerified": "E-mail vérifié",
+        "emailNotVerified": "E-mail non vérifié",
+        "totalPublications": "Total des publications",
+        "availablePublications": "Publications disponibles",
+        "activeAlerts": "Alertes actives",
+        "archivedAlerts": "Alertes archivées",
+        "savedProperties": "Biens enregistrés",
+        "totalFeedback": "Total des commentaires",
+        "accountOverview": "Aperçu du compte",
+        "noBio": "Aucune biographie renseignée.",
+        "accountCreated": "Compte créé le",
+        "lastUpdated": "Dernière mise à jour",
+        "feedbackByStatus": "Commentaires par statut",
+        "createdAt": "Créé le",
+        "active": "Actif",
+        "archived": "Archivé",
+        "tabs": {
+            "overview": "Vue d'ensemble",
+            "publications": "Publications",
+            "alerts": "Alertes",
+            "savedProperties": "Biens enregistrés",
+            "feedback": "Commentaires"
+        },
+        "feedbackStatuses": {
+            "open": "Ouvert",
+            "inProgress": "En cours",
+            "resolved": "Résolu",
+            "closed": "Fermé"
+        }
     }
-
-
-
 }

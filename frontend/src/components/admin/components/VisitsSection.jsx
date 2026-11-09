@@ -1,4 +1,13 @@
 import { useEffect, useState } from "react";
+import Chip from "@mui/material/Chip";
+
+import Timeline from "@mui/lab/Timeline";
+import TimelineItem from "@mui/lab/TimelineItem";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineDot from "@mui/lab/TimelineDot";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 
 import {
     Alert,
@@ -107,9 +116,13 @@ function SummaryCard({ title, value, icon, description }) {
     );
 }
 
+
 function VisitorCard({ visitor }) {
     const { t } = useTranslation();
-    const name = visitor.fullName || t("visitsSection.anonymousVisitor");
+
+    const name =
+        visitor.fullName ||
+        t("visitsSection.anonymousVisitor");
 
     const initials = name
         .split(/\s+/)
@@ -119,20 +132,35 @@ function VisitorCard({ visitor }) {
         .slice(0, 2)
         .toUpperCase();
 
+    const pageHistory = visitor.pageHistory || [];
+
+    const formatTime = (date) => {
+        if (!date) return "—";
+
+        return new Date(date).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        });
+    };
+
     return (
         <Card
             elevation={0}
             sx={{
                 border: "1px solid",
                 borderColor: "divider",
-                borderRadius: "16px",
+                borderRadius: 3,
+                width: "100%",
+                minWidth: 0,
             }}
         >
             <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                {/* Visitor information */}
                 <Stack
-                    direction={{ xs: "column", md: "row" }}
+                    direction={{ xs: "column", sm: "row" }}
                     spacing={2}
-                    alignItems={{ xs: "flex-start", md: "center" }}
+                    alignItems={{ xs: "flex-start", sm: "center" }}
                 >
                     <Avatar
                         sx={{
@@ -159,53 +187,60 @@ function VisitorCard({ visitor }) {
                             color="text.secondary"
                             sx={{ overflowWrap: "anywhere" }}
                         >
-                            {visitor.email || t("visitsSection.noAccountEmail")}
-                        </Typography>
-
-                        <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ overflowWrap: "anywhere" }}
-                        >
-                            {t("visitsSection.userId")}: {visitor.userId || t("visitsSection.anonymous")}
-                        </Typography>
-                    </Box>
-
-                    <Box sx={{ minWidth: { md: 180 } }}>
-                        <Typography
-                            variant="body2"
-                            fontWeight={700}
-                        >
-                            {t("visitsSection.activeTime")}
-                        </Typography>
-
-                        <Typography color="text.secondary">
-                            {formatDuration(visitor.activeSeconds)}
+                            {visitor.email ||
+                                t("visitsSection.noAccountEmail")}
                         </Typography>
 
                         <Typography
                             variant="caption"
                             color="text.secondary"
                         >
-                            {t("visitsSection.pageViews", {
-                                count: visitor.pageViews || 0,
-                            })}
+                            {t("visitsSection.userId")}:{" "}
+                            {visitor.userId ||
+                                t("visitsSection.anonymous")}
                         </Typography>
                     </Box>
+
+                    <Stack
+                        direction="row"
+                        flexWrap="wrap"
+                        gap={1}
+                        alignItems="center"
+                    >
+                        <Chip
+                            size="small"
+                            color={visitor.isActive ? "success" : "default"}
+                            label={
+                                visitor.isActive
+                                    ? t("visitsSection.active", "Active")
+                                    : t("visitsSection.inactive", "Inactive")
+                            }
+                        />
+
+                        <Chip
+                            size="small"
+                            variant="outlined"
+                            label={`${visitor.pageViews || 0} ${t(
+                                "visitsSection.pageViewsLabel",
+                                "pages"
+                            )}`}
+                        />
+                    </Stack>
                 </Stack>
 
+                {/* Session statistics */}
                 <Box
                     sx={{
-                        mt: 2,
-                        pt: 2,
-                        borderTop: "1px solid",
-                        borderColor: "divider",
                         display: "grid",
                         gridTemplateColumns: {
                             xs: "1fr",
-                            sm: "repeat(2, minmax(0, 1fr))",
+                            sm: "repeat(3, minmax(0, 1fr))",
                         },
                         gap: 2,
+                        mt: 3,
+                        p: 2,
+                        bgcolor: "action.hover",
+                        borderRadius: 2,
                     }}
                 >
                     <Box>
@@ -213,10 +248,10 @@ function VisitorCard({ visitor }) {
                             variant="caption"
                             color="text.secondary"
                         >
-                            {t("visitsSection.firstVisit")}
+                            {t("visitsSection.sessionStarted", "Session started")}
                         </Typography>
 
-                        <Typography variant="body2" fontWeight={600}>
+                        <Typography variant="body2" fontWeight={700}>
                             {formatDate(visitor.startedAt)}
                         </Typography>
                     </Box>
@@ -226,36 +261,274 @@ function VisitorCard({ visitor }) {
                             variant="caption"
                             color="text.secondary"
                         >
-                            {t("visitsSection.lastActivity")}
+                            {t("visitsSection.totalActiveTime", "Active time")}
                         </Typography>
 
-                        <Typography variant="body2" fontWeight={600}>
-                            {formatDate(visitor.lastActivityAt)}
+                        <Typography variant="body2" fontWeight={700}>
+                            {formatDuration(visitor.activeSeconds)}
                         </Typography>
                     </Box>
 
-                    {visitor.lastPage && (
-                        <Box sx={{ gridColumn: "1 / -1", minWidth: 0 }}>
-                            <Typography
-                                variant="caption"
-                                color="text.secondary"
-                            >
-                                {t("visitsSection.lastPage")}
-                            </Typography>
+                    <Box>
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                        >
+                            {t("visitsSection.lastActivity", "Last activity")}
+                        </Typography>
 
-                            <Typography
-                                variant="body2"
-                                sx={{ overflowWrap: "anywhere" }}
-                            >
-                                {visitor.lastPage}
-                            </Typography>
-                        </Box>
+                        <Typography variant="body2" fontWeight={700}>
+                            {formatDate(visitor.lastActivityAt)}
+                        </Typography>
+                    </Box>
+                </Box>
+
+                {/* Navigation journey */}
+                <Box sx={{ mt: 3 }}>
+                    <Typography
+                        variant="subtitle1"
+                        fontWeight={750}
+                        mb={1}
+                    >
+                        {t(
+                            "visitsSection.navigationJourney",
+                            "Navigation journey"
+                        )}
+                    </Typography>
+
+                    {pageHistory.length === 0 ? (
+                        <Alert severity="info">
+                            {t(
+                                "visitsSection.noHistory",
+                                "Navigation history is not available for this session."
+                            )}
+                        </Alert>
+                    ) : (
+                        <Timeline
+                            position="right"
+                            sx={{
+                                p: 0,
+                                m: 0,
+                                "& .MuiTimelineItem-root:before": {
+                                    flex: 0,
+                                    padding: 0,
+                                },
+                            }}
+                        >
+                            {/* Session start */}
+                            <TimelineItem>
+                                <TimelineOppositeContent
+                                    sx={{
+                                        flex: "0 0 105px",
+                                        px: 1,
+                                        py: 1,
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                    >
+                                        {formatTime(visitor.startedAt)}
+                                    </Typography>
+                                </TimelineOppositeContent>
+
+                                <TimelineSeparator>
+                                    <TimelineDot color="success" />
+                                    <TimelineConnector />
+                                </TimelineSeparator>
+
+                                <TimelineContent sx={{ py: 1, px: 2, minWidth: 0 }}>
+                                    <Typography fontWeight={700} variant="body2">
+                                        {t(
+                                            "visitsSection.sessionStarted",
+                                            "Session started"
+                                        )}
+                                    </Typography>
+
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                    >
+                                        {t(
+                                            "visitsSection.visitorEntered",
+                                            "Visitor entered the website"
+                                        )}
+                                    </Typography>
+                                </TimelineContent>
+                            </TimelineItem>
+
+                            {/* Visited pages */}
+                            {pageHistory.map((page, index) => (
+                                <TimelineItem key={`${page.path}-${index}`}>
+                                    <TimelineOppositeContent
+                                        sx={{
+                                            flex: "0 0 105px",
+                                            px: 1,
+                                            py: 1,
+                                            textAlign: "right",
+                                        }}
+                                    >
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                        >
+                                            {formatTime(page.visitedAt)}
+                                        </Typography>
+                                    </TimelineOppositeContent>
+
+                                    <TimelineSeparator>
+                                        <TimelineDot
+                                            color={
+                                                index === pageHistory.length - 1
+                                                    ? "primary"
+                                                    : "grey"
+                                            }
+                                        />
+                                        {index !== pageHistory.length - 1 && (
+                                            <TimelineConnector />
+                                        )}
+                                    </TimelineSeparator>
+
+                                    <TimelineContent
+                                        sx={{
+                                            py: 1,
+                                            px: 2,
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            fontWeight={700}
+                                        >
+                                            {t(
+                                                "visitsSection.pageVisited",
+                                                "Page visited"
+                                            )}{" "}
+                                            #{index + 1}
+                                        </Typography>
+
+                                        <Box
+                                            sx={{
+                                                mt: 0.5,
+                                                p: 1,
+                                                borderRadius: 1.5,
+                                                bgcolor: "action.hover",
+                                                minWidth: 0,
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="body2"
+                                                component="code"
+                                                sx={{
+                                                    display: "block",
+                                                    whiteSpace: "normal",
+                                                    overflowWrap: "anywhere",
+                                                    color: "primary.main",
+                                                }}
+                                            >
+                                                {page.path}
+                                            </Typography>
+                                        </Box>
+
+                                        <Stack
+                                            direction="row"
+                                            flexWrap="wrap"
+                                            gap={1.5}
+                                            sx={{ mt: 1 }}
+                                        >
+                                            <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                            >
+                                                {t(
+                                                    "visitsSection.timeSpent",
+                                                    "Time spent"
+                                                )}:{" "}
+                                                <strong>
+                                                    {formatDuration(
+                                                        page.durationSeconds
+                                                    )}
+                                                </strong>
+                                            </Typography>
+
+                                            <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                            >
+                                                {t(
+                                                    "visitsSection.lastSeen",
+                                                    "Last seen"
+                                                )}:{" "}
+                                                <strong>
+                                                    {formatTime(page.lastSeenAt)}
+                                                </strong>
+                                            </Typography>
+                                        </Stack>
+                                    </TimelineContent>
+                                </TimelineItem>
+                            ))}
+
+                            {/* Last recorded interaction */}
+                            <TimelineItem>
+                                <TimelineOppositeContent
+                                    sx={{
+                                        flex: "0 0 105px",
+                                        px: 1,
+                                        py: 1,
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                    >
+                                        {formatTime(visitor.lastActivityAt)}
+                                    </Typography>
+                                </TimelineOppositeContent>
+
+                                <TimelineSeparator>
+                                    <TimelineDot
+                                        color={visitor.isActive ? "success" : "warning"}
+                                        variant="outlined"
+                                    />
+                                </TimelineSeparator>
+
+                                <TimelineContent sx={{ py: 1, px: 2 }}>
+                                    <Typography
+                                        variant="body2"
+                                        fontWeight={700}
+                                    >
+                                        {t(
+                                            "visitsSection.lastInteraction",
+                                            "Last recorded interaction"
+                                        )}
+                                    </Typography>
+
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                    >
+                                        {visitor.isActive
+                                            ? t(
+                                                "visitsSection.stillBrowsing",
+                                                "Visitor is still browsing"
+                                            )
+                                            : t(
+                                                "visitsSection.noRecentActivity",
+                                                "No recent activity recorded"
+                                            )}
+                                    </Typography>
+                                </TimelineContent>
+                            </TimelineItem>
+                        </Timeline>
                     )}
                 </Box>
             </CardContent>
         </Card>
     );
 }
+
 
 export default function VisitsSection() {
     const { t } = useTranslation();

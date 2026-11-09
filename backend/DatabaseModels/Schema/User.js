@@ -28,6 +28,14 @@ const userSchema = new mongoose.Schema(
             trim: true,
             required: true,
         },
+        accountStatus: {
+            type: String,
+            enum: ["active", "suspended"],
+            default: "active",
+            lowercase: true,
+            trim: true,
+            index: true,
+        },
         language: {
             type: String,
             enum: ["en", "fr", "ar"],
