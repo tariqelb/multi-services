@@ -45,6 +45,11 @@ import UserDetailsPage from "./components/admin/components/UserDetailsPage";
 
 import FindByMap from "./components/FindByMap/FindByMap";
 import DirectionProvider from "./components/DirectionProvider";
+import KnowledgeCenter from "./components/admin/components/knowledge/KnowledgeCenter";
+import KnowledgeDetails from "./components/admin/components/knowledge/KnowledgeDetails";
+import KnowledgeManagement from "./components/admin/components/knowledge/KnowledgeManagement";
+import PublicProfile from "./components/PublicProfile";
+
 
 // Authentication loader
 async function requireAuth() {
@@ -222,6 +227,10 @@ const router = createBrowserRouter([
                         index: true,
                         element: <ProfileOverview />,
                     },
+                    {
+                        path: ":userId",
+                        element: <PublicProfile />,
+                    },
                 ],
             },
             {
@@ -249,6 +258,19 @@ const router = createBrowserRouter([
             {
                 path: "/admin/users/:userId",
                 element: <UserDetailsPage />,
+            },
+            // Public knowledge center (authenticated users).
+            {
+                path: "/knowledge",
+                element: <KnowledgeCenter />,
+            },
+            {
+                path: "/knowledge/:id",
+                element: <KnowledgeDetails />,
+            },
+            {
+                path: "/admin/knowledge",
+                element: <KnowledgeManagement />,
             },
         ],
     },

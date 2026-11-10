@@ -13,6 +13,7 @@ import dashboardRouter from "./dashboard/dashboardRouter.js";
 import externalListingRouter from "./externalListings/externalListingRouter.js";
 import externalListingClickRoutes from "./externalListings/externalListingClickRoutes.js";
 import externalListingAnalyticsRoutes from "./externalListings/externalListingAnalyticsRoutes.js";
+import knowledgeRouter from "./knowledge/knowledgeRouter.js";
 
 const router = express.Router();
 
@@ -42,5 +43,7 @@ router.use(
     "/external-listings",
     externalListingRouter
 );
+
+router.use("/knowledge", knowledgeRouter);
 
 export default router;

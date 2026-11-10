@@ -26,6 +26,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
+
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
+
+
 export default function Sidebar({
     sidebarOpen,
     setSidebarOpen,
@@ -139,20 +144,31 @@ export default function Sidebar({
             icon: SettingsIcon,
             path: "/setting",
         },
+        {
+            name: t("sidebar.knowledge"),
+            icon: MenuBookIcon,
+            path: "/knowledge",
+        },
+
 
         ...(isAdmin
-            ? [
-                  {
-                      name: t("sidebar.statistics"),
-                      icon: DashboardOutlinedIcon,
-                      path: "/dashboard",
-                  },
-                  {
-                      name: t("sidebar.addExternalListing"),
-                      icon: AddLinkIcon,
-                      path: "/addexternalListings",
-                  },
-              ]
+            ?   [
+                    {
+                        name: t("sidebar.statistics"),
+                        icon: DashboardOutlinedIcon,
+                        path: "/dashboard",
+                    },
+                    {
+                        name: t("sidebar.addExternalListing"),
+                        icon: AddLinkIcon,
+                        path: "/addexternalListings",
+                    },
+                    {
+                        name: t("sidebar.knowledgeManagement"),
+                        icon: VideoLibraryIcon,
+                        path: "/admin/knowledge",
+                    },
+                ]
             : []),
     ];
 
