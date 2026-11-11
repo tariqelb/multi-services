@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 
 import {
@@ -21,15 +22,14 @@ import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import PublicIcon from "@mui/icons-material/Public";
 import AddLinkIcon from "@mui/icons-material/AddLink";
-
-import { useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
-
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 
+import { useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 export default function Sidebar({
     sidebarOpen,
@@ -70,7 +70,6 @@ export default function Sidebar({
         const handleOutsideClick = (event) => {
             if (window.innerWidth >= 900) return;
 
-            // Ignore clicks on the sidebar toggle button.
             if (event.target.closest?.("[data-sidebar-toggle]")) {
                 return;
             }
@@ -103,6 +102,11 @@ export default function Sidebar({
             name: t("sidebar.properties"),
             icon: HomeWorkIcon,
             path: "/properties",
+        },
+        {
+            name: t("sidebar.findRoommate"),
+            icon: PeopleAltIcon,
+            path: "/roommates",
         },
         {
             name: t("sidebar.externalListing"),
@@ -150,25 +154,24 @@ export default function Sidebar({
             path: "/knowledge",
         },
 
-
         ...(isAdmin
-            ?   [
-                    {
-                        name: t("sidebar.statistics"),
-                        icon: DashboardOutlinedIcon,
-                        path: "/dashboard",
-                    },
-                    {
-                        name: t("sidebar.addExternalListing"),
-                        icon: AddLinkIcon,
-                        path: "/addexternalListings",
-                    },
-                    {
-                        name: t("sidebar.knowledgeManagement"),
-                        icon: VideoLibraryIcon,
-                        path: "/admin/knowledge",
-                    },
-                ]
+            ? [
+                  {
+                      name: t("sidebar.statistics"),
+                      icon: DashboardOutlinedIcon,
+                      path: "/dashboard",
+                  },
+                  {
+                      name: t("sidebar.addExternalListing"),
+                      icon: AddLinkIcon,
+                      path: "/addexternalListings",
+                  },
+                  {
+                      name: t("sidebar.knowledgeManagement"),
+                      icon: VideoLibraryIcon,
+                      path: "/admin/knowledge",
+                  },
+              ]
             : []),
     ];
 

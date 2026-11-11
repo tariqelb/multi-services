@@ -11,6 +11,10 @@ import {
     Typography,
 } from "@mui/material";
 
+import cities from "../data/moroccanCities";
+
+const moroccanCities = cities;
+
 const categories = [
     { value: "All Properties", key: "all" },
     { value: "Apartment", key: "apartment" },
@@ -27,15 +31,17 @@ const categories = [
     { value: "Garage", key: "garage" },
     { value: "other", key: "other" },
 ];
-import cities from "../data/moroccanCities"
-
-const moroccanCities = cities
-
 
 const transactionTypes = [
     { value: "All", key: "allTransactions" },
     { value: "For Sale", key: "forSale" },
     { value: "For Rent", key: "forRent" },
+];
+
+const rentalPeriods = [
+    { value: "All", key: "allRentalPeriods" },
+    { value: "Daily", key: "daily" },
+    { value: "Monthly", key: "monthly" },
 ];
 
 const normalize = (value) =>
@@ -51,7 +57,6 @@ const normalizeCity = (value) => {
     if (city === "tanger") return "tangier";
     if (city === "marrakech") return "marrakesh";
     if (city === "fes") return "fez";
-    if (city === "sale") return "sale";
 
     return city;
 };
@@ -62,10 +67,14 @@ export default function PropertyCategoryBar({
     onCategoryChange,
     selectedListingType = "All",
     onListingTypeChange,
+    selectedRentalPeriod = "All",
+    onRentalPeriodChange,
     selectedCity = "All Cities",
     onCityChange,
 }) {
     const { t, i18n } = useTranslation();
+
+    const isForRent = selectedListingType === "For Rent";
 
     const getCategoryCount = (category) => {
         return properties.filter((property) => {
@@ -78,6 +87,12 @@ export default function PropertyCategoryBar({
                 normalize(property.listingType) ===
                     normalize(selectedListingType);
 
+            const matchesRentalPeriod =
+                !isForRent ||
+                selectedRentalPeriod === "All" ||
+                normalize(property.rentalPeriod) ===
+                    normalize(selectedRentalPeriod);
+
             const matchesCity =
                 selectedCity === "All Cities" ||
                 normalizeCity(property.city) === normalizeCity(selectedCity);
@@ -85,6 +100,7 @@ export default function PropertyCategoryBar({
             return (
                 matchesCategory &&
                 matchesTransaction &&
+                matchesRentalPeriod &&
                 matchesCity
             );
         }).length;
@@ -95,16 +111,9 @@ export default function PropertyCategoryBar({
             return t("properties.filter.allCities");
         }
 
-        return i18n.language === "ar"
+        return i18n.resolvedLanguage === "ar"
             ? city.ar
             : city.en;
-    };
-
-    const normalizeCityKey = (city) => {
-        return normalize(city)
-            .replace(/[()]/g, "")
-            .replace(/[^a-z0-9]+/g, "_")
-            .replace(/^_|_$/g, "");
     };
 
     const filterFieldSx = {
@@ -114,6 +123,13 @@ export default function PropertyCategoryBar({
             borderRadius: "10px",
             backgroundColor: "#fff",
         },
+    };
+
+    const handleClearFilters = () => {
+        onListingTypeChange?.("All");
+        onRentalPeriodChange?.("All");
+        onCityChange?.("All Cities");
+        onCategoryChange?.("All Properties");
     };
 
     return (
@@ -285,6 +301,7 @@ export default function PropertyCategoryBar({
                         minWidth: 0,
                     }}
                 >
+                    {/* Transaction type */}
                     <TextField
                         select
                         label={t("properties.filter.transactionType")}
@@ -311,14 +328,48 @@ export default function PropertyCategoryBar({
                         ))}
                     </TextField>
 
+                    {/* Rental period: only available for rental properties */}
+                    {isForRent && (
+                        <TextField
+                            select
+                            label={t("properties.filter.rentalPeriod")}
+                            value={selectedRentalPeriod}
+                            onChange={(event) =>
+                                onRentalPeriodChange?.(event.target.value)
+                            }
+                            size="medium"
+                            sx={{
+                                ...filterFieldSx,
+                                flex: {
+                                    xs: "1 1 100%",
+                                    sm: "1 1 190px",
+                                },
+                            }}
+                        >
+                            {rentalPeriods.map((period) => (
+                                <MenuItem
+                                    key={period.value}
+                                    value={period.value}
+                                >
+                                    {t(`properties.filter.${period.key}`)}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    )}
+
+                    {/* City */}
                     <Autocomplete
                         options={[
                             { en: "All Cities", ar: "جميع المدن" },
                             ...moroccanCities,
                         ]}
                         value={
-                            moroccanCities.find((city) => city.en === selectedCity) ||
-                            { en: "All Cities", ar: "جميع المدن" }
+                            moroccanCities.find(
+                                (city) => city.en === selectedCity
+                            ) || {
+                                en: "All Cities",
+                                ar: "جميع المدن",
+                            }
                         }
                         onChange={(_event, newValue) =>
                             onCityChange?.(newValue?.en || "All Cities")
@@ -344,13 +395,10 @@ export default function PropertyCategoryBar({
                         )}
                     />
 
+                    {/* Clear filters */}
                     <Button
                         variant="outlined"
-                        onClick={() => {
-                            onListingTypeChange?.("All");
-                            onCityChange?.("All Cities");
-                            onCategoryChange?.("All Properties");
-                        }}
+                        onClick={handleClearFilters}
                         sx={{
                             minHeight: 56,
                             minWidth: { xs: 0, sm: "auto" },

@@ -32,6 +32,10 @@ import NotificationPage from "./components/NotificationPage";
 import SettingPage from "./components/Settings/SettingsPage";
 import FeedbackPage from "./components/FeedbackPage";
 
+// Roommate components
+import RoommatePage from "./components/roommate/RoommatePage";
+import RoommateDetailsPage from "./components/roommate/RoommateDetailsPage";
+
 import TopBar from "./components/TopBar";
 import Sidebar from "./components/Sidebar";
 import MiddleContent from "./components/MiddleContent";
@@ -45,13 +49,17 @@ import UserDetailsPage from "./components/admin/components/UserDetailsPage";
 
 import FindByMap from "./components/FindByMap/FindByMap";
 import DirectionProvider from "./components/DirectionProvider";
+
 import KnowledgeCenter from "./components/admin/components/knowledge/KnowledgeCenter";
 import KnowledgeDetails from "./components/admin/components/knowledge/KnowledgeDetails";
 import KnowledgeManagement from "./components/admin/components/knowledge/KnowledgeManagement";
+
 import PublicProfile from "./components/PublicProfile";
 
-
+// -----------------------------------------------------------------------------
 // Authentication loader
+// -----------------------------------------------------------------------------
+
 async function requireAuth() {
     try {
         const response = await axiosInstance.get("/auth/me", {
@@ -78,7 +86,10 @@ async function requireAuth() {
     }
 }
 
+// -----------------------------------------------------------------------------
 // Persistent layout with TopBar, Sidebar and Footer
+// -----------------------------------------------------------------------------
+
 function DashboardLayout() {
     const user = useLoaderData();
     const dispatch = useDispatch();
@@ -160,7 +171,10 @@ function DashboardLayout() {
     );
 }
 
+// -----------------------------------------------------------------------------
 // Application routes
+// -----------------------------------------------------------------------------
+
 const router = createBrowserRouter([
     {
         path: "/login",
@@ -183,17 +197,14 @@ const router = createBrowserRouter([
                 path: "/",
                 element: <MiddleContent activeNav="Dashboard" />,
             },
+
+            // -----------------------------------------------------------------
+            // Properties
+            // -----------------------------------------------------------------
+
             {
                 path: "/properties",
                 element: <Properties />,
-            },
-            {
-                path: "/findbymap",
-                element: <FindByMap />,
-            },
-            {
-                path: "/mypublication",
-                element: <ProfilePropertyList />,
             },
             {
                 path: "/properties/publish",
@@ -207,6 +218,32 @@ const router = createBrowserRouter([
                 path: "/property/:id",
                 element: <ProfilePropertyDetails />,
             },
+
+            // -----------------------------------------------------------------
+            // Roommates
+            // -----------------------------------------------------------------
+
+            {
+                path: "/roommates",
+                element: <RoommatePage />,
+            },
+            {
+                path: "/roommates/:id",
+                element: <RoommateDetailsPage />,
+            },
+
+            // -----------------------------------------------------------------
+            // Other application pages
+            // -----------------------------------------------------------------
+
+            {
+                path: "/findbymap",
+                element: <FindByMap />,
+            },
+            {
+                path: "/mypublication",
+                element: <ProfilePropertyList />,
+            },
             {
                 path: "/saved",
                 element: <SavedPropertiesList />,
@@ -219,6 +256,11 @@ const router = createBrowserRouter([
                 path: "/alert",
                 element: <PropertyAlert />,
             },
+
+            // -----------------------------------------------------------------
+            // Profile
+            // -----------------------------------------------------------------
+
             {
                 path: "/profile",
                 element: <ProfileLayout />,
@@ -233,6 +275,11 @@ const router = createBrowserRouter([
                     },
                 ],
             },
+
+            // -----------------------------------------------------------------
+            // Dashboard and settings
+            // -----------------------------------------------------------------
+
             {
                 path: "/dashboard",
                 element: <Dashboard />,
@@ -245,6 +292,11 @@ const router = createBrowserRouter([
                 path: "/feedback",
                 element: <FeedbackPage />,
             },
+
+            // -----------------------------------------------------------------
+            // External listings
+            // -----------------------------------------------------------------
+
             {
                 path: "/externalListings",
                 element: <ExternalListings />,
@@ -254,12 +306,23 @@ const router = createBrowserRouter([
                 element: <ExternalListingSources />,
             },
 
-            // Admin user details
+            // -----------------------------------------------------------------
+            // Admin
+            // -----------------------------------------------------------------
+
             {
                 path: "/admin/users/:userId",
                 element: <UserDetailsPage />,
             },
-            // Public knowledge center (authenticated users).
+            {
+                path: "/admin/knowledge",
+                element: <KnowledgeManagement />,
+            },
+
+            // -----------------------------------------------------------------
+            // Knowledge center
+            // -----------------------------------------------------------------
+
             {
                 path: "/knowledge",
                 element: <KnowledgeCenter />,
@@ -267,10 +330,6 @@ const router = createBrowserRouter([
             {
                 path: "/knowledge/:id",
                 element: <KnowledgeDetails />,
-            },
-            {
-                path: "/admin/knowledge",
-                element: <KnowledgeManagement />,
             },
         ],
     },
@@ -281,6 +340,10 @@ const router = createBrowserRouter([
         element: <NotFound />,
     },
 ]);
+
+// -----------------------------------------------------------------------------
+// App
+// -----------------------------------------------------------------------------
 
 export default function App() {
     return (

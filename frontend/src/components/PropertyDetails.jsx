@@ -32,6 +32,20 @@ import PropertyContactOwner from "./PropertyContactOwner";
 import axiosInstance from "../api/axiosInstance";
 import getImageUrl from "../utils/getImageUrl";
 
+function getRentalValueLabel(value, t) {
+    const translations = {
+        Daily: "properties.details.rentalPeriod.daily",
+        Monthly: "properties.details.rentalPeriod.monthly",
+        Furnished: "properties.details.furnishingStatus.furnished",
+        Unfurnished: "properties.details.furnishingStatus.unfurnished",
+    };
+
+    const key = translations[value];
+
+    return key ? t(key) : value || "";
+}
+
+
 // Extract a YouTube video ID from supported YouTube URLs.
 function getYoutubeVideoId(videoUrl) {
     if (!videoUrl || typeof videoUrl !== "string") {
@@ -962,6 +976,23 @@ export default function PropertyDetails({
                         </Typography>
 
                         <Grid container spacing={2}>
+                            {property.rentalPeriod && (
+                                <Grid item xs={12} sm={6} md={4}>
+                                    <InfoItem
+                                        label={t("properties.details.rentalPeriod.label")}
+                                        value={getRentalValueLabel(property.rentalPeriod, t)}
+                                    />
+                                </Grid>
+                            )}
+
+                            {property.furnishingStatus && (
+                                <Grid item xs={12} sm={6} md={4}>
+                                    <InfoItem
+                                        label={t("properties.details.furnishingStatus.label")}
+                                        value={getRentalValueLabel(property.furnishingStatus, t)}
+                                    />
+                                </Grid>
+                            )}
                             {property.rentWithContract != null && (
                                 <Grid item xs={12} sm={6} md={4}>
                                     <InfoItem

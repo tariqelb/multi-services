@@ -23,7 +23,8 @@
         "addExternalListing": "Ajouter une annonce externe",
         "systemsOnline": "Tous les systèmes sont opérationnels",
         "knowledge": "Centre de connaissances",
-        "knowledgeManagement": "Gestion du centre de connaissances"
+        "knowledgeManagement": "Gestion du centre de connaissances",
+        "findRoommate": "Trouver un colocataire"
     },
     "middleContent": {
         "overview": "Aperçu de {{section}}",
@@ -155,7 +156,11 @@
             "city": "Ville",
             "allCities": "Toutes les villes",
             "searchCity": "Rechercher une ville",
-            "clearFilters": "Effacer les filtres"
+            "clearFilters": "Effacer les filtres",
+            "rentalPeriod": "Durée de location",
+            "allRentalPeriods": "Toutes les durées",
+            "daily": "À la journée",
+            "monthly": "Au mois"
         },
         "cities": {
             "agadir": "Agadir",
@@ -312,7 +317,17 @@
             "propertyNotFound": "Bien immobilier introuvable.",
             "backToMyPublications": "Retour à mes publications",
             "video": "Vidéo",
-            "viewVideo": "Voir la vidéo"
+            "viewVideo": "Voir la vidéo",
+            "rentalPeriod": {
+                "label": "Durée de location",
+                "daily": "À la journée",
+                "monthly": "Au mois"
+            },
+            "furnishingStatus": {
+                "label": "État du mobilier",
+                "furnished": "Meublé",
+                "unfurnished": "Non meublé"
+            }
         },
         "profileDetails": {
             "backToMyPublications": "Retour à mes annonces",
@@ -404,7 +419,13 @@
                     "contract": "Contrat de location disponible",
                     "mortgage": "Accord de crédit immobilier",
                     "deposit": "Dépôt de garantie (MAD)",
-                    "mediatorFee": "Frais d'intermédiaire (MAD)"
+                    "mediatorFee": "Frais d'intermédiaire (MAD)",
+                    "period": "Durée de location",
+                    "daily": "À la journée",
+                    "monthly": "Au mois",
+                    "furnishing": "État du mobilier",
+                    "furnished": "Meublé",
+                    "unfurnished": "Non meublé"
                 },
                 "youtubeVideo": {
                     "label": "Lien vidéo YouTube (facultatif)",

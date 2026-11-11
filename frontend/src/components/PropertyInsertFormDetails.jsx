@@ -299,7 +299,8 @@ export default function PropertyInsertFormDetails({
                         }
                     )}
                 </Grid>
-                                {/* Optional YouTube video link */}
+
+                {/* Optional YouTube video link */}
                 <Grid size={{ xs: 12 }}>
                     {renderField(
                         "youtubeVideoUrl",
@@ -344,8 +345,6 @@ export default function PropertyInsertFormDetails({
             </Box>
 
             <Grid container spacing={2.5}>
-
-
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     {renderField(
                         "price",
@@ -470,6 +469,62 @@ export default function PropertyInsertFormDetails({
                     </Box>
 
                     <Grid container spacing={2.5}>
+                        {/* Rental period */}
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            {renderField(
+                                "rentalPeriod",
+                                t("properties.insert.details.rental.period"),
+                                {
+                                    select: true,
+                                    required: true,
+                                    children: [
+                                        <MenuItem key="Daily" value="Daily">
+                                            {t(
+                                                "properties.insert.details.rental.daily"
+                                            )}
+                                        </MenuItem>,
+                                        <MenuItem key="Monthly" value="Monthly">
+                                            {t(
+                                                "properties.insert.details.rental.monthly"
+                                            )}
+                                        </MenuItem>,
+                                    ],
+                                }
+                            )}
+                        </Grid>
+
+                        {/* Furnishing status */}
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            {renderField(
+                                "furnishingStatus",
+                                t(
+                                    "properties.insert.details.rental.furnishing"
+                                ),
+                                {
+                                    select: true,
+                                    required: true,
+                                    children: [
+                                        <MenuItem
+                                            key="Furnished"
+                                            value="Furnished"
+                                        >
+                                            {t(
+                                                "properties.insert.details.rental.furnished"
+                                            )}
+                                        </MenuItem>,
+                                        <MenuItem
+                                            key="Unfurnished"
+                                            value="Unfurnished"
+                                        >
+                                            {t(
+                                                "properties.insert.details.rental.unfurnished"
+                                            )}
+                                        </MenuItem>,
+                                    ],
+                                }
+                            )}
+                        </Grid>
+
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Box
                                 sx={{

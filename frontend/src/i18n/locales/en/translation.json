@@ -23,7 +23,8 @@
         "addExternalListing": "Add External listing",
         "systemsOnline": "All systems online",
         "knowledge": "Knowledge Center",
-        "knowledgeManagement": "Knowledge Management"
+        "knowledgeManagement": "Knowledge Management",
+        "findRoommate": "Find a Roommate"
     },
     "middleContent": {
         "overview": "{{section}} Overview",
@@ -155,7 +156,11 @@
             "city": "City",
             "allCities": "All Cities",
             "searchCity": "Search a city",
-            "clearFilters": "Clear Filters"
+            "clearFilters": "Clear Filters",
+            "rentalPeriod": "Rental period",
+            "allRentalPeriods": "All periods",
+            "daily": "Daily",
+            "monthly": "Monthly"
         },
         "cities": {
             "agadir": "Agadir",
@@ -312,7 +317,17 @@
             "propertyNotFound": "Property not found.",
             "backToMyPublications": "Back to my publications",
             "video": "Video",
-            "viewVideo": "View video"
+            "viewVideo": "View video",
+            "rentalPeriod": {
+                "label": "Rental period",
+                "daily": "Daily",
+                "monthly": "Monthly"
+            },
+            "furnishingStatus": {
+                "label": "Furnishing status",
+                "furnished": "Furnished",
+                "unfurnished": "Unfurnished"
+            }
         },
         "profileDetails": {
             "backToMyPublications": "Back to My Publications",
@@ -404,7 +419,13 @@
                     "contract": "Rental contract available",
                     "mortgage": "Mortgage agreement",
                     "deposit": "Deposit (MAD)",
-                    "mediatorFee": "Mediator Fee (MAD)"
+                    "mediatorFee": "Mediator Fee (MAD)",
+                    "period": "Rental period",
+                    "daily": "Daily",
+                    "monthly": "Monthly",
+                    "furnishing": "Furnishing status",
+                    "furnished": "Furnished",
+                    "unfurnished": "Unfurnished"
                 },
                 "youtubeVideo": {
                     "label": "YouTube video link (optional)",

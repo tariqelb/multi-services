@@ -14,6 +14,7 @@ import externalListingRouter from "./externalListings/externalListingRouter.js";
 import externalListingClickRoutes from "./externalListings/externalListingClickRoutes.js";
 import externalListingAnalyticsRoutes from "./externalListings/externalListingAnalyticsRoutes.js";
 import knowledgeRouter from "./knowledge/knowledgeRouter.js";
+import roommateRouter from "./roommate/roommateRouter.js";
 
 const router = express.Router();
 
@@ -21,11 +22,15 @@ router.use("/auth", authRouter);
 router.use("/profile", profileRouter);
 router.use("/profile/me/verification", verificationRouter);
 router.use("/profile/me/account-deletion", accountDeletionRoutes);
+
 router.use("/property", propertyRoutes);
+router.use("/roommates", roommateRouter);
+
 router.use("/notifications", notificationRouter);
 router.use("/test-email", emailTestRouter);
 router.use("/feedback", feedbackRoutes);
 router.use("/dashboard", dashboardRouter);
+
 // External listing analytics — register before dynamic listing routes.
 router.use(
     "/external-listings/analytics",

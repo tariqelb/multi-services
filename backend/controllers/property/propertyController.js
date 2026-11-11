@@ -24,19 +24,11 @@ const isAllowedGoogleMapsHost = (hostname) => {
 };
 
 // Extract latitude and longitude from a Google Maps URL.
-
 const parseGoogleMapsCoordinates = (url) => {
     const coordinatePatterns = [
-        // Example: /@31.6295,-7.9811,15z
         /@(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/,
-
-        // Example: !3d31.6295!4d-7.9811
         /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/,
-
-        // Example: /maps/search/27.147560,+-13.198621
         /\/maps\/(?:search|place)\/(-?\d+(?:\.\d+)?),\s*\+?(-?\d+(?:\.\d+)?)/i,
-
-        // Example: /maps/dir/31.6295,-7.9811
         /\/maps\/dir\/(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/i,
     ];
 
@@ -86,7 +78,6 @@ const parseGoogleMapsCoordinates = (url) => {
     return null;
 };
 
-
 // Resolve a shortened Google Maps URL and extract its coordinates.
 const extractGoogleMapsLocation = async (mapLink) => {
     let currentUrl;
@@ -109,7 +100,9 @@ const extractGoogleMapsLocation = async (mapLink) => {
     // Follow redirects manually and validate every destination.
     for (let attempt = 0; attempt < 10; attempt++) {
         if (!isAllowedGoogleMapsHost(currentUrl.hostname)) {
-            throw new Error("The Google Maps link redirected to an invalid domain.");
+            throw new Error(
+                "The Google Maps link redirected to an invalid domain."
+            );
         }
 
         const response = await fetch(currentUrl.toString(), {
@@ -123,9 +116,7 @@ const extractGoogleMapsLocation = async (mapLink) => {
             },
         });
 
-        if (
-            [301, 302, 303, 307, 308].includes(response.status)
-        ) {
+        if ([301, 302, 303, 307, 308].includes(response.status)) {
             const redirectLocation = response.headers.get("location");
 
             await response.body?.cancel();
@@ -134,11 +125,7 @@ const extractGoogleMapsLocation = async (mapLink) => {
                 throw new Error("Google Maps returned an invalid redirect.");
             }
 
-            currentUrl = new URL(
-                redirectLocation,
-                currentUrl
-            );
-
+            currentUrl = new URL(redirectLocation, currentUrl);
             continue;
         }
 
@@ -153,7 +140,6 @@ const extractGoogleMapsLocation = async (mapLink) => {
         finalUrl = response.url || currentUrl.toString();
 
         await response.body?.cancel();
-
         break;
     }
 
@@ -303,6 +289,8 @@ export const createProperty = async (req, res) => {
             description,
             listingType,
             propertyType,
+            rentalPeriod,
+            furnishingStatus,
             city,
             neighborhood,
             fullAddress,
@@ -357,7 +345,52 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // 7. Validate description.
+        // 7. Validate listing type.
+        if (!["For Sale", "For Rent"].includes(listingType)) {
+            return res.status(400).json({
+                message: "Listing type must be For Sale or For Rent.",
+                field: "listingType",
+            });
+        }
+
+        // 8. Validate rental-specific fields.
+        let normalizedRentalPeriod = null;
+        let normalizedFurnishingStatus = null;
+
+        if (listingType === "For Rent") {
+            normalizedRentalPeriod =
+                typeof rentalPeriod === "string"
+                    ? rentalPeriod.trim()
+                    : "";
+
+            normalizedFurnishingStatus =
+                typeof furnishingStatus === "string"
+                    ? furnishingStatus.trim()
+                    : "";
+
+            if (
+                !["Daily", "Monthly"].includes(normalizedRentalPeriod)
+            ) {
+                return res.status(400).json({
+                    message: "Please select a valid rental period.",
+                    field: "rentalPeriod",
+                });
+            }
+
+            if (
+                !["Furnished", "Unfurnished"].includes(
+                    normalizedFurnishingStatus
+                )
+            ) {
+                return res.status(400).json({
+                    message: "Please select a valid furnishing status.",
+                    field: "furnishingStatus",
+                });
+            }
+        }
+
+        // For sale listings, rental-specific fields remain null.
+        // 9. Validate description.
         if (
             description !== undefined &&
             typeof description !== "string"
@@ -372,7 +405,7 @@ export const createProperty = async (req, res) => {
                 ? description.trim()
                 : "";
 
-        // 8. Validate numeric fields.
+        // 10. Validate numeric fields.
         const numericFields = {
             price,
             surface,
@@ -419,7 +452,7 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // 9. Parse Boolean fields.
+        // 11. Parse Boolean fields.
         let parsedRentWithContract;
         let parsedMortgageAgreement;
         let parsedShowEmail;
@@ -445,7 +478,7 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // 10. Validate and extract Google Maps coordinates.
+        // 12. Validate and extract Google Maps coordinates.
         const normalizedMapLink = mapLink?.trim() || "";
 
         let location = {
@@ -459,7 +492,10 @@ export const createProperty = async (req, res) => {
                     normalizedMapLink
                 );
 
-                console.log("[CreateProperty] Location extracted:", location);
+                console.log(
+                    "[CreateProperty] Location extracted:",
+                    location
+                );
             } catch (error) {
                 console.error(
                     "[CreateProperty] Location extraction failed:",
@@ -472,7 +508,8 @@ export const createProperty = async (req, res) => {
                 });
             }
         }
-        // Validate optional YouTube video URL.
+
+        // 13. Validate optional YouTube video URL.
         const normalizedYoutubeVideoUrl =
             youtubeVideoUrl?.trim() || "";
 
@@ -480,7 +517,9 @@ export const createProperty = async (req, res) => {
             try {
                 const url = new URL(normalizedYoutubeVideoUrl);
 
-                const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+                const hostname = url.hostname
+                    .toLowerCase()
+                    .replace(/^www\./, "");
 
                 let videoId = "";
 
@@ -515,14 +554,14 @@ export const createProperty = async (req, res) => {
             }
         }
 
-        // 11. Upload images.
+        // 14. Upload images.
         uploadedImages = await uploadPropertyImages(uploadedFiles);
 
         console.log("[CreateProperty] Images uploaded:", {
             count: uploadedImages.length,
         });
 
-        // 12. Create property with extracted location.
+        // 15. Create property with extracted location and rental details.
         const property = await Property.create({
             userId,
             role,
@@ -536,6 +575,11 @@ export const createProperty = async (req, res) => {
             status: "Available",
             listingType,
             propertyType,
+
+            // Rental-specific fields.
+            rentalPeriod: normalizedRentalPeriod,
+            furnishingStatus: normalizedFurnishingStatus,
+
             city,
             neighborhood,
             fullAddress,
@@ -562,9 +606,11 @@ export const createProperty = async (req, res) => {
             title: property.title,
             contactPhone: property.phone,
             location: property.location,
+            rentalPeriod: property.rentalPeriod,
+            furnishingStatus: property.furnishingStatus,
         });
 
-        // 13. Notify matching property alerts.
+        // 16. Notify matching property alerts.
         try {
             const io = req.app.get("io");
 
@@ -576,7 +622,7 @@ export const createProperty = async (req, res) => {
             );
         }
 
-        // 14. Return success.
+        // 17. Return success.
         return res.status(201).json({
             message: "Property created successfully.",
             property,

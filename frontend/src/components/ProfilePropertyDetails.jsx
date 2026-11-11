@@ -152,6 +152,22 @@ function getYoutubeEmbedUrl(url) {
     }
 }
 
+// Translate rental period and furnishing status.
+function getRentalValueLabel(value, t) {
+    const translations = {
+        Daily: "properties.details.rentalPeriod.daily",
+        Monthly: "properties.details.rentalPeriod.monthly",
+        Furnished: "properties.details.furnishingStatus.furnished",
+        Unfurnished: "properties.details.furnishingStatus.unfurnished",
+    };
+
+    const translationKey = translations[value];
+
+    return translationKey
+        ? t(translationKey)
+        : value || "";
+}
+
 export default function ProfilePropertyDetails() {
     const { t } = useTranslation();
 
@@ -858,6 +874,36 @@ export default function ProfilePropertyDetails() {
                         </Typography>
 
                         <Grid container spacing={2}>
+                            {/* Rental Period */}
+                            {property.rentalPeriod && (
+                                <Grid item xs={12} sm={6}>
+                                    <InfoItem
+                                        label={t(
+                                            "properties.details.rentalPeriod.label"
+                                        )}
+                                        value={getRentalValueLabel(
+                                            property.rentalPeriod,
+                                            t
+                                        )}
+                                    />
+                                </Grid>
+                            )}
+
+                            {/* Furnishing Status */}
+                            {property.furnishingStatus && (
+                                <Grid item xs={12} sm={6}>
+                                    <InfoItem
+                                        label={t(
+                                            "properties.details.furnishingStatus.label"
+                                        )}
+                                        value={getRentalValueLabel(
+                                            property.furnishingStatus,
+                                            t
+                                        )}
+                                    />
+                                </Grid>
+                            )}
+
                             {property.rentWithContract != null && (
                                 <Grid item xs={12} sm={6}>
                                     <InfoItem

@@ -23,7 +23,8 @@
         "addExternalListing": "إضافة إعلان خارجي",
         "systemsOnline": "جميع الأنظمة تعمل",
         "knowledge": "مركز المعرفة",
-        "knowledgeManagement": "إدارة مركز المعرفة"
+        "knowledgeManagement": "إدارة مركز المعرفة",
+        "findRoommate": "ابحث عن شريك سكن"
     },
     "middleContent": {
         "overview": "نظرة عامة على {{section}}",
@@ -159,7 +160,11 @@
             "city": "المدينة",
             "allCities": "جميع المدن",
             "searchCity": "ابحث عن مدينة",
-            "clearFilters": "مسح الفلاتر"
+            "clearFilters": "مسح الفلاتر",
+            "rentalPeriod": "مدة الإيجار",
+            "allRentalPeriods": "جميع المدد",
+            "daily": "يومي",
+            "monthly": "شهري"
         },
         "cities": {
             "agadir": "أكادير",
@@ -316,7 +321,17 @@
             "propertyNotFound": "العقار غير موجود.",
             "backToMyPublications": "العودة إلى منشوراتي",
             "video": "الفيديو",
-            "viewVideo": "مشاهدة الفيديو"
+            "viewVideo": "مشاهدة الفيديو",
+            "rentalPeriod": {
+                "label": "مدة الإيجار",
+                "daily": "يومي",
+                "monthly": "شهري"
+            },
+            "furnishingStatus": {
+                "label": "حالة الأثاث",
+                "furnished": "مفروش",
+                "unfurnished": "غير مفروش"
+            }
         },
         "profileDetails": {
             "backToMyPublications": "العودة إلى إعلاناتي",
@@ -408,7 +423,13 @@
                     "contract": "عقد الكراء متوفر",
                     "mortgage": "اتفاقية الرهن العقاري",
                     "deposit": "مبلغ الضمان (درهم)",
-                    "mediatorFee": "رسوم الوسيط (درهم)"
+                    "mediatorFee": "رسوم الوسيط (درهم)",
+                    "period": "مدة الإيجار",
+                    "daily": "يومي",
+                    "monthly": "شهري",
+                    "furnishing": "حالة الأثاث",
+                    "furnished": "مفروش",
+                    "unfurnished": "غير مفروش"
                 },
                 "youtubeVideo": {
                     "label": "رابط فيديو يوتيوب (اختياري)",

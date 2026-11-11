@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +16,23 @@ import PropertyCategoryBar from "./PropertyCategoryBar";
 import axiosInstance from "../api/axiosInstance";
 import UserProfilePropertyCard from "./UserProfilePropertyCard";
 
+const normalize = (value) =>
+    String(value ?? "")
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+const normalizeCity = (value) => {
+    const city = normalize(value);
+
+    if (city === "tanger") return "tangier";
+    if (city === "marrakech") return "marrakesh";
+    if (city === "fes") return "fez";
+
+    return city;
+};
+
 export default function ProfilePropertyList({
     refreshTrigger = 0,
     onSelectProperty,
@@ -29,7 +47,17 @@ export default function ProfilePropertyList({
     const [selectedCategory, setSelectedCategory] =
         useState("All Properties");
 
+    const [selectedListingType, setSelectedListingType] =
+        useState("All");
+
+    const [selectedRentalPeriod, setSelectedRentalPeriod] =
+        useState("All");
+
+    const [selectedCity, setSelectedCity] =
+        useState("All Cities");
+
     const [page, setPage] = useState(1);
+
     const itemsPerPage = 5;
 
     // Fetch properties published by the logged-in user.
@@ -61,8 +89,8 @@ export default function ProfilePropertyList({
                 if (!cancelled) {
                     setError(
                         err.response?.data?.message ||
-                        err.message ||
-                        t("properties.profileList.fetchError")
+                            err.message ||
+                            t("properties.profileList.fetchError")
                     );
                 }
             } finally {
@@ -79,6 +107,7 @@ export default function ProfilePropertyList({
         };
     }, [refreshTrigger, t]);
 
+    // Delete a property.
     const handleDeleteProperty = async (propertyId) => {
         try {
             await axiosInstance.delete(
@@ -86,33 +115,105 @@ export default function ProfilePropertyList({
             );
 
             setProperties((prev) =>
-                prev.filter((p) => (p._id || p.id) !== propertyId)
+                prev.filter(
+                    (property) =>
+                        (property._id || property.id) !== propertyId
+                )
             );
+
+            setPage(1);
         } catch (err) {
             alert(
                 err.response?.data?.message ||
-                t("properties.profileList.deleteError")
+                    t("properties.profileList.deleteError")
             );
         }
     };
 
-    // Filter properties using the original category values.
-    const filteredProperties =
-        selectedCategory === "All Properties"
-            ? properties
-            : properties.filter(
-                (property) =>
-                    property.propertyType?.toLowerCase() ===
-                    selectedCategory.toLowerCase()
-            );
-
+    // Category filter.
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);
         setPage(1);
     };
 
-    const handlePageChange = (event, value) => {
+    // Transaction filter.
+    const handleListingTypeChange = (listingType) => {
+        setSelectedListingType(listingType);
+
+        // Rental period only applies to rental properties.
+        if (listingType !== "For Rent") {
+            setSelectedRentalPeriod("All");
+        }
+
+        setPage(1);
+    };
+
+    // Rental period filter.
+    const handleRentalPeriodChange = (rentalPeriod) => {
+        setSelectedRentalPeriod(rentalPeriod);
+        setPage(1);
+    };
+
+    // City filter.
+    const handleCityChange = (city) => {
+        setSelectedCity(city);
+        setPage(1);
+    };
+
+    // Apply all filters.
+    const filteredProperties = properties.filter((property) => {
+        const matchesCategory =
+            selectedCategory === "All Properties" ||
+            normalize(property.propertyType) ===
+                normalize(selectedCategory);
+
+        const matchesListingType =
+            selectedListingType === "All" ||
+            normalize(property.listingType) ===
+                normalize(selectedListingType);
+
+        const matchesRentalPeriod =
+            selectedListingType !== "For Rent" ||
+            selectedRentalPeriod === "All" ||
+            normalize(property.rentalPeriod) ===
+                normalize(selectedRentalPeriod);
+
+        const matchesCity =
+            selectedCity === "All Cities" ||
+            normalizeCity(property.city) ===
+                normalizeCity(selectedCity);
+
+        return (
+            matchesCategory &&
+            matchesListingType &&
+            matchesRentalPeriod &&
+            matchesCity
+        );
+    });
+
+    const handleClearFilters = () => {
+        setSelectedCategory("All Properties");
+        setSelectedListingType("All");
+        setSelectedRentalPeriod("All");
+        setSelectedCity("All Cities");
+        setPage(1);
+    };
+
+    const hasActiveFilters =
+        selectedCategory !== "All Properties" ||
+        selectedListingType !== "All" ||
+        selectedRentalPeriod !== "All" ||
+        selectedCity !== "All Cities";
+
+    const handlePageChange = (_event, value) => {
         setPage(value);
+
+        if (listRef?.current) {
+            listRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }
     };
 
     const totalPages = Math.ceil(
@@ -124,7 +225,7 @@ export default function ProfilePropertyList({
         page * itemsPerPage
     );
 
-    // Translate category labels without changing their stored values.
+    // Translate category labels without changing stored values.
     const getCategoryLabel = (category) => {
         if (category === "All Properties") {
             return t("properties.profileList.allProperties");
@@ -180,10 +281,17 @@ export default function ProfilePropertyList({
                 p: { xs: 2, md: 4 },
             }}
         >
+            {/* All property filters */}
             <PropertyCategoryBar
                 properties={properties}
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategoryChange}
+                selectedListingType={selectedListingType}
+                onListingTypeChange={handleListingTypeChange}
+                selectedRentalPeriod={selectedRentalPeriod}
+                onRentalPeriodChange={handleRentalPeriodChange}
+                selectedCity={selectedCity}
+                onCityChange={handleCityChange}
             />
 
             {/* Listings heading */}
@@ -207,18 +315,17 @@ export default function ProfilePropertyList({
                     {selectedCategory === "All Properties"
                         ? t("properties.profileList.myPublications")
                         : t("properties.profileList.categoryPublications", {
-                            category: categoryLabel,
-                        })}
+                              category: categoryLabel,
+                          })}
                 </Typography>
 
                 <Typography
                     variant="body2"
                     sx={{ color: "#5B6577", fontWeight: 600 }}
                 >
-                    {filteredProperties.length}{" "}
-                    {filteredProperties.length === 1
-                        ? t("properties.profileList.property")
-                        : t("properties.profileList.properties")}
+                    {t("properties.list.propertyCount", {
+                        count: filteredProperties.length,
+                    })}
                 </Typography>
             </Box>
 
@@ -241,11 +348,12 @@ export default function ProfilePropertyList({
                             mb: 1,
                         }}
                     >
-                        {selectedCategory === "All Properties"
+                        {selectedCategory === "All Properties" &&
+                        selectedListingType === "All" &&
+                        selectedRentalPeriod === "All" &&
+                        selectedCity === "All Cities"
                             ? t("properties.profileList.noProperties")
-                            : t("properties.profileList.noCategoryProperties", {
-                                category: categoryLabel.toLowerCase(),
-                            })}
+                            : t("properties.list.emptyTitle")}
                     </Typography>
 
                     <Typography
@@ -255,33 +363,40 @@ export default function ProfilePropertyList({
                         {t("properties.profileList.emptySubtitle")}
                     </Typography>
 
-                    {selectedCategory !== "All Properties" && (
+                    {hasActiveFilters && (
                         <Button
                             variant="outlined"
-                            onClick={() =>
-                                handleCategoryChange("All Properties")
-                            }
+                            onClick={handleClearFilters}
                             sx={{ textTransform: "none" }}
                         >
-                            {t("properties.profileList.viewAll")}
+                            {t("properties.filter.clearFilters")}
                         </Button>
                     )}
                 </Box>
             ) : (
                 <>
                     <Stack spacing={2.5}>
-                        {displayedProperties.map((property) => (
-                            <UserProfilePropertyCard
-                                key={property._id || property.id}
-                                property={property}
-                                onViewDetails={
-                                    onSelectProperty
-                                        ? (prop) => onSelectProperty(prop)
-                                        : undefined
-                                }
-                                onDelete={handleDeleteProperty}
-                            />
-                        ))}
+                        {displayedProperties.map((property) => {
+                            const formattedProperty = {
+                                ...property,
+                                rentalPeriod: property.rentalPeriod || null,
+                                furnishingStatus:
+                                    property.furnishingStatus || null,
+                            };
+
+                            return (
+                                <UserProfilePropertyCard
+                                    key={property._id || property.id}
+                                    property={formattedProperty}
+                                    onViewDetails={
+                                        onSelectProperty
+                                            ? (prop) => onSelectProperty(prop)
+                                            : undefined
+                                    }
+                                    onDelete={handleDeleteProperty}
+                                />
+                            );
+                        })}
                     </Stack>
 
                     {/* Pagination */}
@@ -295,7 +410,7 @@ export default function ProfilePropertyList({
                         >
                             <Pagination
                                 count={totalPages}
-                                page={page}
+                                page={Math.min(page, totalPages)}
                                 onChange={handlePageChange}
                                 color="primary"
                                 size="large"

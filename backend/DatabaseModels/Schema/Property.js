@@ -58,6 +58,19 @@ const propertySchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+
+        // Rental-specific information
+        rentalPeriod: {
+            type: String,
+            enum: ["Daily", "Monthly", null],
+            default: null,
+        },
+        furnishingStatus: {
+            type: String,
+            enum: ["Furnished", "Unfurnished", null],
+            default: null,
+        },
+
         city: {
             type: String,
             required: true,

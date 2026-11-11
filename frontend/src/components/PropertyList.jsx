@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -72,6 +73,9 @@ export default function PropertyList({
     const [selectedListingType, setSelectedListingType] =
         useState("All");
 
+    const [selectedRentalPeriod, setSelectedRentalPeriod] =
+        useState("All");
+
     const [selectedCity, setSelectedCity] =
         useState("All Cities");
 
@@ -84,7 +88,6 @@ export default function PropertyList({
             ? externalCategory
             : internalCategory;
 
-    // Resolve the category's translated display label.
     const categoryKey =
         categoryTranslationKeys[selectedCategory];
 
@@ -92,7 +95,6 @@ export default function PropertyList({
         ? t(`properties.categories.${categoryKey}`)
         : selectedCategory;
 
-    // Locale used for prices and dates.
     const currentLanguage =
         i18n.resolvedLanguage || "en";
 
@@ -167,7 +169,8 @@ export default function PropertyList({
         };
     }, [refreshTrigger]);
 
-    // Filter by property type, transaction type, and city.
+    // Filter properties by category, transaction type,
+    // rental period, and city.
     const filteredProperties = properties.filter((property) => {
         const matchesCategory =
             selectedCategory === "All Properties" ||
@@ -179,6 +182,12 @@ export default function PropertyList({
             normalize(property.listingType) ===
                 normalize(selectedListingType);
 
+        const matchesRentalPeriod =
+            selectedListingType !== "For Rent" ||
+            selectedRentalPeriod === "All" ||
+            normalize(property.rentalPeriod) ===
+                normalize(selectedRentalPeriod);
+
         const matchesCity =
             selectedCity === "All Cities" ||
             normalizeCity(property.city) ===
@@ -187,6 +196,7 @@ export default function PropertyList({
         return (
             matchesCategory &&
             matchesListingType &&
+            matchesRentalPeriod &&
             matchesCity
         );
     });
@@ -203,6 +213,17 @@ export default function PropertyList({
 
     const handleListingTypeChange = (listingType) => {
         setSelectedListingType(listingType);
+
+        // Rental period is only applicable to rental listings.
+        if (listingType !== "For Rent") {
+            setSelectedRentalPeriod("All");
+        }
+
+        setPage(1);
+    };
+
+    const handleRentalPeriodChange = (rentalPeriod) => {
+        setSelectedRentalPeriod(rentalPeriod);
         setPage(1);
     };
 
@@ -243,11 +264,13 @@ export default function PropertyList({
     const hasActiveFilters =
         selectedCategory !== "All Properties" ||
         selectedListingType !== "All" ||
+        selectedRentalPeriod !== "All" ||
         selectedCity !== "All Cities";
 
     const clearFilters = () => {
         handleCategoryChange("All Properties");
         handleListingTypeChange("All");
+        handleRentalPeriodChange("All");
         handleCityChange("All Cities");
     };
 
@@ -325,6 +348,8 @@ export default function PropertyList({
                     onCategoryChange={handleCategoryChange}
                     selectedListingType={selectedListingType}
                     onListingTypeChange={handleListingTypeChange}
+                    selectedRentalPeriod={selectedRentalPeriod}
+                    onRentalPeriodChange={handleRentalPeriodChange}
                     selectedCity={selectedCity}
                     onCityChange={handleCityChange}
                 />
@@ -468,6 +493,8 @@ export default function PropertyList({
 
                             const formattedProperty = {
                                 ...property,
+                                _id: property._id || property.id,
+                                id: property.id || property._id,
                                 title: property.title,
                                 status: property.status || "Available",
                                 price:
@@ -479,6 +506,9 @@ export default function PropertyList({
                                 image: fullImageUrl,
                                 listingType: property.listingType,
                                 propertyType: property.propertyType,
+                                rentalPeriod: property.rentalPeriod || "",
+                                furnishingStatus:
+                                    property.furnishingStatus || "",
                                 referenceCode: property._id
                                     ? `#${property._id.slice(-4)}`
                                     : "#48",
@@ -497,7 +527,7 @@ export default function PropertyList({
 
                             return (
                                 <Box
-                                    key={property._id}
+                                    key={property._id || property.id}
                                     sx={{
                                         minWidth: 0,
                                         width: "100%",
@@ -515,7 +545,9 @@ export default function PropertyList({
                                     <PropertyCard
                                         property={formattedProperty}
                                         onClick={() =>
-                                            handleSelectProperty(property)
+                                            handleSelectProperty(
+                                                formattedProperty
+                                            )
                                         }
                                     />
                                 </Box>
@@ -551,29 +583,46 @@ export default function PropertyList({
                                 showLastButton
                                 siblingCount={0}
                                 boundaryCount={1}
-                                getItemAriaLabel={(type, pageNumber, selected) => {
+                                getItemAriaLabel={(
+                                    type,
+                                    pageNumber,
+                                    selected
+                                ) => {
                                     if (type === "first") {
-                                        return t("properties.list.pagination.first");
+                                        return t(
+                                            "properties.list.pagination.first"
+                                        );
                                     }
 
                                     if (type === "last") {
-                                        return t("properties.list.pagination.last");
+                                        return t(
+                                            "properties.list.pagination.last"
+                                        );
                                     }
 
                                     if (type === "next") {
-                                        return t("properties.list.pagination.next");
+                                        return t(
+                                            "properties.list.pagination.next"
+                                        );
                                     }
 
                                     if (type === "previous") {
-                                        return t("properties.list.pagination.previous");
+                                        return t(
+                                            "properties.list.pagination.previous"
+                                        );
                                     }
 
-                                    return t("properties.list.pagination.page", {
-                                        page: pageNumber,
-                                        selected: selected
-                                            ? t("properties.list.pagination.current")
-                                            : "",
-                                    });
+                                    return t(
+                                        "properties.list.pagination.page",
+                                        {
+                                            page: pageNumber,
+                                            selected: selected
+                                                ? t(
+                                                      "properties.list.pagination.current"
+                                                  )
+                                                : "",
+                                        }
+                                    );
                                 }}
                             />
                         </Box>
