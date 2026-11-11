@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -14,11 +15,12 @@ import {
     FormControlLabel,
     Checkbox,
 } from "@mui/material";
-import cities from "../data/moroccanCities"
 
-const moroccanCities = cities
+import cities from "../data/moroccanCities";
+
+const moroccanCities = cities;
+
 // Keep English names as the values saved in the database.
-
 const propertyTypeKeys = {
     apartment: "apartment",
     house: "house",
@@ -297,6 +299,25 @@ export default function PropertyInsertFormDetails({
                         }
                     )}
                 </Grid>
+                                {/* Optional YouTube video link */}
+                <Grid size={{ xs: 12 }}>
+                    {renderField(
+                        "youtubeVideoUrl",
+                        t("properties.insert.details.youtubeVideo.label"),
+                        {
+                            placeholder: t(
+                                "properties.insert.details.youtubeVideo.placeholder"
+                            ),
+                            type: "url",
+                            helperText:
+                                errors.youtubeVideoUrl ||
+                                t(
+                                    "properties.insert.details.youtubeVideo.helper"
+                                ),
+                            error: Boolean(errors.youtubeVideoUrl),
+                        }
+                    )}
+                </Grid>
             </Grid>
 
             {/* Price and specifications */}
@@ -323,6 +344,8 @@ export default function PropertyInsertFormDetails({
             </Box>
 
             <Grid container spacing={2.5}>
+
+
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     {renderField(
                         "price",
@@ -378,9 +401,7 @@ export default function PropertyInsertFormDetails({
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     {renderField(
                         "bathrooms",
-                        t(
-                            "properties.insert.details.specifications.bathrooms"
-                        ),
+                        t("properties.insert.details.specifications.bathrooms"),
                         {
                             type: "number",
                             slotProps: {
@@ -406,9 +427,7 @@ export default function PropertyInsertFormDetails({
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     {renderField(
                         "syndicateFees",
-                        t(
-                            "properties.insert.details.specifications.syndicateFees"
-                        ),
+                        t("properties.insert.details.specifications.syndicateFees"),
                         {
                             type: "number",
                             slotProps: {
@@ -468,10 +487,8 @@ export default function PropertyInsertFormDetails({
                                         <Checkbox
                                             name="rentWithContract"
                                             checked={
-                                                formData.rentWithContract ===
-                                                    true ||
-                                                formData.rentWithContract ===
-                                                    "true"
+                                                formData.rentWithContract === true ||
+                                                formData.rentWithContract === "true"
                                             }
                                             onChange={handleChange}
                                         />
@@ -500,10 +517,8 @@ export default function PropertyInsertFormDetails({
                                         <Checkbox
                                             name="mortgageAgreement"
                                             checked={
-                                                formData.mortgageAgreement ===
-                                                    true ||
-                                                formData.mortgageAgreement ===
-                                                    "true"
+                                                formData.mortgageAgreement === true ||
+                                                formData.mortgageAgreement === "true"
                                             }
                                             onChange={handleChange}
                                         />
@@ -531,9 +546,7 @@ export default function PropertyInsertFormDetails({
                         <Grid size={{ xs: 12, sm: 6 }}>
                             {renderField(
                                 "mediatorFee",
-                                t(
-                                    "properties.insert.details.rental.mediatorFee"
-                                ),
+                                t("properties.insert.details.rental.mediatorFee"),
                                 {
                                     type: "number",
                                     slotProps: {

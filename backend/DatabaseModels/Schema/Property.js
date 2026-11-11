@@ -160,6 +160,11 @@ const propertySchema = new mongoose.Schema(
                 },
             },
         ],
+        youtubeVideoUrl: {
+            type: String,
+            trim: true,
+            default: "",
+        },
     },
     {
         timestamps: true,

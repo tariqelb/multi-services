@@ -6,7 +6,7 @@ const initialState = {
     role: 'Owner', firstName: '', lastName: '', email: '', phone: '',
     title: '', listingType: 'For Sale', propertyType: '', city: '',
     neighborhood: '', fullAddress: '', mapLink: '', price: '', surface: '',
-    rooms: '', salons: '', bathrooms: '', floor: '', syndicateFees: '', images: [],
+    rooms: '', salons: '', bathrooms: '', floor: '', syndicateFees: '', images: [],youtubeVideoUrl: "",
   },
   errors: {},
 };

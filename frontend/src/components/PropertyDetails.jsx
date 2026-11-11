@@ -32,6 +32,50 @@ import PropertyContactOwner from "./PropertyContactOwner";
 import axiosInstance from "../api/axiosInstance";
 import getImageUrl from "../utils/getImageUrl";
 
+// Extract a YouTube video ID from supported YouTube URLs.
+function getYoutubeVideoId(videoUrl) {
+    if (!videoUrl || typeof videoUrl !== "string") {
+        return null;
+    }
+
+    try {
+        const url = new URL(videoUrl.trim());
+
+        if (!["https:", "http:"].includes(url.protocol)) {
+            return null;
+        }
+
+        const hostname = url.hostname
+            .toLowerCase()
+            .replace(/^www\./, "");
+
+        let videoId = "";
+
+        if (hostname === "youtu.be") {
+            videoId = url.pathname.slice(1).split("/")[0];
+        } else if (
+            hostname === "youtube.com" ||
+            hostname === "m.youtube.com" ||
+            hostname === "youtube-nocookie.com"
+        ) {
+            if (url.pathname === "/watch") {
+                videoId = url.searchParams.get("v") || "";
+            } else if (
+                url.pathname.startsWith("/embed/") ||
+                url.pathname.startsWith("/shorts/")
+            ) {
+                videoId = url.pathname.split("/")[2] || "";
+            }
+        }
+
+        return /^[a-zA-Z0-9_-]{11}$/.test(videoId)
+            ? videoId
+            : null;
+    } catch {
+        return null;
+    }
+}
+
 function InfoItem({ label, value }) {
     if (value === undefined || value === null || value === "") {
         return null;
@@ -136,7 +180,6 @@ function getTranslatedPropertyValue(value, t, namespace) {
         .replace(/[^a-z0-9]+/g, "");
 
     const keyMap = {
-        // Property types
         apartment: "apartment",
         house: "house",
         villa: "villa",
@@ -150,8 +193,6 @@ function getTranslatedPropertyValue(value, t, namespace) {
         commercialstore: "commercialStore",
         garage: "garage",
         other: "other",
-
-        // Listing roles
         owner: "owner",
         realestateagent: "realEstateAgent",
         agency: "agency",
@@ -205,6 +246,10 @@ export default function PropertyDetails({
     const images = (property.images || [])
         .map(getImageUrl)
         .filter(Boolean);
+
+    const youtubeVideoId = getYoutubeVideoId(
+        property.youtubeVideoUrl
+    );
 
     const title = property.title || t("properties.details.title");
     const city = property.city || "";
@@ -314,13 +359,7 @@ export default function PropertyDetails({
             }}
         >
             <Button
-                onClick={() => {
-                    // if (onBack) {
-                        // onBack();
-                    // } else {
-                        navigate(-1);
-                    // }
-                }}
+                onClick={() => navigate(-1)}
                 startIcon={<ArrowBack />}
                 sx={{
                     mb: 3,
@@ -475,6 +514,63 @@ export default function PropertyDetails({
                 )}
             </Paper>
 
+            {/* YouTube Video - displayed after all property images */}
+            {youtubeVideoId && (
+                <Paper
+                    variant="outlined"
+                    sx={{
+                        borderRadius: "16px",
+                        overflow: "hidden",
+                        mb: 4,
+                        boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)",
+                    }}
+                >
+                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 700,
+                                color: "#0f172a",
+                                mb: 2,
+                            }}
+                        >
+                            {t("properties.details.propertyVideo.title")}
+                        </Typography>
+
+                        <Box
+                            sx={{
+                                position: "relative",
+                                width: "100%",
+                                aspectRatio: "16 / 9",
+                                bgcolor: "#0f172a",
+                                borderRadius: 2,
+                                overflow: "hidden",
+                            }}
+                        >
+                            <Box
+                                component="iframe"
+                                src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}`}
+                                title={t(
+                                    "properties.details.propertyVideo.iframeTitle",
+                                    { title }
+                                )}
+                                loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                sx={{
+                                    position: "absolute",
+                                    inset: 0,
+                                    width: "100%",
+                                    height: "100%",
+                                    border: 0,
+                                }}
+                            />
+                        </Box>
+                    </Box>
+                </Paper>
+            )}
+
             {/* Main Property Information */}
             <Paper
                 variant="outlined"
@@ -551,10 +647,7 @@ export default function PropertyDetails({
 
                     <Box
                         sx={{
-                            textAlign: {
-                                xs: "left",
-                                sm: "right",
-                            },
+                            textAlign: { xs: "left", sm: "right" },
                             minWidth: 0,
                         }}
                     >

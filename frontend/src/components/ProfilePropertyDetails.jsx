@@ -106,6 +106,52 @@ function getStatusStyles(status) {
     }
 }
 
+// Convert supported YouTube URLs into a safe embed URL.
+function getYoutubeEmbedUrl(url) {
+    if (!url || typeof url !== "string") return "";
+
+    try {
+        const parsedUrl = new URL(url.trim());
+        const hostname = parsedUrl.hostname.toLowerCase();
+
+        const allowedHosts = [
+            "youtube.com",
+            "www.youtube.com",
+            "m.youtube.com",
+            "youtu.be",
+            "youtube-nocookie.com",
+            "www.youtube-nocookie.com",
+        ];
+
+        if (
+            !allowedHosts.includes(hostname) ||
+            !["https:", "http:"].includes(parsedUrl.protocol)
+        ) {
+            return "";
+        }
+
+        let videoId = "";
+
+        if (hostname === "youtu.be") {
+            videoId = parsedUrl.pathname.split("/").filter(Boolean)[0];
+        } else {
+            videoId =
+                parsedUrl.searchParams.get("v") ||
+                parsedUrl.pathname.match(
+                    /^\/(?:embed|shorts|live)\/([^/?]+)/
+                )?.[1];
+        }
+
+        if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+            return "";
+        }
+
+        return `https://www.youtube-nocookie.com/embed/${videoId}`;
+    } catch {
+        return "";
+    }
+}
+
 export default function ProfilePropertyDetails() {
     const { t } = useTranslation();
 
@@ -191,9 +237,15 @@ export default function ProfilePropertyDetails() {
         };
     }, [id, state?.property, t]);
 
+    // Property photos only.
     const images = (property?.images || [])
         .map(getImageUrl)
         .filter(Boolean);
+
+    // YouTube video is displayed separately underneath the photo gallery.
+    const youtubeEmbedUrl = getYoutubeEmbedUrl(
+        property?.youtubeVideoUrl
+    );
 
     const title =
         property?.title || t("properties.details.title");
@@ -356,7 +408,7 @@ export default function ProfilePropertyDetails() {
                 {t("properties.details.back")}
             </Button>
 
-            {/* Image Gallery */}
+            {/* Property Photo Gallery */}
             <Paper
                 variant="outlined"
                 sx={{
@@ -454,6 +506,7 @@ export default function ProfilePropertyDetails() {
                     )}
                 </Box>
 
+                {/* Photo Thumbnails */}
                 {images.length > 1 && (
                     <Stack
                         direction="row"
@@ -462,6 +515,7 @@ export default function ProfilePropertyDetails() {
                             p: 2,
                             overflowX: "auto",
                             bgcolor: "white",
+                            alignItems: "center",
                         }}
                     >
                         {images.map((src, index) => (
@@ -503,6 +557,63 @@ export default function ProfilePropertyDetails() {
                     </Stack>
                 )}
             </Paper>
+
+            {/* YouTube Video - displayed separately below the photos */}
+            {youtubeEmbedUrl && (
+                <Paper
+                    variant="outlined"
+                    sx={{
+                        borderRadius: "16px",
+                        overflow: "hidden",
+                        mb: 4,
+                        boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)",
+                    }}
+                >
+                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 700,
+                                color: "#0f172a",
+                                mb: 2,
+                            }}
+                        >
+                            {t("properties.details.propertyVideo.title")}
+                        </Typography>
+
+                        <Box
+                            sx={{
+                                position: "relative",
+                                width: "100%",
+                                aspectRatio: "16 / 9",
+                                bgcolor: "#0f172a",
+                                borderRadius: 2,
+                                overflow: "hidden",
+                            }}
+                        >
+                            <Box
+                                component="iframe"
+                                src={youtubeEmbedUrl}
+                                title={t(
+                                    "properties.details.propertyVideo.iframeTitle",
+                                    { title }
+                                )}
+                                loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                sx={{
+                                    position: "absolute",
+                                    inset: 0,
+                                    width: "100%",
+                                    height: "100%",
+                                    border: 0,
+                                }}
+                            />
+                        </Box>
+                    </Box>
+                </Paper>
+            )}
 
             {/* Main Property Information */}
             <Paper

@@ -306,7 +306,17 @@
                 "saved": "تم حفظ العقار بنجاح!",
                 "unsaved": "تمت إزالة العقار من المحفوظات.",
                 "saveError": "تعذر تحديث العقار المحفوظ. يرجى المحاولة مرة أخرى."
-            }
+            },
+            "propertyVideo": {
+                "title": "فيديو العقار",
+                "iframeTitle": "فيديو العقار: {{title}}"
+            },
+            "missingId": "معرّف العقار غير موجود.",
+            "loadError": "تعذّر تحميل تفاصيل العقار. يُرجى المحاولة مرة أخرى.",
+            "propertyNotFound": "العقار غير موجود.",
+            "backToMyPublications": "العودة إلى منشوراتي",
+            "video": "الفيديو",
+            "viewVideo": "مشاهدة الفيديو"
         },
         "profileDetails": {
             "backToMyPublications": "العودة إلى إعلاناتي",
@@ -399,6 +409,14 @@
                     "mortgage": "اتفاقية الرهن العقاري",
                     "deposit": "مبلغ الضمان (درهم)",
                     "mediatorFee": "رسوم الوسيط (درهم)"
+                },
+                "youtubeVideo": {
+                    "label": "رابط فيديو يوتيوب (اختياري)",
+                    "placeholder": "https://www.youtube.com/watch?v=XXXXXXXXXXX",
+                    "helper": "أضف فيديو من يوتيوب لعرض عقارك. يتم قبول روابط يوتيوب فقط."
+                },
+                "validation": {
+                    "invalidYoutubeUrl": "يرجى إدخال رابط فيديو يوتيوب صالح."
                 }
             },
             "images": {

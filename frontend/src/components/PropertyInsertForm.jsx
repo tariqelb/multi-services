@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -576,6 +577,54 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 );
             }
         }
+
+        // Validate optional YouTube video URL.
+        if (formData.youtubeVideoUrl?.trim()) {
+            try {
+                const url = new URL(formData.youtubeVideoUrl.trim());
+
+                const hostname = url.hostname
+                    .toLowerCase()
+                    .replace(/^www\./, "");
+
+                let videoId = "";
+
+                if (
+                    url.protocol !== "https:" &&
+                    url.protocol !== "http:"
+                ) {
+                    throw new Error("Invalid URL protocol");
+                }
+
+                if (hostname === "youtu.be") {
+                    videoId = url.pathname
+                        .slice(1)
+                        .split("/")[0];
+                } else if (
+                    hostname === "youtube.com" ||
+                    hostname === "m.youtube.com" ||
+                    hostname === "youtube-nocookie.com"
+                ) {
+                    if (url.pathname === "/watch") {
+                        videoId = url.searchParams.get("v") || "";
+                    } else if (
+                        url.pathname.startsWith("/embed/") ||
+                        url.pathname.startsWith("/shorts/")
+                    ) {
+                        videoId = url.pathname.split("/")[2] || "";
+                    }
+                }
+
+                if (!/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+                    throw new Error("Invalid YouTube video ID");
+                }
+            } catch {
+                validationErrors.youtubeVideoUrl = t(
+                    "properties.insert.validation.invalidYoutubeUrl"
+                );
+            }
+        }
+
 
         if ((formData.images || []).length > 15) {
             validationErrors.images = t(

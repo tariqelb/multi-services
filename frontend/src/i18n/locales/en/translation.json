@@ -302,8 +302,17 @@
                 "saved": "Property saved successfully!",
                 "unsaved": "Property removed from saved properties.",
                 "saveError": "Unable to update saved property. Please try again."
-            }
-
+            },
+            "propertyVideo": {
+                "title": "Property Video",
+                "iframeTitle": "Property video: {{title}}"
+            },
+            "missingId": "Property ID is missing.",
+            "loadError": "Unable to load property details. Please try again.",
+            "propertyNotFound": "Property not found.",
+            "backToMyPublications": "Back to my publications",
+            "video": "Video",
+            "viewVideo": "View video"
         },
         "profileDetails": {
             "backToMyPublications": "Back to My Publications",
@@ -396,6 +405,14 @@
                     "mortgage": "Mortgage agreement",
                     "deposit": "Deposit (MAD)",
                     "mediatorFee": "Mediator Fee (MAD)"
+                },
+                "youtubeVideo": {
+                    "label": "YouTube video link (optional)",
+                    "placeholder": "https://www.youtube.com/watch?v=XXXXXXXXXXX",
+                    "helper": "Add a YouTube video to showcase your property. Only YouTube links are accepted."
+                },
+                "validation": {
+                    "invalidYoutubeUrl": "Please enter a valid YouTube video link."
                 }
             },
             "images": {

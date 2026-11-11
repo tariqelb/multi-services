@@ -302,7 +302,17 @@
                 "saved": "Bien immobilier enregistré avec succès !",
                 "unsaved": "Bien immobilier retiré des favoris.",
                 "saveError": "Impossible de mettre à jour le bien enregistré. Veuillez réessayer."
-            }
+            },
+            "propertyVideo": {
+                "title": "Vidéo du bien immobilier",
+                "iframeTitle": "Vidéo du bien immobilier : {{title}}"
+            },
+            "missingId": "L'identifiant du bien est manquant.",
+            "loadError": "Impossible de charger les détails du bien. Veuillez réessayer.",
+            "propertyNotFound": "Bien immobilier introuvable.",
+            "backToMyPublications": "Retour à mes publications",
+            "video": "Vidéo",
+            "viewVideo": "Voir la vidéo"
         },
         "profileDetails": {
             "backToMyPublications": "Retour à mes annonces",
@@ -395,6 +405,14 @@
                     "mortgage": "Accord de crédit immobilier",
                     "deposit": "Dépôt de garantie (MAD)",
                     "mediatorFee": "Frais d'intermédiaire (MAD)"
+                },
+                "youtubeVideo": {
+                    "label": "Lien vidéo YouTube (facultatif)",
+                    "placeholder": "https://www.youtube.com/watch?v=XXXXXXXXXXX",
+                    "helper": "Ajoutez une vidéo YouTube pour présenter votre bien immobilier. Seuls les liens YouTube sont acceptés."
+                },
+                "validation": {
+                    "invalidYoutubeUrl": "Veuillez saisir un lien vidéo YouTube valide."
                 }
             },
             "images": {
