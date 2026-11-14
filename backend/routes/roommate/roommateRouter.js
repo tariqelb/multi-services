@@ -1,4 +1,3 @@
-
 import express from "express";
 
 import {
@@ -6,6 +5,7 @@ import {
     getRoommateListings,
     getRoommateListingById,
     getMyRoommateListings,
+    getUserRoommateListings,
     updateRoommateListing,
     deleteRoommateListing,
     updateRoommateListingStatus,
@@ -21,6 +21,9 @@ const router = express.Router();
 
 // Public routes
 router.get("/", getRoommateListings);
+
+// Public roommate announcements for a specific publisher
+router.get("/user/:userId", getUserRoommateListings);
 
 // Authenticated routes
 router.get("/my-listings", authMiddleware, getMyRoommateListings);

@@ -1,8 +1,9 @@
 
 import mongoose from "mongoose";
-
+import { extractGoogleMapsLocation } from "../../utils/googleMapsLocation.js";
 import RoommateListing from "../../DatabaseModels/Schema/RoommateListing.js";
 import User from "../../DatabaseModels/Schema/User.js";
+import notifyMatchingRoommateAlerts from "../../services/notifyMatchingRoommateAlerts.js";
 
 import {
     uploadPropertyImages,
@@ -240,7 +241,7 @@ export const createRoommateListing = async (req, res) => {
         // ---------------------------------------------------------------------
 
         const userId = req.user?.userId;
-        console.log("body : ", req.body);
+
         if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(401).json({
                 message: "Authentication required.",
@@ -274,7 +275,7 @@ export const createRoommateListing = async (req, res) => {
         }
 
         // ---------------------------------------------------------------------
-        // 3. Parse roommate preferences (multipart/form-data compatible)
+        // 3. Parse roommate preferences
         // ---------------------------------------------------------------------
 
         const rawPreferences = req.body?.preferences;
@@ -291,7 +292,7 @@ export const createRoommateListing = async (req, res) => {
             } else if (typeof rawPreferences === "string") {
                 parsedPreferences = JSON.parse(rawPreferences);
 
-                // Also support accidentally double-encoded JSON.
+                // Support accidentally double-encoded JSON.
                 if (typeof parsedPreferences === "string") {
                     parsedPreferences = JSON.parse(parsedPreferences);
                 }
@@ -301,7 +302,6 @@ export const createRoommateListing = async (req, res) => {
         } catch (error) {
             console.error(
                 "[CreateRoommateListing] Preferences parsing failed:",
-                rawPreferences,
                 error.message
             );
 
@@ -316,12 +316,6 @@ export const createRoommateListing = async (req, res) => {
             typeof parsedPreferences !== "object" ||
             Array.isArray(parsedPreferences)
         ) {
-            console.error(
-                "[CreateRoommateListing] Invalid preferences type:",
-                typeof parsedPreferences,
-                parsedPreferences
-            );
-
             return res.status(400).json({
                 message: "Invalid roommate preferences.",
                 field: "preferences",
@@ -456,7 +450,6 @@ export const createRoommateListing = async (req, res) => {
             });
         }
 
-        // Share My Property must have at least one available place.
         if (
             normalizedPurpose === "Share My Property" &&
             normalizedCurrentPeople >= normalizedTotalPeople
@@ -611,13 +604,53 @@ export const createRoommateListing = async (req, res) => {
         const normalizedAvailableFrom =
             validateAvailableFrom(availableFrom);
 
+        // Validate the Google Maps URL.
         const normalizedMapLink = validateGoogleMapsLink(mapLink);
+
+        // ---------------------------------------------------------------------
+        // 13. Extract Google Maps coordinates
+        // ---------------------------------------------------------------------
+
+        let location = {
+            lat: null,
+            lng: null,
+        };
+
+        if (normalizedMapLink) {
+            try {
+                location = await extractGoogleMapsLocation(
+                    normalizedMapLink
+                );
+
+                if (
+                    !location ||
+                    !Number.isFinite(location.lat) ||
+                    !Number.isFinite(location.lng)
+                ) {
+                    throw new Error(
+                        "Could not extract valid coordinates from the Google Maps link."
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    "[CreateRoommateListing] Location extraction failed:",
+                    error.message
+                );
+
+                return res.status(400).json({
+                    message:
+                        error.message ||
+                        "Unable to extract coordinates from Google Maps link.",
+                    field: "mapLink",
+                });
+            }
+        }
 
         const normalizedYoutubeVideoUrl =
             validateYoutubeVideoUrl(youtubeVideoUrl);
 
         // ---------------------------------------------------------------------
-        // 13. Validate and upload listing images
+        // 14. Validate and upload listing images
         // ---------------------------------------------------------------------
 
         const uploadedFiles = req.files || [];
@@ -632,7 +665,7 @@ export const createRoommateListing = async (req, res) => {
         uploadedImages = await uploadPropertyImages(uploadedFiles);
 
         // ---------------------------------------------------------------------
-        // 14. Calculate listing status
+        // 15. Calculate listing status
         // ---------------------------------------------------------------------
 
         const initialStatus =
@@ -641,7 +674,7 @@ export const createRoommateListing = async (req, res) => {
                 : "Open";
 
         // ---------------------------------------------------------------------
-        // 15. Create listing
+        // 16. Create listing and store coordinates
         // ---------------------------------------------------------------------
 
         const roommateListing = await RoommateListing.create({
@@ -661,7 +694,14 @@ export const createRoommateListing = async (req, res) => {
                 typeof fullAddress === "string"
                     ? fullAddress.trim()
                     : "",
+
             mapLink: normalizedMapLink,
+
+            // Extracted Google Maps coordinates.
+            location: {
+                lat: location.lat,
+                lng: location.lng,
+            },
 
             totalRent: normalizedTotalRent,
             rentalPeriod: normalizedRentalPeriod,
@@ -695,12 +735,32 @@ export const createRoommateListing = async (req, res) => {
 
             youtubeVideoUrl: normalizedYoutubeVideoUrl,
 
-            // Initial status is always calculated by the backend.
             status: initialStatus,
         });
+        // Notify users who have matching roommate alerts.
+        // Notification failures must not cancel successful publication.
+        try {
+            const io = req.app.get("io");
+
+            const notificationSummary =
+                await notifyMatchingRoommateAlerts(
+                    roommateListing,
+                    io
+                );
+
+            console.log(
+                "[Roommate Alerts] Notification summary:",
+                notificationSummary
+            );
+        } catch (notificationError) {
+            console.error(
+                "[Roommate Alerts] Matching failed:",
+                notificationError
+            );
+        }
 
         // ---------------------------------------------------------------------
-        // 16. Calculate derived values
+        // 17. Calculate derived values
         // ---------------------------------------------------------------------
 
         const availablePlaces =
@@ -714,15 +774,17 @@ export const createRoommateListing = async (req, res) => {
                 : null;
 
         // ---------------------------------------------------------------------
-        // 17. Response
+        // 18. Response
         // ---------------------------------------------------------------------
 
         return res.status(201).json({
             message: "Roommate listing created successfully.",
             roommateListing,
+            location: roommateListing.location,
             availablePlaces,
             rentPerPerson,
         });
+
     } catch (error) {
         console.error("[CreateRoommateListing] Error:", error);
 
@@ -801,7 +863,7 @@ export const getRoommateListings = async (req, res) => {
             filter.status = { $in: ["Open", "Full"] };
         }
 
-        if (purpose) {
+        if (purpose && purpose !== "All") {
             if (!allowedPurposes.includes(purpose)) {
                 return res.status(400).json({
                     message: "Invalid roommate purpose.",
@@ -811,30 +873,36 @@ export const getRoommateListings = async (req, res) => {
             filter.purpose = purpose;
         }
 
-        if (propertyType) {
+        if (propertyType && propertyType !== "All") {
             if (!allowedPropertyTypes.includes(propertyType)) {
                 return res.status(400).json({
                     message: "Invalid property type.",
+                    received: propertyType,
+                    allowed: allowedPropertyTypes,
                 });
             }
 
             filter.propertyType = propertyType;
         }
 
-        if (rentalPeriod) {
+        if (rentalPeriod && rentalPeriod !== "All") {
             if (!allowedRentalPeriods.includes(rentalPeriod)) {
                 return res.status(400).json({
                     message: "Invalid rental period.",
+                    received: rentalPeriod,
+                    allowed: allowedRentalPeriods,
                 });
             }
 
             filter.rentalPeriod = rentalPeriod;
         }
 
-        if (furnishingStatus) {
+        if (furnishingStatus && furnishingStatus !== "All") {
             if (!allowedFurnishingStatuses.includes(furnishingStatus)) {
                 return res.status(400).json({
                     message: "Invalid furnishing status.",
+                    received: furnishingStatus,
+                    allowed: allowedFurnishingStatuses,
                 });
             }
 
@@ -867,7 +935,15 @@ export const getRoommateListings = async (req, res) => {
         const [listings, total] = await Promise.all([
             RoommateListing.find(filter)
                 .select("-fullAddress")
-                .populate("userId", "firstName lastName")
+                .populate({
+                    path: "userId",
+                    select: [
+                        "firstName",
+                        "lastName",
+                        "phoneNumber",
+                        "notificationPreferences.whatsapp.phoneNumber",
+                    ].join(" "),
+                })
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
@@ -912,7 +988,15 @@ export const getRoommateListingById = async (req, res) => {
             status: { $in: ["Open", "Full"] },
         })
             .select("-fullAddress")
-            .populate("userId", "firstName lastName")
+            .populate({
+                path: "userId",
+                select: [
+                    "firstName",
+                    "lastName",
+                    "phoneNumber",
+                    "notificationPreferences.whatsapp.phoneNumber",
+                ].join(" "),
+            })
             .lean();
 
         if (!listing) {
@@ -956,7 +1040,15 @@ export const getMyRoommateListings = async (req, res) => {
         const [listings, total] = await Promise.all([
             RoommateListing.find(filter)
                 .select("-fullAddress")
-                .populate("userId", "firstName lastName")
+                .populate({
+                    path: "userId",
+                    select: [
+                        "firstName",
+                        "lastName",
+                        "phoneNumber",
+                        "notificationPreferences.whatsapp.phoneNumber",
+                    ].join(" "),
+                })
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
@@ -981,6 +1073,62 @@ export const getMyRoommateListings = async (req, res) => {
 
         return res.status(500).json({
             message: "Failed to retrieve your roommate listings.",
+        });
+    }
+};
+
+// GET /api/roommates/user/:userId
+export const getUserRoommateListings = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                message: "Invalid user ID.",
+            });
+        }
+
+        const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+        const limit = Math.min(
+            30,
+            Math.max(1, Number.parseInt(req.query.limit, 10) || 12)
+        );
+
+        // Only publicly visible roommate announcements.
+        const filter = {
+            userId,
+            status: { $in: ["Open", "Full"] },
+        };
+
+        const skip = (page - 1) * limit;
+
+        const [listings, total] = await Promise.all([
+            RoommateListing.find(filter)
+                .select("-fullAddress")
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+
+            RoommateListing.countDocuments(filter),
+        ]);
+
+        return res.status(200).json({
+            listings: listings.map(formatRoommateListing),
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                totalListings: total,
+                limit,
+                hasNextPage: page * limit < total,
+                hasPreviousPage: page > 1,
+            },
+        });
+    } catch (error) {
+        console.error("[GetUserRoommateListings] Error:", error);
+
+        return res.status(500).json({
+            message: "Failed to retrieve this user's roommate announcements.",
         });
     }
 };
@@ -1429,7 +1577,7 @@ export const updateRoommateListingStatus = async (req, res) => {
             });
         }
 
-        const allowedStatuses = ["Open", "Inactive", "Completed"];
+        const allowedStatuses = ["Open", "Full", "Inactive", "Completed"];
 
         if (!allowedStatuses.includes(status)) {
             return res.status(400).json({

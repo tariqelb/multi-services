@@ -15,31 +15,32 @@ import { Box } from "@mui/material";
 
 import axiosInstance from "./api/axiosInstance";
 
-import Login from "./components/Login";
+import Login from "./components/LoginAndSignUp/Login";
 import NotFound from "./pages/NotFound";
 
-import ProfileLayout from "./components/Profile";
-import ProfileOverview from "./components/ProfileOverview";
-import ProfilePropertyList from "./components/ProfilePropertyList";
-import ProfilePropertyDetails from "./components/ProfilePropertyDetails";
+import ProfileLayout from "./components/MyProfile/Profile";
+import ProfileOverview from "./components/MyProfile/ProfileOverview";
+import ProfilePropertyList from "./components/MyProfile/ProfilePropertyList";
+import ProfilePropertyDetails from "./components/properties/ProfilePropertyDetails";
 
-import Properties from "./components/Properties";
-import PropertyDetailsPage from "./components/PropertyDetailsPage";
-import PublishPropertyPage from "./components/PublishPropertyPage";
-import SavedPropertiesList from "./components/SavedPropertyList";
-import PropertyAlert from "./components/PropertyAlert";
-import NotificationPage from "./components/NotificationPage";
+import Properties from "./components/properties/Properties";
+import PropertyDetailsPage from "./components/properties/PropertyDetailsPage";
+import PublishPropertyPage from "./components/propertyInsertForm/PublishPropertyPage";
+import SavedPropertiesList from "./components/saved/SavedPropertyList";
+import Alert from "./components/Alert/Alert";
+import NotificationPage from "./components/Notification/NotificationPage";
 import SettingPage from "./components/Settings/SettingsPage";
-import FeedbackPage from "./components/FeedbackPage";
+import FeedbackPage from "./components/Feedback/FeedbackPage";
 
 // Roommate components
 import RoommatePage from "./components/roommate/RoommatePage";
 import RoommateDetailsPage from "./components/roommate/RoommateDetailsPage";
+import RoommateProfileDetails from "./components/roommate/RoommateProfileDetails";
 
-import TopBar from "./components/TopBar";
-import Sidebar from "./components/Sidebar";
-import MiddleContent from "./components/MiddleContent";
-import Footer from "./components/Footer";
+import TopBar from "./components/Home/TopBar";
+import Sidebar from "./components/Home/Sidebar";
+import MiddleContent from "./components/Home/MiddleContent";
+import Footer from "./components/Footer/Footer";
 
 import Dashboard from "./components/admin/Dashboard";
 import VisitTracker from "./components/admin/components/VisitTracker";
@@ -48,13 +49,22 @@ import ExternalListingSources from "./components/admin/externalListings/External
 import UserDetailsPage from "./components/admin/components/UserDetailsPage";
 
 import FindByMap from "./components/FindByMap/FindByMap";
-import DirectionProvider from "./components/DirectionProvider";
+import DirectionProvider from "./components/Home/DirectionProvider";
 
 import KnowledgeCenter from "./components/admin/components/knowledge/KnowledgeCenter";
 import KnowledgeDetails from "./components/admin/components/knowledge/KnowledgeDetails";
 import KnowledgeManagement from "./components/admin/components/knowledge/KnowledgeManagement";
 
-import PublicProfile from "./components/PublicProfile";
+import PublicProfile from "./components/PublicProfile/PublicProfile";
+
+
+import FurnishedProperties from "./components/FurnishedRental/FurnishedProperties";
+import FurnishedPropertyDetailsPage from "./components/FurnishedRental/FurnishedPropertyDetailsPage";
+
+
+import Establishments from "./components/Establishment/Establishments";
+import EstablishmentDetailsPage from "./components/Establishment/EstablishmentDetailsPage";
+import EstablishmentInsertForm from "./components/Establishment/EstablishmentInsertForm";
 
 // -----------------------------------------------------------------------------
 // Authentication loader
@@ -218,6 +228,38 @@ const router = createBrowserRouter([
                 path: "/property/:id",
                 element: <ProfilePropertyDetails />,
             },
+            // -----------------------------------------------------------------
+            // Furnished Properties
+            // -----------------------------------------------------------------
+
+            {
+                path: "/furnishedproperties",
+                element: <FurnishedProperties />,
+            },
+            {
+                path: "/furnishedproperties/:id",
+                element: (
+                    <FurnishedPropertyDetailsPage
+                        // DetailsComponent={FurnishedPropertyDetails}
+                    />
+                ),
+            },
+            // -----------------------------------------------------------------
+            // Hotels, Riads and other establishments
+            // -----------------------------------------------------------------
+
+            {
+                path: "/establishments",
+                element: <Establishments />,
+            },
+            {
+                path: "/establishments/publish",
+                element: <EstablishmentInsertForm />,
+            },
+            {
+                path: "/establishments/:id",
+                element: <EstablishmentDetailsPage />,
+            },
 
             // -----------------------------------------------------------------
             // Roommates
@@ -230,6 +272,14 @@ const router = createBrowserRouter([
             {
                 path: "/roommates/:id",
                 element: <RoommateDetailsPage />,
+            },
+            {
+                path: "/roommates/profile/:id",
+                element: (
+                    <RoommateDetailsPage
+                        DetailsComponent={RoommateProfileDetails}
+                    />
+                ),
             },
 
             // -----------------------------------------------------------------
@@ -254,7 +304,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/alert",
-                element: <PropertyAlert />,
+                element: <Alert />,
             },
 
             // -----------------------------------------------------------------

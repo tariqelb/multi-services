@@ -106,6 +106,10 @@ const userSchema = new mongoose.Schema(
                     type: Boolean,
                     default: true,
                 },
+                roommateAlerts: {
+                    type: Boolean,
+                    default: true,
+                },
             },
             whatsapp: {
                 enabled: {

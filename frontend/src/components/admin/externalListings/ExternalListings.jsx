@@ -30,7 +30,7 @@ import SquareFootOutlinedIcon from "@mui/icons-material/SquareFootOutlined";
 import { useTranslation } from "react-i18next";
 
 import axiosInstance from "../../../api/axiosInstance";
-import PageLayout from "../../PageLayout";
+import PageLayout from "../../Home/PageLayout";
 import cities from "../../../data/moroccanCities";
 
 const API_URL = "/external-listings";

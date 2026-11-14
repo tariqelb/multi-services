@@ -106,3 +106,122 @@ export const sendVerificationEmail = async ({ to, code }) => {
         `,
     });
 };
+
+
+
+// export const sendRoommateAlertEmail = async ({
+//     to,
+//     roommateListing,
+// }) => {
+//     if (!to || !roommateListing) {
+//         throw new Error(
+//             "A recipient email and roommate listing are required."
+//         );
+//     }
+
+//     const transporter = createTransporter();
+
+//     const roommateUrl =
+//         `${process.env.FRONTEND_URL}/roommates/${roommateListing._id}`;
+
+//     await transporter.sendMail({
+//         from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+//         to,
+//         subject: `New roommate announcement matching your alert: ${roommateListing.title}`,
+//         text: [
+//             "A new roommate announcement matches your saved alert.",
+//             "",
+//             `Title: ${roommateListing.title}`,
+//             `City: ${roommateListing.city}`,
+//             `Purpose: ${roommateListing.purpose}`,
+//             `Property type: ${roommateListing.propertyType || "Not specified"}`,
+//             `Rental period: ${roommateListing.rentalPeriod || "Not specified"}`,
+//             `Rent: ${roommateListing.totalRent ?? "Not specified"} MAD`,
+//             "",
+//             `View announcement: ${roommateUrl}`,
+//         ].join("\n"),
+//         html: `
+//             <h2>A new roommate announcement matches your alert!</h2>
+
+//             <p>
+//                 <strong>${escapeHtml(roommateListing.title)}</strong>
+//             </p>
+
+//             <p>City: ${escapeHtml(roommateListing.city)}</p>
+//             <p>Purpose: ${escapeHtml(roommateListing.purpose)}</p>
+//             <p>Property type: ${escapeHtml(roommateListing.propertyType || "Not specified")}</p>
+//             <p>Rental period: ${escapeHtml(roommateListing.rentalPeriod || "Not specified")}</p>
+//             <p>Rent: ${escapeHtml(roommateListing.totalRent ?? "Not specified")} MAD</p>
+
+//             <p>
+//                 <a href="${roommateUrl}">View roommate announcement</a>
+//             </p>
+//         `,
+//     });
+// };
+export const sendRoommateAlertEmail = async ({
+    to,
+    roommateListing,
+}) => {
+    if (!to || !roommateListing) {
+        throw new Error(
+            "Email address and roommate listing are required."
+        );
+    }
+
+    const transporter = createTransporter();
+
+    const roommateUrl =
+        `${process.env.FRONTEND_URL}/roommates/${roommateListing._id}`;
+
+    const title = roommateListing.title || "Roommate announcement";
+
+    const text = [
+        "A new roommate announcement matches your alert.",
+        "",
+        `Title: ${title}`,
+        `City: ${roommateListing.city}`,
+        `Purpose: ${roommateListing.purpose}`,
+        `Property type: ${roommateListing.propertyType}`,
+        `Rental period: ${roommateListing.rentalPeriod || "Not specified"}`,
+        "",
+        `View announcement: ${roommateUrl}`,
+    ].join("\n");
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+        to,
+        subject: `New roommate announcement: ${title}`,
+        text,
+        html: `
+            <h2>A new roommate announcement matches your alert!</h2>
+
+            <p>
+                <strong>${escapeHtml(title)}</strong>
+            </p>
+
+            <p>
+                City: ${escapeHtml(roommateListing.city)}
+            </p>
+
+            <p>
+                Purpose: ${escapeHtml(roommateListing.purpose)}
+            </p>
+
+            <p>
+                Property type: ${escapeHtml(roommateListing.propertyType)}
+            </p>
+
+            <p>
+                Rental period:
+                ${escapeHtml(roommateListing.rentalPeriod || "Not specified")}
+            </p>
+
+            <p>
+                <a href="${roommateUrl}">
+                    View roommate announcement
+                </a>
+            </p>
+        `,
+    });
+};

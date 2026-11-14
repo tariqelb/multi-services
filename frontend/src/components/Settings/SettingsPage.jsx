@@ -6,7 +6,7 @@ import { Alert, Stack } from "@mui/material";
 import axiosInstance from "../../api/axiosInstance";
 import { updateProfile } from "../../redux/actions/profile/profileAction";
 
-import PageLayout from "../PageLayout";
+import PageLayout from "../Home/PageLayout";
 import AccountProfile from "./AccountProfile";
 import SettingEmailNotifications from "./SettingEmailNotifications";
 import WhatsappNotifications from "./WhatsappNotifications";

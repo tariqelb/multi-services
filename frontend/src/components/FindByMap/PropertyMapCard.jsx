@@ -1,5 +1,5 @@
-
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import {
     Box,
@@ -23,13 +23,26 @@ function getImageUrl(property) {
     return `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
+const isFurnishedRental = (property) => {
+    return (
+        String(property?.listingType || "").trim().toLowerCase() === "for rent" &&
+        String(property?.furnishingStatus || "").trim().toLowerCase() === "furnished" &&
+        ["room", "studio", "apartment", "villa", "house"].includes(
+            String(property?.propertyType || "").trim().toLowerCase()
+        )
+    );
+};
+
 export default function PropertyMapCard({
     property,
     onViewDetails,
 }) {
+    const { t } = useTranslation();
+
     if (!property) return null;
 
     const imageUrl = getImageUrl(property);
+    const furnished = isFurnishedRental(property);
 
     const formattedPrice = new Intl.NumberFormat("fr-MA").format(
         Number(property.price || 0)
@@ -49,7 +62,7 @@ export default function PropertyMapCard({
                 <Box
                     component="img"
                     src={imageUrl}
-                    alt={property.title || "Property"}
+                    alt={property.title || t("findMap.cards.property")}
                     className="property-map-card-image"
                     sx={{
                         width: "100%",
@@ -71,18 +84,42 @@ export default function PropertyMapCard({
                         color: "#64748b",
                     }}
                 >
-                    No image available
+                    {t("findMap.cards.noImage")}
                 </Box>
             )}
 
             <Box sx={{ p: 1.5 }}>
-                <Typography
-                    fontWeight={700}
-                    fontSize="14px"
-                    sx={{ mb: 0.5 }}
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    gap={1}
+                    flexWrap="wrap"
                 >
-                    {property.title || "Untitled property"}
-                </Typography>
+                    <Typography
+                        fontWeight={700}
+                        fontSize="14px"
+                        sx={{ mb: 0.5 }}
+                    >
+                        {property.title || t("findMap.cards.untitledProperty")}
+                    </Typography>
+
+                    {furnished && (
+                        <Box
+                            sx={{
+                                px: 1,
+                                py: 0.25,
+                                borderRadius: 5,
+                                backgroundColor: "#fff3cd",
+                                color: "#a16207",
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {t("findMap.cards.furnished")}
+                        </Box>
+                    )}
+                </Box>
 
                 <Typography
                     color="text.secondary"
@@ -107,7 +144,15 @@ export default function PropertyMapCard({
                     fontSize="12px"
                     color="text.secondary"
                 >
-                    {property.listingType} · {property.propertyType}
+                    {t(
+                        `findMap.listingTypes.${String(property.listingType || "").toLowerCase().replace(/\s+/g, "")}`,
+                        { defaultValue: property.listingType }
+                    )}
+                    {" · "}
+                    {t(
+                        `findMap.propertyTypes.${String(property.propertyType || "").toLowerCase()}`,
+                        { defaultValue: property.propertyType }
+                    )}
                 </Typography>
 
                 <Button
@@ -117,13 +162,12 @@ export default function PropertyMapCard({
                     onClick={onViewDetails}
                     sx={{ mt: 1.5 }}
                 >
-                    View details
+                    {t("findMap.cards.viewDetails")}
                 </Button>
             </Box>
         </Box>
     );
 }
-
 // import React from "react";
 
 // import {
@@ -148,39 +192,101 @@ export default function PropertyMapCard({
 //     return `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
 // }
 
+// const isFurnishedRental = (property) => {
+//     return (
+//         String(property?.listingType || "").trim().toLowerCase() === "for rent" &&
+//         String(property?.furnishingStatus || "").trim().toLowerCase() === "furnished" &&
+//         ["room", "studio", "apartment", "villa", "house"].includes(
+//             String(property?.propertyType || "").trim().toLowerCase()
+//         )
+//     );
+// };
+
 // export default function PropertyMapCard({
 //     property,
 //     onViewDetails,
 // }) {
+//     if (!property) return null;
+
 //     const imageUrl = getImageUrl(property);
+//     const furnished = isFurnishedRental(property);
 
 //     const formattedPrice = new Intl.NumberFormat("fr-MA").format(
 //         Number(property.price || 0)
 //     );
 
 //     return (
-//         <Box className="property-map-card">
+//         <Box
+//             className="property-map-card"
+//             sx={{
+//                 width: 250,
+//                 overflow: "hidden",
+//                 backgroundColor: "#fff",
+//                 borderRadius: 2,
+//             }}
+//         >
 //             {imageUrl ? (
 //                 <Box
 //                     component="img"
 //                     src={imageUrl}
-//                     alt={property.title}
+//                     alt={property.title || "Property"}
 //                     className="property-map-card-image"
+//                     sx={{
+//                         width: "100%",
+//                         height: 135,
+//                         objectFit: "cover",
+//                         display: "block",
+//                     }}
 //                 />
 //             ) : (
-//                 <Box className="property-map-card-placeholder">
-//                     No image
+//                 <Box
+//                     className="property-map-card-placeholder"
+//                     sx={{
+//                         width: "100%",
+//                         height: 135,
+//                         display: "flex",
+//                         alignItems: "center",
+//                         justifyContent: "center",
+//                         backgroundColor: "#f1f5f9",
+//                         color: "#64748b",
+//                     }}
+//                 >
+//                     No image available
 //                 </Box>
 //             )}
 
 //             <Box sx={{ p: 1.5 }}>
-//                 <Typography
-//                     fontWeight={700}
-//                     fontSize="14px"
-//                     sx={{ mb: 0.5 }}
+//                 <Box
+//                     display="flex"
+//                     alignItems="center"
+//                     gap={1}
+//                     flexWrap="wrap"
 //                 >
-//                     {property.title}
-//                 </Typography>
+//                     <Typography
+//                         fontWeight={700}
+//                         fontSize="14px"
+//                         sx={{ mb: 0.5 }}
+//                     >
+//                         {property.title || "Untitled property"}
+//                     </Typography>
+
+//                     {furnished && (
+//                         <Box
+//                             sx={{
+//                                 px: 1,
+//                                 py: 0.25,
+//                                 borderRadius: 5,
+//                                 backgroundColor: "#fff3cd",
+//                                 color: "#a16207",
+//                                 fontSize: "10px",
+//                                 fontWeight: 700,
+//                                 whiteSpace: "nowrap",
+//                             }}
+//                         >
+//                             FURNISHED
+//                         </Box>
+//                     )}
+//                 </Box>
 
 //                 <Typography
 //                     color="text.secondary"
@@ -189,7 +295,7 @@ export default function PropertyMapCard({
 //                     {property.neighborhood
 //                         ? `${property.neighborhood}, `
 //                         : ""}
-//                     {property.city}
+//                     {property.city || ""}
 //                 </Typography>
 
 //                 <Typography
@@ -201,7 +307,10 @@ export default function PropertyMapCard({
 //                     {formattedPrice} MAD
 //                 </Typography>
 
-//                 <Typography fontSize="12px" color="text.secondary">
+//                 <Typography
+//                     fontSize="12px"
+//                     color="text.secondary"
+//                 >
 //                     {property.listingType} · {property.propertyType}
 //                 </Typography>
 
@@ -218,3 +327,4 @@ export default function PropertyMapCard({
 //         </Box>
 //     );
 // }
+

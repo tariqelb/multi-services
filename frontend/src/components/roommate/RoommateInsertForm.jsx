@@ -6,29 +6,22 @@ import axiosInstance from "../../api/axiosInstance";
 import {
     Box,
     Typography,
-    Divider,
     Stack,
     Chip,
-    Paper,
     Snackbar,
     Alert,
-    Grid,
-    TextField,
-    MenuItem,
-    Button,
-    Checkbox,
-    FormControlLabel,
     CircularProgress,
 } from "@mui/material";
 
-import HomeWorkIcon from "@mui/icons-material/HomeWork";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import PaymentsIcon from "@mui/icons-material/Payments";
-import TuneIcon from "@mui/icons-material/Tune";
-import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import DescriptionIcon from "@mui/icons-material/Description";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import HomeWorkIcon from "@mui/icons-material/HomeWork";
+
+import RoommateAnnouncementSection from "./RoommateAnnouncementSection";
+import RoommateLocationSection from "./RoommateLocationSection";
+import RoommateRentSection from "./RoommateRentSection";
+import RoommatePreferencesSection from "./RoommatePreferencesSection";
+import RoommateMediaSection from "./RoommateMediaSection";
+import RoommatePublishSection from "./RoommatePublishSection";
 
 // -----------------------------------------------------------------------------
 // Initial form values
@@ -82,87 +75,6 @@ const initialFormData = {
 };
 
 // -----------------------------------------------------------------------------
-// Section header
-// -----------------------------------------------------------------------------
-
-const SectionHeader = ({ icon, title, subtitle, number }) => (
-    <Box sx={{ mb: 3 }}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
-            <Box
-                sx={{
-                    width: 44,
-                    height: 44,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: "12px",
-                    bgcolor: "#EFF6FF",
-                    color: "#2563EB",
-                    flexShrink: 0,
-                    fontWeight: 700,
-                    fontSize: "1.1rem",
-                }}
-            >
-                {icon}
-            </Box>
-
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography
-                    variant="h6"
-                    sx={{
-                        fontWeight: 600,
-                        color: "#0F172A",
-                        fontSize: "1.08rem",
-                    }}
-                >
-                    {title}
-                </Typography>
-
-                <Typography
-                    variant="body2"
-                    sx={{ color: "#5B6577", mt: 0.3 }}
-                >
-                    {subtitle}
-                </Typography>
-            </Box>
-
-            <Chip
-                label={`0${number}`}
-                size="small"
-                sx={{
-                    fontWeight: 700,
-                    color: "#2563EB",
-                    bgcolor: "#EFF6FF",
-                    borderRadius: "8px",
-                }}
-            />
-        </Stack>
-
-        <Divider sx={{ mt: 2.5, borderColor: "#E2E8F0" }} />
-    </Box>
-);
-
-// -----------------------------------------------------------------------------
-// Section container
-// -----------------------------------------------------------------------------
-
-const SectionPaper = ({ children }) => (
-    <Paper
-        elevation={0}
-        sx={{
-            p: { xs: 2.5, sm: 3.5, md: 4 },
-            mb: 3,
-            border: "1px solid #E2E8F0",
-            borderRadius: "16px",
-            bgcolor: "#ffffff",
-            boxShadow: "0 3px 12px rgba(15, 23, 42, 0.025)",
-        }}
-    >
-        {children}
-    </Paper>
-);
-
-// -----------------------------------------------------------------------------
 // Main component
 // -----------------------------------------------------------------------------
 
@@ -170,8 +82,14 @@ export default function RoommateInsertForm({ onAddListing }) {
     const { t } = useTranslation();
 
     const fileInputRef = useRef(null);
+    const imagesRef = useRef([]);
 
-    const [formData, setFormData] = useState(initialFormData);
+    const [formData, setFormData] = useState(() => ({
+        ...initialFormData,
+        preferences: { ...initialFormData.preferences },
+        images: [],
+    }));
+
     const [errors, setErrors] = useState({});
 
     const [loading, setLoading] = useState(false);
@@ -185,7 +103,7 @@ export default function RoommateInsertForm({ onAddListing }) {
     });
 
     // -------------------------------------------------------------------------
-    // Translation helper
+    // Translation
     // -------------------------------------------------------------------------
 
     const translate = (key, fallback, options = {}) =>
@@ -234,6 +152,31 @@ export default function RoommateInsertForm({ onAddListing }) {
             severity,
         });
     };
+
+    const closeNotification = () => {
+        setNotification((previous) => ({
+            ...previous,
+            open: false,
+        }));
+    };
+
+    // -------------------------------------------------------------------------
+    // Keep a reference to the current images for unmount cleanup
+    // -------------------------------------------------------------------------
+
+    useEffect(() => {
+        imagesRef.current = formData.images;
+    }, [formData.images]);
+
+    useEffect(() => {
+        return () => {
+            imagesRef.current.forEach((image) => {
+                if (image?.url) {
+                    URL.revokeObjectURL(image.url);
+                }
+            });
+        };
+    }, []);
 
     // -------------------------------------------------------------------------
     // Load authenticated user's profile
@@ -320,21 +263,7 @@ export default function RoommateInsertForm({ onAddListing }) {
     }, []);
 
     // -------------------------------------------------------------------------
-    // Clean up image preview URLs when component unmounts
-    // -------------------------------------------------------------------------
-
-    useEffect(() => {
-        return () => {
-            formData.images.forEach((image) => {
-                if (image?.url) {
-                    URL.revokeObjectURL(image.url);
-                }
-            });
-        };
-    }, [formData.images]);
-
-    // -------------------------------------------------------------------------
-    // Handle regular fields
+    // Regular field changes
     // -------------------------------------------------------------------------
 
     const handleChange = (event) => {
@@ -352,7 +281,24 @@ export default function RoommateInsertForm({ onAddListing }) {
     };
 
     // -------------------------------------------------------------------------
-    // Handle nested roommate preferences
+    // City changes
+    // The city component returns the English city name.
+    // -------------------------------------------------------------------------
+
+    const handleCityChange = (city) => {
+        setFormData((previous) => ({
+            ...previous,
+            city: city || "",
+        }));
+
+        setErrors((previous) => ({
+            ...previous,
+            city: "",
+        }));
+    };
+
+    // -------------------------------------------------------------------------
+    // Nested roommate preferences
     // -------------------------------------------------------------------------
 
     const handlePreferenceChange = (event) => {
@@ -368,7 +314,7 @@ export default function RoommateInsertForm({ onAddListing }) {
     };
 
     // -------------------------------------------------------------------------
-    // Handle images
+    // Image upload
     // -------------------------------------------------------------------------
 
     const handleImageChange = (event) => {
@@ -694,7 +640,7 @@ export default function RoommateInsertForm({ onAddListing }) {
     // -------------------------------------------------------------------------
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
+        event?.preventDefault();
 
         if (loading || profileLoading) return;
 
@@ -763,11 +709,6 @@ export default function RoommateInsertForm({ onAddListing }) {
             return;
         }
 
-        // ---------------------------------------------------------------------
-        // Create FormData
-        // IMPORTANT: Every field must be appended only once.
-        // ---------------------------------------------------------------------
-
         const payload = new FormData();
 
         const submissionData = {
@@ -810,14 +751,12 @@ export default function RoommateInsertForm({ onAddListing }) {
             youtubeVideoUrl: formData.youtubeVideoUrl.trim(),
         };
 
-        // Append ordinary fields exactly once.
         Object.entries(submissionData).forEach(([key, value]) => {
             if (value !== undefined && value !== null) {
                 payload.append(key, String(value));
             }
         });
 
-        // Append nested preferences exactly once as JSON.
         const preferencesPayload = {
             gender: formData.preferences?.gender || "Any",
             smokingAllowed: Boolean(
@@ -833,7 +772,6 @@ export default function RoommateInsertForm({ onAddListing }) {
             JSON.stringify(preferencesPayload)
         );
 
-        // Append actual image files exactly once.
         formData.images.forEach((image) => {
             if (image?.file instanceof File) {
                 payload.append("images", image.file);
@@ -851,8 +789,6 @@ export default function RoommateInsertForm({ onAddListing }) {
                 }
             );
 
-            // Match the backend response:
-            // { message, roommateListing, availablePlaces, rentPerPerson }
             const createdListing =
                 response.data?.roommateListing ||
                 response.data?.listing ||
@@ -897,81 +833,104 @@ export default function RoommateInsertForm({ onAddListing }) {
     };
 
     // -------------------------------------------------------------------------
-    // Reusable input
+    // Compatibility adapters for the extracted section components
     // -------------------------------------------------------------------------
 
-    const renderField = (
-        name,
-        label,
-        options = {}
-    ) => {
-        const {
-            type = "text",
-            required = false,
-            multiline = false,
-            rows = 1,
-            select = false,
-            choices = [],
-            disabled = false,
-            helperText = "",
-            placeholder = "",
-        } = options;
-
-        return (
-            <TextField
-                fullWidth
-                name={name}
-                label={label}
-                type={type}
-                value={formData[name] ?? ""}
-                onChange={handleChange}
-                required={required}
-                multiline={multiline}
-                rows={rows}
-                select={select}
-                disabled={disabled}
-                placeholder={placeholder}
-                error={Boolean(errors[name])}
-                helperText={errors[name] || helperText}
-                sx={fieldSx}
-                InputLabelProps={
-                    type === "date"
-                        ? { shrink: true }
-                        : undefined
-                }
-            >
-                {select &&
-                    choices.map((choice) => (
-                        <MenuItem
-                            key={choice.value}
-                            value={choice.value}
-                        >
-                            {choice.label}
-                        </MenuItem>
-                    ))}
-            </TextField>
-        );
+    const purposeToSection = {
+        "Share My Property": "Share My Apartment",
+        "Find a Room": "Find a Room",
+        "Rent Together": "Rent Together",
     };
 
-    // -------------------------------------------------------------------------
-    // Purpose descriptions
-    // -------------------------------------------------------------------------
+    const purposeFromSection = {
+        "Share My Apartment": "Share My Property",
+        "Find a Room": "Find a Room",
+        "Rent Together": "Rent Together",
+    };
 
-    const purposeDescriptions = {
-        "Share My Property": translate(
-            "roommates.insert.purposeDescriptions.share",
-            "I already have accommodation and want to find people to share it with."
-        ),
+    const adaptedAnnouncementData = {
+        ...formData,
+        purpose: purposeToSection[formData.purpose] || formData.purpose,
+    };
 
-        "Find a Room": translate(
-            "roommates.insert.purposeDescriptions.find",
-            "I am looking for an available room in an existing shared property."
-        ),
+    const handleAnnouncementChange = (event) => {
+        if (event.target.name === "purpose") {
+            handleChange({
+                target: {
+                    ...event.target,
+                    value:
+                        purposeFromSection[event.target.value] ||
+                        event.target.value,
+                },
+            });
 
-        "Rent Together": translate(
-            "roommates.insert.purposeDescriptions.together",
-            "I want to find people to rent a property together."
-        ),
+            return;
+        }
+
+        handleChange(event);
+    };
+
+    const adaptedLocationData = {
+        ...formData,
+        furnishing: formData.furnishingStatus,
+        condition: formData.propertyCondition,
+        bedrooms: formData.rooms,
+    };
+
+    const locationFieldMap = {
+        furnishing: "furnishingStatus",
+        condition: "propertyCondition",
+        bedrooms: "rooms",
+    };
+
+    const handleLocationChange = (event) => {
+        const originalName =
+            locationFieldMap[event.target.name] || event.target.name;
+
+        handleChange({
+            target: {
+                ...event.target,
+                name: originalName,
+            },
+        });
+    };
+
+    const adaptedPreferencesData = {
+        ...formData,
+        preferredGender: formData.preferences.gender,
+        smokingAllowed: formData.preferences.smokingAllowed,
+        petsAllowed: formData.preferences.petsAllowed,
+    };
+
+    const handleAdaptedPreferenceChange = (event) => {
+        handlePreferenceChange({
+            target: {
+                ...event.target,
+                name:
+                    event.target.name === "preferredGender"
+                        ? "gender"
+                        : event.target.name,
+            },
+        });
+    };
+
+    const adaptedMediaData = {
+        ...formData,
+        youtubeLink: formData.youtubeVideoUrl,
+    };
+
+    const handleMediaChange = (event) => {
+        const originalName =
+            event.target.name === "youtubeLink"
+                ? "youtubeVideoUrl"
+                : event.target.name;
+
+        handleChange({
+            target: {
+                ...event.target,
+                name: originalName,
+            },
+        });
     };
 
     // -------------------------------------------------------------------------
@@ -1049,8 +1008,7 @@ export default function RoommateInsertForm({ onAddListing }) {
                         alignItems="center"
                         sx={{ mt: 2 }}
                     >
-                        <Box
-                            component="span"
+                        <Typography
                             sx={{
                                 color: "#10b981",
                                 fontWeight: 700,
@@ -1058,7 +1016,7 @@ export default function RoommateInsertForm({ onAddListing }) {
                             }}
                         >
                             ✓
-                        </Box>
+                        </Typography>
 
                         <Typography
                             variant="caption"
@@ -1074,987 +1032,65 @@ export default function RoommateInsertForm({ onAddListing }) {
 
                 {/* Form */}
                 <Box component="form" onSubmit={handleSubmit}>
-                    {/* Section 1: Announcement */}
-
-                    <SectionPaper>
-                        <SectionHeader
-                            number={1}
-                            icon={<DescriptionIcon />}
-                            title={translate(
-                                "roommates.insert.sections.announcement",
-                                "Announcement information"
-                            )}
-                            subtitle={translate(
-                                "roommates.insert.sections.announcementSubtitle",
-                                "Tell people what kind of roommate you are looking for."
-                            )}
+                    <Stack
+                        spacing={{ xs: 2, sm: 3, md: 3.5 }}
+                        sx={{
+                            width: "100%",
+                            "& > *": {
+                                minWidth: 0,
+                                width: "100%",
+                            },
+                        }}
+                    >
+                        <RoommateAnnouncementSection
+                            formData={adaptedAnnouncementData}
+                            errors={errors}
+                            onChange={handleAnnouncementChange}
+                            t={t}
                         />
 
-                        <Stack spacing={2.5}>
-                            {renderField(
-                                "purpose",
-                                translate(
-                                    "roommates.fields.purpose",
-                                    "Announcement purpose"
-                                ),
-                                {
-                                    select: true,
-                                    required: true,
-                                    choices: [
-                                        {
-                                            value: "Share My Property",
-                                            label: translate(
-                                                "roommates.purpose.Share My Property",
-                                                "Share My Property"
-                                            ),
-                                        },
-                                        {
-                                            value: "Find a Room",
-                                            label: translate(
-                                                "roommates.purpose.Find a Room",
-                                                "Find a Room"
-                                            ),
-                                        },
-                                        {
-                                            value: "Rent Together",
-                                            label: translate(
-                                                "roommates.purpose.Rent Together",
-                                                "Rent Together"
-                                            ),
-                                        },
-                                    ],
-                                }
-                            )}
-
-                            <Alert severity="info" sx={{ borderRadius: 2 }}>
-                                {purposeDescriptions[formData.purpose]}
-                            </Alert>
-
-                            {renderField(
-                                "title",
-                                translate(
-                                    "roommates.fields.title",
-                                    "Announcement title"
-                                ),
-                                {
-                                    required: true,
-                                    placeholder: translate(
-                                        "roommates.insert.titlePlaceholder",
-                                        "Example: Looking for 2 roommates in Marrakech"
-                                    ),
-                                    helperText: `${formData.title.length}/120`,
-                                }
-                            )}
-
-                            {renderField(
-                                "description",
-                                translate(
-                                    "roommates.fields.description",
-                                    "Description"
-                                ),
-                                {
-                                    required: true,
-                                    multiline: true,
-                                    rows: 5,
-                                    placeholder: translate(
-                                        "roommates.insert.descriptionPlaceholder",
-                                        "Describe the accommodation, expectations, and the type of roommate you are looking for."
-                                    ),
-                                    helperText: `${formData.description.length}/3000`,
-                                }
-                            )}
-                        </Stack>
-                    </SectionPaper>
-
-                    {/* Section 2: Location and accommodation */}
-
-                    <SectionPaper>
-                        <SectionHeader
-                            number={2}
-                            icon={<LocationOnIcon />}
-                            title={translate(
-                                "roommates.insert.sections.location",
-                                "Location and accommodation"
-                            )}
-                            subtitle={translate(
-                                "roommates.insert.sections.locationSubtitle",
-                                "Provide information about the property and its location."
-                            )}
+                        <RoommateLocationSection
+                            formData={adaptedLocationData}
+                            errors={errors}
+                            onChange={handleLocationChange}
+                            onCityChange={handleCityChange}
+                            t={t}
                         />
 
-                        <Grid container spacing={2.5}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "city",
-                                    translate(
-                                        "roommates.fields.city",
-                                        "City"
-                                    ),
-                                    {
-                                        required: true,
-                                        placeholder: "Marrakech",
-                                    }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "neighborhood",
-                                    translate(
-                                        "roommates.fields.neighborhood",
-                                        "Neighborhood"
-                                    ),
-                                    {
-                                        placeholder: "Gueliz",
-                                    }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12 }}>
-                                {renderField(
-                                    "fullAddress",
-                                    translate(
-                                        "roommates.fields.fullAddress",
-                                        "Full address"
-                                    ),
-                                    {
-                                        placeholder: translate(
-                                            "roommates.insert.addressPlaceholder",
-                                            "Optional address details"
-                                        ),
-                                    }
-                                )}
-
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    sx={{ display: "block", mt: 0.5 }}
-                                >
-                                    {translate(
-                                        "roommates.insert.addressPrivacy",
-                                        "Your full address should only be shared with people you choose."
-                                    )}
-                                </Typography>
-                            </Grid>
-
-                            <Grid size={{ xs: 12 }}>
-                                {renderField(
-                                    "mapLink",
-                                    translate(
-                                        "roommates.fields.mapLink",
-                                        "Google Maps link"
-                                    ),
-                                    {
-                                        placeholder: "https://maps.google.com/...",
-                                    }
-                                )}
-                            </Grid>
-
-                            {formData.purpose !== "Rent Together" && (
-                                <>
-                                    <Grid size={{ xs: 12, sm: 6 }}>
-                                        {renderField(
-                                            "propertyType",
-                                            translate(
-                                                "roommates.fields.propertyType",
-                                                "Property type"
-                                            ),
-                                            {
-                                                select: true,
-                                                required: true,
-                                                choices: [
-                                                    "Apartment",
-                                                    "House",
-                                                    "Villa",
-                                                    "Studio",
-                                                    "Room",
-                                                    "Other",
-                                                ].map((value) => ({
-                                                    value,
-                                                    label: translate(
-                                                        `properties.types.${value}`,
-                                                        value
-                                                    ),
-                                                })),
-                                            }
-                                        )}
-                                    </Grid>
-
-                                    <Grid size={{ xs: 12, sm: 6 }}>
-                                        {renderField(
-                                            "furnishingStatus",
-                                            translate(
-                                                "roommates.fields.furnishing",
-                                                "Furnishing"
-                                            ),
-                                            {
-                                                select: true,
-                                                choices: [
-                                                    {
-                                                        value: "Furnished",
-                                                        label: translate(
-                                                            "roommates.furnishing.Furnished",
-                                                            "Furnished"
-                                                        ),
-                                                    },
-                                                    {
-                                                        value: "Unfurnished",
-                                                        label: translate(
-                                                            "roommates.furnishing.Unfurnished",
-                                                            "Unfurnished"
-                                                        ),
-                                                    },
-                                                ],
-                                            }
-                                        )}
-                                    </Grid>
-                                </>
-                            )}
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "surface",
-                                    translate(
-                                        "roommates.fields.surface",
-                                        "Surface (m²)"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "propertyCondition",
-                                    translate(
-                                        "roommates.fields.condition",
-                                        "Property condition"
-                                    ),
-                                    {
-                                        select: true,
-                                        choices: [
-                                            "New",
-                                            "Good",
-                                            "Needs Renovation",
-                                        ].map((value) => ({
-                                            value,
-                                            label: translate(
-                                                `roommates.condition.${value}`,
-                                                value
-                                            ),
-                                        })),
-                                    }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "rooms",
-                                    translate(
-                                        "roommates.fields.rooms",
-                                        "Bedrooms"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "salons",
-                                    translate(
-                                        "roommates.fields.salons",
-                                        "Living rooms"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "bathrooms",
-                                    translate(
-                                        "roommates.fields.bathrooms",
-                                        "Bathrooms"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "floor",
-                                    translate(
-                                        "roommates.fields.floor",
-                                        "Floor"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12 }}>
-                                <Divider sx={{ my: 1 }} />
-
-                                <Typography
-                                    fontWeight={600}
-                                    sx={{ mb: 1 }}
-                                >
-                                    {translate(
-                                        "roommates.insert.features",
-                                        "Property features"
-                                    )}
-                                </Typography>
-
-                                <Stack
-                                    direction={{ xs: "column", sm: "row" }}
-                                    flexWrap="wrap"
-                                    gap={1}
-                                >
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                name="hasBalcony"
-                                                checked={formData.hasBalcony}
-                                                onChange={handleChange}
-                                            />
-                                        }
-                                        label={translate(
-                                            "roommates.fields.balcony",
-                                            "Balcony"
-                                        )}
-                                    />
-
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                name="hasKitchen"
-                                                checked={formData.hasKitchen}
-                                                onChange={handleChange}
-                                            />
-                                        }
-                                        label={translate(
-                                            "roommates.fields.kitchen",
-                                            "Kitchen"
-                                        )}
-                                    />
-
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                name="hasParking"
-                                                checked={formData.hasParking}
-                                                onChange={handleChange}
-                                            />
-                                        }
-                                        label={translate(
-                                            "roommates.fields.parking",
-                                            "Parking"
-                                        )}
-                                    />
-                                </Stack>
-                            </Grid>
-                        </Grid>
-                    </SectionPaper>
-
-                    {/* Section 3: Rent and capacity */}
-
-                    <SectionPaper>
-                        <SectionHeader
-                            number={3}
-                            icon={<PaymentsIcon />}
-                            title={translate(
-                                "roommates.insert.sections.rent",
-                                "Rent and occupancy"
-                            )}
-                            subtitle={translate(
-                                "roommates.insert.sections.rentSubtitle",
-                                "Specify the rent, rental period, and number of roommates."
-                            )}
+                        <RoommateRentSection
+                            formData={formData}
+                            errors={errors}
+                            onChange={handleChange}
+                            t={t}
                         />
 
-                        <Grid container spacing={2.5}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "totalRent",
-                                    translate(
-                                        "roommates.fields.totalRent",
-                                        "Total property rent"
-                                    ),
-                                    {
-                                        type: "number",
-                                        required:
-                                            formData.purpose ===
-                                            "Share My Property",
-                                    }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "rentalPeriod",
-                                    translate(
-                                        "roommates.fields.rentalPeriod",
-                                        "Rental period"
-                                    ),
-                                    {
-                                        select: true,
-                                        choices: [
-                                            {
-                                                value: "Daily",
-                                                label: translate(
-                                                    "roommates.rentalPeriod.Daily",
-                                                    "Daily"
-                                                ),
-                                            },
-                                            {
-                                                value: "Monthly",
-                                                label: translate(
-                                                    "roommates.rentalPeriod.Monthly",
-                                                    "Monthly"
-                                                ),
-                                            },
-                                        ],
-                                    }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "individualRoomPrice",
-                                    translate(
-                                        "roommates.fields.individualRoomPrice",
-                                        "Individual room price"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "rentSplitType",
-                                    translate(
-                                        "roommates.fields.rentSplitType",
-                                        "Rent split"
-                                    ),
-                                    {
-                                        select: true,
-                                        choices: [
-                                            {
-                                                value: "Equal",
-                                                label: translate(
-                                                    "roommates.rentSplit.Equal",
-                                                    "Equal"
-                                                ),
-                                            },
-                                            {
-                                                value: "Custom",
-                                                label: translate(
-                                                    "roommates.rentSplit.Custom",
-                                                    "Custom"
-                                                ),
-                                            },
-                                        ],
-                                    }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 4 }}>
-                                {renderField(
-                                    "deposit",
-                                    translate(
-                                        "roommates.fields.deposit",
-                                        "Deposit"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 4 }}>
-                                {renderField(
-                                    "syndicateFees",
-                                    translate(
-                                        "roommates.fields.syndicateFees",
-                                        "Syndicate fees"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 4 }}>
-                                {renderField(
-                                    "otherExpenses",
-                                    translate(
-                                        "roommates.fields.otherExpenses",
-                                        "Other expenses"
-                                    ),
-                                    { type: "number" }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12 }}>
-                                <Divider sx={{ my: 1 }} />
-
-                                <Typography
-                                    fontWeight={600}
-                                    sx={{ mb: 2 }}
-                                >
-                                    {translate(
-                                        "roommates.insert.capacity",
-                                        "Roommate capacity"
-                                    )}
-                                </Typography>
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 4 }}>
-                                {renderField(
-                                    "totalPeople",
-                                    translate(
-                                        "roommates.fields.totalPeople",
-                                        "Total people"
-                                    ),
-                                    {
-                                        type: "number",
-                                        required: true,
-                                    }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 4 }}>
-                                {renderField(
-                                    "currentPeople",
-                                    translate(
-                                        "roommates.fields.currentPeople",
-                                        "Current occupants"
-                                    ),
-                                    {
-                                        type: "number",
-                                        required: true,
-                                    }
-                                )}
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 4 }}>
-                                <TextField
-                                    fullWidth
-                                    label={translate(
-                                        "roommates.fields.availablePlaces",
-                                        "Available places"
-                                    )}
-                                    value={Math.max(
-                                        0,
-                                        Number(formData.totalPeople || 0) -
-                                        Number(formData.currentPeople || 0)
-                                    )}
-                                    disabled
-                                    sx={fieldSx}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {renderField(
-                                    "availableFrom",
-                                    translate(
-                                        "roommates.fields.availableFrom",
-                                        "Available from"
-                                    ),
-                                    { type: "date" }
-                                )}
-                            </Grid>
-                        </Grid>
-                    </SectionPaper>
-
-                    {/* Section 4: Roommate preferences */}
-
-                    <SectionPaper>
-                        <SectionHeader
-                            number={4}
-                            icon={<TuneIcon />}
-                            title={translate(
-                                "roommates.insert.sections.preferences",
-                                "Roommate preferences"
-                            )}
-                            subtitle={translate(
-                                "roommates.insert.sections.preferencesSubtitle",
-                                "Describe the type of roommate you would prefer."
-                            )}
+                        <RoommatePreferencesSection
+                            formData={adaptedPreferencesData}
+                            onChange={handleAdaptedPreferenceChange}
+                            t={t}
                         />
 
-                        <Grid container spacing={2.5}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <TextField
-                                    fullWidth
-                                    select
-                                    name="gender"
-                                    label={translate(
-                                        "roommates.fields.gender",
-                                        "Preferred gender"
-                                    )}
-                                    value={formData.preferences.gender}
-                                    onChange={handlePreferenceChange}
-                                    sx={fieldSx}
-                                >
-                                    {[
-                                        {
-                                            value: "Any",
-                                            label: translate(
-                                                "roommates.preferences.any",
-                                                "Any"
-                                            ),
-                                        },
-                                        {
-                                            value: "Male",
-                                            label: translate(
-                                                "roommates.preferences.male",
-                                                "Male"
-                                            ),
-                                        },
-                                        {
-                                            value: "Female",
-                                            label: translate(
-                                                "roommates.preferences.female",
-                                                "Female"
-                                            ),
-                                        },
-                                    ].map((option) => (
-                                        <MenuItem
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </Grid>
-
-                            <Grid size={{ xs: 12 }}>
-                                <Stack
-                                    direction={{ xs: "column", sm: "row" }}
-                                    gap={1}
-                                >
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                name="smokingAllowed"
-                                                checked={
-                                                    formData.preferences
-                                                        .smokingAllowed
-                                                }
-                                                onChange={
-                                                    handlePreferenceChange
-                                                }
-                                            />
-                                        }
-                                        label={translate(
-                                            "roommates.fields.smokingAllowed",
-                                            "Smoking allowed"
-                                        )}
-                                    />
-
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                name="petsAllowed"
-                                                checked={
-                                                    formData.preferences
-                                                        .petsAllowed
-                                                }
-                                                onChange={
-                                                    handlePreferenceChange
-                                                }
-                                            />
-                                        }
-                                        label={translate(
-                                            "roommates.fields.petsAllowed",
-                                            "Pets allowed"
-                                        )}
-                                    />
-                                </Stack>
-                            </Grid>
-                        </Grid>
-                    </SectionPaper>
-
-                    {/* Section 5: Photos and video */}
-
-                    <SectionPaper>
-                        <SectionHeader
-                            number={5}
-                            icon={<PhotoLibraryIcon />}
-                            title={translate(
-                                "roommates.insert.sections.media",
-                                "Photos and video"
+                        <RoommateMediaSection
+                            images={formData.images}
+                            previews={formData.images.map(
+                                (image) => image.url
                             )}
-                            subtitle={translate(
-                                "roommates.insert.sections.mediaSubtitle",
-                                "Add photos and an optional YouTube video of the accommodation."
-                            )}
+                            onImagesChange={handleImageChange}
+                            onRemoveImage={handleRemoveImage}
+                            formData={adaptedMediaData}
+                            onChange={handleMediaChange}
+                            errors={errors}
+                            t={t}
                         />
 
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            multiple
-                            hidden
-                            onChange={handleImageChange}
+                        <RoommatePublishSection
+                            loading={loading}
+                            profileLoading={profileLoading}
+                            profile={profile}
+                            onSubmit={handleSubmit}
+                            t={t}
                         />
-
-                        <Button
-                            variant="outlined"
-                            startIcon={<CloudUploadIcon />}
-                            onClick={() =>
-                                fileInputRef.current?.click()
-                            }
-                            sx={{
-                                borderRadius: "10px",
-                                textTransform: "none",
-                                fontWeight: 600,
-                                py: 1.2,
-                                px: 2.5,
-                            }}
-                        >
-                            {translate(
-                                "roommates.insert.uploadImages",
-                                "Upload photos"
-                            )}
-                        </Button>
-
-                        <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            display="block"
-                            sx={{ mt: 1 }}
-                        >
-                            {translate(
-                                "roommates.insert.imageRules",
-                                "JPG, PNG or WEBP. Maximum 15 images, 5 MB per image."
-                            )}
-                        </Typography>
-
-                        {formData.images.length > 0 && (
-                            <Grid container spacing={1.5} sx={{ mt: 2 }}>
-                                {formData.images.map((image, index) => (
-                                    <Grid
-                                        key={`${image.url}-${index}`}
-                                        size={{ xs: 6, sm: 4, md: 3 }}
-                                    >
-                                        <Box
-                                            sx={{
-                                                position: "relative",
-                                                height: 140,
-                                                borderRadius: 2,
-                                                overflow: "hidden",
-                                                border: "1px solid #E2E8F0",
-                                            }}
-                                        >
-                                            <Box
-                                                component="img"
-                                                src={image.url}
-                                                alt={`Roommate image ${index + 1}`}
-                                                sx={{
-                                                    width: "100%",
-                                                    height: "100%",
-                                                    objectFit: "cover",
-                                                }}
-                                            />
-
-                                            <Button
-                                                size="small"
-                                                color="error"
-                                                variant="contained"
-                                                onClick={() =>
-                                                    handleRemoveImage(index)
-                                                }
-                                                sx={{
-                                                    position: "absolute",
-                                                    top: 6,
-                                                    right: 6,
-                                                    minWidth: 32,
-                                                    width: 32,
-                                                    height: 32,
-                                                    p: 0,
-                                                    borderRadius: "50%",
-                                                }}
-                                            >
-                                                <DeleteOutlineOutlinedIcon fontSize="small" />
-                                            </Button>
-                                        </Box>
-                                    </Grid>
-                                ))}
-                            </Grid>
-                        )}
-
-                        <Divider sx={{ my: 3 }} />
-
-                        {renderField(
-                            "youtubeVideoUrl",
-                            translate(
-                                "roommates.fields.youtubeVideoUrl",
-                                "YouTube video URL (optional)"
-                            ),
-                            {
-                                placeholder: "https://www.youtube.com/watch?v=...",
-                                helperText: translate(
-                                    "roommates.insert.youtubeHelp",
-                                    "Paste a YouTube video link. Video files cannot be uploaded."
-                                ),
-                            }
-                        )}
-                    </SectionPaper>
-
-                    {/* Section 6: Publish */}
-
-                    <SectionPaper>
-                        <SectionHeader
-                            number={6}
-                            icon={<HomeWorkIcon />}
-                            title={translate(
-                                "roommates.insert.sections.publish",
-                                "Publish announcement"
-                            )}
-                            subtitle={translate(
-                                "roommates.insert.sections.publishSubtitle",
-                                "Review your information before publishing."
-                            )}
-                        />
-
-                        {profileLoading ? (
-                            <Stack
-                                direction="row"
-                                alignItems="center"
-                                spacing={1.5}
-                            >
-                                <CircularProgress size={22} />
-
-                                <Typography color="text.secondary">
-                                    {translate(
-                                        "roommates.insert.loadingProfile",
-                                        "Loading your profile..."
-                                    )}
-                                </Typography>
-                            </Stack>
-                        ) : (
-                            <Box>
-                                <Typography
-                                    fontWeight={600}
-                                    sx={{ mb: 1 }}
-                                >
-                                    {translate(
-                                        "roommates.insert.publisher",
-                                        "Publishing as"
-                                    )}
-                                </Typography>
-
-                                <Typography color="text.secondary">
-                                    {profile
-                                        ? `${profile.firstName} ${profile.lastName}`.trim()
-                                        : translate(
-                                            "roommates.insert.profileUnavailable",
-                                            "Profile unavailable"
-                                        )}
-                                </Typography>
-
-                                <Stack
-                                    direction={{ xs: "column", sm: "row" }}
-                                    spacing={1}
-                                    sx={{ mt: 2 }}
-                                >
-                                    <Chip
-                                        label={
-                                            profile?.emailVerified
-                                                ? translate(
-                                                    "roommates.insert.emailVerified",
-                                                    "Email verified"
-                                                )
-                                                : translate(
-                                                    "roommates.insert.emailNotVerified",
-                                                    "Email not verified"
-                                                )
-                                        }
-                                        color={
-                                            profile?.emailVerified
-                                                ? "success"
-                                                : "warning"
-                                        }
-                                        variant="outlined"
-                                    />
-
-                                    <Chip
-                                        label={
-                                            profile?.whatsappVerified
-                                                ? translate(
-                                                    "roommates.insert.whatsappVerified",
-                                                    "WhatsApp verified"
-                                                )
-                                                : translate(
-                                                    "roommates.insert.whatsappNotVerified",
-                                                    "WhatsApp not verified"
-                                                )
-                                        }
-                                        color={
-                                            profile?.whatsappVerified
-                                                ? "success"
-                                                : "warning"
-                                        }
-                                        variant="outlined"
-                                    />
-                                </Stack>
-                            </Box>
-                        )}
-
-                        <Divider sx={{ my: 3 }} />
-
-                        <Stack
-                            direction={{ xs: "column", sm: "row" }}
-                            spacing={2}
-                            justifyContent="flex-end"
-                        >
-                            <Button
-                                variant="outlined"
-                                color="inherit"
-                                disabled={loading}
-                                onClick={resetForm}
-                                sx={{
-                                    borderRadius: "10px",
-                                    textTransform: "none",
-                                    fontWeight: 600,
-                                    px: 3,
-                                    py: 1.2,
-                                }}
-                            >
-                                {translate(
-                                    "roommates.insert.reset",
-                                    "Reset form"
-                                )}
-                            </Button>
-
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                disabled={loading || profileLoading}
-                                sx={{
-                                    borderRadius: "10px",
-                                    textTransform: "none",
-                                    fontWeight: 700,
-                                    px: 4,
-                                    py: 1.2,
-                                    bgcolor: "#2563EB",
-                                    "&:hover": {
-                                        bgcolor: "#1D4ED8",
-                                    },
-                                }}
-                            >
-                                {loading ? (
-                                    <CircularProgress
-                                        size={23}
-                                        color="inherit"
-                                    />
-                                ) : (
-                                    translate(
-                                        "roommates.insert.publish",
-                                        "Publish announcement"
-                                    )
-                                )}
-                            </Button>
-                        </Stack>
-                    </SectionPaper>
+                    </Stack>
                 </Box>
             </Box>
 
@@ -2062,12 +1098,7 @@ export default function RoommateInsertForm({ onAddListing }) {
             <Snackbar
                 open={notification.open}
                 autoHideDuration={5000}
-                onClose={() =>
-                    setNotification((previous) => ({
-                        ...previous,
-                        open: false,
-                    }))
-                }
+                onClose={closeNotification}
                 anchorOrigin={{
                     vertical: "top",
                     horizontal: "right",
@@ -2076,12 +1107,7 @@ export default function RoommateInsertForm({ onAddListing }) {
                 <Alert
                     severity={notification.severity}
                     variant="filled"
-                    onClose={() =>
-                        setNotification((previous) => ({
-                            ...previous,
-                            open: false,
-                        }))
-                    }
+                    onClose={closeNotification}
                     sx={{ width: "100%" }}
                 >
                     {notification.message}

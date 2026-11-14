@@ -1,4 +1,6 @@
-//app/backend/routes/profile/profileRouter.js
+
+// app/backend/routes/profile/profileRouter.js
+
 import { Router } from "express";
 
 import authMiddleware from "../../middleware/authMiddleware.js";
@@ -23,22 +25,23 @@ import {
 
 const router = Router();
 
-// Public publisher profile.
-// This route is accessible without authentication.
-router.get("/:userId", getPublicProfile);
+/*
+|--------------------------------------------------------------------------
+| Private profile routes
+|--------------------------------------------------------------------------
+| Keep these BEFORE /:userId to prevent "me" from being treated as a user ID.
+*/
 
-// Private profile routes.
-router.put("/me", authMiddleware, updateMyProfile);
-
+// Get my profile
 router.get("/me", authMiddleware, getMyProfile);
 
-router.patch(
-    "/me/password",
-    authMiddleware,
-    updateMyPassword
-);
+// Update my profile
+router.put("/me", authMiddleware, updateMyProfile);
 
-// Notification preferences.
+// Update password
+router.patch("/me/password", authMiddleware, updateMyPassword);
+
+// Notification preferences
 router.get(
     "/me/notification-preferences",
     authMiddleware,
@@ -51,16 +54,30 @@ router.patch(
     updateMyNotificationPreferences
 );
 
-// Language preference.
+// Language preference
 router.patch(
     "/me/language",
     authMiddleware,
     updateMyLanguage
 );
 
+/*
+|--------------------------------------------------------------------------
+| Public profile routes
+|--------------------------------------------------------------------------
+*/
 
+// Public user profile
+router.get("/:userId", getPublicProfile);
+
+// User reviews
 router.get("/:userId/reviews", getUserReviews);
-router.post("/:userId/reviews", authMiddleware, createUserReview);
 
+// Create a review
+router.post(
+    "/:userId/reviews",
+    authMiddleware,
+    createUserReview
+);
 
 export default router;

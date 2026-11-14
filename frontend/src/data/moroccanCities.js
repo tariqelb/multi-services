@@ -1,4 +1,4 @@
-
+///home/tariq/multi-services/app/frontend/src/data/moroccanCities.js
 const cityNames = [
     ["Agadir", "أكادير"],
     ["Ain Harrouda", "عين حرودة"],

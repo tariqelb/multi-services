@@ -229,6 +229,20 @@ const roommateListingSchema = new mongoose.Schema(
             default: "Open",
             index: true,
         },
+        location: {
+            lat: {
+                type: Number,
+                default: null,
+                min: -90,
+                max: 90,
+            },
+            lng: {
+                type: Number,
+                default: null,
+                min: -180,
+                max: 180,
+            },
+        },
     },
     {
         timestamps: true,

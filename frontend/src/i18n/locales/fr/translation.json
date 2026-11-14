@@ -2,20 +2,23 @@
     "topbar": {
         "myProfile": "Mon profil",
         "settings": "Paramètres",
-        "notification": "Notifications",
+        "notification": "Notification",
+        "myPublication": "Mes publications",
+        "saved": "Enregistrés",
         "logout": "Déconnexion",
         "member": "Membre",
         "user": "Utilisateur"
     },
     "sidebar": {
         "home": "Accueil",
-        "properties": "Propriétés",
+        "properties": "Trouver un bien immobilier",
+        "furnishedProperties": "Trouver une location meublée",
         "externalListing": "Annonces externes",
-        "findbymap": "Trouver sur la carte",
-        "publish": "Publier",
+        "findbymap": "Rechercher sur la carte",
+        "publish": "Publier un bien immobilier",
         "myPublication": "Mes publications",
         "saved": "Enregistrés",
-        "alert": "Alerte",
+        "alert": "Alertes",
         "notifications": "Notifications",
         "feedback": "Commentaires",
         "settings": "Paramètres",
@@ -23,8 +26,10 @@
         "addExternalListing": "Ajouter une annonce externe",
         "systemsOnline": "Tous les systèmes sont opérationnels",
         "knowledge": "Centre de connaissances",
-        "knowledgeManagement": "Gestion du centre de connaissances",
-        "findRoommate": "Trouver un colocataire"
+        "knowledgeManagement": "Gestion des connaissances",
+        "findRoommate": "Trouver un colocataire",
+        "establishments": "Hôtels et Riads",
+        "publishEstablishment": "Publier un établissement"
     },
     "middleContent": {
         "overview": "Aperçu de {{section}}",
@@ -261,7 +266,9 @@
             "surface": "Superficie",
             "rooms": "Chambres",
             "salons": "Salons",
-            "bathrooms": "Salles de bain"
+            "bathrooms": "Salles de bain",
+            "furnished": "Meublé",
+            "unfurnished": "Non meublé"
         },
         "details": {
             "title": "Détails du bien immobilier",
@@ -585,10 +592,21 @@
                 "archive": "Impossible d'archiver l'alerte.",
                 "restore": "Impossible de restaurer l'alerte."
             }
+        },
+        "furnished": {
+            "title": "Locations meublées",
+            "subtitle": "Trouvez des villas, studios, chambres, appartements et maisons meublés à louer à la journée ou au mois.",
+            "filterTitle": "Trouver un logement meublé",
+            "propertyType": "Type de logement",
+            "categoriesAriaLabel": "Catégories de logements meublés",
+            "rentalPeriod": "Durée de location",
+            "allPeriods": "Toutes les durées",
+            "daily": "À la journée",
+            "monthly": "Au mois",
+            "listingsTitle": "Logements meublés disponibles",
+            "emptyTitle": "Aucune location meublée trouvée",
+            "emptyDescription": "Essayez de sélectionner un autre type de logement ou une autre durée de location."
         }
-
-
-
     },
     "notifications": {
         "title": "Notifications",
@@ -1696,9 +1714,673 @@
         "reviewSubmitError": "Impossible d'envoyer votre avis.",
         "reviewsLoadError": "Impossible de charger les avis.",
         "anonymousReviewer": "Utilisateur"
-
-
-
-
+    },
+    "roommates": {
+        "properties": {
+            "types": {
+                "apartment": "Appartement",
+                "house": "Maison",
+                "villa": "Villa",
+                "studio": "Studio",
+                "room": "Chambre",
+                "other": "Autre"
+            },
+            "rentalPeriod": {
+                "daily": "Journalier",
+                "monthly": "Mensuel"
+            }
+        },
+        "form": {
+            "rentOccupancy": "Loyer et occupation",
+            "rentDescription": "Définissez le prix du loyer et les places disponibles.",
+            "totalRent": "Loyer total",
+            "individualRoomPrice": "Prix individuel de la chambre",
+            "deposit": "Caution",
+            "syndicateFees": "Frais de syndic",
+            "otherExpenses": "Autres dépenses",
+            "totalPeople": "Nombre total d'occupants",
+            "currentPeople": "Occupants actuels",
+            "availablePlaces": "Places disponibles",
+            "rentalPeriod": "Période de location",
+            "rentSplitType": "Type de répartition du loyer",
+            "availableFrom": "Disponible à partir du",
+            "announcement": "Annonce",
+            "announcementDescription": "Présentez votre logement ou expliquez ce que vous recherchez.",
+            "title": "Titre",
+            "titlePlaceholder": "Exemple : Je cherche 2 colocataires à Marrakech",
+            "description": "Description",
+            "descriptionPlaceholder": "Décrivez le logement et vos attentes.",
+            "purpose": "Objectif",
+            "location": "Localisation et logement",
+            "locationDescription": "Fournissez des informations sur le logement.",
+            "neighborhood": "Quartier",
+            "fullAddress": "Adresse complète",
+            "mapLink": "Lien Google Maps",
+            "propertyType": "Type de bien",
+            "furnishing": "Ameublement",
+            "surface": "Superficie (m²)",
+            "condition": "État du logement",
+            "bedrooms": "Chambres",
+            "salons": "Salons",
+            "bathrooms": "Salles de bain",
+            "floor": "Étage",
+            "photosVideo": "Photos et vidéo",
+            "mediaDescription": "Ajoutez des photos et éventuellement une vidéo YouTube.",
+            "uploadPhotos": "Télécharger des photos",
+            "imageRequirements": "15 images maximum. Formats JPG, PNG ou WEBP. 5 Mo maximum par image.",
+            "youtubeLink": "Lien de la vidéo YouTube",
+            "preferences": "Préférences concernant les colocataires",
+            "preferencesDescription": "Choisissez les préférences qui comptent pour vous.",
+            "preferredGender": "Genre préféré",
+            "smokingAllowed": "Tabac autorisé",
+            "petsAllowed": "Animaux autorisés",
+            "publishTitle": "Publier votre annonce",
+            "publishDescription": "Vérifiez vos informations avant de publier votre annonce de colocation.",
+            "verificationRequired": "Veuillez vérifier votre adresse e-mail et votre numéro WhatsApp avant de publier.",
+            "publishing": "Publication en cours...",
+            "publish": "Publier l'annonce"
+        },
+        "rentSplit": {
+            "equal": "Égal",
+            "custom": "Personnalisé"
+        },
+        "title": "Trouver un colocataire",
+        "subtitle": "Trouvez une chambre, partagez votre logement ou rencontrez des personnes souhaitant louer ensemble.",
+        "announcements": "Annonces",
+        "addAnnouncement": "Ajouter une annonce",
+        "results": "annonces trouvées",
+        "errors": {
+            "loadFailed": "Impossible de charger les annonces de colocation. Veuillez réessayer."
+        },
+        "empty": {
+            "title": "Aucune annonce de colocation trouvée",
+            "description": "Essayez de modifier vos filtres ou de rechercher une autre ville."
+        },
+        "filters": {
+            "allPurposes": "Toutes les annonces",
+            "allPropertyTypes": "Tous les types de biens",
+            "propertyType": "Type de bien",
+            "rentalPeriod": "Période de location",
+            "allPeriods": "Toutes les périodes",
+            "city": "Ville",
+            "allCities": "Toutes les villes",
+            "search": "Rechercher des annonces...",
+            "clear": "Effacer les filtres"
+        },
+        "purpose": {
+            "shareMyProperty": "Partager mon logement",
+            "findARoom": "Trouver une chambre",
+            "shareApartment": "Partager mon appartement",
+            "findRoom": "Trouver une chambre",
+            "rentTogether": "Louer ensemble",
+            "Share My Property": "Partager mon logement",
+            "Share My Apartment": "Partager mon appartement",
+            "Find a Room": "Trouver une chambre",
+            "Rent Together": "Louer ensemble"
+        },
+       "pagination": {
+            "results": "{{count}} annonces trouvées",
+            "label": "Pages des annonces de colocation",
+            "pageInfo": "Page {{current}} sur {{total}}",
+            "first": "Première page",
+            "last": "Dernière page",
+            "next": "Page suivante",
+            "previous": "Page précédente",
+            "goToPage": "Aller à la page {{page}}"
+        },
+        "insert": {
+            "cityPlaceholder": "Sélectionnez une ville marocaine",
+            "badge": "ANNONCE DE COLOCATION",
+            "title": "Créer une annonce de colocation",
+            "subtitle": "Partagez votre logement, trouvez une chambre ou contactez des personnes souhaitant louer ensemble.",
+            "requiredFields": "Les champs marqués d'un * sont obligatoires.",
+            "validation": {
+                "required": "Ce champ est obligatoire.",
+                "titleLength": "Le titre doit contenir entre 5 et 120 caractères.",
+                "descriptionLength": "La description ne peut pas dépasser 3000 caractères.",
+                "invalidCapacity": "Saisissez un nombre total de personnes valide.",
+                "invalidOccupants": "Saisissez un nombre valide d'occupants actuels.",
+                "capacityExceeded": "Le nombre d'occupants actuels ne peut pas dépasser la capacité totale.",
+                "availablePlaceRequired": "Vous devez disposer d'au moins une place disponible.",
+                "nonNegativeNumber": "Saisissez un nombre positif ou égal à zéro.",
+                "surfacePositive": "La superficie doit être supérieure à zéro.",
+                "invalidMapUrl": "Saisissez une URL Google Maps valide.",
+                "invalidYoutubeUrl": "Saisissez une URL de vidéo YouTube valide.",
+                "invalidDate": "Saisissez une date valide."
+            },
+            "verification": {
+                "email": "la vérification de votre adresse e-mail",
+                "whatsapp": "la vérification de WhatsApp"
+            },
+            "notifications": {
+                "profileLoadError": "Impossible de charger votre profil. Veuillez réessayer.",
+                "invalidImages": "Certaines images ont été refusées. Utilisez des fichiers JPG, PNG ou WEBP de 5 Mo maximum.",
+                "maxImages": "Vous pouvez télécharger un maximum de 15 images.",
+                "profileVerifyError": "Impossible de vérifier votre compte. Veuillez recharger la page.",
+                "verifyBeforePublishing": "Veuillez terminer {{items}} avant de publier.",
+                "correctFields": "Veuillez corriger les champs signalés.",
+                "publishSuccess": "Votre annonce de colocation a été publiée avec succès.",
+                "publishError": "Impossible de publier votre annonce. Veuillez réessayer."
+            }
+        },
+        "card": {
+            "noImage": "Aucune image disponible",
+            "priceNotSpecified": "Prix non spécifié",
+            "totalRent": "au total",
+            "perPerson": "Par personne",
+            "availablePlaces": "places disponibles",
+            "bedrooms": "chambres",
+            "availableFrom": "Disponible à partir du",
+            "postedBy": "Publié par"
+        },
+        "fields": {
+            "city": "Ville"
+        },
+        "details": {
+            "notSpecified": "Non spécifié",
+            "noPhotos": "Aucune photo disponible",
+            "video": "Vidéo du logement",
+            "description": "Description",
+            "noDescription": "Aucune description fournie.",
+            "accommodation": "Détails du logement",
+            "viewMap": "Voir l'emplacement sur la carte",
+            "preferences": "Préférences concernant les colocataires",
+            "totalRent": "Loyer total",
+            "roomPrice": "Prix individuel de la chambre",
+            "rentPerPerson": "Loyer estimé par personne",
+            "additionalExpenses": "Frais supplémentaires",
+            "owner": "Propriétaire de l'annonce",
+            "postedOn": "Publié le",
+            "viewProfile": "Voir le profil du propriétaire",
+            "backToAnnouncements": "Retour aux annonces",
+            "contactOwner": "Contacter le propriétaire de l'annonce",
+            "callOwner": "Appeler le propriétaire",
+            "whatsappOwner": "Contacter via WhatsApp",
+            "noPhone": "Le propriétaire n'a pas fourni de numéro de téléphone."
+        },
+        "preferences": {
+            "any": "Peu importe",
+            "male": "Homme",
+            "female": "Femme"
+        },
+        "furnishing": {
+            "Furnished": "Meublé",
+            "Unfurnished": "Non meublé",
+            "Partially Furnished": "Partiellement meublé",
+            "furnished": "Meublé",
+            "unfurnished": "Non meublé"
+        },
+        "condition": {
+            "New": "Neuf",
+            "Excellent": "Excellent",
+            "Good": "Bon état",
+            "Needs Renovation": "À rénover",
+            "Under Construction": "En construction",
+            "new": "Neuf",
+            "good": "Bon état",
+            "needsrenovation": "À rénover"
+        },
+        "gender": {
+            "any": "Peu importe",
+            "male": "Homme",
+            "female": "Femme"
+        }
+    },
+    "establishmentForm": {
+        "badge": "HÉBERGEMENT",
+        "title": "Ajouter votre établissement",
+        "description": "Créez un profil détaillé pour votre hôtel, riad, maison d'hôtes ou autre hébergement.",
+        "sections": {
+        "information": "Informations sur l'établissement",
+        "informationSubtitle": "Présentez votre hébergement.",
+        "location": "Emplacement",
+        "locationSubtitle": "Où les visiteurs peuvent-ils trouver votre établissement ?",
+        "rooms": "Chambres et hébergement",
+        "roomsSubtitle": "Définissez les catégories de chambres et leurs tarifs.",
+        "facilities": "Services et équipements",
+        "facilitiesSubtitle": "Sélectionnez tous les services proposés.",
+        "contact": "Contact et présence en ligne",
+        "contactSubtitle": "Comment les visiteurs peuvent-ils vous contacter et vous trouver en ligne ?",
+        "photos": "Photos et médias",
+        "photosSubtitle": "Montrez aux visiteurs à quoi ressemble votre établissement."
+        },
+        "fields": {
+        "name": "Nom de l'établissement",
+        "accommodationType": "Type d'hébergement",
+        "shortDescription": "Description courte",
+        "fullDescription": "Description complète",
+        "yearEstablished": "Année de création",
+        "numberOfRooms": "Nombre de chambres",
+        "numberOfFloors": "Nombre d'étages",
+        "classification": "Classement de l'hôtel",
+        "city": "Ville",
+        "neighborhood": "Quartier",
+        "fullAddress": "Adresse complète",
+        "googleMapsLink": "Lien Google Maps",
+        "roomType": "Type de chambre",
+        "roomQuantity": "Nombre de chambres de ce type",
+        "maxGuests": "Nombre maximum de personnes",
+        "pricePerNight": "Prix par nuit (MAD)",
+        "bedConfiguration": "Configuration des lits",
+        "roomFacilities": "Équipements de la chambre",
+        "roomDescription": "Description de la chambre",
+        "otherServices": "Autres services",
+        "phoneNumber": "Numéro de téléphone",
+        "whatsappNumber": "Numéro WhatsApp",
+        "email": "Adresse e-mail",
+        "officialWebsite": "Site officiel",
+        "bookingWebsite": "Lien de réservation",
+        "socialMedia": "Réseaux sociaux",
+        "platform": "Plateforme",
+        "socialUrl": "Lien du réseau social",
+        "coverPhoto": "Photo de couverture principale",
+        "gallery": "Galerie de l'établissement",
+        "establishmentVideo": "Vidéo de l'établissement",
+        "youtubeUrl": "Lien vidéo YouTube"
+        },
+        "actions": {
+        "add": "Ajouter",
+        "remove": "Supprimer",
+        "addRoom": "Ajouter un autre type de chambre",
+        "uploadRoomPhotos": "Télécharger les photos de la chambre",
+        "uploadCover": "Télécharger la photo de couverture",
+        "removeCover": "Supprimer la photo de couverture",
+        "uploadGallery": "Télécharger les photos de la galerie",
+        "watchOnYoutube": "Regarder sur YouTube",
+        "reset": "Réinitialiser",
+        "publishing": "Publication...",
+        "create": "Créer l'établissement"
+        },
+        "helpers": {
+        "googleMaps": "Ajoutez un lien Google Maps pour extraire automatiquement les coordonnées.",
+        "imageLimit": "JPG, PNG ou WEBP · 5 Mo maximum",
+        "roomPhotosLimit": "Maximum 15 photos par type de chambre, 5 Mo chacune.",
+        "galleryLimit": "Maximum 30 images, 5 Mo par image.",
+        "videoDescription": "Ajoutez une vidéo YouTube pour présenter votre hôtel, riad ou maison d'hôtes. Les visiteurs pourront la regarder directement sur votre page.",
+        "youtubeUrl": "Collez un lien YouTube classique, Shorts ou un lien raccourci."
+        },
+        "submit": {
+        "title": "Prêt à créer votre établissement ?",
+        "description": "Vérifiez vos informations avant de les envoyer."
+        },
+        "notClassified": "Non classé",
+        "star": "Étoile",
+        "stars": "Étoiles",
+        "roomType": "Type de chambre",
+        "videoPreview": "Aperçu vidéo",
+        "videoTitle": "Aperçu de la vidéo de l'établissement",
+        "errors": {
+        "invalidYoutube": "Ce lien YouTube n'est pas valide. Veuillez vérifier l'URL."
+        },
+        "empty": {
+        "gallery": "Aucune photo de galerie sélectionnée",
+        "roomPhotos": "Aucune photo de chambre sélectionnée"
+        }
+    },
+    "establishments": {
+        "title": "Hôtels et Riads",
+        "subtitle": "Découvrez des hôtels, riads, maisons d'hôtes et autres hébergements.",
+        "publish": "Publier un établissement",
+        "accommodation": "Hébergement",
+        "locationNotSpecified": "Emplacement non précisé",
+        "descriptionFallback": "Découvrez cet hébergement et ses chambres disponibles.",
+        "rooms_one": "{{count}} chambre",
+        "rooms_other": "{{count}} chambres",
+        "startingPrice": "Prix à partir de / nuit",
+        "contactForPrices": "Nous contacter pour les tarifs",
+        "viewDetails": "Voir les détails",
+        "filters": {
+        "search": "Rechercher un établissement",
+        "searchPlaceholder": "Rechercher par nom...",
+        "city": "Ville",
+        "cityPlaceholder": "Saisir une ville",
+        "accommodationType": "Type d'hébergement",
+        "allTypes": "Tous les types"
+        },
+        "types": {
+            "all": "Tous",
+            "hotel": "Hôtel",
+            "riad": "Riad",
+            "guesthouse": "Maison d'hôtes",
+            "hostel": "Auberge de jeunesse",
+            "aparthotel": "Appart'hôtel",
+            "other": "Autre"
+        },
+        "errors": {
+            "fetch": "Impossible de charger les établissements. Veuillez réessayer."
+        },
+        "empty": {
+            "title": "Aucun établissement trouvé",
+            "subtitle": "Essayez de modifier votre recherche ou vos filtres.",
+            "clearFilters": "Effacer les filtres"
+        },
+        "details": {
+            "back": "Retour aux établissements",
+            "fetchError": "Impossible de récupérer cet établissement.",
+            "notFound": "Établissement introuvable.",
+            "locationNotSpecified": "Emplacement non précisé",
+            "previousImage": "Image précédente",
+            "nextImage": "Image suivante",
+            "morePhotos": "Voir plus de photos",
+            "starClassification": "étoiles",
+            "about": "À propos de cet établissement",
+            "noDescription": "Aucune description supplémentaire.",
+            "numberOfRooms": "Nombre de chambres",
+            "numberOfFloors": "Nombre d'étages",
+            "established": "Année de création",
+            "rooms": "Chambres et hébergement",
+            "noRooms": "Aucune information sur les chambres.",
+            "room": "Chambre",
+            "roomCount": "chambre(s)",
+            "night": "nuit",
+            "guests": "personnes",
+            "privateBathroom": "Salle de bain privée",
+            "airConditioning": "Climatisation",
+            "balcony": "Balcon / terrasse",
+            "facilitiesTitle": "Équipements et services",
+            "location": "Emplacement",
+            "addressNotProvided": "Adresse non renseignée",
+            "viewMap": "Voir sur Google Maps",
+            "video": "Vidéo de l'établissement",
+            "watchOnYoutube": "Regarder sur YouTube",
+            "invalidVideo": "Ce lien vidéo ne peut pas être intégré. Vous pouvez essayer de l'ouvrir directement.",
+            "openVideo": "Ouvrir la vidéo",
+            "contactReservation": "Contact et réservation",
+            "call": "Appeler l'établissement",
+            "whatsapp": "Contacter sur WhatsApp",
+            "sendEmail": "Envoyer un e-mail",
+            "officialWebsite": "Site officiel",
+            "bookingWebsite": "Visiter le site de réservation",
+            "followUs": "Suivez-nous",
+            "socialMedia": "Réseaux sociaux",
+            "facilities": {
+                "swimmingPool": "Piscine",
+                "restaurant": "Restaurant",
+                "breakfast": "Petit-déjeuner",
+                "wifi": "Wi-Fi",
+                "parking": "Parking",
+                "spaHammam": "Spa / Hammam",
+                "airportTransfer": "Transfert aéroport",
+                "gardenRooftop": "Jardin / Terrasse",
+                "reception": "Réception",
+                "laundry": "Blanchisserie",
+                "roomService": "Service en chambre"
+            }
+        }
+    },
+    "profileEstablishment": {
+        "myEstablishments": "Mes établissements",
+        "publicationCount": "{{count}} établissements",
+        "noEstablishments": "Vous n'avez pas encore publié d'établissement.",
+        "emptySubtitle": "Vos hôtels, riads et maisons d'hôtes publiés apparaîtront ici.",
+        "fetchError": "Impossible de charger vos établissements.",
+        "deleteError": "Impossible de supprimer cet établissement.",
+        "startingPrice": "Prix à partir de / nuit",
+        "contactForPrices": "Contactez-nous pour connaître les tarifs",
+        "rooms": "chambres",
+        "unnamed": "Établissement sans nom",
+        "confirmDeleteTitle": "Supprimer cet établissement ?",
+        "confirmDeleteMessage": "Voulez-vous vraiment supprimer {{name}} ? Cette action est irréversible.",
+        "types": {
+            "Hotel": "Hôtel",
+            "Riad": "Riad",
+            "Guesthouse": "Maison d'hôtes",
+            "Hostel": "Auberge",
+            "Aparthotel": "Appart'hôtel",
+            "Other": "Autre"
+        }
+    },
+    "publicProfile": {
+        "title": "Profil du propriétaire",
+        "subtitle": "Consultez les informations et les annonces du propriétaire.",
+        "publisher": "Annonceur immobilier",
+        "about": "À propos",
+        "propertiesTab": "Biens immobiliers",
+        "roommatesTab": "Colocations",
+        "establishmentsTab": "Hôtels et Riads",
+        "reviewsTab": "Avis",
+        "totalProperties": "Biens publiés",
+        "availableProperties": "Biens disponibles",
+        "totalRoommates": "Annonces de colocation",
+        "totalEstablishments": "Établissements",
+        "totalReviews": "Nombre d'avis",
+        "noProperties": "Aucun bien publié pour le moment.",
+        "noRoommates": "Aucune annonce de colocation pour le moment.",
+        "noEstablishments": "Aucun établissement publié pour le moment.",
+        "viewProperty": "Voir le bien",
+        "viewRoommate": "Voir l'annonce",
+        "viewEstablishment": "Voir l'établissement",
+        "reviewsTitle": "Avis sur l'annonceur",
+        "writeReview": "Écrire un avis",
+        "yourRating": "Votre note",
+        "submitReview": "Envoyer l'avis",
+        "noReviews": "Aucun avis pour le moment.",
+        "loginToReview": "Connectez-vous pour laisser un avis.",
+        "ownProfileReview": "Vous ne pouvez pas évaluer votre propre profil.",
+        "reviewSuccess": "Votre avis a été envoyé avec succès.",
+        "loadError": "Impossible de charger ce profil.",
+        "back": "Retour",
+        "member": "Membre",
+        "unknownUser": "Utilisateur inconnu",
+        "untitled": "Sans titre",
+        "memberSince": "Membre depuis {{date}}",
+        "reviewCount": "{{count}} avis",
+        "viewDetails": "Voir les détails",
+        "loadMore": "Afficher plus",
+        "loading": "Chargement...",
+        "from": "À partir de ",
+        "pricePerMonth": "",
+        "bedrooms": "chambres",
+        "rooms": "pièces",
+        "occupants": "occupants",
+        "roommateListing": "Annonce de colocation",
+        "stats": {
+            "properties": "Biens publiés",
+            "availableProperties": "Biens disponibles",
+            "roommates": "Annonces de colocation",
+            "establishments": "Établissements",
+            "reviews": "Avis"
+        },
+        "tabs": {
+            "properties": "Biens immobiliers",
+            "roommates": "Colocation",
+            "establishments": "Hôtels et Riads",
+            "reviews": "Avis"
+        },
+        "empty": {
+            "properties": "Aucun bien immobilier publié.",
+            "roommates": "Aucune annonce de colocation publiée.",
+            "establishments": "Aucun établissement publié.",
+            "reviews": "Aucun avis pour le moment."
+        },
+        "roles": {
+            "client": "Client",
+            "admin": "Administrateur",
+            "owner": "Propriétaire",
+            "agent": "Agent immobilier",
+            "agency": "Agence"
+        },
+        "genders": {
+            "male": "Homme",
+            "female": "Femme",
+            "any": "Tous"
+        },
+        "reviews": {
+            "ratingSummary": "Résumé des évaluations",
+            "writeReview": "Écrire un avis",
+            "yourRating": "Votre note",
+            "comment": "Votre commentaire",
+            "submitting": "Envoi...",
+            "submit": "Envoyer l'avis",
+            "submitSuccess": "Votre avis a été envoyé avec succès.",
+            "allReviews": "Tous les avis"
+        },
+        "errors": {
+            "profile": "Impossible de charger ce profil.",
+            "properties": "Impossible de charger les biens immobiliers.",
+            "roommates": "Impossible de charger les annonces de colocation.",
+            "establishments": "Impossible de charger les établissements.",
+            "reviews": "Impossible de charger les avis.",
+            "ratingRequired": "Veuillez sélectionner une note.",
+            "commentLength": "Votre commentaire doit contenir entre 3 et 1000 caractères.",
+            "submitReview": "Impossible d'envoyer votre avis."
+        }
+    },
+    "findMap": {
+        "title": "Trouver des biens, colocations et établissements sur la carte",
+        "subtitle": "Explorez les biens immobiliers, les annonces de colocation, les hôtels, les riads et autres hébergements partout au Maroc.",
+        "listingsOnMap_one": "{{count}} annonce sur la carte",
+        "listingsOnMap_other": "{{count}} annonces sur la carte",
+        "loading": "Chargement des biens, colocations et établissements...",
+        "errors": {
+            "allListings": "Impossible de charger les biens, les colocations et les établissements. Veuillez réessayer.",
+            "loadMap": "Impossible de charger les annonces sur la carte. Veuillez réessayer."
+        },
+        "empty": {
+            "title": "Aucune annonce avec des coordonnées cartographiques trouvée.",
+            "subtitle": "Les annonces doivent avoir des coordonnées marocaines valides pour apparaître ici."
+        },
+        "filters": {
+            "city": "Ville",
+            "allMorocco": "Tout le Maroc",
+            "propertyType": "Type de bien",
+            "allTypes": "Tous les types",
+            "establishmentType": "Type d'établissement",
+            "allEstablishments": "Tous les établissements",
+            "listing": "Annonce",
+            "allListings": "Toutes les annonces",
+            "forSale": "À vendre",
+            "forRent": "À louer",
+            "rentalType": "Type de location",
+            "allRentals": "Toutes les locations",
+            "regularRental": "Location classique",
+            "roommate": "Colocation",
+            "maximumPrice": "Prix maximum (MAD)"
+        },
+        "accommodationTypes": {
+            "hotel": "Hôtel",
+            "riad": "Riad",
+            "guesthouse": "Maison d'hôtes",
+            "hostel": "Auberge de jeunesse",
+            "aparthotel": "Appart'hôtel",
+            "other": "Autre"
+        },
+        "propertyTypes": {
+            "room": "Chambre",
+            "studio": "Studio",
+            "apartment": "Appartement",
+            "house": "Maison",
+            "villa": "Villa",
+            "land": "Terrain",
+            "office": "Bureau",
+            "store": "Magasin",
+            "warehouse": "Entrepôt",
+            "garage": "Garage",
+            "commercial space": "Espace commercial",
+            "commercial store": "Local commercial",
+            "other": "Autre"
+        },
+        "listingTypes": {
+            "forsale": "À vendre",
+            "forrent": "À louer"
+        },
+        "rentalPeriods": {
+            "day": "jour",
+            "daily": "jour",
+            "week": "semaine",
+            "weekly": "semaine",
+            "month": "mois",
+            "monthly": "mois",
+            "year": "an",
+            "yearly": "an"
+        },
+        "cards": {
+            "property": "Bien immobilier",
+            "untitledProperty": "Bien sans titre",
+            "noImage": "Aucune image disponible",
+            "furnished": "MEUBLÉ",
+            "viewDetails": "Voir les détails",
+            "roommateAnnouncement": "Annonce de colocation",
+            "availablePlaces_one": "{{count}} place disponible",
+            "availablePlaces_other": "{{count}} places disponibles",
+            "establishment": "Établissement",
+            "unnamedEstablishment": "Établissement sans nom",
+            "accommodation": "Hébergement",
+            "fromPrice": "À partir de {{price}} MAD / nuit",
+            "viewEstablishment": "Voir l'établissement",
+            "viewAnnouncement": "Voir l'annonce"
+        },
+        "map": {
+            "unknownError": "Erreur cartographique inconnue.",
+            "markerRoommate": "annonce de colocation",
+            "markerEstablishment": "établissement",
+            "markerFurnished": "bien meublé",
+            "markerProperty": "bien immobilier",
+            "viewMarker": "Voir {{type}} {{number}}",
+            "missingApiKey": "La clé API MapTiler est manquante. Ajoutez VITE_MAPTILER_API_KEY à votre fichier .env frontend.",
+            "loadFailed": "Impossible de charger la carte.",
+            "checkConfiguration": "Vérifiez votre clé API, les origines autorisées et l'identifiant de la carte.",
+            "loading": "Chargement de la carte..."
+        },
+        "legend": {
+            "properties_one": "{{count}} bien immobilier",
+            "properties_other": "{{count}} biens immobiliers",
+            "furnishedRentals_one": "{{count}} location meublée",
+            "furnishedRentals_other": "{{count}} locations meublées",
+            "roommates_one": "{{count}} annonce de colocation",
+            "roommates_other": "{{count}} annonces de colocation",
+            "establishments_one": "{{count}} établissement",
+            "establishments_other": "{{count}} établissements"
+        }
+    },
+    "alerts": {
+        "title": "Mes alertes",
+        "subtitle": "Gérez vos notifications immobilières et de colocation au même endroit.",
+        "propertyAlerts": "Alertes immobilières",
+        "roommateAlerts": "Alertes de colocation",
+        "roommateCreateTitle": "Créer une alerte de colocation",
+        "roommateCreateSubtitle": "Choisissez votre ville, les types de biens, vos objectifs et les périodes de location pour trouver des annonces de colocation correspondantes.",
+        "city": "Ville",
+        "cityPlaceholder": "Choisissez ou saisissez une ville",
+        "roommatePurposes": "Objectif de colocation",
+        "roommatePropertyTypes": "Types de biens",
+        "rentalPeriods": "Période de location",
+        "rentalPeriodsHint": "Ne sélectionnez aucune option pour recevoir les annonces pour toutes les périodes de location.",
+        "selectedForAlert": "Vos préférences d'alerte",
+        "anyCity": "Toutes les villes",
+        "propertyTypeCount": "{{count}} types de biens",
+        "restoreAlert": "Restaurer l'alerte",
+        "restoring": "Restauration...",
+        "restore": "Restaurer",
+        "archiveAlert": "Archiver l'alerte",
+        "archiving": "Archivage...",
+        "archive": "Archiver",
+        "archivedLabel": "Archivée",
+        "anyRentalPeriod": "Toutes les périodes de location",
+        "noPropertyTypes": "Aucun type de bien sélectionné.",
+        "rentalPeriodSummary": "Période de location :",
+        "saving": "Enregistrement...",
+        "save": "Créer l'alerte",
+        "yourAlerts": "Vos alertes actives",
+        "emptyTitle": "Aucune alerte active pour le moment",
+        "emptySubtitle": "Créez une alerte ci-dessus pour recevoir des notifications concernant les annonces correspondantes.",
+        "archivedAlerts": "Alertes archivées",
+        "noArchivedAlerts": "Vous n'avez aucune alerte archivée.",
+        "errors": {
+        "load": "Impossible de charger les alertes.",
+        "cityRequired": "Veuillez sélectionner une ville.",
+        "propertyTypeRequired": "Veuillez sélectionner au moins un type de bien.",
+        "purposeRequired": "Veuillez sélectionner au moins un objectif de colocation.",
+        "duplicate": "Cette alerte existe déjà.",
+        "missingCreatedAlert": "L'alerte créée n'a pas été renvoyée par le serveur.",
+        "create": "Impossible de créer l'alerte.",
+        "archive": "Impossible d'archiver l'alerte.",
+        "restore": "Impossible de restaurer l'alerte."
+        },
+        "success": {
+        "created": "Alerte créée avec succès.",
+        "archived": "Alerte archivée avec succès.",
+        "restored": "Alerte restaurée avec succès."
+        }
     }
 }

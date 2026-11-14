@@ -1,0 +1,513 @@
+import React, { useCallback, useEffect, useState } from "react";
+import {
+    Badge,
+    Box,
+    Button,
+    CircularProgress,
+    Divider,
+    IconButton,
+    Menu,
+    MenuItem,
+    Stack,
+    Tooltip,
+    Typography,
+} from "@mui/material";
+
+import NotificationsNone from "@mui/icons-material/NotificationsNone";
+import NotificationsActive from "@mui/icons-material/NotificationsActive";
+import DoneAll from "@mui/icons-material/DoneAll";
+import Delete from "@mui/icons-material/Delete";
+import Circle from "@mui/icons-material/Circle";
+
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+import axiosInstance from "../../api/axiosInstance";
+import { socket } from "../../Socket/Socket";
+
+const API_URL = "/notifications";
+
+export default function NotificationMenu() {
+    const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const open = Boolean(anchorEl);
+
+    const currentLanguage = (
+        i18n.resolvedLanguage ||
+        i18n.language ||
+        "en"
+    )
+        .split("-")[0]
+        .split("_")[0];
+
+    const isRTL = currentLanguage === "ar";
+
+    const dateLocale = {
+        en: "en-GB",
+        fr: "fr-FR",
+        ar: "ar-MA",
+    }[currentLanguage] || "en-GB";
+
+    const formatDate = (date) => {
+        if (!date) return "";
+
+        const parsedDate = new Date(date);
+
+        if (Number.isNaN(parsedDate.getTime())) return "";
+
+        return new Intl.DateTimeFormat(dateLocale, {
+            dateStyle: "medium",
+            timeStyle: "short",
+        }).format(parsedDate);
+    };
+
+    const fetchNotifications = useCallback(async () => {
+        setLoading(true);
+        setError("");
+
+        try {
+            const response = await axiosInstance.get(API_URL);
+
+            setNotifications(response.data.notifications || []);
+            setUnreadCount(response.data.unreadCount || 0);
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                    t("notifications.errors.load")
+            );
+        } finally {
+            setLoading(false);
+        }
+    }, [t]);
+
+    useEffect(() => {
+        fetchNotifications();
+
+        const handleNewNotification = (notification) => {
+            setNotifications((previous) => {
+                if (
+                    previous.some(
+                        (item) => item._id === notification._id
+                    )
+                ) {
+                    return previous;
+                }
+
+                return [notification, ...previous].slice(0, 50);
+            });
+
+            if (!notification.isRead) {
+                setUnreadCount((count) => count + 1);
+            }
+        };
+
+        socket.on("notification:new", handleNewNotification);
+
+        return () => {
+            socket.off("notification:new", handleNewNotification);
+        };
+    }, [fetchNotifications]);
+
+    const handleOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+        fetchNotifications();
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleMarkAsRead = async (notification) => {
+        if (notification.isRead) return;
+
+        try {
+            await axiosInstance.patch(
+                `${API_URL}/${notification._id}/read`
+            );
+
+            setNotifications((previous) =>
+                previous.map((item) =>
+                    item._id === notification._id
+                        ? { ...item, isRead: true }
+                        : item
+                )
+            );
+
+            setUnreadCount((count) => Math.max(0, count - 1));
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                    t("notificationsMenu.errors.updateOne")
+            );
+        }
+    };
+
+    const handleMarkAllAsRead = async () => {
+        try {
+            await axiosInstance.patch(`${API_URL}/read-all`);
+
+            setNotifications((previous) =>
+                previous.map((item) => ({
+                    ...item,
+                    isRead: true,
+                }))
+            );
+
+            setUnreadCount(0);
+            setError("");
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                    t("notificationsMenu.errors.updateAll")
+            );
+        }
+    };
+
+    const handleDelete = async (event, notificationId) => {
+        event.stopPropagation();
+
+        try {
+            const notification = notifications.find(
+                (item) => item._id === notificationId
+            );
+
+            await axiosInstance.delete(
+                `${API_URL}/${notificationId}`
+            );
+
+            setNotifications((previous) =>
+                previous.filter((item) => item._id !== notificationId)
+            );
+
+            if (notification && !notification.isRead) {
+                setUnreadCount((count) => Math.max(0, count - 1));
+            }
+
+            setError("");
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                    t("notificationsMenu.errors.delete")
+            );
+        }
+    };
+
+    const handleNotificationClick = async (notification) => {
+        await handleMarkAsRead(notification);
+        handleClose();
+
+        if (notification.link) {
+            navigate(notification.link);
+        }
+    };
+
+    return (
+        <>
+            {/* Notification button */}
+            <Tooltip title={t("notificationsMenu.title")}>
+                <Button
+                    color="inherit"
+                    onClick={handleOpen}
+                    aria-label={t("notificationsMenu.buttonAriaLabel", {
+                        count: unreadCount,
+                    })}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                    startIcon={
+                        <Badge
+                            badgeContent={unreadCount}
+                            color="error"
+                            max={99}
+                            overlap="circular"
+                        >
+                            {unreadCount > 0 ? (
+                                <NotificationsActive />
+                            ) : (
+                                <NotificationsNone />
+                            )}
+                        </Badge>
+                    }
+                    sx={{
+                        minWidth: "auto",
+                        width: "auto",
+                        height: 40,
+                        px: 2,
+                        borderRadius: "10px",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                        gap: 0.5,
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: {
+                                xs: "none",
+                                sm: "block",
+                            },
+                        }}
+                    >
+                        {t("notificationsMenu.title")}
+                    </Box>
+                </Button>
+            </Tooltip>
+
+            {/* Notifications dropdown */}
+            <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                disableScrollLock
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: isRTL ? "left" : "right",
+                }}
+                transformOrigin={{
+                    vertical: "top",
+                    horizontal: isRTL ? "left" : "right",
+                }}
+                slotProps={{
+                    paper: {
+                        dir: isRTL ? "rtl" : "ltr",
+                        sx: {
+                            width: {
+                                xs: "min(340px, calc(100vw - 16px))",
+                                sm: 390,
+                            },
+                            maxWidth: "calc(100vw - 16px)",
+                            maxHeight: {
+                                xs: "calc(100dvh - 90px)",
+                                sm: 480,
+                            },
+                            mt: 1,
+                            borderRadius: "16px",
+                            overflow: "hidden",
+                        },
+                    },
+                }}
+            >
+                {/* Header */}
+                <Box
+                    sx={{
+                        px: { xs: 1.5, sm: 2 },
+                        py: 1.5,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                    }}
+                >
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography fontWeight={700}>
+                            {t("notificationsMenu.title")}
+                        </Typography>
+
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                        >
+                            {t("notificationsMenu.unreadCount", {
+                                count: unreadCount,
+                            })}
+                        </Typography>
+                    </Box>
+
+                    <Tooltip title={t("notificationsMenu.markAllAsRead")}>
+                        <span>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                startIcon={<DoneAll />}
+                                onClick={handleMarkAllAsRead}
+                                disabled={unreadCount === 0}
+                                sx={{
+                                    width: "auto",
+                                    minWidth: 0,
+                                    height: 34,
+                                    px: 1.5,
+                                    borderRadius: "8px",
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                    fontSize: "0.78rem",
+                                    whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {t("notificationsMenu.markAllAsRead")}
+                            </Button>
+                        </span>
+                    </Tooltip>
+                </Box>
+
+                <Divider />
+
+                {/* Error message */}
+                {error && (
+                    <Box sx={{ px: 2, py: 1 }}>
+                        <Typography color="error" variant="body2">
+                            {error}
+                        </Typography>
+
+                        <Button
+                            size="small"
+                            onClick={fetchNotifications}
+                        >
+                            {t("common.retry")}
+                        </Button>
+                    </Box>
+                )}
+
+                {/* Loading */}
+                {loading && notifications.length === 0 ? (
+                    <Box
+                        sx={{
+                            py: 4,
+                            display: "flex",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <CircularProgress size={26} />
+                    </Box>
+                ) : notifications.length === 0 ? (
+                    /* Empty state */
+                    <Stack
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ py: 5, px: 2 }}
+                    >
+                        <NotificationsNone
+                            sx={{
+                                fontSize: 38,
+                                color: "text.disabled",
+                            }}
+                        />
+
+                        <Typography fontWeight={600}>
+                            {t("notificationsMenu.emptyTitle")}
+                        </Typography>
+
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            textAlign="center"
+                        >
+                            {t("notificationsMenu.emptyDescription")}
+                        </Typography>
+                    </Stack>
+                ) : (
+                    /* Notifications list */
+                    <Box
+                        sx={{
+                            maxHeight: {
+                                xs: "calc(100dvh - 190px)",
+                                sm: 350,
+                            },
+                            overflowY: "auto",
+                            overflowX: "hidden",
+                        }}
+                    >
+                        {notifications.map((notification) => (
+                            <MenuItem
+                                key={notification._id}
+                                onClick={() =>
+                                    handleNotificationClick(notification)
+                                }
+                                sx={{
+                                    alignItems: "flex-start",
+                                    whiteSpace: "normal",
+                                    py: 1.5,
+                                    px: { xs: 1.5, sm: 2 },
+                                    gap: 1.25,
+                                    bgcolor: notification.isRead
+                                        ? "background.paper"
+                                        : "#F5F9FF",
+                                }}
+                            >
+                                <Circle
+                                    sx={{
+                                        fontSize: 9,
+                                        mt: 0.9,
+                                        flexShrink: 0,
+                                        color: notification.isRead
+                                            ? "transparent"
+                                            : "primary.main",
+                                    }}
+                                />
+
+                                <Box
+                                    sx={{
+                                        flex: 1,
+                                        minWidth: 0,
+                                    }}
+                                >
+                                    <Typography
+                                        variant="body2"
+                                        fontWeight={
+                                            notification.isRead ? 500 : 700
+                                        }
+                                        sx={{ overflowWrap: "anywhere" }}
+                                    >
+                                        {notification.title}
+                                    </Typography>
+
+                                    <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                        sx={{
+                                            mt: 0.5,
+                                            overflowWrap: "anywhere",
+                                        }}
+                                    >
+                                        {notification.message}
+                                    </Typography>
+
+                                    <Typography
+                                        variant="caption"
+                                        color="text.disabled"
+                                        sx={{
+                                            display: "block",
+                                            mt: 0.75,
+                                        }}
+                                    >
+                                        {formatDate(notification.createdAt)}
+                                    </Typography>
+                                </Box>
+
+                                <Tooltip
+                                    title={t("notificationsMenu.delete")}
+                                >
+                                    <IconButton
+                                        size="small"
+                                        aria-label={t(
+                                            "notificationsMenu.delete"
+                                        )}
+                                        onClick={(event) =>
+                                            handleDelete(
+                                                event,
+                                                notification._id
+                                            )
+                                        }
+                                        sx={{
+                                            mt: -0.5,
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        <Delete fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            </MenuItem>
+                        ))}
+                    </Box>
+                )}
+            </Menu>
+        </>
+    );
+}

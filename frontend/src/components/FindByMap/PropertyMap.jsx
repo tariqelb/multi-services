@@ -1,4 +1,3 @@
-
 import React, {
     useEffect,
     useMemo,
@@ -9,8 +8,9 @@ import React, {
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+import { useTranslation } from "react-i18next";
 
+import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { createRoot } from "react-dom/client";
 
 import {
@@ -21,12 +21,12 @@ import {
 } from "@mui/material";
 
 import PropertyMapCard from "./PropertyMapCard";
+import RoommateMapCard from "./RoommateMapCard";
+import EstablishmentMapCard from "./EstablishmentMapCard";
 
 maplibregl.setWorkerUrl(workerUrl);
 
-// MapTiler configuration
-const MAPTILER_API_KEY =
-    import.meta.env.VITE_MAPTILER_API_KEY;
+const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY;
 
 const MAPTILER_MAP_ID =
     import.meta.env.VITE_MAPTILER_MAP_ID || "streets-v4";
@@ -41,52 +41,93 @@ const moroccoCenter = {
 
 const initialZoom = 6;
 
+const isFurnishedRental = (property) => {
+    return (
+        String(property?.listingType || "").trim().toLowerCase() === "for rent" &&
+        String(property?.furnishingStatus || "").trim().toLowerCase() === "furnished" &&
+        ["room", "studio", "apartment", "villa", "house"].includes(
+            String(property?.propertyType || "").trim().toLowerCase()
+        )
+    );
+};
+
+const hasValidCoordinates = (item) => {
+    const lat = item?.location?.lat;
+    const lng = item?.location?.lng;
+
+    if (
+        lat === null ||
+        lat === undefined ||
+        lat === "" ||
+        lng === null ||
+        lng === undefined ||
+        lng === ""
+    ) {
+        return false;
+    }
+
+    const numericLat = Number(lat);
+    const numericLng = Number(lng);
+
+    return (
+        Number.isFinite(numericLat) &&
+        Number.isFinite(numericLng) &&
+        numericLat >= 20 &&
+        numericLat <= 36 &&
+        numericLng >= -18 &&
+        numericLng <= -0.5
+    );
+};
+
 export default function PropertyMap({
     properties = [],
+    roommates = [],
+    establishments = [],
     onPropertyClick,
+    onRoommateClick,
+    onEstablishmentClick,
 }) {
+    const { t } = useTranslation();
+
     const mapContainerRef = useRef(null);
     const mapRef = useRef(null);
-
     const markersRef = useRef([]);
+
     const onPropertyClickRef = useRef(onPropertyClick);
+    const onRoommateClickRef = useRef(onRoommateClick);
+    const onEstablishmentClickRef = useRef(onEstablishmentClick);
 
     const [mapLoaded, setMapLoaded] = useState(false);
     const [mapError, setMapError] = useState("");
 
-    // Keep the latest navigation callback without rebuilding markers.
     onPropertyClickRef.current = onPropertyClick;
+    onRoommateClickRef.current = onRoommateClick;
+    onEstablishmentClickRef.current = onEstablishmentClick;
 
-    // Validate property coordinates.
-    const validProperties = useMemo(() => {
-        return properties.filter((property) => {
-            const rawLat = property.location?.lat;
-            const rawLng = property.location?.lng;
+    const validProperties = useMemo(
+        () => properties.filter(hasValidCoordinates),
+        [properties]
+    );
 
-            if (
-                rawLat === null ||
-                rawLat === undefined ||
-                rawLat === "" ||
-                rawLng === null ||
-                rawLng === undefined ||
-                rawLng === ""
-            ) {
-                return false;
-            }
+    const validRoommates = useMemo(
+        () => roommates.filter(hasValidCoordinates),
+        [roommates]
+    );
 
-            const lat = Number(rawLat);
-            const lng = Number(rawLng);
+    const validEstablishments = useMemo(
+        () => establishments.filter(hasValidCoordinates),
+        [establishments]
+    );
 
-            return (
-                Number.isFinite(lat) &&
-                Number.isFinite(lng) &&
-                lat >= -90 &&
-                lat <= 90 &&
-                lng >= -180 &&
-                lng <= 180
-            );
-        });
-    }, [properties]);
+    const regularProperties = useMemo(
+        () => validProperties.filter((item) => !isFurnishedRental(item)),
+        [validProperties]
+    );
+
+    const furnishedProperties = useMemo(
+        () => validProperties.filter(isFurnishedRental),
+        [validProperties]
+    );
 
     // Initialize MapTiler / MapLibre.
     useEffect(() => {
@@ -112,10 +153,7 @@ export default function PropertyMap({
                 map = new maplibregl.Map({
                     container: mapContainerRef.current,
                     style: MAPTILER_STYLE_URL,
-                    center: [
-                        moroccoCenter.lng,
-                        moroccoCenter.lat,
-                    ],
+                    center: [moroccoCenter.lng, moroccoCenter.lat],
                     zoom: initialZoom,
                     attributionControl: true,
                 });
@@ -140,19 +178,13 @@ export default function PropertyMap({
                 });
 
                 map.on("error", (event) => {
-                    console.error(
-                        "MapLibre resource error:",
-                        event.error
-                    );
+                    console.error("MapLibre resource error:", event.error);
                 });
-
             } catch (error) {
                 console.error("Map initialization failed:", error);
 
                 if (!cancelled) {
-                    setMapError(
-                        error.message || "Unknown map error."
-                    );
+                    setMapError(error.message || t("findMap.map.unknownError"));
                 }
             }
         };
@@ -161,22 +193,20 @@ export default function PropertyMap({
 
         return () => {
             cancelled = true;
-
             map?.remove();
             mapRef.current = null;
         };
-    }, []);
+    }, [t]);
 
-    // Add markers with hover previews.
+    // Create all listing markers.
     useEffect(() => {
         const map = mapRef.current;
 
         if (!map || !mapLoaded) return;
 
-        // Clean up previous markers and popups.
+        // Remove old markers and popups.
         markersRef.current.forEach((item) => {
             clearTimeout(item.closeTimer);
-
             item.popup.remove();
             item.root.unmount();
             item.marker.remove();
@@ -184,38 +214,75 @@ export default function PropertyMap({
 
         markersRef.current = [];
 
-        if (!validProperties.length) return;
+        const totalListings =
+            validProperties.length +
+            validRoommates.length +
+            validEstablishments.length;
+
+        if (totalListings === 0) return;
 
         const bounds = new maplibregl.LngLatBounds();
 
-        validProperties.forEach((property, index) => {
-            const lat = Number(property.location.lat);
-            const lng = Number(property.location.lng);
+        const createListingMarker = ({
+            listing,
+            index,
+            type,
+        }) => {
+            const isRoommate = type === "roommate";
+            const isEstablishment = type === "establishment";
+            const isFurnished = !isRoommate &&
+                !isEstablishment &&
+                isFurnishedRental(listing);
 
+            const lat = Number(listing.location.lat);
+            const lng = Number(listing.location.lng);
             const coordinates = [lng, lat];
 
             bounds.extend(coordinates);
 
-            // Create numbered marker.
             const markerElement = document.createElement("button");
-
             markerElement.type = "button";
-            markerElement.className = "property-map-marker";
-            markerElement.textContent = String(index + 1);
+
+            markerElement.className = isRoommate
+                ? "roommate-map-marker"
+                : isEstablishment
+                    ? "establishment-map-marker"
+                    : isFurnished
+                        ? "furnished-map-marker"
+                        : "property-map-marker";
+
+            const markerLabel = isRoommate
+                ? t("findMap.map.markerRoommate")
+                : isEstablishment
+                    ? t("findMap.map.markerEstablishment")
+                    : isFurnished
+                        ? t("findMap.map.markerFurnished")
+                        : t("findMap.map.markerProperty");
 
             markerElement.setAttribute(
                 "aria-label",
-                `View property ${index + 1}`
+                t("findMap.map.viewMarker", {
+                    type: markerLabel,
+                    number: index + 1,
+                })
             );
 
-            markerElement.title = "Hover to preview, click to view details";
+            markerElement.title = markerLabel;
+
+            const markerColor = isRoommate
+                ? "#2e9d50"
+                : isEstablishment
+                    ? "#7e22ce"
+                    : isFurnished
+                        ? "#f59e0b"
+                        : "#1976d2";
 
             Object.assign(markerElement.style, {
-                width: "32px",
-                height: "32px",
+                width: isEstablishment ? "40px" : "34px",
+                height: isEstablishment ? "40px" : "34px",
                 padding: "0",
-                borderRadius: "50%",
-                backgroundColor: "#1976d2",
+                borderRadius: isRoommate ? "5px" : isEstablishment ? "8px" : "50%",
+                backgroundColor: markerColor,
                 border: "3px solid white",
                 color: "#ffffff",
                 display: "flex",
@@ -226,26 +293,57 @@ export default function PropertyMap({
                 cursor: "pointer",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
                 outline: "none",
-                transition: "transform 0.15s ease, background-color 0.15s ease",
+                transition: "transform 0.15s ease",
+                transform: isRoommate
+                    ? "rotate(45deg)"
+                    : isEstablishment
+                        ? "rotate(45deg)"
+                        : "none",
             });
 
-            // Create the property preview popup.
-            const popupContainer = document.createElement("div");
+            // Establishment marker has a hexagonal shape.
+            if (isEstablishment) {
+                markerElement.style.clipPath =
+                    "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)";
+                markerElement.style.borderRadius = "0";
+                markerElement.style.transform = "none";
+            }
 
+            const numberElement = document.createElement("span");
+            numberElement.textContent = String(index + 1);
+
+            if (isRoommate || isEstablishment) {
+                Object.assign(numberElement.style, {
+                    display: "block",
+                    transform: isRoommate
+                        ? "rotate(-45deg)"
+                        : "none",
+                });
+            }
+
+            markerElement.appendChild(numberElement);
+
+            // Popup container.
+            const popupContainer = document.createElement("div");
             const root = createRoot(popupContainer);
 
             const popup = new maplibregl.Popup({
-                offset: 22,
+                offset: isRoommate ? 24 : 22,
                 closeButton: false,
                 closeOnClick: false,
                 closeOnMove: false,
                 maxWidth: "320px",
-                className: "property-hover-popup",
+                className: isRoommate
+                    ? "roommate-hover-popup"
+                    : isEstablishment
+                        ? "establishment-hover-popup"
+                        : isFurnished
+                            ? "furnished-hover-popup"
+                            : "property-hover-popup",
             })
                 .setLngLat(coordinates)
                 .setDOMContent(popupContainer);
 
-            // Store marker, popup and React root.
             const markerData = {
                 marker: null,
                 popup,
@@ -254,7 +352,6 @@ export default function PropertyMap({
                 popupEventsAttached: false,
             };
 
-            // Close preview after leaving marker and popup.
             const schedulePopupClose = () => {
                 clearTimeout(markerData.closeTimer);
 
@@ -263,32 +360,50 @@ export default function PropertyMap({
                 }, 180);
             };
 
-            // Cancel closing when mouse enters preview.
             const keepPopupOpen = () => {
                 clearTimeout(markerData.closeTimer);
             };
 
-            // Render property preview.
-            root.render(
-                <PropertyMapCard
-                    property={property}
-                    onViewDetails={() => {
-                        clearTimeout(markerData.closeTimer);
+            const handleViewDetails = () => {
+                clearTimeout(markerData.closeTimer);
+                popup.remove();
 
-                        popup.remove();
+                if (isRoommate) {
+                    onRoommateClickRef.current?.(listing);
+                } else if (isEstablishment) {
+                    onEstablishmentClickRef.current?.(listing);
+                } else {
+                    onPropertyClickRef.current?.(listing);
+                }
+            };
 
-                        onPropertyClickRef.current?.(property);
-                    }}
-                />
-            );
+            if (isRoommate) {
+                root.render(
+                    <RoommateMapCard
+                        roommate={listing}
+                        onViewDetails={handleViewDetails}
+                    />
+                );
+            } else if (isEstablishment) {
+                root.render(
+                    <EstablishmentMapCard
+                        establishment={listing}
+                        onViewDetails={handleViewDetails}
+                    />
+                );
+            } else {
+                root.render(
+                    <PropertyMapCard
+                        property={listing}
+                        onViewDetails={handleViewDetails}
+                    />
+                );
+            }
 
-            // Show preview when hovering over marker.
             markerElement.addEventListener("mouseenter", () => {
                 clearTimeout(markerData.closeTimer);
-
                 popup.addTo(map);
 
-                // Attach popup hover events only once.
                 if (!markerData.popupEventsAttached) {
                     const popupElement = popup.getElement();
 
@@ -306,41 +421,17 @@ export default function PropertyMap({
                 }
             });
 
-            // Close preview when leaving marker.
             markerElement.addEventListener(
                 "mouseleave",
                 schedulePopupClose
             );
 
-            // Navigate directly when clicking marker.
             markerElement.addEventListener("click", (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-
-                clearTimeout(markerData.closeTimer);
-                popup.remove();
-
-                const propertyId =
-                    property?._id || property?.id;
-
-                if (!propertyId) {
-                    console.error(
-                        "Property ID is missing:",
-                        property
-                    );
-                    return;
-                }
-
-                if (typeof onPropertyClickRef.current === "function") {
-                    onPropertyClickRef.current(property);
-                } else {
-                    console.error(
-                        "onPropertyClick callback is missing."
-                    );
-                }
+                handleViewDetails();
             });
 
-            // Create MapLibre marker.
             const marker = new maplibregl.Marker({
                 element: markerElement,
                 anchor: "center",
@@ -349,16 +440,56 @@ export default function PropertyMap({
                 .addTo(map);
 
             markerData.marker = marker;
-
             markersRef.current.push(markerData);
+        };
+
+        // Regular properties.
+        regularProperties.forEach((property, index) => {
+            createListingMarker({
+                listing: property,
+                index,
+                type: "property",
+            });
         });
 
-        // Fit map to property locations.
-        if (validProperties.length === 1) {
+        // Furnished rentals.
+        furnishedProperties.forEach((property, index) => {
+            createListingMarker({
+                listing: property,
+                index,
+                type: "property",
+            });
+        });
+
+        // Roommates.
+        validRoommates.forEach((roommate, index) => {
+            createListingMarker({
+                listing: roommate,
+                index,
+                type: "roommate",
+            });
+        });
+
+        // Establishments.
+        validEstablishments.forEach((establishment, index) => {
+            createListingMarker({
+                listing: establishment,
+                index,
+                type: "establishment",
+            });
+        });
+
+        // Fit the map to all displayed listings.
+        if (totalListings === 1) {
+            const onlyListing =
+                validProperties[0] ||
+                validRoommates[0] ||
+                validEstablishments[0];
+
             map.flyTo({
                 center: [
-                    Number(validProperties[0].location.lng),
-                    Number(validProperties[0].location.lat),
+                    Number(onlyListing.location.lng),
+                    Number(onlyListing.location.lat),
                 ],
                 zoom: 14,
                 duration: 700,
@@ -371,11 +502,9 @@ export default function PropertyMap({
             });
         }
 
-        // Cleanup when properties change or component unmounts.
         return () => {
             markersRef.current.forEach((item) => {
                 clearTimeout(item.closeTimer);
-
                 item.popup.remove();
                 item.root.unmount();
                 item.marker.remove();
@@ -383,13 +512,20 @@ export default function PropertyMap({
 
             markersRef.current = [];
         };
-    }, [mapLoaded, validProperties]);
+    }, [
+        mapLoaded,
+        validProperties,
+        validRoommates,
+        validEstablishments,
+        regularProperties,
+        furnishedProperties,
+        t,
+    ]);
 
     if (!MAPTILER_API_KEY) {
         return (
             <Alert severity="warning">
-                MapTiler API key is missing.
-                Add VITE_MAPTILER_API_KEY to your frontend .env file.
+                {t("findMap.map.missingApiKey")}
             </Alert>
         );
     }
@@ -398,14 +534,14 @@ export default function PropertyMap({
         return (
             <Alert severity="error">
                 <Typography fontWeight={700}>
-                    The map could not be loaded.
+                    {t("findMap.map.loadFailed")}
                 </Typography>
 
                 <Typography variant="body2">
                     {mapError}
                 </Typography>
 
-                Check your API key, allowed origins, and map ID.
+                {t("findMap.map.checkConfiguration")}
             </Alert>
         );
     }
@@ -423,9 +559,8 @@ export default function PropertyMap({
                     }}
                 >
                     <CircularProgress />
-
                     <Typography color="text.secondary">
-                        Loading MapTiler map...
+                        {t("findMap.map.loading")}
                     </Typography>
                 </Box>
             )}
@@ -442,15 +577,74 @@ export default function PropertyMap({
             />
 
             <Box className="property-map-legend">
-                <Typography variant="caption">
-                    {validProperties.length} properties displayed
-                </Typography>
+                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                    <Box
+                        sx={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: "50%",
+                            backgroundColor: "#1976d2",
+                        }}
+                    />
+                    <Typography variant="caption">
+                        {t("findMap.legend.properties", {
+                            count: regularProperties.length,
+                        })}
+                    </Typography>
+                </Box>
+
+                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                    <Box
+                        sx={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: "50%",
+                            backgroundColor: "#f59e0b",
+                        }}
+                    />
+                    <Typography variant="caption">
+                        {t("findMap.legend.furnishedRentals", {
+                            count: furnishedProperties.length,
+                        })}
+                    </Typography>
+                </Box>
+
+                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                    <Box
+                        sx={{
+                            width: 11,
+                            height: 11,
+                            backgroundColor: "#2e9d50",
+                            transform: "rotate(45deg)",
+                        }}
+                    />
+                    <Typography variant="caption">
+                        {t("findMap.legend.roommates", {
+                            count: validRoommates.length,
+                        })}
+                    </Typography>
+                </Box>
+
+                <Box display="flex" alignItems="center" gap={1}>
+                    <Box
+                        sx={{
+                            width: 13,
+                            height: 13,
+                            backgroundColor: "#7e22ce",
+                            clipPath:
+                                "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                        }}
+                    />
+                    <Typography variant="caption">
+                        {t("findMap.legend.establishments", {
+                            count: validEstablishments.length,
+                        })}
+                    </Typography>
+                </Box>
             </Box>
         </Box>
     );
 }
-
-
 // import React, {
 //     useEffect,
 //     useMemo,
@@ -462,6 +656,7 @@ export default function PropertyMap({
 // import "maplibre-gl/dist/maplibre-gl.css";
 
 // import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+// import { createRoot } from "react-dom/client";
 
 // import {
 //     Alert,
@@ -470,11 +665,13 @@ export default function PropertyMap({
 //     Typography,
 // } from "@mui/material";
 
+// import PropertyMapCard from "./PropertyMapCard";
+// import RoommateMapCard from "./RoommateMapCard";
+// import EstablishmentMapCard from "./EstablishmentMapCard";
+
 // maplibregl.setWorkerUrl(workerUrl);
 
-// // MapTiler configuration
-// const MAPTILER_API_KEY =
-//     import.meta.env.VITE_MAPTILER_API_KEY;
+// const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY;
 
 // const MAPTILER_MAP_ID =
 //     import.meta.env.VITE_MAPTILER_MAP_ID || "streets-v4";
@@ -489,49 +686,93 @@ export default function PropertyMap({
 
 // const initialZoom = 6;
 
+// const isFurnishedRental = (property) => {
+//     return (
+//         String(property?.listingType || "").trim().toLowerCase() === "for rent" &&
+//         String(property?.furnishingStatus || "").trim().toLowerCase() === "furnished" &&
+//         ["room", "studio", "apartment", "villa", "house"].includes(
+//             String(property?.propertyType || "").trim().toLowerCase()
+//         )
+//     );
+// };
+
+// const hasValidCoordinates = (item) => {
+//     const lat = item?.location?.lat;
+//     const lng = item?.location?.lng;
+
+//     if (
+//         lat === null ||
+//         lat === undefined ||
+//         lat === "" ||
+//         lng === null ||
+//         lng === undefined ||
+//         lng === ""
+//     ) {
+//         return false;
+//     }
+
+//     const numericLat = Number(lat);
+//     const numericLng = Number(lng);
+
+//     return (
+//         Number.isFinite(numericLat) &&
+//         Number.isFinite(numericLng) &&
+//         numericLat >= 20 &&
+//         numericLat <= 36 &&
+//         numericLng >= -18 &&
+//         numericLng <= -0.5
+//     );
+// };
+
 // export default function PropertyMap({
 //     properties = [],
+//     roommates = [],
+//     establishments = [],
 //     onPropertyClick,
+//     onRoommateClick,
+//     onEstablishmentClick,
 // }) {
 //     const mapContainerRef = useRef(null);
 //     const mapRef = useRef(null);
 //     const markersRef = useRef([]);
 
+//     const onPropertyClickRef = useRef(onPropertyClick);
+//     const onRoommateClickRef = useRef(onRoommateClick);
+//     const onEstablishmentClickRef = useRef(onEstablishmentClick);
+
 //     const [mapLoaded, setMapLoaded] = useState(false);
 //     const [mapError, setMapError] = useState("");
 
-//     // Validate property coordinates
-//     const validProperties = useMemo(() => {
-//         return properties.filter((property) => {
-//             const rawLat = property.location?.lat;
-//             const rawLng = property.location?.lng;
+//     onPropertyClickRef.current = onPropertyClick;
+//     onRoommateClickRef.current = onRoommateClick;
+//     onEstablishmentClickRef.current = onEstablishmentClick;
 
-//             if (
-//                 rawLat === null ||
-//                 rawLat === undefined ||
-//                 rawLat === "" ||
-//                 rawLng === null ||
-//                 rawLng === undefined ||
-//                 rawLng === ""
-//             ) {
-//                 return false;
-//             }
+//     const validProperties = useMemo(
+//         () => properties.filter(hasValidCoordinates),
+//         [properties]
+//     );
 
-//             const lat = Number(rawLat);
-//             const lng = Number(rawLng);
+//     const validRoommates = useMemo(
+//         () => roommates.filter(hasValidCoordinates),
+//         [roommates]
+//     );
 
-//             return (
-//                 Number.isFinite(lat) &&
-//                 Number.isFinite(lng) &&
-//                 lat >= -90 &&
-//                 lat <= 90 &&
-//                 lng >= -180 &&
-//                 lng <= 180
-//             );
-//         });
-//     }, [properties]);
+//     const validEstablishments = useMemo(
+//         () => establishments.filter(hasValidCoordinates),
+//         [establishments]
+//     );
 
-//     // Initialize MapTiler / MapLibre
+//     const regularProperties = useMemo(
+//         () => validProperties.filter((item) => !isFurnishedRental(item)),
+//         [validProperties]
+//     );
+
+//     const furnishedProperties = useMemo(
+//         () => validProperties.filter(isFurnishedRental),
+//         [validProperties]
+//     );
+
+//     // Initialize MapTiler / MapLibre.
 //     useEffect(() => {
 //         let cancelled = false;
 //         let map = null;
@@ -555,10 +796,7 @@ export default function PropertyMap({
 //                 map = new maplibregl.Map({
 //                     container: mapContainerRef.current,
 //                     style: MAPTILER_STYLE_URL,
-//                     center: [
-//                         moroccoCenter.lng,
-//                         moroccoCenter.lat,
-//                     ],
+//                     center: [moroccoCenter.lng, moroccoCenter.lat],
 //                     zoom: initialZoom,
 //                     attributionControl: true,
 //                 });
@@ -583,19 +821,13 @@ export default function PropertyMap({
 //                 });
 
 //                 map.on("error", (event) => {
-//                     console.error(
-//                         "MapLibre resource error:",
-//                         event.error
-//                     );
+//                     console.error("MapLibre resource error:", event.error);
 //                 });
-
 //             } catch (error) {
 //                 console.error("Map initialization failed:", error);
 
 //                 if (!cancelled) {
-//                     setMapError(
-//                         error.message || "Unknown map error."
-//                     );
+//                     setMapError(error.message || "Unknown map error.");
 //                 }
 //             }
 //         };
@@ -604,55 +836,93 @@ export default function PropertyMap({
 
 //         return () => {
 //             cancelled = true;
-
-//             markersRef.current.forEach((marker) => marker.remove());
-//             markersRef.current = [];
-
 //             map?.remove();
 //             mapRef.current = null;
 //         };
 //     }, []);
 
-//     // Add property markers
+//     // Create all listing markers.
 //     useEffect(() => {
 //         const map = mapRef.current;
 
 //         if (!map || !mapLoaded) return;
 
-//         // Remove previous markers
-//         markersRef.current.forEach((marker) => marker.remove());
+//         // Remove old markers and popups.
+//         markersRef.current.forEach((item) => {
+//             clearTimeout(item.closeTimer);
+//             item.popup.remove();
+//             item.root.unmount();
+//             item.marker.remove();
+//         });
+
 //         markersRef.current = [];
 
-//         if (!validProperties.length) return;
+//         const totalListings =
+//             validProperties.length +
+//             validRoommates.length +
+//             validEstablishments.length;
+
+//         if (totalListings === 0) return;
 
 //         const bounds = new maplibregl.LngLatBounds();
 
-//         validProperties.forEach((property, index) => {
-//             const lat = Number(property.location.lat);
-//             const lng = Number(property.location.lng);
+//         const createListingMarker = ({
+//             listing,
+//             index,
+//             type,
+//         }) => {
+//             const isRoommate = type === "roommate";
+//             const isEstablishment = type === "establishment";
+//             const isFurnished = !isRoommate &&
+//                 !isEstablishment &&
+//                 isFurnishedRental(listing);
 
+//             const lat = Number(listing.location.lat);
+//             const lng = Number(listing.location.lng);
 //             const coordinates = [lng, lat];
 
 //             bounds.extend(coordinates);
 
-//             // Create clickable numbered marker
 //             const markerElement = document.createElement("button");
-
 //             markerElement.type = "button";
-//             markerElement.className = "property-map-marker";
-//             markerElement.textContent = String(index + 1);
+
+//             markerElement.className = isRoommate
+//                 ? "roommate-map-marker"
+//                 : isEstablishment
+//                     ? "establishment-map-marker"
+//                     : isFurnished
+//                         ? "furnished-map-marker"
+//                         : "property-map-marker";
+
+//             const markerLabel = isRoommate
+//                 ? "roommate announcement"
+//                 : isEstablishment
+//                     ? "establishment"
+//                     : isFurnished
+//                         ? "furnished property"
+//                         : "property";
+
 //             markerElement.setAttribute(
 //                 "aria-label",
-//                 `View property ${index + 1}`
+//                 `View ${markerLabel} ${index + 1}`
 //             );
-//             markerElement.title = "View property details";
+
+//             markerElement.title = markerLabel;
+
+//             const markerColor = isRoommate
+//                 ? "#2e9d50"
+//                 : isEstablishment
+//                     ? "#7e22ce"
+//                     : isFurnished
+//                         ? "#f59e0b"
+//                         : "#1976d2";
 
 //             Object.assign(markerElement.style, {
-//                 width: "32px",
-//                 height: "32px",
+//                 width: isEstablishment ? "40px" : "34px",
+//                 height: isEstablishment ? "40px" : "34px",
 //                 padding: "0",
-//                 borderRadius: "50%",
-//                 backgroundColor: "#1976d2",
+//                 borderRadius: isRoommate ? "5px" : isEstablishment ? "8px" : "50%",
+//                 backgroundColor: markerColor,
 //                 border: "3px solid white",
 //                 color: "#ffffff",
 //                 display: "flex",
@@ -663,30 +933,143 @@ export default function PropertyMap({
 //                 cursor: "pointer",
 //                 boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
 //                 outline: "none",
+//                 transition: "transform 0.15s ease",
+//                 transform: isRoommate
+//                     ? "rotate(45deg)"
+//                     : isEstablishment
+//                         ? "rotate(45deg)"
+//                         : "none",
 //             });
 
-//             // Navigate directly when marker is clicked
+//             // Establishment marker has a hexagonal shape.
+//             if (isEstablishment) {
+//                 markerElement.style.clipPath =
+//                     "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)";
+//                 markerElement.style.borderRadius = "0";
+//                 markerElement.style.transform = "none";
+//             }
+
+//             const numberElement = document.createElement("span");
+//             numberElement.textContent = String(index + 1);
+
+//             if (isRoommate || isEstablishment) {
+//                 Object.assign(numberElement.style, {
+//                     display: "block",
+//                     transform: isRoommate
+//                         ? "rotate(-45deg)"
+//                         : "none",
+//                 });
+//             }
+
+//             markerElement.appendChild(numberElement);
+
+//             // Popup container.
+//             const popupContainer = document.createElement("div");
+//             const root = createRoot(popupContainer);
+
+//             const popup = new maplibregl.Popup({
+//                 offset: isRoommate ? 24 : 22,
+//                 closeButton: false,
+//                 closeOnClick: false,
+//                 closeOnMove: false,
+//                 maxWidth: "320px",
+//                 className: isRoommate
+//                     ? "roommate-hover-popup"
+//                     : isEstablishment
+//                         ? "establishment-hover-popup"
+//                         : isFurnished
+//                             ? "furnished-hover-popup"
+//                             : "property-hover-popup",
+//             })
+//                 .setLngLat(coordinates)
+//                 .setDOMContent(popupContainer);
+
+//             const markerData = {
+//                 marker: null,
+//                 popup,
+//                 root,
+//                 closeTimer: null,
+//                 popupEventsAttached: false,
+//             };
+
+//             const schedulePopupClose = () => {
+//                 clearTimeout(markerData.closeTimer);
+
+//                 markerData.closeTimer = setTimeout(() => {
+//                     popup.remove();
+//                 }, 180);
+//             };
+
+//             const keepPopupOpen = () => {
+//                 clearTimeout(markerData.closeTimer);
+//             };
+
+//             const handleViewDetails = () => {
+//                 clearTimeout(markerData.closeTimer);
+//                 popup.remove();
+
+//                 if (isRoommate) {
+//                     onRoommateClickRef.current?.(listing);
+//                 } else if (isEstablishment) {
+//                     onEstablishmentClickRef.current?.(listing);
+//                 } else {
+//                     onPropertyClickRef.current?.(listing);
+//                 }
+//             };
+
+//             if (isRoommate) {
+//                 root.render(
+//                     <RoommateMapCard
+//                         roommate={listing}
+//                         onViewDetails={handleViewDetails}
+//                     />
+//                 );
+//             } else if (isEstablishment) {
+//                 root.render(
+//                     <EstablishmentMapCard
+//                         establishment={listing}
+//                         onViewDetails={handleViewDetails}
+//                     />
+//                 );
+//             } else {
+//                 root.render(
+//                     <PropertyMapCard
+//                         property={listing}
+//                         onViewDetails={handleViewDetails}
+//                     />
+//                 );
+//             }
+
+//             markerElement.addEventListener("mouseenter", () => {
+//                 clearTimeout(markerData.closeTimer);
+//                 popup.addTo(map);
+
+//                 if (!markerData.popupEventsAttached) {
+//                     const popupElement = popup.getElement();
+
+//                     popupElement.addEventListener(
+//                         "mouseenter",
+//                         keepPopupOpen
+//                     );
+
+//                     popupElement.addEventListener(
+//                         "mouseleave",
+//                         schedulePopupClose
+//                     );
+
+//                     markerData.popupEventsAttached = true;
+//                 }
+//             });
+
+//             markerElement.addEventListener(
+//                 "mouseleave",
+//                 schedulePopupClose
+//             );
+
 //             markerElement.addEventListener("click", (event) => {
 //                 event.preventDefault();
 //                 event.stopPropagation();
-
-//                 const propertyId = property?._id || property?.id;
-
-//                 if (!propertyId) {
-//                     console.error(
-//                         "Property ID is missing:",
-//                         property
-//                     );
-//                     return;
-//                 }
-
-//                 if (typeof onPropertyClick === "function") {
-//                     onPropertyClick(property);
-//                 } else {
-//                     console.error(
-//                         "onPropertyClick callback is missing."
-//                     );
-//                 }
+//                 handleViewDetails();
 //             });
 
 //             const marker = new maplibregl.Marker({
@@ -696,15 +1079,57 @@ export default function PropertyMap({
 //                 .setLngLat(coordinates)
 //                 .addTo(map);
 
-//             markersRef.current.push(marker);
+//             markerData.marker = marker;
+//             markersRef.current.push(markerData);
+//         };
+
+//         // Regular properties.
+//         regularProperties.forEach((property, index) => {
+//             createListingMarker({
+//                 listing: property,
+//                 index,
+//                 type: "property",
+//             });
 //         });
 
-//         // Fit map to property locations
-//         if (validProperties.length === 1) {
+//         // Furnished rentals.
+//         furnishedProperties.forEach((property, index) => {
+//             createListingMarker({
+//                 listing: property,
+//                 index,
+//                 type: "property",
+//             });
+//         });
+
+//         // Roommates.
+//         validRoommates.forEach((roommate, index) => {
+//             createListingMarker({
+//                 listing: roommate,
+//                 index,
+//                 type: "roommate",
+//             });
+//         });
+
+//         // Establishments.
+//         validEstablishments.forEach((establishment, index) => {
+//             createListingMarker({
+//                 listing: establishment,
+//                 index,
+//                 type: "establishment",
+//             });
+//         });
+
+//         // Fit the map to all displayed listings.
+//         if (totalListings === 1) {
+//             const onlyListing =
+//                 validProperties[0] ||
+//                 validRoommates[0] ||
+//                 validEstablishments[0];
+
 //             map.flyTo({
 //                 center: [
-//                     Number(validProperties[0].location.lng),
-//                     Number(validProperties[0].location.lat),
+//                     Number(onlyListing.location.lng),
+//                     Number(onlyListing.location.lat),
 //                 ],
 //                 zoom: 14,
 //                 duration: 700,
@@ -716,7 +1141,25 @@ export default function PropertyMap({
 //                 duration: 700,
 //             });
 //         }
-//     }, [mapLoaded, validProperties, onPropertyClick]);
+
+//         return () => {
+//             markersRef.current.forEach((item) => {
+//                 clearTimeout(item.closeTimer);
+//                 item.popup.remove();
+//                 item.root.unmount();
+//                 item.marker.remove();
+//             });
+
+//             markersRef.current = [];
+//         };
+//     }, [
+//         mapLoaded,
+//         validProperties,
+//         validRoommates,
+//         validEstablishments,
+//         regularProperties,
+//         furnishedProperties,
+//     ]);
 
 //     if (!MAPTILER_API_KEY) {
 //         return (
@@ -756,9 +1199,8 @@ export default function PropertyMap({
 //                     }}
 //                 >
 //                     <CircularProgress />
-
 //                     <Typography color="text.secondary">
-//                         Loading MapTiler map...
+//                         Loading map...
 //                     </Typography>
 //                 </Box>
 //             )}
@@ -775,9 +1217,62 @@ export default function PropertyMap({
 //             />
 
 //             <Box className="property-map-legend">
-//                 <Typography variant="caption">
-//                     {validProperties.length} properties displayed
-//                 </Typography>
+//                 <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+//                     <Box
+//                         sx={{
+//                             width: 12,
+//                             height: 12,
+//                             borderRadius: "50%",
+//                             backgroundColor: "#1976d2",
+//                         }}
+//                     />
+//                     <Typography variant="caption">
+//                         {regularProperties.length} properties
+//                     </Typography>
+//                 </Box>
+
+//                 <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+//                     <Box
+//                         sx={{
+//                             width: 12,
+//                             height: 12,
+//                             borderRadius: "50%",
+//                             backgroundColor: "#f59e0b",
+//                         }}
+//                     />
+//                     <Typography variant="caption">
+//                         {furnishedProperties.length} furnished rentals
+//                     </Typography>
+//                 </Box>
+
+//                 <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+//                     <Box
+//                         sx={{
+//                             width: 11,
+//                             height: 11,
+//                             backgroundColor: "#2e9d50",
+//                             transform: "rotate(45deg)",
+//                         }}
+//                     />
+//                     <Typography variant="caption">
+//                         {validRoommates.length} roommate announcements
+//                     </Typography>
+//                 </Box>
+
+//                 <Box display="flex" alignItems="center" gap={1}>
+//                     <Box
+//                         sx={{
+//                             width: 13,
+//                             height: 13,
+//                             backgroundColor: "#7e22ce",
+//                             clipPath:
+//                                 "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+//                         }}
+//                     />
+//                     <Typography variant="caption">
+//                         {validEstablishments.length} establishments
+//                     </Typography>
+//                 </Box>
 //             </Box>
 //         </Box>
 //     );

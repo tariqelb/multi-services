@@ -2,6 +2,8 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import PhoneIcon from "@mui/icons-material/Phone";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 import {
     Alert,
@@ -160,6 +162,18 @@ export default function RoommateDetails({ listing }) {
                 owner?.lastName,
             ].filter(Boolean).join(" ")
             : "";
+
+    
+    const ownerPhone = (
+        listing?.phone ||
+        owner?.phoneNumber ||
+        owner?.notificationPreferences?.whatsapp?.phoneNumber ||
+        owner?.whatsappPhoneNumber ||
+        ""
+    ).trim();
+
+    const whatsappNumber = ownerPhone.replace(/\D/g, "");
+
 
     const availablePlaces =
         listing?.availablePlaces ??
@@ -924,6 +938,74 @@ export default function RoommateDetails({ listing }) {
                                 </Typography>
                             </Box>
                         </Stack>
+                        {/* Contact Owner */}
+                        <Divider sx={{ my: 2 }} />
+
+                        <Typography fontWeight={700} mb={1.5}>
+                            {translate(
+                                "roommates.details.contactOwner",
+                                "Contact announcement owner"
+                            )}
+                        </Typography>
+
+                        {ownerPhone ? (
+                            <Stack spacing={1.5}>
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ overflowWrap: "anywhere" }}
+                                >
+                                    {ownerPhone}
+                                </Typography>
+
+                                <Button
+                                    fullWidth
+                                    component="a"
+                                    href={`tel:${ownerPhone}`}
+                                    variant="contained"
+                                    color="primary"
+                                    startIcon={<PhoneIcon />}
+                                    sx={{
+                                        textTransform: "none",
+                                        fontWeight: 700,
+                                    }}
+                                >
+                                    {translate(
+                                        "roommates.details.callOwner",
+                                        "Call owner"
+                                    )}
+                                </Button>
+
+                                {whatsappNumber && (
+                                    <Button
+                                        fullWidth
+                                        component="a"
+                                        href={`https://wa.me/${whatsappNumber}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        variant="outlined"
+                                        color="success"
+                                        startIcon={<WhatsAppIcon />}
+                                        sx={{
+                                            textTransform: "none",
+                                            fontWeight: 700,
+                                        }}
+                                    >
+                                        {translate(
+                                            "roommates.details.whatsappOwner",
+                                            "Contact via WhatsApp"
+                                        )}
+                                    </Button>
+                                )}
+                            </Stack>
+                        ) : (
+                            <Alert severity="info">
+                                {translate(
+                                    "roommates.details.noPhone",
+                                    "The owner has not provided a phone number."
+                                )}
+                            </Alert>
+                    )}
 
                         {ownerId && (
                             <Button

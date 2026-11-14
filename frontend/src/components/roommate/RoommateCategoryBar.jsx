@@ -7,11 +7,12 @@ import {
     Button,
     MenuItem,
     TextField,
-    Typography,
 } from "@mui/material";
 
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import SearchIcon from "@mui/icons-material/Search";
+
+import cities from "../../data/moroccanCities";
 
 const purposes = [
     "All",
@@ -30,11 +31,7 @@ const propertyTypes = [
     "Other",
 ];
 
-const rentalPeriods = [
-    "All",
-    "Daily",
-    "Monthly",
-];
+const rentalPeriods = ["All", "Daily", "Monthly"];
 
 export default function RoommateCategoryBar({
     selectedPurpose,
@@ -49,7 +46,9 @@ export default function RoommateCategoryBar({
     onSearchChange,
     onClearFilters,
 }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+
+    const isArabic = i18n.language?.startsWith("ar");
 
     const getPurposeLabel = (purpose) => {
         if (purpose === "All") {
@@ -58,9 +57,16 @@ export default function RoommateCategoryBar({
             });
         }
 
-        return t(`roommates.purpose.${purpose}`, {
-            defaultValue: purpose,
-        });
+        const purposeKeys = {
+            "Share My Property": "shareMyProperty",
+            "Find a Room": "findARoom",
+            "Rent Together": "rentTogether",
+        };
+
+        return t(
+            `roommates.purpose.${purposeKeys[purpose] || purpose}`,
+            { defaultValue: purpose }
+        );
     };
 
     const getPropertyTypeLabel = (type) => {
@@ -70,7 +76,7 @@ export default function RoommateCategoryBar({
             });
         }
 
-        return t(`properties.types.${type}`, {
+        return t(`roommates.properties.types.${type.toLowerCase()}`, {
             defaultValue: type,
         });
     };
@@ -125,7 +131,9 @@ export default function RoommateCategoryBar({
                     defaultValue: "Search announcements...",
                 })}
                 value={search}
-                onChange={(event) => onSearchChange(event.target.value)}
+                onChange={(event) =>
+                    onSearchChange(event.target.value)
+                }
                 InputProps={{
                     startAdornment: (
                         <SearchIcon
@@ -152,6 +160,7 @@ export default function RoommateCategoryBar({
                     alignItems: "center",
                 }}
             >
+                {/* Property type */}
                 <TextField
                     select
                     size="small"
@@ -171,6 +180,7 @@ export default function RoommateCategoryBar({
                     ))}
                 </TextField>
 
+                {/* Rental period */}
                 <TextField
                     select
                     size="small"
@@ -187,28 +197,48 @@ export default function RoommateCategoryBar({
                         <MenuItem key={period} value={period}>
                             {period === "All"
                                 ? t("roommates.filters.allPeriods", {
-                                    defaultValue: "All periods",
-                                })
-                                : t(`properties.rentalPeriod.${period}`, {
-                                    defaultValue: period,
-                                })}
+                                      defaultValue: "All periods",
+                                  })
+                                : t(
+                                      `roommates.properties.rentalPeriod.${period.toLowerCase()}`,
+                                      { defaultValue: period }
+                                  )}
                         </MenuItem>
                     ))}
                 </TextField>
 
+                {/* City */}
                 <TextField
+                    select
                     size="small"
                     fullWidth
                     label={t("roommates.filters.city", {
                         defaultValue: "City",
                     })}
-                    placeholder={t("roommates.filters.enterCity", {
-                        defaultValue: "Enter city",
-                    })}
                     value={city}
-                    onChange={(event) => onCityChange(event.target.value)}
-                />
+                    onChange={(event) =>
+                        onCityChange(event.target.value)
+                    }
+                >
+                    <MenuItem value="">
+                        {t("roommates.filters.allCities", {
+                            defaultValue: "All cities",
+                        })}
+                    </MenuItem>
 
+                    {cities.map((cityItem) => (
+                        <MenuItem
+                            key={cityItem.en}
+                            value={cityItem.en}
+                        >
+                            {isArabic
+                                ? cityItem.ar
+                                : cityItem.en}
+                        </MenuItem>
+                    ))}
+                </TextField>
+
+                {/* Clear filters */}
                 <Button
                     variant="outlined"
                     color="inherit"

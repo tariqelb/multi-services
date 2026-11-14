@@ -3,16 +3,19 @@
         "myProfile": "My Profile",
         "settings": "Settings",
         "notification": "Notification",
+        "myPublication": "My Publication",
+        "saved": "Saved",
         "logout": "Logout",
         "member": "Member",
         "user": "User"
     },
     "sidebar": {
         "home": "Home",
-        "properties": "Properties",
+        "properties": "Find a Property",
+        "furnishedProperties":"Find Furnished Rental",
         "externalListing": "External listing",
         "findbymap": "Find by map",
-        "publish": "Publish",
+        "publish": "Publish a Property",
         "myPublication": "My Publication",
         "saved": "Saved",
         "alert": "Alert",
@@ -24,7 +27,9 @@
         "systemsOnline": "All systems online",
         "knowledge": "Knowledge Center",
         "knowledgeManagement": "Knowledge Management",
-        "findRoommate": "Find a Roommate"
+        "findRoommate": "Find a Roommate",
+        "establishments": "Find Hotels & Riads",
+        "publishEstablishment": "Publish an Establishment"
     },
     "middleContent": {
         "overview": "{{section}} Overview",
@@ -261,7 +266,9 @@
             "surface": "Surface",
             "rooms": "Rooms",
             "salons": "Salons",
-            "bathrooms": "Bathrooms"
+            "bathrooms": "Bathrooms",
+            "furnished": "Furnished",
+            "unfurnished": "Unfurnished"
         },
         "details": {
             "title": "Property details",
@@ -586,9 +593,29 @@
                 "archive": "Failed to archive alert.",
                 "restore": "Failed to restore alert."
             }
-        } 
-
-
+        },
+        "roommatesTypes": {
+            "apartment": "Apartment",
+            "house": "House",
+            "villa": "Villa",
+            "studio": "Studio",
+            "room": "Room",
+            "other": "Other"
+        },
+        "furnished": {
+            "filterTitle": "Find furnished accommodation",
+            "propertyType": "Property type",
+            "categoriesAriaLabel": "Furnished property categories",
+            "rentalPeriod": "Rental period",
+            "allPeriods": "All periods",
+            "daily": "Daily",
+            "monthly": "Monthly",
+            "title": "Furnished Rentals",
+            "subtitle": "Find furnished villas, studios, rooms, apartments and houses for daily or monthly rent.",
+            "listingsTitle": "Available furnished properties",
+            "emptyTitle": "No furnished rentals found",
+            "emptyDescription": "Try selecting another property type or rental period."
+        }
     },
     "notifications": {
         "title": "Notifications",
@@ -1702,5 +1729,705 @@
 
 
 
+    },
+    "roommates": {
+        "properties": {
+            "types": {
+                "apartment": "Apartment",
+                "house": "House",
+                "villa": "Villa",
+                "studio": "Studio",
+                "room": "Room",
+                "other": "Other"
+            },
+            "rentalPeriod": {
+                "daily": "Daily",
+                "monthly": "Monthly"
+            }
+        },
+        "form": {
+            "rentOccupancy": "Rent and occupancy",
+            "rentDescription": "Set the rental price and available places.",
+            "totalRent": "Total rent",
+            "individualRoomPrice": "Individual room price",
+            "deposit": "Deposit",
+            "syndicateFees": "Syndicate fees",
+            "otherExpenses": "Other expenses",
+            "totalPeople": "Total occupants",
+            "currentPeople": "Current occupants",
+            "availablePlaces": "Available places",
+            "rentalPeriod": "Rental period",
+            "rentSplitType": "Rent split type",
+            "availableFrom": "Available from",
+                "announcement": "Announcement",
+            "announcementDescription": "Introduce your accommodation or explain what you are looking for.",
+            "title": "Title",
+            "titlePlaceholder": "Example: Looking for 2 roommates in Marrakech",
+            "description": "Description",
+            "descriptionPlaceholder": "Describe the accommodation and expectations.",
+            "purpose": "Purpose",
+            "location": "Location and accommodation",
+            "locationDescription": "Provide information about the accommodation.",
+            "neighborhood": "Neighborhood",
+            "fullAddress": "Full address",
+            "mapLink": "Google Maps link",
+            "propertyType": "Property type",
+            "furnishing": "Furnishing",
+            "surface": "Surface area (m²)",
+            "condition": "Property condition",
+            "bedrooms": "Bedrooms",
+            "salons": "Living rooms",
+            "bathrooms": "Bathrooms",
+            "floor": "Floor",
+            "photosVideo": "Photos and video",
+            "mediaDescription": "Add photos and optionally a YouTube video.",
+            "uploadPhotos": "Upload photos",
+            "imageRequirements": "Maximum 15 images. JPG, PNG or WEBP. Maximum 5 MB per image.",
+            "youtubeLink": "YouTube video link",
+            "preferences": "Roommate preferences",
+            "preferencesDescription": "Choose the preferences that matter to you.",
+            "preferredGender": "Preferred gender",
+            "smokingAllowed": "Smoking allowed",
+            "petsAllowed": "Pets allowed",
+            "publishTitle": "Publish your announcement",
+            "publishDescription": "Review your information before publishing your roommate announcement.",
+            "verificationRequired": "Please verify your email address and WhatsApp number before publishing.",
+            "publishing": "Publishing...",
+            "publish": "Publish announcement"
+        },
+        "rentSplit": {
+            "equal": "Equal",
+            "custom": "Custom"
+        },
+        "title": "Find a Roommate",
+        "subtitle": "Find a room, share your property, or connect with people looking to rent together.",
+        "announcements": "Announcements",
+        "addAnnouncement": "Add an announcement",
+        "results": "announcements found",
+        "errors": {
+            "loadFailed": "Unable to load roommate announcements. Please try again."
+        },
+        "empty": {
+            "title": "No roommate announcements found",
+            "description": "Try changing your filters or search for another city."
+        },
+        "filters": {
+            "allPurposes": "All announcements",
+            "allPropertyTypes": "All property types",
+            "propertyType": "Property type",
+            "rentalPeriod": "Rental period",
+            "allPeriods": "All periods",
+            "city": "City",
+            "allCities": "All cities",
+            "search": "Search announcements...",
+            "clear": "Clear filters"
+        },
+        "purpose": {
+            "shareMyProperty": "Share My Property",
+            "findARoom": "Find a Room",
+            "rentTogether": "Rent Together",
+            "shareApartment": "Share my apartment",
+            "findRoom": "Find a room",
+            "Share My Property": "Share my property",
+            "Share My Apartment": "Share my apartment",
+            "Find a Room": "Find a room",
+            "Rent Together": "Rent together"
+        },
+       "pagination": {
+            "results": "{{count}} announcements found",
+            "label": "Roommate announcements pages",
+            "pageInfo": "Page {{current}} of {{total}}",
+            "first": "First page",
+            "last": "Last page",
+            "next": "Next page",
+            "previous": "Previous page",
+            "goToPage": "Go to page {{page}}"
+        },
+        "insert": {
+            "cityPlaceholder": "Select a Moroccan city",
+            "badge": "ROOMMATE ANNOUNCEMENT",
+            "title": "Create a roommate announcement",
+            "subtitle": "Share your accommodation, find a room, or connect with people who want to rent together.",
+            "requiredFields": "Fields marked with * are required.",
+            "validation": {
+                "required": "This field is required.",
+                "titleLength": "The title must contain between 5 and 120 characters.",
+                "descriptionLength": "The description cannot exceed 3000 characters.",
+                "invalidCapacity": "Enter a valid total number of people.",
+                "invalidOccupants": "Enter a valid number of current occupants.",
+                "capacityExceeded": "Current occupants cannot exceed total capacity.",
+                "availablePlaceRequired": "You must have at least one available place.",
+                "nonNegativeNumber": "Enter a valid non-negative number.",
+                "surfacePositive": "Surface must be greater than zero.",
+                "invalidMapUrl": "Enter a valid Google Maps URL.",
+                "invalidYoutubeUrl": "Enter a valid YouTube video URL.",
+                "invalidDate": "Enter a valid date."
+            },
+            "verification": {
+                "email": "email verification",
+                "whatsapp": "WhatsApp verification"
+            },
+            "notifications": {
+                "profileLoadError": "Unable to load your profile. Please try again.",
+                "invalidImages": "Some images were rejected. Use JPG, PNG or WEBP files up to 5 MB.",
+                "maxImages": "You can upload a maximum of 15 images.",
+                "profileVerifyError": "Unable to verify your account. Please reload the page.",
+                "verifyBeforePublishing": "Please complete {{items}} before publishing.",
+                "correctFields": "Please correct the highlighted fields.",
+                "publishSuccess": "Your roommate announcement has been published successfully.",
+                "publishError": "Failed to publish your announcement. Please try again."
+            }
+        },
+        "card": {
+            "noImage": "No image available",
+            "priceNotSpecified": "Price not specified",
+            "totalRent": "total",
+            "perPerson": "Per person",
+            "availablePlaces": "available places",
+            "bedrooms": "bedrooms",
+            "availableFrom": "Available from",
+            "postedBy": "Posted by"
+        },
+        "fields": {
+            "city": "City"
+        },
+        "details": {
+            "notSpecified": "Not specified",
+            "noPhotos": "No photos available",
+            "video": "Property video",
+            "description": "Description",
+            "noDescription": "No description provided.",
+            "accommodation": "Accommodation details",
+            "viewMap": "View location on map",
+            "preferences": "Roommate preferences",
+            "totalRent": "Total rent",
+            "roomPrice": "Individual room price",
+            "rentPerPerson": "Estimated rent per person",
+            "additionalExpenses": "Additional expenses",
+            "owner": "Announcement owner",
+            "postedOn": "Posted on",
+            "viewProfile": "View owner profile",
+            "backToAnnouncements": "Back to announcements",
+            "contactOwner": "Contact announcement owner",
+            "callOwner": "Call owner",
+            "whatsappOwner": "Contact via WhatsApp",
+            "noPhone": "The owner has not provided a phone number."
+        },
+        "preferences": {
+            "any": "Any",
+            "male": "Male",
+            "female": "Female"
+        },
+        "furnishing": {
+            "Furnished": "Furnished",
+            "Unfurnished": "Unfurnished",
+            "Partially Furnished": "Partially furnished",
+            "furnished": "Furnished",
+            "unfurnished": "Unfurnished"
+        },
+        "condition": {
+            "New": "New",
+            "Excellent": "Excellent",
+            "Good": "Good",
+            "Needs Renovation": "Needs renovation",
+            "Under Construction": "Under construction",
+            "needsrenovation": "Needs renovation",
+            "new": "New",
+            "good": "Good"
+        },
+        "gender": {
+            "any": "Any",
+            "male": "Male",
+            "female": "Female"
+        }
+    },
+    "establishmentForm": {
+        "badge": "ACCOMMODATION",
+        "title": "Add your establishment",
+        "description": "Create a detailed profile for your hotel, riad, guesthouse or other accommodation.",
+        "sections": {
+        "information": "Establishment information",
+        "informationSubtitle": "Introduce your accommodation.",
+        "location": "Location",
+        "locationSubtitle": "Where can visitors find your establishment?",
+        "rooms": "Rooms and accommodation",
+        "roomsSubtitle": "Define your room categories and their prices.",
+        "facilities": "Services and facilities",
+        "facilitiesSubtitle": "Select everything your establishment offers.",
+        "contact": "Contact and online presence",
+        "contactSubtitle": "How can visitors contact and find you online?",
+        "photos": "Photos and media",
+        "photosSubtitle": "Show visitors what your establishment looks like."
+        },
+        "fields": {
+        "name": "Establishment name",
+        "accommodationType": "Accommodation type",
+        "shortDescription": "Short description",
+        "fullDescription": "Full description",
+        "yearEstablished": "Year established",
+        "numberOfRooms": "Number of rooms",
+        "numberOfFloors": "Number of floors",
+        "classification": "Hotel classification",
+        "city": "City",
+        "neighborhood": "Neighborhood",
+        "fullAddress": "Full address",
+        "googleMapsLink": "Google Maps link",
+        "roomType": "Room type",
+        "roomQuantity": "Number of rooms of this type",
+        "maxGuests": "Maximum guests",
+        "pricePerNight": "Price per night (MAD)",
+        "bedConfiguration": "Bed configuration",
+        "roomFacilities": "Room facilities",
+        "roomDescription": "Room description",
+        "otherServices": "Other services",
+        "phoneNumber": "Phone number",
+        "whatsappNumber": "WhatsApp number",
+        "email": "Email address",
+        "officialWebsite": "Official website",
+        "bookingWebsite": "Booking / reservation link",
+        "socialMedia": "Social media links",
+        "platform": "Platform",
+        "socialUrl": "Social media URL",
+        "coverPhoto": "Main cover photo",
+        "gallery": "Establishment gallery",
+        "establishmentVideo": "Establishment video",
+        "youtubeUrl": "YouTube video URL"
+        },
+        "actions": {
+        "add": "Add",
+        "remove": "Remove",
+        "addRoom": "Add another room type",
+        "uploadRoomPhotos": "Upload room photos",
+        "uploadCover": "Upload main cover photo",
+        "removeCover": "Remove cover photo",
+        "uploadGallery": "Upload gallery photos",
+        "watchOnYoutube": "Watch on YouTube",
+        "reset": "Reset",
+        "publishing": "Publishing...",
+        "create": "Create establishment"
+        },
+        "helpers": {
+        "googleMaps": "Add a Google Maps share link so the location coordinates can be extracted automatically.",
+        "imageLimit": "JPG, PNG or WEBP · Maximum 5MB",
+        "roomPhotosLimit": "Maximum 15 photos per room type, 5MB each.",
+        "galleryLimit": "Maximum 30 images, 5MB per image.",
+        "videoDescription": "Add a YouTube video to introduce your hotel, riad or guesthouse. Visitors will be able to watch it directly on your establishment page.",
+        "youtubeUrl": "Paste a YouTube video, Shorts or shortened YouTube link."
+        },
+        "submit": {
+        "title": "Ready to create your establishment?",
+        "description": "Check your information before submitting."
+        },
+        "notClassified": "Not classified",
+        "star": "Star",
+        "stars": "Stars",
+        "roomType": "Room type",
+        "videoPreview": "Video preview",
+        "videoTitle": "Establishment video preview",
+        "errors": {
+        "invalidYoutube": "This YouTube link is not valid. Please check the URL."
+        },
+        "empty": {
+        "gallery": "No gallery photos selected",
+        "roomPhotos": "No room photos selected"
+        },
+        "options": {
+        "hotel": "Hotel",
+        "riad": "Riad",
+        "guesthouse": "Guesthouse",
+        "hostel": "Hostel",
+        "aparthotel": "Aparthotel",
+        "other": "Other",
+        "single_room": "Single room",
+        "double_room": "Double room",
+        "twin_room": "Twin room",
+        "triple_room": "Triple room",
+        "family_room": "Family room",
+        "suite": "Suite",
+        "deluxe_room": "Deluxe room",
+        "studio": "Studio",
+        "apartment": "Apartment",
+        "dormitory": "Dormitory",
+        "single_bed": "Single bed",
+        "double_bed": "Double bed",
+        "queen_bed": "Queen bed",
+        "king_bed": "King bed",
+        "sofa_bed": "Sofa bed",
+        "bunk_bed": "Bunk bed",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "tiktok": "TikTok",
+        "youtube": "YouTube",
+        "linkedin": "LinkedIn"
+        }
+    },
+    "establishments": {
+        "title": "Hotels & Riads",
+        "subtitle": "Discover hotels, riads, guesthouses and other accommodation.",
+        "publish": "Publish establishment",
+        "accommodation": "Accommodation",
+        "locationNotSpecified": "Location not specified",
+        "descriptionFallback": "Discover this accommodation and its available rooms.",
+        "rooms_one": "{{count}} room",
+        "rooms_other": "{{count}} rooms",
+        "startingPrice": "Starting price / night",
+        "contactForPrices": "Contact for prices",
+        "viewDetails": "View details",
+        "filters": {
+        "search": "Search establishments",
+        "searchPlaceholder": "Search by name...",
+        "city": "City",
+        "cityPlaceholder": "Enter city",
+        "accommodationType": "Accommodation type",
+        "allTypes": "All types"
+        },
+        "types": {
+            "all": "All",
+            "hotel": "Hotel",
+            "riad": "Riad",
+            "guesthouse": "Guesthouse",
+            "hostel": "Hostel",
+            "aparthotel": "Aparthotel",
+            "other": "Other"
+        },
+        "errors": {
+            "fetch": "Unable to load establishments. Please try again."
+        },
+        "empty": {
+            "title": "No establishments found",
+            "subtitle": "Try changing your search or filters.",
+            "clearFilters": "Clear filters"
+        },
+        "details": {
+            "back": "Back to establishments",
+            "fetchError": "Unable to retrieve this establishment.",
+            "notFound": "Establishment not found.",
+            "locationNotSpecified": "Location not specified",
+            "previousImage": "Previous image",
+            "nextImage": "Next image",
+            "morePhotos": "View more photos",
+            "starClassification": "star classification",
+            "about": "About this establishment",
+            "noDescription": "No additional description provided.",
+            "numberOfRooms": "Number of rooms",
+            "numberOfFloors": "Number of floors",
+            "established": "Established",
+            "rooms": "Rooms & accommodation",
+            "noRooms": "No room information provided.",
+            "room": "Room",
+            "roomCount": "room(s)",
+            "night": "night",
+            "guests": "guests",
+            "privateBathroom": "Private bathroom",
+            "airConditioning": "Air conditioning",
+            "balcony": "Balcony / terrace",
+            "facilitiesTitle": "Facilities & services",
+            "location": "Location",
+            "addressNotProvided": "Address not provided",
+            "viewMap": "View on Google Maps",
+            "video": "Establishment video",
+            "watchOnYoutube": "Watch on YouTube",
+            "invalidVideo": "This video link could not be embedded. You can try opening it directly.",
+            "openVideo": "Open video",
+            "contactReservation": "Contact & reservation",
+            "call": "Call establishment",
+            "whatsapp": "Contact on WhatsApp",
+            "sendEmail": "Send email",
+            "officialWebsite": "Official website",
+            "bookingWebsite": "Visit booking website",
+            "followUs": "Follow us",
+            "socialMedia": "Social media",
+            "facilities": {
+                "swimmingPool": "Swimming pool",
+                "restaurant": "Restaurant",
+                "breakfast": "Breakfast",
+                "wifi": "Wi-Fi",
+                "parking": "Parking",
+                "spaHammam": "Spa / Hammam",
+                "airportTransfer": "Airport transfer",
+                "gardenRooftop": "Garden / Rooftop",
+                "reception": "Reception",
+                "laundry": "Laundry",
+                "roomService": "Room service"
+            }
+        }
+    },
+    "profileEstablishment": {
+        "myEstablishments": "My Establishments",
+        "publicationCount": "{{count}} establishments",
+        "noEstablishments": "You haven't published any establishments yet.",
+        "emptySubtitle": "Your published hotels and riads will appear here.",
+        "fetchError": "Unable to load your establishments.",
+        "deleteError": "Unable to delete this establishment.",
+        "startingPrice": "Starting price / night",
+        "contactForPrices": "Contact for prices",
+        "rooms": "rooms",
+        "unnamed": "Unnamed establishment",
+        "confirmDeleteTitle": "Delete establishment?",
+        "confirmDeleteMessage": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+        "types": {
+        "Hotel": "Hotel",
+        "Riad": "Riad",
+        "Guesthouse": "Guesthouse",
+        "Hostel": "Hostel",
+        "Aparthotel": "Aparthotel",
+        "Other": "Other"
+        }
+    },
+    "publicProfile": {
+        "title": "Publisher profile",
+        "subtitle": "View publisher information and listings.",
+        "publisher": "Property publisher",
+        "about": "About the publisher",
+        "propertiesTab": "Properties",
+        "roommatesTab": "Roommates",
+        "establishmentsTab": "Hotels & Riads",
+        "reviewsTab": "Reviews",
+        "totalProperties": "Published properties",
+        "availableProperties": "Available properties",
+        "totalRoommates": "Roommate announcements",
+        "totalEstablishments": "Establishments",
+        "totalReviews": "Total reviews",
+        "noProperties": "No properties published yet.",
+        "noRoommates": "No roommate announcements yet.",
+        "noEstablishments": "No establishments published yet.",
+        "viewProperty": "View property",
+        "viewRoommate": "View announcement",
+        "viewEstablishment": "View establishment",
+        "reviewsTitle": "Publisher reviews",
+        "writeReview": "Write a review",
+        "yourRating": "Your rating",
+        "submitReview": "Submit review",
+        "noReviews": "No reviews yet.",
+        "loginToReview": "Log in to write a review.",
+        "ownProfileReview": "You cannot review your own profile.",
+        "reviewSuccess": "Your review was submitted successfully.",
+        "loadError": "Unable to load this profile.",
+        "back": "Back",
+        "member": "Member",
+        "unknownUser": "Unknown user",
+        "untitled": "Untitled",
+        "memberSince": "Member since {{date}}",
+        "reviewCount": "{{count}} reviews",
+        "viewDetails": "View details",
+        "loadMore": "Load more",
+        "loading": "Loading...",
+        "from": "From ",
+        "pricePerMonth": "",
+        "bedrooms": "bedrooms",
+        "rooms": "rooms",
+        "occupants": "occupants",
+        "roommateListing": "Roommate announcement",
+        "stats": {
+            "properties": "Published properties",
+            "availableProperties": "Available properties",
+            "roommates": "Roommate announcements",
+            "establishments": "Establishments",
+            "reviews": "Reviews"
+        },
+        "tabs": {
+            "properties": "Properties",
+            "roommates": "Roommates",
+            "establishments": "Hotels & Riads",
+            "reviews": "Reviews"
+        },
+        "empty": {
+            "properties": "No properties published yet.",
+            "roommates": "No roommate announcements published yet.",
+            "establishments": "No establishments published yet.",
+            "reviews": "No reviews yet."
+        },
+        "roles": {
+            "client": "Client",
+            "admin": "Administrator",
+            "owner": "Owner",
+            "agent": "Real estate agent",
+            "agency": "Agency"
+        },
+        "genders": {
+            "male": "Male",
+            "female": "Female",
+            "any": "Any"
+        },
+        "reviews": {
+            "ratingSummary": "Rating summary",
+            "writeReview": "Write a review",
+            "yourRating": "Your rating",
+            "comment": "Your comment",
+            "submitting": "Submitting...",
+            "submit": "Submit review",
+            "submitSuccess": "Your review was submitted successfully.",
+            "allReviews": "All reviews"
+        },
+        "errors": {
+            "profile": "Unable to load this profile.",
+            "properties": "Unable to load properties.",
+            "roommates": "Unable to load roommate announcements.",
+            "establishments": "Unable to load establishments.",
+            "reviews": "Unable to load reviews.",
+            "ratingRequired": "Please select a rating.",
+            "commentLength": "Your comment must contain between 3 and 1000 characters.",
+            "submitReview": "Unable to submit your review."
+        }
+    },
+    "findMap": {
+        "title": "Find Properties, Roommates and Establishments on Map",
+        "subtitle": "Explore properties, roommate announcements, hotels, riads and other accommodations across Morocco.",
+        "listingsOnMap_one": "{{count}} listing on map",
+        "listingsOnMap_other": "{{count}} listings on map",
+        "loading": "Loading properties, roommates and establishments...",
+        "errors": {
+        "allListings": "Unable to load properties, roommates and establishments. Please try again.",
+        "loadMap": "Unable to load map listings. Please try again."
+        },
+        "empty": {
+            "title": "No listings with map coordinates found.",
+            "subtitle": "Listings need valid Moroccan map coordinates to appear here."
+        },
+        "filters": {
+            "city": "City",
+            "allMorocco": "All Morocco",
+            "propertyType": "Property type",
+            "allTypes": "All types",
+            "establishmentType": "Establishment type",
+            "allEstablishments": "All establishments",
+            "listing": "Listing",
+            "allListings": "All listings",
+            "forSale": "For Sale",
+            "forRent": "For Rent",
+            "rentalType": "Rental type",
+            "allRentals": "All rentals",
+            "regularRental": "Regular rent",
+            "roommate": "Roommate",
+            "maximumPrice": "Maximum price (MAD)"
+        },
+        "accommodationTypes": {
+            "hotel": "Hotel",
+            "riad": "Riad",
+            "guesthouse": "Guesthouse",
+            "hostel": "Hostel",
+            "aparthotel": "Aparthotel",
+            "other": "Other"
+        },
+        "propertyTypes": {
+            "room": "Room",
+            "studio": "Studio",
+            "apartment": "Apartment",
+            "house": "House",
+            "villa": "Villa",
+            "land": "Land",
+            "office": "Office",
+            "store": "Store",
+            "warehouse": "Warehouse",
+            "garage": "Garage",
+            "commercial space": "Commercial space",
+            "commercial store": "Commercial store",
+            "other": "Other"
+        },
+        "listingTypes": {
+            "forsale": "For Sale",
+            "forrent": "For Rent"
+        },
+        "rentalPeriods": {
+            "day": "day",
+            "daily": "day",
+            "week": "week",
+            "weekly": "week",
+            "month": "month",
+            "monthly": "month",
+            "year": "year",
+            "yearly": "year"
+        },
+        "cards": {
+            "property": "Property",
+            "untitledProperty": "Untitled property",
+            "noImage": "No image available",
+            "furnished": "FURNISHED",
+            "viewDetails": "View details",
+            "roommateAnnouncement": "Roommate announcement",
+            "availablePlaces_one": "{{count}} place available",
+            "availablePlaces_other": "{{count}} places available",
+            "establishment": "Establishment",
+            "unnamedEstablishment": "Unnamed establishment",
+            "accommodation": "Accommodation",
+            "fromPrice": "From {{price}} MAD / night",
+            "viewEstablishment": "View establishment",
+            "viewAnnouncement": "View announcement"
+        },
+        "map": {
+            "unknownError": "Unknown map error.",
+            "markerRoommate": "roommate announcement",
+            "markerEstablishment": "establishment",
+            "markerFurnished": "furnished property",
+            "markerProperty": "property",
+            "viewMarker": "View {{type}} {{number}}",
+            "missingApiKey": "MapTiler API key is missing. Add VITE_MAPTILER_API_KEY to your frontend .env file.",
+            "loadFailed": "The map could not be loaded.",
+            "checkConfiguration": "Check your API key, allowed origins, and map ID.",
+            "loading": "Loading map..."
+        },
+        "legend": {
+            "properties_one": "{{count}} property",
+            "properties_other": "{{count}} properties",
+            "furnishedRentals_one": "{{count}} furnished rental",
+            "furnishedRentals_other": "{{count}} furnished rentals",
+            "roommates_one": "{{count}} roommate announcement",
+            "roommates_other": "{{count}} roommate announcements",
+            "establishments_one": "{{count}} establishment",
+            "establishments_other": "{{count}} establishments"
+        }
+    },
+    "alerts": {
+        "title": "My Alerts",
+        "subtitle": "Manage your property and roommate notifications in one place.",
+        "propertyAlerts": "Property Alerts",
+        "roommateAlerts": "Roommate Alerts",
+        "roommateCreateTitle": "Create roommate alert",
+        "roommateCreateSubtitle": "Choose your preferred city, property types, purposes and rental periods to find matching roommate announcements.",
+        "city": "City",
+        "cityPlaceholder": "Choose or enter a city",
+        "roommatePurposes": "Roommate purpose",
+        "roommatePropertyTypes": "Property types",
+        "rentalPeriods": "Rental period",
+        "rentalPeriodsHint": "Leave both options unselected to receive announcements for any rental period.",
+        "selectedForAlert": "Your alert preferences",
+        "anyCity": "Any city",
+        "propertyTypeCount": "{{count}} property types",
+        "restoreAlert": "Restore alert",
+        "restoring": "Restoring...",
+        "restore": "Restore",
+        "archiveAlert": "Archive alert",
+        "archiving": "Archiving...",
+        "archive": "Archive",
+        "archivedLabel": "Archived",
+        "anyRentalPeriod": "Any rental period",
+        "noPropertyTypes": "No property types selected.",
+        "rentalPeriodSummary": "Rental period:",
+        "saving": "Saving...",
+        "save": "Create alert",
+        "yourAlerts": "Your active alerts",
+        "emptyTitle": "No active alerts yet",
+        "emptySubtitle": "Create an alert above to receive notifications about matching announcements.",
+        "archivedAlerts": "Archived alerts",
+        "noArchivedAlerts": "You don't have any archived alerts.",
+        "errors": {
+        "load": "Failed to load alerts.",
+        "cityRequired": "Please select a city.",
+        "propertyTypeRequired": "Please select at least one property type.",
+        "purposeRequired": "Please select at least one roommate purpose.",
+        "duplicate": "This alert already exists.",
+        "missingCreatedAlert": "The created alert was not returned by the server.",
+        "create": "Failed to create alert.",
+        "archive": "Failed to archive alert.",
+        "restore": "Failed to restore alert."
+        },
+        "success": {
+        "created": "Alert created successfully.",
+        "archived": "Alert archived successfully.",
+        "restored": "Alert restored successfully."
+        }
     }
+
+
+
 }

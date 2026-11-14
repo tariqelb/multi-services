@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -17,7 +16,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axiosInstance from "../../api/axiosInstance";
 import RoommateDetails from "./RoommateDetails";
 
-export default function RoommateDetailsPage() {
+export default function RoommateDetailsPage({
+    DetailsComponent = RoommateDetails,
+}) {
     const { id } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -150,7 +151,7 @@ export default function RoommateDetailsPage() {
             )}
 
             {!loading && !error && listing && (
-                <RoommateDetails listing={listing} />
+                <DetailsComponent listing={listing} />
             )}
         </Container>
     );
