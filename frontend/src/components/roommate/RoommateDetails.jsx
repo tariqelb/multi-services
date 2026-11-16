@@ -1040,7 +1040,7 @@ export default function RoommateDetails({ listing }) {
                         >
                             {translate(
                                 "roommates.details.backToAnnouncements",
-                                "Back to announcements"
+                                "Back"
                             )}
                         </Button>
                     </Paper>

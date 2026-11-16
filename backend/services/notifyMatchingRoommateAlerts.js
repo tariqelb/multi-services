@@ -1,3 +1,4 @@
+
 import RoommateAlert from "../DatabaseModels/Schema/RoommateAlert.js";
 import User from "../DatabaseModels/Schema/User.js";
 
@@ -9,17 +10,53 @@ import {
     sendRoommateAlertEmail,
 } from "./emailService.js";
 
+import {
+    sendRoommateAlertSMS,
+} from "./smsService.js";
+
+// Unique marker to verify that this exact file is loaded.
+console.log(
+    "🔥 [RoommateAlerts] LOADED SMS VERSION 2026-11-15"
+);
+
 const escapeRegex = (value) =>
     value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+const normalizeLanguage = (language) => {
+    const normalized = String(language || "en")
+        .toLowerCase()
+        .split("-")[0]
+        .split("_")[0];
 
-export const sendRoommateEmailIfEnabled = async (
-    alert,
-    roommateListing
-) => {
-    const user = await User.findById(alert.user)
-        .select("email notificationPreferences");
+    return ["en", "fr", "ar"].includes(normalized)
+        ? normalized
+        : "en";
+};
 
+const notificationTranslations = {
+    en: {
+        title: "New roommate announcement matches your alert",
+        message: (listing) =>
+            `${listing.title || "A new announcement"} is available in ${listing.city}.`,
+    },
+
+    fr: {
+        title: "Une nouvelle annonce de colocation correspond à votre alerte",
+        message: (listing) =>
+            `${listing.title || "Une nouvelle annonce"} est disponible à ${listing.city}.`,
+    },
+
+    ar: {
+        title: "إعلان سكن مشترك جديد يطابق التنبيه الخاص بك",
+        message: (listing) =>
+            `${listing.title || "إعلان جديد"} متاح في ${listing.city}.`,
+    },
+};
+
+/**
+ * Send email notification if enabled.
+ */
+const sendEmailIfEnabled = async (user, roommateListing) => {
     if (!user?.email) {
         return {
             sent: false,
@@ -27,33 +64,104 @@ export const sendRoommateEmailIfEnabled = async (
         };
     }
 
-    const emailPreferences =
+    const preferences =
         user.notificationPreferences?.email;
 
     if (
-        emailPreferences?.enabled !== true ||
-        emailPreferences?.roommateAlerts !== true
+        preferences?.enabled !== true ||
+        preferences?.propertyAlerts !== true
     ) {
         return {
             sent: false,
-            reason: "Roommate email alerts disabled",
+            reason: "Email property alerts disabled",
         };
     }
 
     await sendRoommateAlertEmail({
         to: user.email,
         roommateListing,
+        language: normalizeLanguage(user.language),
     });
 
-    return { sent: true };
+    return {
+        sent: true,
+    };
 };
 
+/**
+ * Send SMS notification if enabled.
+ *
+ * Reuses the existing WhatsApp preference object
+ * because it contains the verified phone number.
+ */
+const sendSMSIfEnabled = async (user, roommateListing) => {
+    const preferences =
+        user?.notificationPreferences?.whatsapp;
 
+    console.log("\n[Roommate SMS] Checking recipient:", {
+        userId: String(user._id),
+        language: user.language,
+        normalizedLanguage: normalizeLanguage(user.language),
+        smsEnabled: preferences?.enabled,
+        propertyAlertsEnabled: preferences?.propertyAlerts,
+        phoneVerified: preferences?.verified,
+        phoneNumberExists: Boolean(preferences?.phoneNumber),
+    });
+
+    if (
+        preferences?.enabled !== true ||
+        preferences?.propertyAlerts !== true
+    ) {
+        return {
+            sent: false,
+            reason: "SMS property alerts disabled",
+        };
+    }
+
+    if (preferences.verified !== true) {
+        return {
+            sent: false,
+            reason: "Phone number not verified",
+        };
+    }
+
+    if (!preferences.phoneNumber) {
+        return {
+            sent: false,
+            reason: "No phone number configured",
+        };
+    }
+
+    console.log("[Roommate SMS] Eligible recipient:", {
+        userId: String(user._id),
+        phoneNumber: preferences.phoneNumber,
+        language: normalizeLanguage(user.language),
+        listingId: String(roommateListing._id),
+    });
+
+    const result = await sendRoommateAlertSMS({
+        to: preferences.phoneNumber,
+        roommateListing,
+        language: normalizeLanguage(user.language),
+    });
+
+    console.log("[Roommate SMS] Service result:", {
+        userId: String(user._id),
+        result,
+    });
+
+    return result;
+};
+
+/**
+ * Find users with matching roommate alerts and notify them.
+ */
 const notifyMatchingRoommateAlerts = async (
     roommateListing,
     io
 ) => {
     console.log("\n========== ROOMMATE ALERT DEBUG ==========");
+    console.log("Handler version: SMS VERSION 2026-11-15");
 
     console.log("Listing ID:", String(roommateListing._id));
     console.log("Publisher:", String(roommateListing.userId));
@@ -70,12 +178,17 @@ const notifyMatchingRoommateAlerts = async (
         !roommateListing.propertyType ||
         !roommateListing.userId
     ) {
-        console.log("Missing required matching fields.");
+        console.log("[Roommate Alerts] Missing required matching fields.");
+        console.log("==========================================\n");
 
         return {
             matchedUsers: 0,
             notifiedUsers: 0,
             emailsSent: 0,
+            smsSent: 0,
+            failedNotifications: 0,
+            failedEmails: 0,
+            failedSMS: 0,
         };
     }
 
@@ -108,52 +221,12 @@ const notifyMatchingRoommateAlerts = async (
         .select("user city propertyTypes purposes rentalPeriods")
         .lean();
 
-    console.log("Matching alerts found:", matchingAlerts.length);
-
-    const userIds = [
-        ...new Set(
-            matchingAlerts.map((alert) => String(alert.user))
-        ),
-    ];
-
-    // Send in-app notifications.
-    const notificationResults = await Promise.allSettled(
-        userIds.map((userId) =>
-            createAndEmitNotification(io, {
-                userId,
-                type: "roommate_match",
-                title: "New roommate announcement matches your alert",
-                message: `${roommateListing.title} is available in ${roommateListing.city}.`,
-                link: `/roommates/${roommateListing._id}`,
-                data: {
-                    roommateListingId: String(roommateListing._id),
-                    city: roommateListing.city,
-                    purpose: roommateListing.purpose,
-                    propertyType: roommateListing.propertyType,
-                    rentalPeriod: roommateListing.rentalPeriod,
-                },
-            })
-        )
+    console.log(
+        "[Roommate Alerts] Matching alerts found:",
+        matchingAlerts.length
     );
 
-    notificationResults.forEach((result, index) => {
-        if (result.status === "fulfilled") {
-            console.log(
-                `Roommate notification saved for ${userIds[index]}`
-            );
-        } else {
-            console.error(
-                `Roommate notification failed for ${userIds[index]}:`,
-                result.reason
-            );
-        }
-    });
-
-    const notifiedUsers = notificationResults.filter(
-        (result) => result.status === "fulfilled"
-    ).length;
-
-    // Deduplicate alerts by user before sending emails.
+    // One notification per user, even if they have multiple matching alerts.
     const uniqueAlertsByUser = new Map();
 
     for (const alert of matchingAlerts) {
@@ -164,16 +237,104 @@ const notifyMatchingRoommateAlerts = async (
         }
     }
 
-    // Send emails independently of in-app notifications.
+    const uniqueAlerts = [...uniqueAlertsByUser.values()];
+
+    const userIds = uniqueAlerts.map(
+        (alert) => alert.user
+    );
+
+    if (userIds.length === 0) {
+        console.log("[Roommate Alerts] No users matched.");
+        console.log("==========================================\n");
+
+        return {
+            matchedUsers: 0,
+            notifiedUsers: 0,
+            emailsSent: 0,
+            smsSent: 0,
+            failedNotifications: 0,
+            failedEmails: 0,
+            failedSMS: 0,
+        };
+    }
+
+    // Load recipient language and notification preferences once.
+    const users = await User.find({
+        _id: { $in: userIds },
+    })
+        .select("email language notificationPreferences")
+        .lean();
+
+    const usersById = new Map(
+        users.map((user) => [
+            String(user._id),
+            user,
+        ])
+    );
+
+    const recipients = uniqueAlerts
+        .map((alert) => usersById.get(String(alert.user)))
+        .filter(Boolean);
+
+    console.log("[Roommate Alerts] Unique recipients:", recipients.length);
+
+    // 1. In-app notifications.
+    const notificationResults = await Promise.allSettled(
+        recipients.map((user) => {
+            const language = normalizeLanguage(user.language);
+            const translations = notificationTranslations[language];
+
+            console.log("[Roommate Notification] Recipient:", {
+                userId: String(user._id),
+                language,
+            });
+
+            return createAndEmitNotification(io, {
+                userId: String(user._id),
+                type: "roommate_match",
+                title: translations.title,
+                message: translations.message(roommateListing),
+                link: `/roommates/${roommateListing._id}`,
+                data: {
+                    roommateListingId: String(roommateListing._id),
+                    city: roommateListing.city,
+                    purpose: roommateListing.purpose,
+                    propertyType: roommateListing.propertyType,
+                    rentalPeriod: roommateListing.rentalPeriod,
+                },
+            });
+        })
+    );
+
+    notificationResults.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+            console.log(
+                `[RoommateNotification] Saved for ${recipients[index]._id}`
+            );
+        } else {
+            console.error(
+                `[RoommateNotification] Failed for ${recipients[index]._id}:`,
+                result.reason?.message ?? result.reason
+            );
+        }
+    });
+
+    const notifiedUsers = notificationResults.filter(
+        (result) => result.status === "fulfilled"
+    ).length;
+
+    // 2. Email notifications.
+    console.log("\n========== ROOMMATE EMAIL NOTIFICATIONS ==========");
+
     const emailResults = await Promise.allSettled(
-        [...uniqueAlertsByUser.values()].map(async (alert) => {
-            const result = await sendRoommateEmailIfEnabled(
-                alert,
+        recipients.map(async (user) => {
+            const result = await sendEmailIfEnabled(
+                user,
                 roommateListing
             );
 
             console.log(
-                `[RoommateAlertEmail] User ${alert.user}:`,
+                `[RoommateAlertEmail] User ${user._id}:`,
                 result
             );
 
@@ -181,10 +342,10 @@ const notifyMatchingRoommateAlerts = async (
         })
     );
 
-    emailResults.forEach((result) => {
+    emailResults.forEach((result, index) => {
         if (result.status === "rejected") {
             console.error(
-                "[RoommateAlertEmail] Failed:",
+                `[RoommateAlertEmail] Failed for ${recipients[index]._id}:`,
                 result.reason?.message ?? result.reason
             );
         }
@@ -196,19 +357,98 @@ const notifyMatchingRoommateAlerts = async (
             result.value.sent
     ).length;
 
-    console.log("Notifications saved:", notifiedUsers);
-    console.log("Emails sent:", emailsSent);
-    console.log("==========================================\n");
+    const failedEmails = emailResults.filter(
+        (result) => result.status === "rejected"
+    ).length;
+
+    // 3. SMS notifications.
+    console.log("\n========== ROOMMATE SMS NOTIFICATIONS ==========");
+
+    console.log("[Roommate SMS] Recipients diagnostic:");
+
+    recipients.forEach((user) => {
+        const preferences =
+            user?.notificationPreferences?.whatsapp;
+
+        console.log({
+            userId: String(user._id),
+            language: user.language,
+            normalizedLanguage: normalizeLanguage(user.language),
+            enabled: preferences?.enabled,
+            propertyAlerts: preferences?.propertyAlerts,
+            verified: preferences?.verified,
+            phoneNumberExists: Boolean(preferences?.phoneNumber),
+            phoneNumber: preferences?.phoneNumber || "MISSING",
+        });
+    });
+
+    const smsResults = await Promise.allSettled(
+        recipients.map(async (user) => {
+            const result = await sendSMSIfEnabled(
+                user,
+                roommateListing
+            );
+
+            console.log(
+                `[RoommateAlertSMS] User ${user._id}:`,
+                result
+            );
+
+            return result;
+        })
+    );
+
+    smsResults.forEach((result, index) => {
+        if (result.status === "rejected") {
+            console.error(
+                `[RoommateAlertSMS] Failed for ${recipients[index]._id}:`,
+                result.reason?.message ?? result.reason
+            );
+        }
+    });
+
+    const smsSent = smsResults.filter(
+        (result) =>
+            result.status === "fulfilled" &&
+            result.value.sent === true
+    ).length;
+
+    const smsSkipped = smsResults.filter(
+        (result) =>
+            result.status === "fulfilled" &&
+            result.value.sent !== true
+    ).length;
+
+    const failedSMS = smsResults.filter(
+        (result) => result.status === "rejected"
+    ).length;
+
+    const failedNotifications =
+        notificationResults.filter(
+            (result) => result.status === "rejected"
+        ).length;
+
+    // Final summary.
+    console.log("\n========== ROOMMATE ALERT SUMMARY ==========");
+    console.log("Matched users:", recipients.length);
+    console.log("In-app notifications saved:", notifiedUsers);
+    console.log("Emails accepted:", emailsSent);
+    console.log("SMS messages accepted:", smsSent);
+    console.log("SMS skipped:", smsSkipped);
+    console.log("Failed in-app notifications:", failedNotifications);
+    console.log("Failed emails:", failedEmails);
+    console.log("Failed SMS messages:", failedSMS);
+    console.log("=============================================\n");
 
     return {
-        matchedUsers: userIds.length,
+        matchedUsers: recipients.length,
         notifiedUsers,
-        failedNotifications:
-            notificationResults.length - notifiedUsers,
         emailsSent,
-        failedEmails: emailResults.filter(
-            (result) => result.status === "rejected"
-        ).length,
+        smsSent,
+        smsSkipped,
+        failedNotifications,
+        failedEmails,
+        failedSMS,
     };
 };
 

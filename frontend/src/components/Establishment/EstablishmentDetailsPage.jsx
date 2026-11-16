@@ -456,9 +456,9 @@ export default function EstablishmentDetailsPage() {
 
                 <Button
                     startIcon={<ArrowBack />}
-                    onClick={() => navigate("/establishments")}
+                    onClick={() => navigate(-1)}
                 >
-                    {tr("back", "Back to establishments")}
+                    {tr("back", "Back")}
                 </Button>
             </Container>
         );
@@ -516,10 +516,10 @@ export default function EstablishmentDetailsPage() {
             {/* Back button */}
             <Button
                 startIcon={<ArrowBack />}
-                onClick={() => navigate("/establishments")}
+                onClick={() => navigate(-1)}
                 sx={{ mb: 3 }}
             >
-                {tr("back", "Back to establishments")}
+                {tr("back", "Back")}
             </Button>
 
             {/* Main heading */}

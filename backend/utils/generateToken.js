@@ -9,7 +9,7 @@ const generateToken = (user) => {
     };
 
     const options = {
-        expiresIn: '48h',
+        expiresIn: '24h',
         algorithm: "HS256",
     };
 

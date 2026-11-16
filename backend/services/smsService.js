@@ -1,8 +1,15 @@
 
-const BASE_URL =
-    process.env.ENVOISMS_BASE_URL || "https://api.envoisms.ma/v1";
+import { createHash } from "node:crypto";
 
-async function envoiSmsRequest(endpoint, body) {
+const BASE_URL = (
+    process.env.ENVOISMS_BASE_URL ||
+    "https://api.envoisms.ma/v1"
+).replace(/\/$/, "");
+
+/**
+ * Common EnvoiSMS API request.
+ */
+async function envoiSmsRequest(endpoint, body, extraHeaders = {}) {
     const apiKey = process.env.ENVOISMS_API_KEY;
 
     if (!apiKey) {
@@ -15,11 +22,20 @@ async function envoiSmsRequest(endpoint, body) {
             Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
             Accept: "application/json",
+            ...extraHeaders,
         },
         body: JSON.stringify(body),
     });
 
-    const data = await response.json().catch(() => ({}));
+    const responseText = await response.text();
+
+    let data = {};
+
+    try {
+        data = responseText ? JSON.parse(responseText) : {};
+    } catch {
+        data = { rawResponse: responseText };
+    }
 
     if (!response.ok) {
         const apiError = data.error;
@@ -32,12 +48,153 @@ async function envoiSmsRequest(endpoint, body) {
 
         throw new Error(
             apiError?.message ||
-                data.message ||
-                `EnvoiSMS request failed (${response.status})`
+            data.message ||
+            `EnvoiSMS request failed (${response.status})`
         );
     }
 
     return data;
+}
+
+/**
+ * Normalize and validate an international phone number.
+ */
+function normalizePhoneNumber(phone) {
+    let number = String(phone || "").replace(/[\s().-]/g, "");
+
+    if (number.startsWith("00212")) {
+        number = `+${number.slice(2)}`;
+    }
+
+    if (/^0[5-7]\d{8}$/.test(number)) {
+        number = `+212${number.slice(1)}`;
+    }
+
+    if (/^\+2120[5-7]\d{8}$/.test(number)) {
+        number = `+212${number.slice(4)}`;
+    }
+
+    if (!/^\+[1-9]\d{7,14}$/.test(number)) {
+        throw new Error(
+            `Invalid phone number: ${phone}. Use international format.`
+        );
+    }
+
+    return number;
+}
+
+/**
+ * Normalize supported profile languages.
+ */
+function normalizeLanguage(language) {
+    const normalized = String(language || "en")
+        .toLowerCase()
+        .split("-")[0]
+        .split("_")[0];
+
+    return ["en", "fr", "ar"].includes(normalized)
+        ? normalized
+        : "en";
+}
+
+/**
+ * Build a roommate alert SMS in the recipient's language.
+ */
+function buildRoommateAlertMessage({
+    roommateListing,
+    language,
+}) {
+    const title =
+        roommateListing.title || "New roommate listing";
+
+    const city = roommateListing.city || "";
+
+    const frontendUrl = (
+        process.env.FRONTEND_URL ||
+        "https://multi-services-frontend.vercel.app"
+    ).replace(/\/$/, "");
+
+    const listingUrl =
+        `${frontendUrl}/roommates/${roommateListing._id}`;
+
+    const messages = {
+        en: [
+            "MultiServices - New roommate listing matching your alert!",
+            `Title: ${title}`,
+            `City: ${city}`,
+            `View listing: ${listingUrl}`,
+        ].join("\n"),
+
+        fr: [
+            "MultiServices - Nouvelle annonce de colocation correspondant à votre alerte !",
+            `Titre : ${title}`,
+            `Ville : ${city}`,
+            `Voir l'annonce : ${listingUrl}`,
+        ].join("\n"),
+
+        ar: [
+            "MultiServices - إعلان سكن مشترك جديد يطابق تنبيهك!",
+            `العنوان: ${title}`,
+            `المدينة: ${city}`,
+            `شاهد الإعلان: ${listingUrl}`,
+        ].join("\n"),
+    };
+
+    return messages[language];
+}
+
+/**
+ * Send a roommate listing alert using a normal SMS.
+ */
+export async function sendRoommateAlertSMS({
+    to,
+    roommateListing,
+    language = "en",
+}) {
+    if (!roommateListing?._id) {
+        throw new Error("A valid roommate listing is required.");
+    }
+
+    const recipient = normalizePhoneNumber(to);
+    const recipientLanguage = normalizeLanguage(language);
+
+    const message = buildRoommateAlertMessage({
+        roommateListing,
+        language: recipientLanguage,
+    });
+
+    const idempotencyKey = createHash("sha256")
+        .update(
+            `roommate-sms:${roommateListing._id}:${recipient}:${recipientLanguage}`
+        )
+        .digest("hex");
+
+    console.log("[Roommate SMS] Sending alert:", {
+        to: recipient,
+        listingId: String(roommateListing._id),
+        language: recipientLanguage,
+    });
+
+    const result = await envoiSmsRequest(
+        "/messages",
+        {
+            to: recipient,
+            message,
+        },
+        {
+            "Idempotency-Key": idempotencyKey,
+        }
+    );
+
+    console.log("[Roommate SMS] EnvoiSMS response:", result);
+
+    return {
+        sent: true,
+        messageId: result.id || result.message_id,
+        status: result.status || "queued",
+        language: recipientLanguage,
+        channel: "sms",
+    };
 }
 
 /**
@@ -49,13 +206,7 @@ export async function sendVerificationSms({ to }) {
         throw new Error("A phone number is required.");
     }
 
-    const phoneNumber = to.trim();
-
-    if (!/^\+[1-9]\d{7,14}$/.test(phoneNumber)) {
-        throw new Error(
-            "Use international phone format, for example +212612345678."
-        );
-    }
+    const phoneNumber = normalizePhoneNumber(to);
 
     const result = await envoiSmsRequest("/verify/send", {
         to: phoneNumber,

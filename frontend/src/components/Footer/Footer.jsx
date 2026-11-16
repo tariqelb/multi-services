@@ -2,6 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
 import {
     Box,
     Container,
@@ -9,12 +10,13 @@ import {
     Stack,
     Divider,
 } from "@mui/material";
-import footerBackground from "../../assets/Login_backgound.jpeg";
+
 import {
     HomeRounded,
-    DirectionsCarRounded,
-    HandymanRounded,
-    LocalShippingRounded,
+    ApartmentRounded,
+    PeopleAltRounded,
+    HotelRounded,
+    TravelExploreRounded,
     FacebookRounded,
     Instagram,
     LinkedIn,
@@ -26,18 +28,49 @@ import {
 import logo from "../../assets/iconlogo.png";
 
 const services = [
-    { label: "realEstate", icon: <HomeRounded />, path: "/properties" },
-    { label: "cars", icon: <DirectionsCarRounded />, path: "/cars" },
-    { label: "services", icon: <HandymanRounded />, path: "/services" },
-    { label: "deliveryTransport", icon: <LocalShippingRounded />, path: "/transport" },
+    {
+        label: "realEstate",
+        icon: <HomeRounded />,
+        path: "/properties",
+    },
+    {
+        label: "furnishedRentals",
+        icon: <ApartmentRounded />,
+        path: "/furnishedProperties",
+    },
+    {
+        label: "roommates",
+        icon: <PeopleAltRounded />,
+        path: "/roommates",
+    },
+    {
+        label: "establishments",
+        icon: <HotelRounded />,
+        path: "/establishments",
+    },
+    {
+        label: "exploreMap",
+        icon: <TravelExploreRounded />,
+        path: "/findbymap",
+    },
 ];
 
 const quickLinks = [
     { label: "dashboard", path: "/" },
     { label: "browseProperties", path: "/properties" },
-    { label: "savedProperties", path: "/saved" },
-    { label: "myPublications", path: "/mypublication" },
+    { label: "browseRoommates", path: "/roommates" },
+    { label: "browseEstablishments", path: "/establishments" },
+    { label: "findOnMap", path: "/findbymap" },
+    { label: "alerts", path: "/alert" },
+];
+
+const publishLinks = [
     { label: "publishAd", path: "/properties/publish" },
+    {
+        label: "publishEstablishment",
+        path: "/establishments/publish",
+    },
+    { label: "myPublications", path: "/mypublication" },
 ];
 
 const supportLinks = [
@@ -135,7 +168,11 @@ export default function Footer() {
                             direction="row"
                             alignItems="center"
                             spacing={1.5}
-                            sx={{ mb: 2, textDecoration: "none", width: "fit-content" }}
+                            sx={{
+                                mb: 2,
+                                textDecoration: "none",
+                                width: "fit-content",
+                            }}
                         >
                             <Box
                                 sx={{
@@ -153,7 +190,7 @@ export default function Footer() {
                                 <Box
                                     component="img"
                                     src={logo}
-                                    alt="MultiService logo"
+                                    alt="MultiServices logo"
                                     sx={{
                                         width: "100%",
                                         height: "100%",
@@ -170,7 +207,7 @@ export default function Footer() {
                                     letterSpacing: "-0.025em",
                                 }}
                             >
-                                MultiService
+                                MultiServices
                             </Typography>
                         </Stack>
 
@@ -228,9 +265,13 @@ export default function Footer() {
                         <Typography sx={sectionTitle}>
                             {t("footer.explore")}
                         </Typography>
+
                         <Stack spacing={1.5}>
                             {quickLinks.map((item) => (
-                                <FooterLink key={item.path} to={item.path}>
+                                <FooterLink
+                                    key={item.path}
+                                    to={item.path}
+                                >
                                     {t(`footer.links.${item.label}`)}
                                 </FooterLink>
                             ))}
@@ -242,6 +283,7 @@ export default function Footer() {
                         <Typography sx={sectionTitle}>
                             {t("footer.ourServices")}
                         </Typography>
+
                         <Stack spacing={1.5}>
                             {services.map((item) => (
                                 <Stack
@@ -254,11 +296,14 @@ export default function Footer() {
                                         sx={{
                                             color: "primary.main",
                                             display: "flex",
-                                            "& svg": { fontSize: 20 },
+                                            "& svg": {
+                                                fontSize: 20,
+                                            },
                                         }}
                                     >
                                         {item.icon}
                                     </Box>
+
                                     <FooterLink to={item.path}>
                                         {t(`footer.services.${item.label}`)}
                                     </FooterLink>
@@ -267,7 +312,7 @@ export default function Footer() {
                         </Stack>
                     </Box>
 
-                    {/* Support */}
+                    {/* Account and support */}
                     <Box>
                         <Typography sx={sectionTitle}>
                             {t("footer.accountSupport")}
@@ -275,14 +320,39 @@ export default function Footer() {
 
                         <Stack spacing={1.5}>
                             {supportLinks.map((item) => (
-                                <FooterLink key={item.path} to={item.path}>
+                                <FooterLink
+                                    key={item.path}
+                                    to={item.path}
+                                >
                                     {t(`footer.links.${item.label}`)}
                                 </FooterLink>
                             ))}
                         </Stack>
 
+                        {/* Publishing */}
+                        <Typography
+                            sx={{
+                                ...sectionTitle,
+                                mt: 3,
+                                mb: 1.5,
+                            }}
+                        >
+                            {t("footer.publishing")}
+                        </Typography>
+
+                        <Stack spacing={1.5}>
+                            {publishLinks.map((item) => (
+                                <FooterLink
+                                    key={item.path}
+                                    to={item.path}
+                                >
+                                    {t(`footer.links.${item.label}`)}
+                                </FooterLink>
+                            ))}
+                        </Stack>
+
+                        {/* Contact information */}
                         <Stack spacing={1.5} sx={{ mt: 3 }}>
-                            {/* Support email */}
                             <Stack
                                 direction="row"
                                 spacing={1}
@@ -308,13 +378,13 @@ export default function Footer() {
                                 </Box>
                             </Stack>
 
-                            {/* Location */}
                             <Stack
                                 direction="row"
                                 spacing={1}
                                 alignItems="center"
                             >
                                 <LocationOnOutlined sx={contactIcon} />
+
                                 <Typography sx={contactText}>
                                     {t("footer.location")}
                                 </Typography>
@@ -323,7 +393,12 @@ export default function Footer() {
                     </Box>
                 </Box>
 
-                <Divider sx={{ my: 4, borderColor: "#E2E8F0" }} />
+                <Divider
+                    sx={{
+                        my: 4,
+                        borderColor: "#E2E8F0",
+                    }}
+                />
 
                 {/* Bottom section */}
                 <Stack
@@ -333,7 +408,8 @@ export default function Footer() {
                     spacing={2}
                 >
                     <Typography sx={bottomText}>
-                        © {new Date().getFullYear()} MultiService. {t("footer.rightsReserved")}
+                        © {new Date().getFullYear()} MultiServices.{" "}
+                        {t("footer.rightsReserved")}
                     </Typography>
 
                     <Typography sx={bottomText}>

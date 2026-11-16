@@ -1,20 +1,26 @@
-
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
     const token = req.cookies?.token;
 
-    console.log("\n========== AUTH MIDDLEWARE DEBUG ==========");
-
-    // Check whether the token exists.
-    console.log("[Auth] Token exists:", Boolean(token), token);
+    console.log("\n========== AUTH MIDDLEWARE ==========");
+    console.log("[Auth] Token exists:", Boolean(token));
 
     if (!token) {
-        console.log("[Auth] No token found in cookies.");
-        console.log("============================================\n");
+        console.log("[Auth] No token found.");
+        console.log("=====================================\n");
 
         return res.status(401).json({
             message: "Authentication required",
+            code: "NO_TOKEN",
+        });
+    }
+
+    if (!process.env.JWT_SECRET) {
+        console.error("[Auth] JWT_SECRET is not configured.");
+
+        return res.status(500).json({
+            message: "Authentication configuration error",
         });
     }
 
@@ -25,29 +31,39 @@ const authMiddleware = (req, res, next) => {
             { algorithms: ["HS256"] }
         );
 
-        console.log("[Auth] Token is valid: true");
-        console.log("[Auth] Token payload:", decoded);
-        console.log("[Auth] Decoded userId:", decoded.userId);
-        console.log(
-            "[Auth] userId exists:",
-            Boolean(decoded.userId)
-        );
+        if (!decoded.userId) {
+            console.log("[Auth] Token has no userId.");
+
+            return res.status(401).json({
+                message: "Invalid authentication token",
+                code: "INVALID_TOKEN",
+            });
+        }
 
         req.user = {
             userId: decoded.userId,
         };
 
-        console.log("[Auth] req.user:", req.user);
         console.log("[Auth] Authentication successful.");
-        console.log("============================================\n");
+        console.log("[Auth] User ID:", decoded.userId);
+        console.log("=====================================\n");
 
-        next();
+        return next();
+
     } catch (error) {
         console.error("[Auth] Token verification failed:", error.message);
-        console.log("============================================\n");
+        console.log("=====================================\n");
+
+        if (error.name === "TokenExpiredError") {
+            return res.status(401).json({
+                message: "Your session has expired. Please log in again.",
+                code: "TOKEN_EXPIRED",
+            });
+        }
 
         return res.status(401).json({
-            message: "Invalid or expired token",
+            message: "Invalid authentication token. Please log in again.",
+            code: "INVALID_TOKEN",
         });
     }
 };

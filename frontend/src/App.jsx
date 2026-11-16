@@ -66,6 +66,9 @@ import Establishments from "./components/Establishment/Establishments";
 import EstablishmentDetailsPage from "./components/Establishment/EstablishmentDetailsPage";
 import EstablishmentInsertForm from "./components/Establishment/EstablishmentInsertForm";
 
+import ForgotPassword from "./components/LoginAndSignUp/ForgotPassword";
+import ResetPassword from "./components/LoginAndSignUp/ResetPassword";
+
 // -----------------------------------------------------------------------------
 // Authentication loader
 // -----------------------------------------------------------------------------
@@ -191,6 +194,14 @@ const router = createBrowserRouter([
         element: <Login />,
     },
     {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
+    },
+    {
+        path: "/reset-password/:token",
+        element: <ResetPassword />,
+    },
+    {
         path: "/signin",
         element: <Navigate to="/login" replace />,
     },
@@ -201,6 +212,7 @@ const router = createBrowserRouter([
         element: <DashboardLayout />,
         loader: requireAuth,
         errorElement: <Navigate to="/login" replace />,
+
 
         children: [
             {

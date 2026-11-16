@@ -102,12 +102,34 @@
         "sendingVerification": "جارٍ إرسال رمز التحقق...",
         "continue": "متابعة",
         "validation": {
-        "firstName": "يجب أن يتكون الاسم الشخصي من حرفين على الأقل.",
-        "lastName": "يجب أن يتكون اسم العائلة من حرفين على الأقل.",
-        "email": "يرجى إدخال بريد إلكتروني صحيح.",
-        "password": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
-        "confirmPassword": "كلمتا المرور غير متطابقتين."
-        }
+            "firstName": "يجب أن يتكون الاسم الشخصي من حرفين على الأقل.",
+            "lastName": "يجب أن يتكون اسم العائلة من حرفين على الأقل.",
+            "email": "يرجى إدخال بريد إلكتروني صحيح.",
+            "password": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
+            "confirmPassword": "كلمتا المرور غير متطابقتين."
+        },
+        "forgotPassword": {
+            "link": "هل نسيت كلمة المرور؟",
+            "title": "هل نسيت كلمة المرور؟",
+            "description": "أدخل بريدك الإلكتروني وسنرسل إليك رابطاً لإعادة تعيين كلمة المرور.",
+            "submit": "إرسال رابط إعادة التعيين",
+            "sending": "جارٍ الإرسال...",
+            "success": "إذا كان هناك حساب مرتبط بهذا البريد الإلكتروني، فسيتم إرسال رابط إعادة تعيين كلمة المرور.",
+            "error": "تعذر إرسال الرابط. يرجى المحاولة مرة أخرى.",
+            "backToLogin": "العودة إلى تسجيل الدخول"
+        },
+        "resetPassword": {
+            "title": "إنشاء كلمة مرور جديدة",
+            "description": "أدخل كلمة المرور الجديدة أدناه.",
+            "newPassword": "كلمة المرور الجديدة",
+            "confirmPassword": "تأكيد كلمة المرور الجديدة",
+            "submit": "إعادة تعيين كلمة المرور",
+            "saving": "جارٍ الحفظ...",
+            "success": "تمت إعادة تعيين كلمة المرور بنجاح.",
+            "error": "تعذرت إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى."
+        },
+        "passwordMinLength": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
+        "passwordMismatch": "كلمتا المرور غير متطابقتين."
     },
     "properties": {
         "banner": {
@@ -1284,8 +1306,8 @@
         "empty": "لم يتم تسجيل أي زيارات بعد. افتح تطبيقك في علامة تبويب أخرى لتسجيل أول زيارة."
     },
     "footer": {
-        "description": "منصة واحدة وإمكانيات لا حدود لها. اكتشف العقارات والمركبات والخدمات المهنية وحلول الحياة اليومية في مكان واحد.",
-        "socialProfile": "قم بزيارة ملفنا الشخصي على {{platform}}",
+        "description": "منصة واحدة، وإمكانيات لا حصر لها. اكتشف العقارات والمركبات والخدمات المهنية وحلول الحياة اليومية، كل ذلك في مكان واحد.",
+        "socialProfile": "قم بزيارة حسابنا على {{platform}}",
         "explore": "استكشف",
         "ourServices": "خدماتنا",
         "accountSupport": "الحساب والدعم",
@@ -1293,22 +1315,32 @@
             "dashboard": "لوحة التحكم",
             "browseProperties": "تصفح العقارات",
             "savedProperties": "العقارات المحفوظة",
-            "myPublications": "منشوراتي",
+            "myPublications": "إعلاناتي",
             "publishAd": "نشر إعلان",
             "myProfile": "ملفي الشخصي",
             "settings": "الإعدادات",
-            "sendFeedback": "إرسال ملاحظات"
+            "sendFeedback": "إرسال ملاحظات",
+            "browseRoommates": "البحث عن شركاء سكن",
+            "browseEstablishments": "تصفح أماكن الإقامة",
+            "findOnMap": "البحث على الخريطة",
+            "alerts": "تنبيهاتي",
+            "publishEstablishment": "إضافة منشأة"
         },
         "services": {
             "realEstate": "العقارات",
             "cars": "السيارات",
             "services": "الخدمات",
-            "deliveryTransport": "التوصيل والنقل"
+            "deliveryTransport": "التوصيل والنقل",
+            "furnishedRentals": "الإيجارات المفروشة",
+            "roommates": "البحث عن شريك سكن",
+            "establishments": "الفنادق وأماكن الإقامة",
+            "exploreMap": "استكشف الخريطة"
         },
         "location": "المغرب",
         "rightsReserved": "جميع الحقوق محفوظة.",
-        "motto": "صُممت لجعل الحياة اليومية أكثر سهولة.",
-        "madeWithCare": "صُنع بكل عناية ♥"
+        "motto": "صُممت لجعل حياتك اليومية أسهل.",
+        "madeWithCare": "صُنع بكل عناية ♥",
+        "publishing": "النشر"
     },
     "adminContactActions": {
         "title": "إجراءات تواصل العملاء",
@@ -1931,7 +1963,7 @@
             "owner": "صاحب الإعلان",
             "postedOn": "تاريخ النشر",
             "viewProfile": "عرض الملف الشخصي لصاحب الإعلان",
-            "backToAnnouncements": "العودة إلى الإعلانات",
+            "backToAnnouncements": "العودة",
             "contactOwner": "التواصل مع صاحب الإعلان",
             "callOwner": "الاتصال بصاحب الإعلان",
             "whatsappOwner": "التواصل عبر واتساب",
@@ -1984,63 +2016,63 @@
         "photosSubtitle": "اعرض للزوار شكل مؤسستك."
         },
         "fields": {
-        "name": "اسم المؤسسة",
-        "accommodationType": "نوع الإقامة",
-        "shortDescription": "وصف مختصر",
-        "fullDescription": "وصف كامل",
-        "yearEstablished": "سنة التأسيس",
-        "numberOfRooms": "عدد الغرف",
-        "numberOfFloors": "عدد الطوابق",
-        "classification": "تصنيف الفندق",
-        "city": "المدينة",
-        "neighborhood": "الحي",
-        "fullAddress": "العنوان الكامل",
-        "googleMapsLink": "رابط خرائط Google",
-        "roomType": "نوع الغرفة",
-        "roomQuantity": "عدد الغرف من هذا النوع",
-        "maxGuests": "الحد الأقصى للضيوف",
-        "pricePerNight": "السعر لليلة الواحدة (درهم)",
-        "bedConfiguration": "ترتيب الأسرّة",
-        "roomFacilities": "مرافق الغرفة",
-        "roomDescription": "وصف الغرفة",
-        "otherServices": "خدمات أخرى",
-        "phoneNumber": "رقم الهاتف",
-        "whatsappNumber": "رقم واتساب",
-        "email": "البريد الإلكتروني",
-        "officialWebsite": "الموقع الرسمي",
-        "bookingWebsite": "رابط الحجز",
-        "socialMedia": "روابط التواصل الاجتماعي",
-        "platform": "المنصة",
-        "socialUrl": "رابط حساب التواصل الاجتماعي",
-        "coverPhoto": "صورة الغلاف الرئيسية",
-        "gallery": "معرض صور المؤسسة",
-        "establishmentVideo": "فيديو المؤسسة",
-        "youtubeUrl": "رابط فيديو YouTube"
+            "name": "اسم المؤسسة",
+            "accommodationType": "نوع الإقامة",
+            "shortDescription": "وصف مختصر",
+            "fullDescription": "وصف كامل",
+            "yearEstablished": "سنة التأسيس",
+            "numberOfRooms": "عدد الغرف",
+            "numberOfFloors": "عدد الطوابق",
+            "classification": "تصنيف الفندق",
+            "city": "المدينة",
+            "neighborhood": "الحي",
+            "fullAddress": "العنوان الكامل",
+            "googleMapsLink": "رابط خرائط Google",
+            "roomType": "نوع الغرفة",
+            "roomQuantity": "عدد الغرف من هذا النوع",
+            "maxGuests": "الحد الأقصى للضيوف",
+            "pricePerNight": "السعر لليلة الواحدة (درهم)",
+            "bedConfiguration": "ترتيب الأسرّة",
+            "roomFacilities": "مرافق الغرفة",
+            "roomDescription": "وصف الغرفة",
+            "otherServices": "خدمات أخرى",
+            "phoneNumber": "رقم الهاتف",
+            "whatsappNumber": "رقم واتساب",
+            "email": "البريد الإلكتروني",
+            "officialWebsite": "الموقع الرسمي",
+            "bookingWebsite": "رابط الحجز",
+            "socialMedia": "روابط التواصل الاجتماعي",
+            "platform": "المنصة",
+            "socialUrl": "رابط حساب التواصل الاجتماعي",
+            "coverPhoto": "صورة الغلاف الرئيسية",
+            "gallery": "معرض صور المؤسسة",
+            "establishmentVideo": "فيديو المؤسسة",
+            "youtubeUrl": "رابط فيديو YouTube"
         },
         "actions": {
-        "add": "إضافة",
-        "remove": "حذف",
-        "addRoom": "إضافة نوع آخر من الغرف",
-        "uploadRoomPhotos": "رفع صور الغرفة",
-        "uploadCover": "رفع صورة الغلاف الرئيسية",
-        "removeCover": "حذف صورة الغلاف",
-        "uploadGallery": "رفع صور المعرض",
-        "watchOnYoutube": "مشاهدة على YouTube",
-        "reset": "إعادة تعيين",
-        "publishing": "جارٍ النشر...",
-        "create": "إنشاء المؤسسة"
+            "add": "إضافة",
+            "remove": "حذف",
+            "addRoom": "إضافة نوع آخر من الغرف",
+            "uploadRoomPhotos": "رفع صور الغرفة",
+            "uploadCover": "رفع صورة الغلاف الرئيسية",
+            "removeCover": "حذف صورة الغلاف",
+            "uploadGallery": "رفع صور المعرض",
+            "watchOnYoutube": "مشاهدة على YouTube",
+            "reset": "إعادة تعيين",
+            "publishing": "جارٍ النشر...",
+            "create": "إنشاء المؤسسة"
         },
         "helpers": {
-        "googleMaps": "أضف رابط مشاركة خرائط Google لاستخراج الإحداثيات تلقائياً.",
-        "imageLimit": "JPG أو PNG أو WEBP · الحد الأقصى 5 ميغابايت",
-        "roomPhotosLimit": "الحد الأقصى 15 صورة لكل نوع غرفة، 5 ميغابايت للصورة.",
-        "galleryLimit": "الحد الأقصى 30 صورة، 5 ميغابايت لكل صورة.",
-        "videoDescription": "أضف فيديو YouTube للتعريف بفندقك أو رياضك أو دار ضيافتك. سيتمكن الزوار من مشاهدته مباشرة في صفحة مؤسستك.",
-        "youtubeUrl": "ألصق رابط فيديو YouTube أو Shorts أو رابط مختصر."
+            "googleMaps": "أضف رابط مشاركة خرائط Google لاستخراج الإحداثيات تلقائياً.",
+            "imageLimit": "JPG أو PNG أو WEBP · الحد الأقصى 5 ميغابايت",
+            "roomPhotosLimit": "الحد الأقصى 15 صورة لكل نوع غرفة، 5 ميغابايت للصورة.",
+            "galleryLimit": "الحد الأقصى 30 صورة، 5 ميغابايت لكل صورة.",
+            "videoDescription": "أضف فيديو YouTube للتعريف بفندقك أو رياضك أو دار ضيافتك. سيتمكن الزوار من مشاهدته مباشرة في صفحة مؤسستك.",
+            "youtubeUrl": "ألصق رابط فيديو YouTube أو Shorts أو رابط مختصر."
         },
         "submit": {
-        "title": "هل أنت مستعد لإنشاء مؤسستك؟",
-        "description": "تحقق من معلوماتك قبل الإرسال."
+            "title": "هل أنت مستعد لإنشاء مؤسستك؟",
+            "description": "تحقق من معلوماتك قبل الإرسال."
         },
         "notClassified": "غير مصنف",
         "star": "نجمة",
@@ -2049,11 +2081,11 @@
         "videoPreview": "معاينة الفيديو",
         "videoTitle": "معاينة فيديو المؤسسة",
         "errors": {
-        "invalidYoutube": "رابط YouTube غير صالح. يرجى التحقق من الرابط."
+            "invalidYoutube": "رابط YouTube غير صالح. يرجى التحقق من الرابط."
         },
         "empty": {
-        "gallery": "لم يتم اختيار صور للمعرض",
-        "roomPhotos": "لم يتم اختيار صور للغرفة"
+            "gallery": "لم يتم اختيار صور للمعرض",
+            "roomPhotos": "لم يتم اختيار صور للغرفة"
         }
     },
     "establishments": {
@@ -2081,24 +2113,24 @@
         "allTypes": "جميع الأنواع"
         },
         "types": {
-        "all": "الكل",
-        "hotel": "فندق",
-        "riad": "رياض",
-        "guesthouse": "دار ضيافة",
-        "hostel": "نزل",
-        "aparthotel": "شقق فندقية",
-        "other": "أخرى"
+            "all": "الكل",
+            "hotel": "فندق",
+            "riad": "رياض",
+            "guesthouse": "دار ضيافة",
+            "hostel": "نزل",
+            "aparthotel": "شقق فندقية",
+            "other": "أخرى"
         },
         "errors": {
-        "fetch": "تعذر تحميل المؤسسات. يرجى المحاولة مرة أخرى."
+            "fetch": "تعذر تحميل المؤسسات. يرجى المحاولة مرة أخرى."
         },
         "empty": {
-        "title": "لم يتم العثور على أي مؤسسة",
-        "subtitle": "حاول تغيير البحث أو عوامل التصفية.",
-        "clearFilters": "مسح عوامل التصفية"
+            "title": "لم يتم العثور على أي مؤسسة",
+            "subtitle": "حاول تغيير البحث أو عوامل التصفية.",
+            "clearFilters": "مسح عوامل التصفية"
         },
         "details": {
-            "back": "العودة إلى أماكن الإقامة",
+            "back": "العودة",
             "fetchError": "تعذر تحميل مكان الإقامة هذا.",
             "notFound": "مكان الإقامة غير موجود.",
             "locationNotSpecified": "الموقع غير محدد",

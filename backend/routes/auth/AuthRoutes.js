@@ -10,6 +10,11 @@ import {
     resendVerificationCode,
 } from "../../controllers/auth/authController.js";
 
+import {
+    forgotPassword,
+    resetPassword,
+} from "../../controllers/auth/PasswordResetController.js";
+
 const router = express.Router();
 
 router.post("/login", login);
@@ -18,4 +23,8 @@ router.get("/me", authMiddleware, getMe);
 router.post("/logout", logout);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-code", resendVerificationCode);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
+
+
 export default router;

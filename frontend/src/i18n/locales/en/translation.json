@@ -102,12 +102,34 @@
         "sendingVerification": "Sending verification code...",
         "continue": "Continue",
         "validation": {
-        "firstName": "First name must contain at least 2 characters.",
-        "lastName": "Last name must contain at least 2 characters.",
-        "email": "Please enter a valid email address.",
-        "password": "Password must contain at least 8 characters.",
-        "confirmPassword": "Passwords do not match."
-        }
+            "firstName": "First name must contain at least 2 characters.",
+            "lastName": "Last name must contain at least 2 characters.",
+            "email": "Please enter a valid email address.",
+            "password": "Password must contain at least 8 characters.",
+            "confirmPassword": "Passwords do not match."
+        },
+        "forgotPassword": {
+            "link": "Forgot your password?",
+            "title": "Forgot your password?",
+            "description": "Enter your email address and we will send you a link to reset your password.",
+            "submit": "Send reset link",
+            "sending": "Sending...",
+            "success": "If an account exists with this email, a password reset link will be sent.",
+            "error": "Unable to send the reset link. Please try again.",
+            "backToLogin": "Back to login"
+        },
+        "resetPassword": {
+            "title": "Create a new password",
+            "description": "Enter your new password below.",
+            "newPassword": "New password",
+            "confirmPassword": "Confirm new password",
+            "submit": "Reset password",
+            "saving": "Saving...",
+            "success": "Your password has been reset successfully.",
+            "error": "Unable to reset your password. Please try again."
+        },
+        "passwordMinLength": "Password must contain at least 8 characters.",
+        "passwordMismatch": "Passwords do not match."
     },
     "properties": {
         "banner": {
@@ -1261,19 +1283,28 @@
             "publishAd": "Publish an Ad",
             "myProfile": "My Profile",
             "settings": "Settings",
-            "sendFeedback": "Send Feedback"
+            "sendFeedback": "Send Feedback",
+            "browseRoommates": "Find Roommates",
+            "browseEstablishments": "Browse Establishments",
+            "findOnMap": "Find on Map",
+            "alerts": "My Alerts",
+            "publishEstablishment": "Publish an Establishment"
         },
         "services": {
             "realEstate": "Real Estate",
             "cars": "Cars",
             "services": "Services",
-            "deliveryTransport": "Delivery & Transport"
+            "deliveryTransport": "Delivery & Transport",
+            "furnishedRentals": "Furnished Rentals",
+            "roommates": "Find a Roommate",
+            "establishments": "Hotels & Establishments",
+            "exploreMap": "Explore the Map"
         },
         "location": "Morocco",
         "rightsReserved": "All rights reserved.",
         "motto": "Built to make everyday life easier.",
-        "madeWithCare": "Made with care ♥"
-
+        "madeWithCare": "Made with care ♥",
+        "publishing": "Publishing"
     },
     "adminContactActions": {
         "title": "Client Contact Actions",
@@ -1725,10 +1756,6 @@
         "reviewSubmitError": "Unable to submit your review.",
         "reviewsLoadError": "Unable to load reviews.",
         "anonymousReviewer": "User"
-
-
-
-
     },
     "roommates": {
         "properties": {
@@ -1907,7 +1934,7 @@
             "owner": "Announcement owner",
             "postedOn": "Posted on",
             "viewProfile": "View owner profile",
-            "backToAnnouncements": "Back to announcements",
+            "backToAnnouncements": "Back",
             "contactOwner": "Contact announcement owner",
             "callOwner": "Call owner",
             "whatsappOwner": "Contact via WhatsApp",
@@ -1960,63 +1987,63 @@
         "photosSubtitle": "Show visitors what your establishment looks like."
         },
         "fields": {
-        "name": "Establishment name",
-        "accommodationType": "Accommodation type",
-        "shortDescription": "Short description",
-        "fullDescription": "Full description",
-        "yearEstablished": "Year established",
-        "numberOfRooms": "Number of rooms",
-        "numberOfFloors": "Number of floors",
-        "classification": "Hotel classification",
-        "city": "City",
-        "neighborhood": "Neighborhood",
-        "fullAddress": "Full address",
-        "googleMapsLink": "Google Maps link",
-        "roomType": "Room type",
-        "roomQuantity": "Number of rooms of this type",
-        "maxGuests": "Maximum guests",
-        "pricePerNight": "Price per night (MAD)",
-        "bedConfiguration": "Bed configuration",
-        "roomFacilities": "Room facilities",
-        "roomDescription": "Room description",
-        "otherServices": "Other services",
-        "phoneNumber": "Phone number",
-        "whatsappNumber": "WhatsApp number",
-        "email": "Email address",
-        "officialWebsite": "Official website",
-        "bookingWebsite": "Booking / reservation link",
-        "socialMedia": "Social media links",
-        "platform": "Platform",
-        "socialUrl": "Social media URL",
-        "coverPhoto": "Main cover photo",
-        "gallery": "Establishment gallery",
-        "establishmentVideo": "Establishment video",
-        "youtubeUrl": "YouTube video URL"
+            "name": "Establishment name",
+            "accommodationType": "Accommodation type",
+            "shortDescription": "Short description",
+            "fullDescription": "Full description",
+            "yearEstablished": "Year established",
+            "numberOfRooms": "Number of rooms",
+            "numberOfFloors": "Number of floors",
+            "classification": "Hotel classification",
+            "city": "City",
+            "neighborhood": "Neighborhood",
+            "fullAddress": "Full address",
+            "googleMapsLink": "Google Maps link",
+            "roomType": "Room type",
+            "roomQuantity": "Number of rooms of this type",
+            "maxGuests": "Maximum guests",
+            "pricePerNight": "Price per night (MAD)",
+            "bedConfiguration": "Bed configuration",
+            "roomFacilities": "Room facilities",
+            "roomDescription": "Room description",
+            "otherServices": "Other services",
+            "phoneNumber": "Phone number",
+            "whatsappNumber": "WhatsApp number",
+            "email": "Email address",
+            "officialWebsite": "Official website",
+            "bookingWebsite": "Booking / reservation link",
+            "socialMedia": "Social media links",
+            "platform": "Platform",
+            "socialUrl": "Social media URL",
+            "coverPhoto": "Main cover photo",
+            "gallery": "Establishment gallery",
+            "establishmentVideo": "Establishment video",
+            "youtubeUrl": "YouTube video URL"
         },
         "actions": {
-        "add": "Add",
-        "remove": "Remove",
-        "addRoom": "Add another room type",
-        "uploadRoomPhotos": "Upload room photos",
-        "uploadCover": "Upload main cover photo",
-        "removeCover": "Remove cover photo",
-        "uploadGallery": "Upload gallery photos",
-        "watchOnYoutube": "Watch on YouTube",
-        "reset": "Reset",
-        "publishing": "Publishing...",
-        "create": "Create establishment"
+            "add": "Add",
+            "remove": "Remove",
+            "addRoom": "Add another room type",
+            "uploadRoomPhotos": "Upload room photos",
+            "uploadCover": "Upload main cover photo",
+            "removeCover": "Remove cover photo",
+            "uploadGallery": "Upload gallery photos",
+            "watchOnYoutube": "Watch on YouTube",
+            "reset": "Reset",
+            "publishing": "Publishing...",
+            "create": "Create establishment"
         },
         "helpers": {
-        "googleMaps": "Add a Google Maps share link so the location coordinates can be extracted automatically.",
-        "imageLimit": "JPG, PNG or WEBP · Maximum 5MB",
-        "roomPhotosLimit": "Maximum 15 photos per room type, 5MB each.",
-        "galleryLimit": "Maximum 30 images, 5MB per image.",
-        "videoDescription": "Add a YouTube video to introduce your hotel, riad or guesthouse. Visitors will be able to watch it directly on your establishment page.",
-        "youtubeUrl": "Paste a YouTube video, Shorts or shortened YouTube link."
+            "googleMaps": "Add a Google Maps share link so the location coordinates can be extracted automatically.",
+            "imageLimit": "JPG, PNG or WEBP · Maximum 5MB",
+            "roomPhotosLimit": "Maximum 15 photos per room type, 5MB each.",
+            "galleryLimit": "Maximum 30 images, 5MB per image.",
+            "videoDescription": "Add a YouTube video to introduce your hotel, riad or guesthouse. Visitors will be able to watch it directly on your establishment page.",
+            "youtubeUrl": "Paste a YouTube video, Shorts or shortened YouTube link."
         },
         "submit": {
-        "title": "Ready to create your establishment?",
-        "description": "Check your information before submitting."
+            "title": "Ready to create your establishment?",
+            "description": "Check your information before submitting."
         },
         "notClassified": "Not classified",
         "star": "Star",
@@ -2025,40 +2052,40 @@
         "videoPreview": "Video preview",
         "videoTitle": "Establishment video preview",
         "errors": {
-        "invalidYoutube": "This YouTube link is not valid. Please check the URL."
+            "invalidYoutube": "This YouTube link is not valid. Please check the URL."
         },
         "empty": {
-        "gallery": "No gallery photos selected",
-        "roomPhotos": "No room photos selected"
+            "gallery": "No gallery photos selected",
+            "roomPhotos": "No room photos selected"
         },
         "options": {
-        "hotel": "Hotel",
-        "riad": "Riad",
-        "guesthouse": "Guesthouse",
-        "hostel": "Hostel",
-        "aparthotel": "Aparthotel",
-        "other": "Other",
-        "single_room": "Single room",
-        "double_room": "Double room",
-        "twin_room": "Twin room",
-        "triple_room": "Triple room",
-        "family_room": "Family room",
-        "suite": "Suite",
-        "deluxe_room": "Deluxe room",
-        "studio": "Studio",
-        "apartment": "Apartment",
-        "dormitory": "Dormitory",
-        "single_bed": "Single bed",
-        "double_bed": "Double bed",
-        "queen_bed": "Queen bed",
-        "king_bed": "King bed",
-        "sofa_bed": "Sofa bed",
-        "bunk_bed": "Bunk bed",
-        "facebook": "Facebook",
-        "instagram": "Instagram",
-        "tiktok": "TikTok",
-        "youtube": "YouTube",
-        "linkedin": "LinkedIn"
+            "hotel": "Hotel",
+            "riad": "Riad",
+            "guesthouse": "Guesthouse",
+            "hostel": "Hostel",
+            "aparthotel": "Aparthotel",
+            "other": "Other",
+            "single_room": "Single room",
+            "double_room": "Double room",
+            "twin_room": "Twin room",
+            "triple_room": "Triple room",
+            "family_room": "Family room",
+            "suite": "Suite",
+            "deluxe_room": "Deluxe room",
+            "studio": "Studio",
+            "apartment": "Apartment",
+            "dormitory": "Dormitory",
+            "single_bed": "Single bed",
+            "double_bed": "Double bed",
+            "queen_bed": "Queen bed",
+            "king_bed": "King bed",
+            "sofa_bed": "Sofa bed",
+            "bunk_bed": "Bunk bed",
+            "facebook": "Facebook",
+            "instagram": "Instagram",
+            "tiktok": "TikTok",
+            "youtube": "YouTube",
+            "linkedin": "LinkedIn"
         }
     },
     "establishments": {
@@ -2099,7 +2126,7 @@
             "clearFilters": "Clear filters"
         },
         "details": {
-            "back": "Back to establishments",
+            "back": "Back",
             "fetchError": "Unable to retrieve this establishment.",
             "notFound": "Establishment not found.",
             "locationNotSpecified": "Location not specified",

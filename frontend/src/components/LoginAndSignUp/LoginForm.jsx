@@ -154,6 +154,12 @@ function LoginForm() {
         }
     };
 
+    const handleForgotPassword = () => {
+        setLoginStatus(null);
+        dispatch(clearLoginStatus());
+        navigate("/forgot-password");
+    };
+
     const handleSignup = () => {
         setLoginStatus(null);
         dispatch(clearLoginStatus());
@@ -243,6 +249,16 @@ function LoginForm() {
                         ) : (
                             <Visibility fontSize="small" />
                         )}
+                    </button>
+                </div>
+                {/* Forgot password */}
+                <div className="flex justify-end -mt-2">
+                    <button
+                        type="button"
+                        onClick={handleForgotPassword}
+                        className="text-sm font-medium text-blue-600 hover:underline"
+                    >
+                        {t("auth.forgotPassword.link")}
                     </button>
                 </div>
 

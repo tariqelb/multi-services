@@ -1,12 +1,3 @@
-// import axios from "axios";
-
-// const axiosInstance = axios.create({
-//     baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
-//     withCredentials: true,
-// });
-
-// export default axiosInstance;
-
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -14,26 +5,38 @@ const axiosInstance = axios.create({
     withCredentials: true,
 });
 
+// Requests that should never trigger an automatic login redirect.
+const AUTH_REQUESTS = [
+    "/auth/login",
+    "/auth/signup",
+    "/auth/verify-email",
+    "/auth/resend-code",
+];
 
-// Redirect to login when an authenticated request returns 401.
+const isAuthRequest = (requestUrl = "") => {
+    return AUTH_REQUESTS.some((path) => requestUrl.includes(path));
+};
+
+// Redirect to login when authentication expires or is invalid.
 axiosInstance.interceptors.response.use(
     (response) => response,
+
     (error) => {
         const status = error.response?.status;
         const requestUrl = error.config?.url || "";
 
-        const isAuthRequest = [
-            "/auth/login",
-            "/auth/signup",
-            "/auth/verify-email",
-            "/auth/resend-code",
-        ].some((path) => requestUrl.includes(path));
+        if (
+            status === 401 &&
+            !isAuthRequest(requestUrl) &&
+            window.location.pathname !== "/login"
+        ) {
+            console.warn(
+                "[Auth] Session expired or authentication invalid. Redirecting to login."
+            );
 
-        if (status === 401 && !isAuthRequest) {
-            // Prevent repeated redirects.
-            if (window.location.pathname !== "/login") {
-                window.location.replace("/login");
-            }
+            // Redirect the user and prevent them from returning
+            // to a page that requires authentication.
+            window.location.replace("/login");
         }
 
         return Promise.reject(error);

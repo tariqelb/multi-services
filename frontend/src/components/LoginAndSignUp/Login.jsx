@@ -14,7 +14,10 @@ function Login() {
             style={{ backgroundImage: `url(${loginBackground})` }}
         >
             {/* Language Switcher */}
-            <div className="absolute right-4 top-4 z-20 sm:right-6 md:right-8">
+            {/* <div className="absolute right-4 top-4 z-20 sm:right-6 md:right-8">
+                <LoginLanguageSwitcher />
+            </div> */}
+            <div className="absolute right-4 top-4 z-50 flex items-center justify-center rounded-xl border border-white/60 bg-white/80 p-2 shadow-lg backdrop-blur-md sm:right-6 sm:top-6 md:right-8">
                 <LoginLanguageSwitcher />
             </div>
 

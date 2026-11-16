@@ -107,7 +107,7 @@ export default function RoommateDetailsPage({
                 }}
             >
                 {t("roommates.details.back", {
-                    defaultValue: "Back to announcements",
+                    defaultValue: "Back",
                 })}
             </Button>
 

@@ -102,12 +102,34 @@
         "sendingVerification": "Envoi du code de vérification...",
         "continue": "Continuer",
         "validation": {
-        "firstName": "Le prénom doit contenir au moins 2 caractères.",
-        "lastName": "Le nom doit contenir au moins 2 caractères.",
-        "email": "Veuillez saisir une adresse e-mail valide.",
-        "password": "Le mot de passe doit contenir au moins 8 caractères.",
-        "confirmPassword": "Les mots de passe ne correspondent pas."
-        }
+            "firstName": "Le prénom doit contenir au moins 2 caractères.",
+            "lastName": "Le nom doit contenir au moins 2 caractères.",
+            "email": "Veuillez saisir une adresse e-mail valide.",
+            "password": "Le mot de passe doit contenir au moins 8 caractères.",
+            "confirmPassword": "Les mots de passe ne correspondent pas."
+        },
+        "forgotPassword": {
+            "link": "Mot de passe oublié ?",
+            "title": "Mot de passe oublié ?",
+            "description": "Saisissez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+            "submit": "Envoyer le lien",
+            "sending": "Envoi en cours...",
+            "success": "Si un compte existe avec cette adresse e-mail, un lien de réinitialisation sera envoyé.",
+            "error": "Impossible d'envoyer le lien. Veuillez réessayer.",
+            "backToLogin": "Retour à la connexion"
+        },
+        "resetPassword": {
+            "title": "Créer un nouveau mot de passe",
+            "description": "Saisissez votre nouveau mot de passe ci-dessous.",
+            "newPassword": "Nouveau mot de passe",
+            "confirmPassword": "Confirmer le nouveau mot de passe",
+            "submit": "Réinitialiser le mot de passe",
+            "saving": "Enregistrement...",
+            "success": "Votre mot de passe a été réinitialisé avec succès.",
+            "error": "Impossible de réinitialiser votre mot de passe. Veuillez réessayer."
+        },
+        "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas."
     },
     "properties": {
         "banner": {
@@ -1268,7 +1290,7 @@
         "empty": "Aucune visite n'a encore été enregistrée. Consultez votre application dans un autre onglet pour générer la première visite."
     },
     "footer": {
-        "description": "Une seule plateforme, des possibilités infinies. Découvrez des biens immobiliers, des véhicules, des services professionnels et des solutions du quotidien au même endroit.",
+        "description": "Une plateforme, des possibilités infinies. Découvrez des biens immobiliers, des véhicules, des services professionnels et des solutions du quotidien au même endroit.",
         "socialProfile": "Visitez notre profil {{platform}}",
         "explore": "Explorer",
         "ourServices": "Nos services",
@@ -1277,22 +1299,32 @@
             "dashboard": "Tableau de bord",
             "browseProperties": "Parcourir les biens immobiliers",
             "savedProperties": "Biens immobiliers enregistrés",
-            "myPublications": "Mes publications",
+            "myPublications": "Mes annonces",
             "publishAd": "Publier une annonce",
             "myProfile": "Mon profil",
             "settings": "Paramètres",
-            "sendFeedback": "Envoyer un avis"
+            "sendFeedback": "Envoyer un commentaire",
+            "browseRoommates": "Trouver des colocataires",
+            "browseEstablishments": "Découvrir les établissements",
+            "findOnMap": "Explorer la carte",
+            "alerts": "Mes alertes",
+            "publishEstablishment": "Publier un établissement"
         },
         "services": {
             "realEstate": "Immobilier",
             "cars": "Voitures",
             "services": "Services",
-            "deliveryTransport": "Livraison et transport"
+            "deliveryTransport": "Livraison et transport",
+            "furnishedRentals": "Locations meublées",
+            "roommates": "Trouver un colocataire",
+            "establishments": "Hôtels et établissements",
+            "exploreMap": "Explorer la carte"
         },
         "location": "Maroc",
         "rightsReserved": "Tous droits réservés.",
-        "motto": "Conçu pour faciliter le quotidien.",
-        "madeWithCare": "Fait avec soin ♥"
+        "motto": "Conçu pour faciliter votre quotidien.",
+        "madeWithCare": "Fait avec soin ♥",
+        "publishing": "Publication"
     },
     "adminContactActions": {
         "title": "Actions de contact des clients",
@@ -1892,7 +1924,7 @@
             "owner": "Propriétaire de l'annonce",
             "postedOn": "Publié le",
             "viewProfile": "Voir le profil du propriétaire",
-            "backToAnnouncements": "Retour aux annonces",
+            "backToAnnouncements": "Retour",
             "contactOwner": "Contacter le propriétaire de l'annonce",
             "callOwner": "Appeler le propriétaire",
             "whatsappOwner": "Contacter via WhatsApp",
@@ -1945,63 +1977,63 @@
         "photosSubtitle": "Montrez aux visiteurs à quoi ressemble votre établissement."
         },
         "fields": {
-        "name": "Nom de l'établissement",
-        "accommodationType": "Type d'hébergement",
-        "shortDescription": "Description courte",
-        "fullDescription": "Description complète",
-        "yearEstablished": "Année de création",
-        "numberOfRooms": "Nombre de chambres",
-        "numberOfFloors": "Nombre d'étages",
-        "classification": "Classement de l'hôtel",
-        "city": "Ville",
-        "neighborhood": "Quartier",
-        "fullAddress": "Adresse complète",
-        "googleMapsLink": "Lien Google Maps",
-        "roomType": "Type de chambre",
-        "roomQuantity": "Nombre de chambres de ce type",
-        "maxGuests": "Nombre maximum de personnes",
-        "pricePerNight": "Prix par nuit (MAD)",
-        "bedConfiguration": "Configuration des lits",
-        "roomFacilities": "Équipements de la chambre",
-        "roomDescription": "Description de la chambre",
-        "otherServices": "Autres services",
-        "phoneNumber": "Numéro de téléphone",
-        "whatsappNumber": "Numéro WhatsApp",
-        "email": "Adresse e-mail",
-        "officialWebsite": "Site officiel",
-        "bookingWebsite": "Lien de réservation",
-        "socialMedia": "Réseaux sociaux",
-        "platform": "Plateforme",
-        "socialUrl": "Lien du réseau social",
-        "coverPhoto": "Photo de couverture principale",
-        "gallery": "Galerie de l'établissement",
-        "establishmentVideo": "Vidéo de l'établissement",
-        "youtubeUrl": "Lien vidéo YouTube"
+            "name": "Nom de l'établissement",
+            "accommodationType": "Type d'hébergement",
+            "shortDescription": "Description courte",
+            "fullDescription": "Description complète",
+            "yearEstablished": "Année de création",
+            "numberOfRooms": "Nombre de chambres",
+            "numberOfFloors": "Nombre d'étages",
+            "classification": "Classement de l'hôtel",
+            "city": "Ville",
+            "neighborhood": "Quartier",
+            "fullAddress": "Adresse complète",
+            "googleMapsLink": "Lien Google Maps",
+            "roomType": "Type de chambre",
+            "roomQuantity": "Nombre de chambres de ce type",
+            "maxGuests": "Nombre maximum de personnes",
+            "pricePerNight": "Prix par nuit (MAD)",
+            "bedConfiguration": "Configuration des lits",
+            "roomFacilities": "Équipements de la chambre",
+            "roomDescription": "Description de la chambre",
+            "otherServices": "Autres services",
+            "phoneNumber": "Numéro de téléphone",
+            "whatsappNumber": "Numéro WhatsApp",
+            "email": "Adresse e-mail",
+            "officialWebsite": "Site officiel",
+            "bookingWebsite": "Lien de réservation",
+            "socialMedia": "Réseaux sociaux",
+            "platform": "Plateforme",
+            "socialUrl": "Lien du réseau social",
+            "coverPhoto": "Photo de couverture principale",
+            "gallery": "Galerie de l'établissement",
+            "establishmentVideo": "Vidéo de l'établissement",
+            "youtubeUrl": "Lien vidéo YouTube"
         },
         "actions": {
-        "add": "Ajouter",
-        "remove": "Supprimer",
-        "addRoom": "Ajouter un autre type de chambre",
-        "uploadRoomPhotos": "Télécharger les photos de la chambre",
-        "uploadCover": "Télécharger la photo de couverture",
-        "removeCover": "Supprimer la photo de couverture",
-        "uploadGallery": "Télécharger les photos de la galerie",
-        "watchOnYoutube": "Regarder sur YouTube",
-        "reset": "Réinitialiser",
-        "publishing": "Publication...",
-        "create": "Créer l'établissement"
+            "add": "Ajouter",
+            "remove": "Supprimer",
+            "addRoom": "Ajouter un autre type de chambre",
+            "uploadRoomPhotos": "Télécharger les photos de la chambre",
+            "uploadCover": "Télécharger la photo de couverture",
+            "removeCover": "Supprimer la photo de couverture",
+            "uploadGallery": "Télécharger les photos de la galerie",
+            "watchOnYoutube": "Regarder sur YouTube",
+            "reset": "Réinitialiser",
+            "publishing": "Publication...",
+            "create": "Créer l'établissement"
         },
         "helpers": {
-        "googleMaps": "Ajoutez un lien Google Maps pour extraire automatiquement les coordonnées.",
-        "imageLimit": "JPG, PNG ou WEBP · 5 Mo maximum",
-        "roomPhotosLimit": "Maximum 15 photos par type de chambre, 5 Mo chacune.",
-        "galleryLimit": "Maximum 30 images, 5 Mo par image.",
-        "videoDescription": "Ajoutez une vidéo YouTube pour présenter votre hôtel, riad ou maison d'hôtes. Les visiteurs pourront la regarder directement sur votre page.",
-        "youtubeUrl": "Collez un lien YouTube classique, Shorts ou un lien raccourci."
+            "googleMaps": "Ajoutez un lien Google Maps pour extraire automatiquement les coordonnées.",
+            "imageLimit": "JPG, PNG ou WEBP · 5 Mo maximum",
+            "roomPhotosLimit": "Maximum 15 photos par type de chambre, 5 Mo chacune.",
+            "galleryLimit": "Maximum 30 images, 5 Mo par image.",
+            "videoDescription": "Ajoutez une vidéo YouTube pour présenter votre hôtel, riad ou maison d'hôtes. Les visiteurs pourront la regarder directement sur votre page.",
+            "youtubeUrl": "Collez un lien YouTube classique, Shorts ou un lien raccourci."
         },
         "submit": {
-        "title": "Prêt à créer votre établissement ?",
-        "description": "Vérifiez vos informations avant de les envoyer."
+            "title": "Prêt à créer votre établissement ?",
+            "description": "Vérifiez vos informations avant de les envoyer."
         },
         "notClassified": "Non classé",
         "star": "Étoile",
@@ -2010,11 +2042,11 @@
         "videoPreview": "Aperçu vidéo",
         "videoTitle": "Aperçu de la vidéo de l'établissement",
         "errors": {
-        "invalidYoutube": "Ce lien YouTube n'est pas valide. Veuillez vérifier l'URL."
+            "invalidYoutube": "Ce lien YouTube n'est pas valide. Veuillez vérifier l'URL."
         },
         "empty": {
-        "gallery": "Aucune photo de galerie sélectionnée",
-        "roomPhotos": "Aucune photo de chambre sélectionnée"
+            "gallery": "Aucune photo de galerie sélectionnée",
+            "roomPhotos": "Aucune photo de chambre sélectionnée"
         }
     },
     "establishments": {
@@ -2055,7 +2087,7 @@
             "clearFilters": "Effacer les filtres"
         },
         "details": {
-            "back": "Retour aux établissements",
+            "back": "Retour",
             "fetchError": "Impossible de récupérer cet établissement.",
             "notFound": "Établissement introuvable.",
             "locationNotSpecified": "Emplacement non précisé",
