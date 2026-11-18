@@ -29,10 +29,14 @@
         "knowledgeManagement": "Knowledge Management",
         "findRoommate": "Find a Roommate",
         "establishments": "Find Hotels & Riads",
-        "publishEstablishment": "Publish an Establishment"
+        "publishEstablishment": "Publish an Establishment",
+        "publicationReviews": "Publication Reviews",
+        "feedbackReviews": "Feedback Reviews",
+        "adminPanel": "Admin Panel",
+        "backToMainMenu": "Back to main menu"
     },
     "middleContent": {
-        "overview": "{{section}} Overview",
+        "overview": "Services Dashboard And Overview",
         "subtitle": "Select a service category below to manage listings and requests.",
         "comingSoon": "Coming Soon",
         "services": {
@@ -880,8 +884,8 @@
             "retry": "Retry",
             "enable": "Enable email notifications",
             "enableDescription": "Allow the platform to send you email alerts.",
-            "propertyAlerts": "Matching property alerts",
-            "propertyAlertsDescription": "Get an email when a new property matches your saved alerts.",
+            "propertyAlerts": "Matching property and roomate alerts",
+            "propertyAlertsDescription": "Get an email when a new property or roommate matches your saved alerts.",
             "saving": "Saving...",
             "save": "Save email preferences",
             "saved": "Email preferences saved successfully.",
@@ -1973,18 +1977,18 @@
         "title": "Add your establishment",
         "description": "Create a detailed profile for your hotel, riad, guesthouse or other accommodation.",
         "sections": {
-        "information": "Establishment information",
-        "informationSubtitle": "Introduce your accommodation.",
-        "location": "Location",
-        "locationSubtitle": "Where can visitors find your establishment?",
-        "rooms": "Rooms and accommodation",
-        "roomsSubtitle": "Define your room categories and their prices.",
-        "facilities": "Services and facilities",
-        "facilitiesSubtitle": "Select everything your establishment offers.",
-        "contact": "Contact and online presence",
-        "contactSubtitle": "How can visitors contact and find you online?",
-        "photos": "Photos and media",
-        "photosSubtitle": "Show visitors what your establishment looks like."
+            "information": "Establishment information",
+            "informationSubtitle": "Introduce your accommodation.",
+            "location": "Location",
+            "locationSubtitle": "Where can visitors find your establishment?",
+            "rooms": "Rooms and accommodation",
+            "roomsSubtitle": "Define your room categories and their prices.",
+            "facilities": "Services and facilities",
+            "facilitiesSubtitle": "Select everything your establishment offers.",
+            "contact": "Contact and online presence",
+            "contactSubtitle": "How can visitors contact and find you online?",
+            "photos": "Photos and media",
+            "photosSubtitle": "Show visitors what your establishment looks like."
         },
         "fields": {
             "name": "Establishment name",
@@ -2452,6 +2456,107 @@
         "created": "Alert created successfully.",
         "archived": "Alert archived successfully.",
         "restored": "Alert restored successfully."
+        }
+    },
+    "dailyWorker": {
+        "brand": "MultiServices / Daily Worker",
+        "heroTitle": "Find work. Find workers.",
+        "heroDescription": "A platform connecting people looking for daily work with individuals and businesses that need reliable workers for temporary jobs and everyday tasks.",
+        "sectionTitle": "Opportunities for everyone",
+        "features": {
+            "dailyJobs": {
+                "title": "Find daily jobs",
+                "description": "Discover temporary and daily work opportunities in your area."
+            },
+            "flexibleWork": {
+                "title": "Flexible work",
+                "description": "Find work based on your availability, skills, and preferred schedule."
+            },
+            "employers": {
+                "title": "Connect with employers",
+                "description": "Get in touch with people and businesses looking for workers."
+            }
+        }
+    },
+    "deliveryMan": {
+        "brand": "MultiServices / Delivery",
+        "heroTitle": "Delivery made simple",
+        "heroDescription": "Find delivery professionals for your packages, products, and everyday transportation needs. Connect with local delivery workers and organize convenient deliveries.",
+        "sectionTitle": "Delivery services",
+        "features": {
+            "packages": {
+                "title": "Send packages",
+                "description": "Find delivery professionals to transport packages and goods."
+            },
+            "localDelivery": {
+                "title": "Local delivery",
+                "description": "Connect with delivery workers available in your city or area."
+            },
+            "flexibleDelivery": {
+                "title": "Flexible delivery",
+                "description": "Arrange deliveries according to your needs and preferred time."
+            }
+        }
+    },
+    "driver": {
+        "brand": "MultiServices / Driver",
+        "heroTitle": "Your ride, your price",
+        "heroDescription": "A ride-booking service inspired by the inDrive model. Passengers can request trips, receive driver offers, compare prices, and choose the ride that works best for them.",
+        "sectionTitle": "How the service works",
+        "features": {
+            "destination": {
+                "title": "Choose your destination",
+                "description": "Set your pickup location and destination to request a ride."
+            },
+            "drivers": {
+                "title": "Connect with drivers",
+                "description": "Find available drivers and compare the offers they provide."
+            },
+            "price": {
+                "title": "Agree on a price",
+                "description": "Passengers and drivers can discuss and agree on a suitable fare."
+            }
+        }
+    },
+    "servicesCompanies": {
+        "brand": "MultiServices / Services & Companies",
+        "heroTitle": "Find the right service for your needs",
+        "heroDescription": "Discover local professionals, service providers, and companies. Explore their profiles, compare services, and connect with the right people for your projects and everyday needs.",
+        "sectionTitle": "Explore businesses and services",
+        "features": {
+            "discoverServices": {
+                "title": "Discover services",
+                "description": "Search for professionals and businesses offering services in your area."
+            },
+            "findCompanies": {
+                "title": "Find companies",
+                "description": "Explore company profiles, business information, and available services."
+            },
+            "reviews": {
+                "title": "Reviews and ratings",
+                "description": "Explore customer feedback to help you choose the right provider."
+            }
+        }
+    },
+    "cars": {
+        "brand": "MultiServices / Cars",
+        "heroTitle": "Find your next vehicle",
+        "heroDescription": "Discover cars and vehicles available for sale or rent. Compare options, explore listings, and connect directly with vehicle owners and dealerships.",
+        "sectionTitle": "Explore the Cars service",
+        "sectionDescription": "Everything you need to find or publish a vehicle.",
+        "features": {
+            "discoverVehicles": {
+                "title": "Discover vehicles",
+                "description": "Explore cars and other vehicles available for sale or rent."
+            },
+            "buyOrRent": {
+                "title": "Buy or rent",
+                "description": "Find vehicles that match your budget and transportation needs."
+            },
+            "connectWithSellers": {
+                "title": "Connect with sellers",
+                "description": "Contact vehicle owners and dealerships directly."
+            }
         }
     }
 

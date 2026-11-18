@@ -29,10 +29,14 @@
         "knowledgeManagement": "Gestion des connaissances",
         "findRoommate": "Trouver un colocataire",
         "establishments": "Hôtels et Riads",
-        "publishEstablishment": "Publier un établissement"
+        "publishEstablishment": "Publier un établissement",
+        "publicationReviews": "Avis sur les publications",
+        "feedbackReviews": "Avis des utilisateurs",
+        "adminPanel": "Panneau d'administration",
+        "backToMainMenu": "Retour au menu principal"
     },
     "middleContent": {
-        "overview": "Aperçu de {{section}}",
+        "overview": "Tableau de bord et aperçu des services",
         "subtitle": "Sélectionnez une catégorie de services ci-dessous pour gérer les annonces et les demandes.",
         "comingSoon": "Bientôt disponible",
         "services": {
@@ -871,8 +875,8 @@
             "retry": "Réessayer",
             "enable": "Activer les notifications par e-mail",
             "enableDescription": "Autoriser la plateforme à vous envoyer des alertes par e-mail.",
-            "propertyAlerts": "Alertes immobilières correspondantes",
-            "propertyAlertsDescription": "Recevez un e-mail lorsqu'un nouveau bien correspond à vos alertes enregistrées.",
+            "propertyAlerts": "Alertes pour des logements et des colocataires correspondants",
+            "propertyAlertsDescription": "Recevez un e-mail lorsqu’un nouveau logement ou un nouveau colocataire correspond à vos alertes enregistrées.",
             "saving": "Enregistrement...",
             "save": "Enregistrer les préférences e-mail",
             "saved": "Préférences e-mail enregistrées avec succès.",
@@ -2413,6 +2417,107 @@
         "created": "Alerte créée avec succès.",
         "archived": "Alerte archivée avec succès.",
         "restored": "Alerte restaurée avec succès."
+        }
+    },
+    "dailyWorker": {
+        "brand": "MultiServices / Travail journalier",
+        "heroTitle": "Trouvez un emploi. Trouvez des travailleurs.",
+        "heroDescription": "Une plateforme qui met en relation les personnes à la recherche d'un travail journalier avec des particuliers et des entreprises ayant besoin de travailleurs fiables pour des missions temporaires et des tâches quotidiennes.",
+        "sectionTitle": "Des opportunités pour tous",
+        "features": {
+            "dailyJobs": {
+                "title": "Trouver des emplois journaliers",
+                "description": "Découvrez des opportunités de travail temporaire et journalier près de chez vous."
+            },
+            "flexibleWork": {
+                "title": "Travail flexible",
+                "description": "Trouvez un travail adapté à vos disponibilités, vos compétences et votre emploi du temps."
+            },
+            "employers": {
+                "title": "Contacter des employeurs",
+                "description": "Entrez en contact avec des particuliers et des entreprises à la recherche de travailleurs."
+            }
+        }
+    },
+    "deliveryMan": {
+        "brand": "MultiServices / Livraison",
+        "heroTitle": "La livraison en toute simplicité",
+        "heroDescription": "Trouvez des professionnels de la livraison pour vos colis, vos produits et vos besoins quotidiens de transport. Entrez en contact avec des livreurs locaux et organisez des livraisons pratiques.",
+        "sectionTitle": "Services de livraison",
+        "features": {
+            "packages": {
+                "title": "Envoyer des colis",
+                "description": "Trouvez des professionnels pour transporter vos colis et marchandises."
+            },
+            "localDelivery": {
+                "title": "Livraison locale",
+                "description": "Contactez des livreurs disponibles dans votre ville ou votre région."
+            },
+            "flexibleDelivery": {
+                "title": "Livraison flexible",
+                "description": "Organisez vos livraisons selon vos besoins et l'horaire qui vous convient."
+            }
+        }
+    },
+    "driver": {
+        "brand": "MultiServices / Transport avec chauffeur",
+        "heroTitle": "Votre trajet, votre prix",
+        "heroDescription": "Un service de réservation de trajets inspiré du modèle inDrive. Les passagers peuvent demander un trajet, recevoir des offres de chauffeurs, comparer les prix et choisir le trajet qui leur convient le mieux.",
+        "sectionTitle": "Comment fonctionne le service",
+        "features": {
+            "destination": {
+                "title": "Choisir votre destination",
+                "description": "Indiquez votre lieu de départ et votre destination pour demander un trajet."
+            },
+            "drivers": {
+                "title": "Contacter des chauffeurs",
+                "description": "Trouvez des chauffeurs disponibles et comparez leurs offres."
+            },
+            "price": {
+                "title": "Négocier le prix",
+                "description": "Les passagers et les chauffeurs peuvent discuter et convenir d'un tarif adapté."
+            }
+        }
+    },
+    "servicesCompanies": {
+        "brand": "MultiServices / Services et entreprises",
+        "heroTitle": "Trouvez le service adapté à vos besoins",
+        "heroDescription": "Découvrez des professionnels, des prestataires de services et des entreprises près de chez vous. Consultez leurs profils, comparez leurs services et contactez les personnes adaptées à vos projets et à vos besoins quotidiens.",
+        "sectionTitle": "Découvrez les entreprises et les services",
+        "features": {
+            "discoverServices": {
+                "title": "Découvrir les services",
+                "description": "Recherchez des professionnels et des entreprises proposant des services dans votre région."
+            },
+            "findCompanies": {
+                "title": "Trouver des entreprises",
+                "description": "Consultez les profils des entreprises, leurs informations et les services qu'elles proposent."
+            },
+            "reviews": {
+                "title": "Avis et évaluations",
+                "description": "Consultez les avis des clients pour choisir le prestataire qui vous convient."
+            }
+        }
+    },
+    "cars": {
+        "brand": "MultiServices / Voitures",
+        "heroTitle": "Trouvez votre prochain véhicule",
+        "heroDescription": "Découvrez des voitures et d'autres véhicules disponibles à la vente ou à la location. Comparez les offres, explorez les annonces et contactez directement les propriétaires et les concessionnaires.",
+        "sectionTitle": "Découvrez le service Voitures",
+        "sectionDescription": "Tout ce dont vous avez besoin pour trouver ou publier un véhicule.",
+        "features": {
+            "discoverVehicles": {
+                "title": "Découvrir les véhicules",
+                "description": "Explorez les voitures et autres véhicules disponibles à la vente ou à la location."
+            },
+            "buyOrRent": {
+                "title": "Acheter ou louer",
+                "description": "Trouvez des véhicules adaptés à votre budget et à vos besoins de transport."
+            },
+            "connectWithSellers": {
+                "title": "Contacter les vendeurs",
+                "description": "Contactez directement les propriétaires de véhicules et les concessionnaires."
+            }
         }
     }
 }

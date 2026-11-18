@@ -6,6 +6,9 @@ import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { v2 as cloudinary } from "cloudinary";
 
+
+
+
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,6 +19,41 @@ const PROFILE_UPLOAD_DIR = path.resolve(
 );
 
 const PROFILE_IMAGE_PREFIX = "/uploads/profile/";
+
+
+
+function normalizePhoneNumber(value) {
+    const input = value.trim();
+
+    if (!input) return "";
+
+    const digits = input.replace(/\D/g, "");
+
+    // Moroccan local number: 0612345678
+    if (digits.length === 10 && digits.startsWith("0")) {
+        return `+212${digits.slice(1)}`;
+    }
+
+    // Moroccan international number with an accidental zero:
+    // +2120612345678
+    if (digits.startsWith("2120")) {
+        return `+212${digits.slice(4)}`;
+    }
+
+    // Moroccan number without the plus sign:
+    // 212612345678
+    if (digits.startsWith("212")) {
+        return `+${digits}`;
+    }
+
+    // Other international numbers.
+    if (input.startsWith("+")) {
+        return `+${digits}`;
+    }
+
+    return input;
+}
+
 
 function getImageFromDataUrl(value) {
     const match = value.match(
@@ -209,6 +247,8 @@ export async function updateMyProfile(req, res) {
             const cleanValue =
                 field === "email"
                     ? value.trim().toLowerCase()
+                    : field === "phoneNumber"
+                    ? normalizePhoneNumber(value)
                     : value.trim();
 
             if (
@@ -234,10 +274,20 @@ export async function updateMyProfile(req, res) {
             if (
                 field === "phoneNumber" &&
                 cleanValue !== "" &&
-                !/^\+?[0-9\s().-]{7,20}$/.test(cleanValue)
+                !/^\+[1-9]\d{7,14}$/.test(cleanValue)
             ) {
                 return res.status(400).json({
-                    message: "Please provide a valid phone number.",
+                    message: "Please provide a valid international phone number.",
+                });
+            }
+
+            if (
+                field === "phoneNumber" &&
+                cleanValue.startsWith("+212") &&
+                !/^\+212\d{9}$/.test(cleanValue)
+            ) {
+                return res.status(400).json({
+                    message: "Please provide a valid Moroccan phone number.",
                 });
             }
 

@@ -1,4 +1,4 @@
-
+// /home/tariq/multi-services/app/frontend/src/App.jsx
 import {
     createBrowserRouter,
     RouterProvider,
@@ -6,6 +6,7 @@ import {
     redirect,
     useLoaderData,
     Outlet,
+    useRouteLoaderData,
 } from "react-router-dom";
 
 import { useEffect, useState } from "react";
@@ -15,60 +16,76 @@ import { Box } from "@mui/material";
 
 import axiosInstance from "./api/axiosInstance";
 
-import Login from "./components/LoginAndSignUp/Login";
+import Login from "./Apps/Property/LoginAndSignUp/Login";
 import NotFound from "./pages/NotFound";
 
-import ProfileLayout from "./components/MyProfile/Profile";
-import ProfileOverview from "./components/MyProfile/ProfileOverview";
-import ProfilePropertyList from "./components/MyProfile/ProfilePropertyList";
-import ProfilePropertyDetails from "./components/properties/ProfilePropertyDetails";
 
-import Properties from "./components/properties/Properties";
-import PropertyDetailsPage from "./components/properties/PropertyDetailsPage";
-import PublishPropertyPage from "./components/propertyInsertForm/PublishPropertyPage";
-import SavedPropertiesList from "./components/saved/SavedPropertyList";
-import Alert from "./components/Alert/Alert";
-import NotificationPage from "./components/Notification/NotificationPage";
-import SettingPage from "./components/Settings/SettingsPage";
-import FeedbackPage from "./components/Feedback/FeedbackPage";
+import MainSideBar from "./Components/Home/MainSideBar";
+
+import CarsDescription from "./Apps/cars/Components/Descriprion/Description";
+import DailyWorkerDescription from "./Apps/DailyWorker/Components/Descriprion/Description";
+import DeliveryManDescription from "./Apps/DelivryMan/Components/Descriprion/Description";
+import DriverDescription from "./Apps/Driver/Components/Descriprion/Description";
+import ServicesCompaniesDescription from "./Apps/Services&Companies/Components/Description/Description";
+
+
+
+import ProfileLayout from "./Apps/Property/MyProfile/Profile";
+import ProfileOverview from "./Apps/Property/MyProfile/ProfileOverview";
+import ProfilePropertyList from "./Apps/Property/MyProfile/ProfilePropertyList";
+import ProfilePropertyDetails from "./Apps/Property/properties/ProfilePropertyDetails";
+
+import Properties from "./Apps/Property/properties/Properties";
+import PropertyDetailsPage from "./Apps/Property/properties/PropertyDetailsPage";
+import PublishPropertyPage from "./Apps/Property/propertyInsertForm/PublishPropertyPage";
+import SavedPropertiesList from "./Apps/Property/saved/SavedPropertyList";
+import Alert from "./Apps/Property/Alert/Alert";
+import NotificationPage from "./Apps/Property/Notification/NotificationPage";
+import SettingPage from "./Apps/Property/Settings/SettingsPage";
+import FeedbackPage from "./Apps/Property/Feedback/FeedbackPage";
 
 // Roommate components
-import RoommatePage from "./components/roommate/RoommatePage";
-import RoommateDetailsPage from "./components/roommate/RoommateDetailsPage";
-import RoommateProfileDetails from "./components/roommate/RoommateProfileDetails";
+import RoommatePage from "./Apps/Property/roommate/RoommatePage";
+import RoommateDetailsPage from "./Apps/Property/roommate/RoommateDetailsPage";
+import RoommateProfileDetails from "./Apps/Property/roommate/RoommateProfileDetails";
 
-import TopBar from "./components/Home/TopBar";
-import Sidebar from "./components/Home/Sidebar";
-import MiddleContent from "./components/Home/MiddleContent";
-import Footer from "./components/Footer/Footer";
+import TopBar from "./Components/Home/TopBar";
+import Sidebar from "./Apps/Property/Sidebar/Sidebar";
+import MiddleContent from "./Components/Home/MiddleContent";
+import Footer from "./Apps/Property/Footer/Footer";
 
-import Dashboard from "./components/admin/Dashboard";
-import VisitTracker from "./components/admin/components/VisitTracker";
-import ExternalListings from "./components/admin/externalListings/ExternalListings";
-import ExternalListingSources from "./components/admin/externalListings/ExternalListingSources";
-import UserDetailsPage from "./components/admin/components/UserDetailsPage";
+import Dashboard from "./Apps/Property/Statistic/Dashboard";
+import VisitTracker from "./Apps/Property/Statistic/components/Visit/VisitTracker";
+import ExternalListings from "./Apps/Property/externalListings/ExternalListings";
+import ExternalListingSources from "./Apps/Property/externalListings/ExternalListingSources";
+import UserDetailsPage from "./Apps/Property/Statistic/components/User/UserDetailsPage";
 
-import FindByMap from "./components/FindByMap/FindByMap";
-import DirectionProvider from "./components/Home/DirectionProvider";
+import FindByMap from "./Apps/Property/FindByMap/FindByMap";
+import DirectionProvider from "./Components/Home/DirectionProvider";
 
-import KnowledgeCenter from "./components/admin/components/knowledge/KnowledgeCenter";
-import KnowledgeDetails from "./components/admin/components/knowledge/KnowledgeDetails";
-import KnowledgeManagement from "./components/admin/components/knowledge/KnowledgeManagement";
+import KnowledgeCenter from "./Apps/Property/knowledge/KnowledgeCenter";
+import KnowledgeDetails from "./Apps/Property/knowledge/KnowledgeDetails";
+import KnowledgeManagement from "./Apps/Property/knowledge/KnowledgeManagement";
 
-import PublicProfile from "./components/PublicProfile/PublicProfile";
-
-
-import FurnishedProperties from "./components/FurnishedRental/FurnishedProperties";
-import FurnishedPropertyDetailsPage from "./components/FurnishedRental/FurnishedPropertyDetailsPage";
+import PublicProfile from "./Apps/Property/PublicProfile/PublicProfile";
 
 
-import Establishments from "./components/Establishment/Establishments";
-import EstablishmentDetailsPage from "./components/Establishment/EstablishmentDetailsPage";
-import EstablishmentInsertForm from "./components/Establishment/EstablishmentInsertForm";
+import FurnishedProperties from "./Apps/Property/FurnishedRental/FurnishedProperties";
+import FurnishedPropertyDetailsPage from "./Apps/Property/FurnishedRental/FurnishedPropertyDetailsPage";
 
-import ForgotPassword from "./components/LoginAndSignUp/ForgotPassword";
-import ResetPassword from "./components/LoginAndSignUp/ResetPassword";
 
+import Establishments from "./Apps/Property/Establishment/Establishments";
+import EstablishmentDetailsPage from "./Apps/Property/Establishment/EstablishmentDetailsPage";
+import EstablishmentInsertForm from "./Apps/Property/Establishment/EstablishmentInsertForm";
+
+import ForgotPassword from "./Apps/Property/LoginAndSignUp/ForgotPassword";
+import ResetPassword from "./Apps/Property/LoginAndSignUp/ResetPassword";
+
+import ScrollToTop from "./Components/Home/ScrollToTop";
+
+
+import PublicationsReviewSection from "./Apps/Property/PublicationReviews/PublicationsReviewSection";
+import FeedbackSection from "./Apps/Property/FeedbackReviews/FeedbackSection";
 // -----------------------------------------------------------------------------
 // Authentication loader
 // -----------------------------------------------------------------------------
@@ -102,6 +119,17 @@ async function requireAuth() {
 // -----------------------------------------------------------------------------
 // Persistent layout with TopBar, Sidebar and Footer
 // -----------------------------------------------------------------------------
+
+function AdminOnly({ children }) {
+    const user = useRouteLoaderData("dashboard-layout");
+
+    if (user?.role?.toLowerCase() !== "admin") {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
+}
+
 
 function DashboardLayout() {
     const user = useLoaderData();
@@ -147,14 +175,19 @@ function DashboardLayout() {
             />
 
             {/* Main layout */}
+            {/* Main layout */}
             <Box
                 sx={{
                     display: "flex",
                     flex: 1,
                     position: "relative",
+                    minWidth: 0,
                 }}
             >
-                {/* Sidebar */}
+                {/* Main service selector */}
+                <MainSideBar />
+
+                {/* Existing service sidebar */}
                 <Sidebar
                     sidebarOpen={sidebarOpen}
                     setSidebarOpen={setSidebarOpen}
@@ -171,12 +204,11 @@ function DashboardLayout() {
                         minWidth: 0,
                     }}
                 >
-                    {/* Current page */}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <ScrollToTop />
                         <Outlet />
                     </Box>
 
-                    {/* Footer */}
                     <Footer />
                 </Box>
             </Box>
@@ -380,6 +412,26 @@ const router = createBrowserRouter([
                 path: "/admin/knowledge",
                 element: <KnowledgeManagement />,
             },
+            // -----------------------------------------------------------------
+            // Admin moderation
+            // -----------------------------------------------------------------
+
+            {
+                path: "/admin/publications",
+                element: (
+                    <AdminOnly>
+                        <PublicationsReviewSection />
+                    </AdminOnly>
+                ),
+            },
+            {
+                path: "/admin/feedback",
+                element: (
+                    <AdminOnly>
+                        <FeedbackSection />
+                    </AdminOnly>
+                ),
+            },
 
             // -----------------------------------------------------------------
             // Knowledge center
@@ -392,6 +444,30 @@ const router = createBrowserRouter([
             {
                 path: "/knowledge/:id",
                 element: <KnowledgeDetails />,
+            },
+            // -----------------------------------------------------------------
+            // Other services - Description pages
+            // -----------------------------------------------------------------
+
+            {
+                path: "/cars/description",
+                element: <CarsDescription />,
+            },
+            {
+                path: "/daily-worker/description",
+                element: <DailyWorkerDescription />,
+            },
+            {
+                path: "/delivery-man/description",
+                element: <DeliveryManDescription />,
+            },
+            {
+                path: "/driver/description",
+                element: <DriverDescription />,
+            },
+            {
+                path: "/services-companies/description",
+                element: <ServicesCompaniesDescription />,
             },
         ],
     },
