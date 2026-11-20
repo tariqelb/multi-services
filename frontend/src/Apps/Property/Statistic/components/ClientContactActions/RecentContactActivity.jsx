@@ -43,33 +43,29 @@ export default function RecentContactActivity({
             elevation={0}
             sx={{
                 p: { xs: 2, md: 3 },
-                border: "1px solid #E8EDF4",
+                border: "1px solid #E2E8F0",
                 borderRadius: 3,
             }}
         >
-            <Box mb={2.5}>
-                <Typography variant="h6" fontWeight={800}>
+            <Box sx={{ mb: 2.5 }}>
+                <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     {t("adminContactActions.recentActivity")}
                 </Typography>
 
                 <Typography
-                    variant="caption"
-                    color="text.secondary"
+                    variant="caption" sx={{ color: "text.secondary" }}
                 >
                     {t("adminContactActions.recentActivitySubtitle")}
                 </Typography>
             </Box>
 
             {contacts.length === 0 ? (
-                <Typography
-                    textAlign="center"
-                    color="text.secondary"
-                    py={4}
+                <Typography sx={{ textAlign: "center", color: "text.secondary", py: 4 }}
                 >
                     {t("adminContactActions.noRecentActivity")}
                 </Typography>
             ) : (
-                <Stack spacing={0} divider={<Box sx={{ borderBottom: "1px solid #EEF2F7" }} />}>
+                <Stack spacing={0} divider={<Box sx={{ borderBottom: "1px solid #F1F5F9" }} />}>
                     {contacts.map((contact) => {
                         const isCall = contact.action === "call";
 
@@ -81,9 +77,7 @@ export default function RecentContactActivity({
                             <Stack
                                 key={contact._id}
                                 direction={{ xs: "column", sm: "row" }}
-                                alignItems={{ xs: "flex-start", sm: "center" }}
-                                spacing={2}
-                                py={2}
+                                spacing={2} sx={{ alignItems: { xs: "flex-start", sm: "center" }, py: 2 }}
                             >
                                 <Avatar
                                     sx={{
@@ -95,8 +89,8 @@ export default function RecentContactActivity({
                                     {getInitials(client)}
                                 </Avatar>
 
-                                <Box flex={1} minWidth={0}>
-                                    <Typography fontWeight={700}>
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Typography sx={{ fontWeight: 700 }}>
                                         {[client?.firstName, client?.lastName]
                                             .filter(Boolean)
                                             .join(" ") ||
@@ -105,16 +99,13 @@ export default function RecentContactActivity({
 
                                     <Typography
                                         variant="body2"
-                                        color="text.secondary"
-                                        noWrap
+                                        noWrap sx={{ color: "text.secondary" }}
                                     >
                                         {client?.email || "—"}
                                     </Typography>
 
                                     <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        display="block"
+                                        variant="caption" sx={{ color: "text.secondary", display: "block" }}
                                     >
                                         {t("adminContactActions.contacted")}{" "}
                                         <Box
@@ -131,19 +122,17 @@ export default function RecentContactActivity({
                                     </Typography>
                                 </Box>
 
-                                <Box flex={1} minWidth={0}>
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
                                     <Typography
                                         variant="body2"
-                                        fontWeight={700}
-                                        noWrap
+                                        noWrap sx={{ fontWeight: 700 }}
                                     >
                                         {property?.title ||
                                             t("adminContactActions.unknownProperty")}
                                     </Typography>
 
                                     <Typography
-                                        variant="caption"
-                                        color="text.secondary"
+                                        variant="caption" sx={{ color: "text.secondary" }}
                                     >
                                         {property?.city || "—"}
                                     </Typography>
@@ -151,8 +140,7 @@ export default function RecentContactActivity({
 
                                 <Stack
                                     direction="row"
-                                    alignItems="center"
-                                    spacing={1}
+                                    spacing={1} sx={{ alignItems: "center" }}
                                 >
                                     <Chip
                                         icon={
@@ -183,9 +171,8 @@ export default function RecentContactActivity({
 
                                 <Stack
                                     direction="row"
-                                    alignItems="center"
                                     spacing={0.6}
-                                    sx={{
+                                    sx={{ alignItems: "center",
                                         minWidth: { sm: 145 },
                                         color: "text.secondary",
                                     }}

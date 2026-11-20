@@ -1,4 +1,5 @@
 
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -7,6 +8,7 @@ import { activeFormAction } from "../../../redux/actions/activeFormAction";
 import { resetSignupForm } from "../../../redux/actions/signupAction";
 
 function EmailVerification() {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
 
     const email = useSelector((state) => state.signup.email);
@@ -31,7 +33,7 @@ function EmailVerification() {
         setSuccess("");
 
         if (code.length !== 6) {
-            setError("Please enter the complete 6-digit verification code.");
+            setError(t("auth.verifyEmail.pleaseEnterTheComplete6digit", "Please enter the complete 6-digit verification code."));
             return;
         }
 
@@ -48,7 +50,7 @@ function EmailVerification() {
 
             setSuccess(
                 response.data.message ||
-                "Your email has been successfully verified."
+                t("auth.verifyEmail.yourEmailHasBeenSuccessfully", "Your email has been successfully verified.")
             );
 
             dispatch(resetSignupForm());
@@ -56,7 +58,7 @@ function EmailVerification() {
         } catch (error) {
             setError(
                 error.response?.data?.message ||
-                "Verification failed. Please check your code and try again."
+                t("auth.verifyEmail.verificationFailedPleaseCheckYour", "Verification failed. Please check your code and try again.")
             );
         } finally {
             setLoading(false);
@@ -80,12 +82,12 @@ function EmailVerification() {
 
             setSuccess(
                 response.data.message ||
-                "A new verification code has been sent to your email."
+                t("auth.verifyEmail.aNewVerificationCodeHas", "A new verification code has been sent to your email.")
             );
         } catch (error) {
             setError(
                 error.response?.data?.message ||
-                "Unable to resend the verification code."
+                t("auth.verifyEmail.unableToResendTheVerification", "Unable to resend the verification code.")
             );
         } finally {
             setResending(false);
@@ -96,11 +98,11 @@ function EmailVerification() {
         <div className="m-0 w-full min-w-0 max-w-full rounded-2xl p-5 sm:p-8 md:p-10 lg:p-15">
 
             <h2 className="mb-3 text-center text-2xl font-bold text-black">
-                Verify your email
+                {t("auth.verifyEmail.verifyYourEmail", "Verify your email")}
             </h2>
 
-            <p className="mb-6 text-center text-sm text-gray-600">
-                We sent a 6-digit verification code to:
+            <p className="mb-6 text-center text-sm text-slate-600">
+                {t("auth.verifyEmail.weSentA6digitVerification", "We sent a 6-digit verification code to:")}
                 <span className="mt-1 block break-all font-semibold text-black">
                     {email}
                 </span>
@@ -113,9 +115,9 @@ function EmailVerification() {
                 <div className="flex flex-col gap-2">
                     <label
                         htmlFor="verificationCode"
-                        className="text-sm font-semibold text-gray-700"
+                        className="text-sm font-semibold text-slate-700"
                     >
-                        Verification code
+                        {t("auth.verifyEmail.verificationCode", "Verification code")}
                     </label>
 
                     <input
@@ -123,16 +125,16 @@ function EmailVerification() {
                         type="text"
                         inputMode="numeric"
                         autoComplete="one-time-code"
-                        placeholder="Enter 6-digit code"
+                        placeholder={t("auth.verifyEmail.enter6digitCode", "Enter 6-digit code")}
                         value={code}
                         onChange={handleCodeChange}
                         maxLength={6}
                         required
-                        className="h-14 w-full rounded-[10px] border border-gray-600 bg-white px-4 text-center text-2xl font-bold tracking-[0.5em] text-black outline-none transition-colors focus:border-blue-600"
+                        className="h-14 w-full rounded-[10px] border border-slate-600 bg-white px-4 text-center text-2xl font-bold tracking-[0.5em] text-black outline-none transition-colors focus:border-blue-600"
                     />
 
-                    <p className="text-xs text-gray-500">
-                        The verification code expires after 10 minutes.
+                    <p className="text-xs text-slate-500">
+                        {t("auth.verifyEmail.theVerificationCodeExpiresAfter", "The verification code expires after 10 minutes.")}
                     </p>
                 </div>
 
@@ -159,13 +161,13 @@ function EmailVerification() {
                     disabled={loading || code.length !== 6}
                     className="h-13 w-full rounded-[10px] bg-blue-600 text-base font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    {loading ? "Verifying..." : "Verify email"}
+                    {loading ? t("auth.verifyEmail.verifying", "Verifying...") : t("auth.verifyEmail.verifyEmail", "Verify email")}
                 </button>
             </form>
 
             <div className="mt-5 text-center">
-                <p className="text-sm text-gray-600">
-                    Didn't receive the code?
+                <p className="text-sm text-slate-600">
+                    {t("auth.verifyEmail.didntReceiveTheCode", "Didn't receive the code?")}
                 </p>
 
                 <button
@@ -174,7 +176,7 @@ function EmailVerification() {
                     disabled={resending}
                     className="mt-2 font-semibold text-blue-600 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    {resending ? "Sending..." : "Resend verification code"}
+                    {resending ? t("auth.verifyEmail.sending", "Sending...") : t("auth.verifyEmail.resendVerificationCode", "Resend verification code")}
                 </button>
             </div>
 
@@ -182,9 +184,9 @@ function EmailVerification() {
                 <button
                     type="button"
                     onClick={() => dispatch(activeFormAction("signup"))}
-                    className="text-sm text-gray-600 hover:text-blue-600"
+                    className="text-sm text-slate-600 hover:text-blue-600"
                 >
-                    Back to signup
+                    {t("auth.verifyEmail.backToSignup", "Back to signup")}
                 </button>
             </div>
         </div>

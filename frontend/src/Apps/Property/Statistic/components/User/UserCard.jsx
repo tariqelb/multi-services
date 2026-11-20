@@ -1,3 +1,4 @@
+// admin/components/User/UserCard.jsx
 
 import {
     Avatar,
@@ -21,6 +22,8 @@ import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+// import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { CheckCircle } from "lucide-react";
 
 import UserStatistic from "./UserStatistic";
 
@@ -42,13 +45,18 @@ export default function UserCard({ user, onViewDetails }) {
         user?.accountStatus || "active"
     ).toLowerCase();
 
-    const isSuspended = accountStatus === "suspended";
+    const statusLabel = t(
+        `userCard.statuses.${accountStatus}`,
+        accountStatus.charAt(0).toUpperCase() +
+            accountStatus.slice(1).replace(/_/g, " ")
+    );
 
-    const statusLabel = isSuspended
-        ? t("userCard.suspended")
-        : t("userCard.active");
-
-    const statusColor = isSuspended ? "error" : "success";
+    const statusColor =
+        accountStatus === "suspended"
+            ? "error"
+            : accountStatus === "active"
+                ? "success"
+                : "warning";
 
     return (
         <Card
@@ -70,8 +78,7 @@ export default function UserCard({ user, onViewDetails }) {
                 {/* Header */}
                 <Stack
                     direction={{ xs: "column", sm: "row" }}
-                    spacing={2}
-                    alignItems={{ xs: "flex-start", sm: "center" }}
+                    spacing={2} sx={{ alignItems: { xs: "flex-start", sm: "center" } }}
                 >
                     <Avatar
                         src={user?.profileImage || undefined}
@@ -90,12 +97,9 @@ export default function UserCard({ user, onViewDetails }) {
                         <Stack
                             direction="row"
                             spacing={1}
-                            alignItems="center"
-                            flexWrap="wrap"
-                            useFlexGap
-                            mb={1}
+                            useFlexGap sx={{ alignItems: "center", flexWrap: "wrap", mb: 1 }}
                         >
-                            <Typography variant="h6" fontWeight={700}>
+                            <Typography variant="h6" sx={{ fontWeight: 700 }}>
                                 {fullName}
                             </Typography>
 
@@ -113,13 +117,31 @@ export default function UserCard({ user, onViewDetails }) {
                                     variant="outlined"
                                 />
                             )}
+
+                            <Chip
+                                size="small"
+                                variant="outlined"
+                                color={user?.emailVerified ? "success" : "warning"}
+                                label={
+                                    user?.emailVerified
+                                        ? t("userCard.emailVerified", "Email verified")
+                                        : t("userCard.emailNotVerified", "Email not verified")
+                                }
+                            />
+
+                            {user?.deletionRequestedAt && (
+                                <Chip
+                                    size="small"
+                                    color="error"
+                                    label={t("userCard.pendingDeletion", "Deletion requested")}
+                                />
+                            )}
                         </Stack>
 
                         <Stack spacing={0.75}>
                             <Stack
                                 direction="row"
-                                spacing={1}
-                                alignItems="center"
+                                spacing={1} sx={{ alignItems: "center" }}
                             >
                                 <EmailOutlinedIcon
                                     fontSize="small"
@@ -128,8 +150,7 @@ export default function UserCard({ user, onViewDetails }) {
 
                                 <Typography
                                     variant="body2"
-                                    color="text.secondary"
-                                    sx={{ overflowWrap: "anywhere" }}
+                                    sx={{ color: "text.secondary", overflowWrap: "anywhere" }}
                                 >
                                     {user?.email || t("userCard.noEmail")}
                                 </Typography>
@@ -137,8 +158,7 @@ export default function UserCard({ user, onViewDetails }) {
 
                             <Stack
                                 direction="row"
-                                spacing={1}
-                                alignItems="center"
+                                spacing={1} sx={{ alignItems: "center" }}
                             >
                                 <PhoneOutlinedIcon
                                     fontSize="small"
@@ -146,8 +166,7 @@ export default function UserCard({ user, onViewDetails }) {
                                 />
 
                                 <Typography
-                                    variant="body2"
-                                    color="text.secondary"
+                                    variant="body2" sx={{ color: "text.secondary" }}
                                 >
                                     {user?.phoneNumber || t("userCard.noPhone")}
                                 </Typography>
@@ -155,8 +174,7 @@ export default function UserCard({ user, onViewDetails }) {
 
                             <Stack
                                 direction="row"
-                                spacing={1}
-                                alignItems="center"
+                                spacing={1} sx={{ alignItems: "center" }}
                             >
                                 <PersonOutlineOutlinedIcon
                                     fontSize="small"
@@ -165,8 +183,7 @@ export default function UserCard({ user, onViewDetails }) {
 
                                 <Typography
                                     variant="body2"
-                                    color="text.secondary"
-                                    sx={{ overflowWrap: "anywhere" }}
+                                    sx={{ color: "text.secondary", overflowWrap: "anywhere" }}
                                 >
                                     {user?.address || t("userCard.noAddress")}
                                 </Typography>
@@ -174,8 +191,7 @@ export default function UserCard({ user, onViewDetails }) {
 
                             <Stack
                                 direction="row"
-                                spacing={1}
-                                alignItems="center"
+                                spacing={1} sx={{ alignItems: "center" }}
                             >
                                 <CalendarMonthOutlinedIcon
                                     fontSize="small"
@@ -183,8 +199,7 @@ export default function UserCard({ user, onViewDetails }) {
                                 />
 
                                 <Typography
-                                    variant="body2"
-                                    color="text.secondary"
+                                    variant="body2" sx={{ color: "text.secondary" }}
                                 >
                                     {t("userCard.joined")}{" "}
                                     {user?.createdAt
@@ -220,9 +235,7 @@ export default function UserCard({ user, onViewDetails }) {
 
                 {/* Activity */}
                 <Typography
-                    variant="subtitle2"
-                    fontWeight={700}
-                    mb={1.5}
+                    variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5 }}
                 >
                     {t("userCard.activity")}
                 </Typography>
@@ -232,7 +245,8 @@ export default function UserCard({ user, onViewDetails }) {
                         display: "grid",
                         gridTemplateColumns: {
                             xs: "1fr",
-                            sm: "repeat(3, minmax(0, 1fr))",
+                            sm: "repeat(2, minmax(0, 1fr))",
+                            md: "repeat(4, minmax(0, 1fr))",
                         },
                         gap: 1.5,
                     }}
@@ -241,6 +255,12 @@ export default function UserCard({ user, onViewDetails }) {
                         icon={<HomeWorkOutlinedIcon />}
                         label={t("userCard.publishedProperties")}
                         value={user?.publishedProperties ?? 0}
+                    />
+
+                    <UserStatistic
+                        icon={<CheckCircle />}
+                        label={t("userCard.availableProperties", "Available listings")}
+                        value={user?.activeProperties ?? 0}
                     />
 
                     <UserStatistic

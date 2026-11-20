@@ -60,7 +60,7 @@ export default function EstablishmentMapCard({
                 overflow: "hidden",
                 backgroundColor: "#fff",
                 borderRadius: 2,
-                color: "#1f2937",
+                color: "#1E293B",
             }}
         >
             {imageUrl ? (
@@ -94,9 +94,7 @@ export default function EstablishmentMapCard({
 
             <Box sx={{ p: 1.5 }}>
                 <Typography
-                    fontWeight={700}
-                    fontSize={14}
-                    sx={{
+                    sx={{ fontWeight: 700, fontSize: 14,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         display: "-webkit-box",
@@ -129,9 +127,7 @@ export default function EstablishmentMapCard({
                 </Box>
 
                 <Typography
-                    color="text.secondary"
-                    fontSize={12}
-                    sx={{ mt: 0.75 }}
+                    sx={{ color: "text.secondary", fontSize: 12, mt: 0.75 }}
                 >
                     {neighborhood ? `${neighborhood}, ` : ""}
                     {city}
@@ -139,10 +135,7 @@ export default function EstablishmentMapCard({
 
                 {formattedPrice !== null && (
                     <Typography
-                        fontWeight={700}
-                        color="secondary"
-                        fontSize={14}
-                        sx={{ mt: 1 }}
+                        sx={{ fontWeight: 700, color: "secondary", fontSize: 14, mt: 1 }}
                     >
                         {t("findMap.cards.fromPrice", {
                             price: formattedPrice,
@@ -152,9 +145,7 @@ export default function EstablishmentMapCard({
 
                 {establishment.shortDescription && (
                     <Typography
-                        color="text.secondary"
-                        fontSize={12}
-                        sx={{
+                        sx={{ color: "text.secondary", fontSize: 12,
                             mt: 0.75,
                             overflow: "hidden",
                             textOverflow: "ellipsis",
@@ -240,7 +231,7 @@ export default function EstablishmentMapCard({
 //                 overflow: "hidden",
 //                 backgroundColor: "#fff",
 //                 borderRadius: 2,
-//                 color: "#1f2937",
+//                 color: "#1E293B",
 //             }}
 //         >
 //             {imageUrl ? (

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import TopBar from "../TopBar";
 import Sidebar from "../Sidebar";
+import MainSideBar from "./MainSideBar";
 import MiddleContent from "../MiddleContent";
 
 export default function Home() {
@@ -27,13 +28,24 @@ export default function Home() {
     const user = {
         name: "Alex Morgan",
         role: "Workspace Admin",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+        avatar:
+            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
     };
 
     return (
-        <div
+        <Box
             dir={isRTL ? "rtl" : "ltr"}
-            className="relative flex min-h-screen w-full flex-col overflow-x-clip bg-[#F4F7FB] font-sans text-gray-800"
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh",
+                width: "100%",
+                maxWidth: "100%",
+                overflowX: "hidden",
+                bgcolor: "#F5F7FB",
+                color: "#1E293B",
+                fontFamily: "sans-serif",
+            }}
         >
             {/* Top navigation */}
             <TopBar
@@ -42,41 +54,76 @@ export default function Home() {
                 user={user}
             />
 
-            {/* Main layout */}
-            <div className="relative flex min-h-0 w-full flex-1">
-                {/* Mobile backdrop */}
-                {sidebarOpen && (
-                    <Box
-                        onClick={() => setSidebarOpen(false)}
-                        sx={{
-                            display: {
-                                xs: "block",
-                                md: "none",
-                            },
-                            position: "fixed",
-                            top: "4rem",
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            bgcolor: "rgba(0, 0, 0, 0.4)",
-                            zIndex: 40,
-                        }}
+            {/* Main application layout */}
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: {
+                        xs: "column",
+                        md: "row",
+                    },
+                    flex: 1,
+                    minHeight: 0,
+                    width: "100%",
+                    maxWidth: "100%",
+                    minWidth: 0,
+                }}
+            >
+                {/* Main services navigation */}
+                <MainSideBar />
+
+                {/* Property sidebar + page content */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        flex: 1,
+                        minWidth: 0,
+                        width: "100%",
+                        maxWidth: "100%",
+                        position: "relative",
+                    }}
+                >
+                    {/* Mobile backdrop */}
+                    {sidebarOpen && (
+                        <Box
+                            onClick={() => setSidebarOpen(false)}
+                            sx={{
+                                display: {
+                                    xs: "block",
+                                    md: "none",
+                                },
+                                position: "fixed",
+                                inset: "4rem 0 0",
+                                bgcolor: "rgba(0, 0, 0, 0.4)",
+                                zIndex: 40,
+                            }}
+                        />
+                    )}
+
+                    {/* Property sidebar */}
+                    <Sidebar
+                        sidebarOpen={sidebarOpen}
+                        setSidebarOpen={setSidebarOpen}
+                        activeNav={activeNav}
+                        setActiveNav={setActiveNav}
                     />
-                )}
 
-                {/* Sidebar */}
-                <Sidebar
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
-                    activeNav={activeNav}
-                    setActiveNav={setActiveNav}
-                />
-
-                {/* Middle content */}
-                <main className="min-w-0 w-full flex-1">
-                    <MiddleContent activeNav={activeNav} />
-                </main>
-            </div>
-        </div>
+                    {/* Main page content */}
+                    <Box
+                        component="main"
+                        sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            width: "100%",
+                            maxWidth: "100%",
+                            overflowX: "hidden",
+                        }}
+                    >
+                        <MiddleContent activeNav={activeNav} />
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
     );
 }

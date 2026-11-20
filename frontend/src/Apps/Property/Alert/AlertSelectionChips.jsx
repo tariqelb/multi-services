@@ -45,7 +45,7 @@ export default function AlertSelectionChips({
         },
         bgcolor: isSelected ? "#eff6ff" : "transparent",
         color: isSelected ? "#1d4ed8" : "#334155",
-        borderColor: isSelected ? "#93c5fd" : "#D5DCE8",
+        borderColor: isSelected ? "#93c5fd" : "#E2E8F0",
         "& .MuiChip-label": {
             whiteSpace: "normal",
             overflowWrap: "anywhere",

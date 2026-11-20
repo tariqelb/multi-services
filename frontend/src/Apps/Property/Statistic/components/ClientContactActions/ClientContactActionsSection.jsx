@@ -1,246 +1,529 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+// admin/components/ClientContactActions/ClientContactActionsSection.jsx
+// Leads: calls, WhatsApp and other contact clicks on properties,
+// roommate announcements and establishments.
+
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import {
-    Alert,
-    Box,
-    Button,
-    CircularProgress,
-    Grid,
+    Avatar,
+    Card,
+    CardContent,
+    Chip,
     Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    ToggleButton,
+    ToggleButtonGroup,
     Typography,
 } from "@mui/material";
 
 import {
-    Refresh,
-    Phone,
+    AccessTimeOutlined,
+    GroupOutlined,
+    HomeWorkOutlined,
+    HotelOutlined,
+    PeopleAltOutlined,
+    PhoneInTalkOutlined,
+    PhoneOutlined,
+    RepeatOutlined,
+    TodayOutlined,
     WhatsApp,
-    Today,
-    TouchApp,
 } from "@mui/icons-material";
 
-import axiosInstance from "../../../../../api/axiosInstance";
+import {
+    BarChartView,
+    ChartCard,
+    ChartGrid,
+    DonutChart,
+    EmptyState,
+    ErrorBanner,
+    HourlyChart,
+    KpiGrid,
+    LoadingState,
+    RangeSelect,
+    RankedList,
+    RefreshButton,
+    SectionHeader,
+    StatCard,
+    TrendChart,
+    getPeakHour,
+    useAnalyticsData,
+} from "../shared/AnalyticsUI";
 
-import ContactStatCard from "./ContactStatCard";
-import ContactActivityChart from "./ContactActivityChart";
-import ContactActionBreakdown from "./ContactActionBreakdown";
-import TopContactedProperties from "./TopContactedProperties";
-import RecentContactActivity from "./RecentContactActivity";
+import {
+    formatDateTime,
+    formatDecimal,
+    formatHour,
+    formatNumber,
+    formatPercent,
+    getFullName,
+    getInitials,
+    getLocale,
+    translateValue,
+} from "../shared/analyticsUtils";
+
+const WHATSAPP_COLOR = "#22C55E";
+const CALL_COLOR = "#2563EB";
+const OTHER_COLOR = "#F59E0B";
+
+const LISTING_TYPES = {
+    property: {
+        url: "/dashboard/property-contacts",
+        detailsPath: "/properties",
+        icon: <HomeWorkOutlined fontSize="small" />,
+        label: "Properties",
+    },
+    roommate: {
+        url: "/dashboard/listing-contacts",
+        detailsPath: "/roommates",
+        icon: <GroupOutlined fontSize="small" />,
+        label: "Roommates",
+    },
+    establishment: {
+        url: "/dashboard/listing-contacts",
+        detailsPath: "/establishments",
+        icon: <HotelOutlined fontSize="small" />,
+        label: "Establishments",
+    },
+};
+
+const ACTION_COLORS = {
+    call: CALL_COLOR,
+    whatsapp: WHATSAPP_COLOR,
+    email: "#9333EA",
+    website: "#0891B2",
+    booking: OTHER_COLOR,
+    social: "#EC4899",
+};
+
+const ACTION_LABELS = {
+    call: "Calls",
+    whatsapp: "WhatsApp",
+    email: "Email",
+    website: "Website",
+    booking: "Booking website",
+    social: "Social media",
+};
+
+function PersonCell({ person, fallback }) {
+    const name = getFullName(person) || person?.email || fallback;
+
+    return (
+        <Stack direction="row" spacing={1.25} sx={{ alignItems: "center", minWidth: 0 }}>
+            <Avatar sx={{ width: 30, height: 30, fontSize: 13, bgcolor: "primary.main" }}>
+                {getInitials(name)}
+            </Avatar>
+
+            <Stack sx={{ minWidth: 0 }}>
+                <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+                    {name}
+                </Typography>
+                {person?.phoneNumber && (
+                    <Typography variant="caption" noWrap sx={{ color: "text.secondary" }}>
+                        {person.phoneNumber}
+                    </Typography>
+                )}
+            </Stack>
+        </Stack>
+    );
+}
 
 export default function ClientContactActionsSection() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = getLocale(i18n.language);
     const navigate = useNavigate();
 
-    const [analytics, setAnalytics] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [error, setError] = useState("");
+    const [range, setRange] = useState("30d");
+    const [listingType, setListingType] = useState("property");
 
-    const handlePropertyClick = useCallback(
-        (propertyId) => {
-            if (!propertyId) {
-                console.error("Property ID is missing.");
-                return;
-            }
+    const config = LISTING_TYPES[listingType];
 
-            navigate(`/properties/${propertyId}`);
-        },
-        [navigate]
+    const { data, loading, error, reload } = useAnalyticsData(
+        config.url,
+        listingType === "property" ? { range } : { range, listingType }
     );
 
-    const fetchAnalytics = useCallback(async (refresh = false) => {
-        try {
-            if (refresh) {
-                setRefreshing(true);
-            } else {
-                setLoading(true);
-            }
+    const typeSwitch = (
+        <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={listingType}
+            onChange={(_event, value) => value && setListingType(value)}
+        >
+            {Object.entries(LISTING_TYPES).map(([key, item]) => (
+                <ToggleButton key={key} value={key} sx={{ gap: 0.75, textTransform: "none" }}>
+                    {item.icon}
+                    {t(`contactActions.types.${key}`, item.label)}
+                </ToggleButton>
+            ))}
+        </ToggleButtonGroup>
+    );
 
-            setError("");
+    if (loading && !data) return <LoadingState />;
 
-            const response = await axiosInstance.get(
-                "/dashboard/property-contacts"
-            );
+    // Ignore a response from the previously selected type while switching.
+    const isCurrentData =
+        listingType === "property"
+            ? !data?.listingType
+            : data?.listingType === listingType;
 
-            setAnalytics(response.data);
-        } catch (err) {
-            console.error("Property contact analytics error:", err);
+    const view = isCurrentData ? data : null;
+    const stats = view?.statistics || {};
+    const hasOtherActions = listingType === "establishment";
 
-            setError(
-                err.response?.data?.message ||
-                    t("adminContactActions.loadError")
-            );
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    }, [t]);
+    const actionLabel = (action) =>
+        t(`contactActions.actions.${action}`, ACTION_LABELS[action] || action);
 
-    useEffect(() => {
-        fetchAnalytics();
-    }, [fetchAnalytics]);
+    const channelData =
+        listingType === "property"
+            ? [
+                { name: actionLabel("call"), value: stats.callContacts || 0, color: CALL_COLOR },
+                { name: actionLabel("whatsapp"), value: stats.whatsappContacts || 0, color: WHATSAPP_COLOR },
+            ]
+            : (view?.actions || []).map((item) => ({
+                name: actionLabel(item.name),
+                value: item.value,
+                color: ACTION_COLORS[item.name],
+            }));
 
-    if (loading) {
-        return (
-            <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                minHeight={350}
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
+    const topItems = view?.topProperties || view?.topListings || [];
+    const peakHour = getPeakHour(view?.hourly, "contacts");
 
-    if (error && !analytics) {
-        return (
-            <Alert
-                severity="error"
-                action={
-                    <Button
-                        color="inherit"
-                        size="small"
-                        onClick={() => fetchAnalytics()}
-                    >
-                        {t("adminContactActions.retry")}
-                    </Button>
-                }
-            >
-                {error}
-            </Alert>
-        );
-    }
-
-    const statistics = analytics?.statistics || {};
-
-    const totalContacts = statistics.totalContacts || 0;
-    const callContacts = statistics.callContacts || 0;
-    const whatsappContacts = statistics.whatsappContacts || 0;
-    const contactsToday = statistics.contactsToday || 0;
+    const callLabel = t("contactActions.calls", "Calls");
+    const whatsappLabel = t("contactActions.whatsapp", "WhatsApp");
 
     return (
         <Stack spacing={3}>
-            {/* Header */}
-            <Stack
-                direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-                alignItems={{ xs: "flex-start", sm: "center" }}
-                spacing={2}
+            <SectionHeader
+                icon={<PhoneInTalkOutlined />}
+                title={t("contactActions.title", "Client contact actions")}
+                subtitle={t(
+                    "contactActions.subtitle",
+                    "Leads generated for owners and establishments."
+                )}
             >
-                <Box>
-                    <Typography
-                        variant="h5"
-                        fontWeight={800}
-                        color="text.primary"
-                    >
-                        {t("adminContactActions.title")}
-                    </Typography>
+                {typeSwitch}
+                <RangeSelect value={range} onChange={setRange} />
+                <RefreshButton onClick={reload} loading={loading} />
+            </SectionHeader>
 
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        mt={0.5}
-                    >
-                        {t("adminContactActions.subtitle")}
-                    </Typography>
-                </Box>
+            <ErrorBanner error={error} />
 
-                <Button
-                    variant="outlined"
-                    startIcon={
-                        refreshing
-                            ? <CircularProgress size={17} />
-                            : <Refresh />
-                    }
-                    onClick={() => fetchAnalytics(true)}
-                    disabled={refreshing}
-                    sx={{
-                        borderRadius: 2,
-                        textTransform: "none",
-                        fontWeight: 600,
-                    }}
+            <KpiGrid>
+                <StatCard
+                    title={t("contactActions.totalContacts", "Total contacts")}
+                    value={formatNumber(stats.totalContacts, locale)}
+                    change={stats.contactsChange}
+                    icon={<PhoneInTalkOutlined />}
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("contactActions.contactsToday", "Today")}
+                    value={formatNumber(stats.contactsToday, locale)}
+                    icon={<TodayOutlined />}
+                    color="#0891B2"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={callLabel}
+                    value={formatNumber(stats.callContacts, locale)}
+                    icon={<PhoneOutlined />}
+                    color={CALL_COLOR}
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={whatsappLabel}
+                    value={formatNumber(stats.whatsappContacts, locale)}
+                    description={t("contactActions.whatsappShare", "{{share}} of contacts", {
+                        share: formatPercent(stats.whatsappShare, locale),
+                    })}
+                    icon={<WhatsApp />}
+                    color={WHATSAPP_COLOR}
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("contactActions.uniqueClients", "Contacting clients")}
+                    value={formatNumber(stats.uniqueClients, locale)}
+                    description={t("contactActions.contactsPerClient", "{{value}} contacts each", {
+                        value: formatDecimal(stats.contactsPerClient, locale),
+                    })}
+                    icon={<PeopleAltOutlined />}
+                    color="#9333EA"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("contactActions.repeatClients", "Returning clients")}
+                    value={formatNumber(stats.repeatClients, locale)}
+                    description={t("contactActions.repeatRate", "{{rate}} contacted more than once", {
+                        rate: formatPercent(stats.repeatClientRate, locale),
+                    })}
+                    icon={<RepeatOutlined />}
+                    color="#EC4899"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t(`contactActions.listingsWithLeads.${listingType}`, {
+                        property: "Properties with leads",
+                        roommate: "Announcements with leads",
+                        establishment: "Establishments with leads",
+                    }[listingType])}
+                    value={formatNumber(stats.uniqueProperties, locale)}
+                    description={t("contactActions.uniqueOwners", "{{count}} owners reached", {
+                        count: formatNumber(stats.uniqueOwners, locale),
+                    })}
+                    icon={<HomeWorkOutlined />}
+                    color="#EA580C"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("contactActions.peakHour", "Busiest hour")}
+                    value={peakHour === null ? "—" : formatHour(peakHour)}
+                    description={t("contactActions.peakHourDescription", "When owners get most contacts")}
+                    icon={<AccessTimeOutlined />}
+                    color="#64748B"
+                    locale={locale}
+                />
+            </KpiGrid>
+
+            <ChartGrid template="7fr 5fr">
+                <ChartCard
+                    title={t("contactActions.trend", "Contacts over time")}
+                    subtitle={t("contactActions.trendDescription", "Contact clicks by channel")}
+                    height={320}
                 >
-                    {t("adminContactActions.refresh")}
-                </Button>
-            </Stack>
-
-            {error && (
-                <Alert severity="warning">
-                    {error}
-                </Alert>
-            )}
-
-            {/* Statistics */}
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                    <ContactStatCard
-                        title={t("adminContactActions.totalContacts")}
-                        value={totalContacts}
-                        icon={<TouchApp />}
-                        color="#2563EB"
-                        background="#EFF6FF"
+                    <TrendChart
+                        stacked
+                        data={view?.dailyActivity || []}
+                        locale={locale}
+                        series={[
+                            { key: "calls", name: callLabel, color: CALL_COLOR },
+                            { key: "whatsapp", name: whatsappLabel, color: WHATSAPP_COLOR },
+                            ...(hasOtherActions
+                                ? [{ key: "other", name: t("contactActions.other", "Email & websites"), color: OTHER_COLOR }]
+                                : []),
+                        ]}
                     />
-                </Grid>
+                </ChartCard>
 
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                    <ContactStatCard
-                        title={t("adminContactActions.contactsToday")}
-                        value={contactsToday}
-                        icon={<Today />}
-                        color="#7C3AED"
-                        background="#F5F3FF"
+                <ChartCard
+                    title={t("contactActions.channels", "Preferred channel")}
+                    height={320}
+                >
+                    <DonutChart locale={locale} data={channelData} />
+                </ChartCard>
+            </ChartGrid>
+
+            <ChartGrid>
+                <ChartCard
+                    title={t("contactActions.cities", "Contacts by city")}
+                    height={320}
+                >
+                    <BarChartView
+                        layout="vertical"
+                        data={view?.cities || []}
+                        bars={[
+                            { key: "calls", name: callLabel, color: CALL_COLOR, stackId: "channel" },
+                            { key: "whatsapp", name: whatsappLabel, color: WHATSAPP_COLOR, stackId: "channel" },
+                            ...(hasOtherActions
+                                ? [{ key: "other", name: t("contactActions.other", "Email & websites"), color: OTHER_COLOR, stackId: "channel" }]
+                                : []),
+                        ]}
+                        locale={locale}
+                        labelWidth={100}
                     />
-                </Grid>
+                </ChartCard>
 
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                    <ContactStatCard
-                        title={t("adminContactActions.phoneClicks")}
-                        value={callContacts}
-                        icon={<Phone />}
-                        color="#0891B2"
-                        background="#ECFEFF"
+                <ChartCard
+                    title={t("contactActions.hourly", "Contacts by hour")}
+                    subtitle={t("contactActions.hourlyDescription", "Morocco time")}
+                    height={320}
+                >
+                    <HourlyChart
+                        data={view?.hourly || []}
+                        valueKey="contacts"
+                        name={t("contactActions.totalContacts", "Contacts")}
+                        color="#16A34A"
+                        locale={locale}
                     />
-                </Grid>
+                </ChartCard>
+            </ChartGrid>
 
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                    <ContactStatCard
-                        title={t("adminContactActions.whatsappClicks")}
-                        value={whatsappContacts}
-                        icon={<WhatsApp />}
-                        color="#059669"
-                        background="#ECFDF5"
+            <ChartGrid>
+                <ChartCard
+                    title={t(`contactActions.topListings.${listingType}`, {
+                        property: "Most contacted properties",
+                        roommate: "Most contacted announcements",
+                        establishment: "Most contacted establishments",
+                    }[listingType])}
+                    subtitle={
+                        listingType === "property"
+                            ? t("contactActions.topPropertiesDescription", "With conversion from views to contacts")
+                            : undefined
+                    }
+                    height={null}
+                >
+                    <RankedList
+                        color="#16A34A"
+                        items={topItems.map((item) => ({
+                            key: item.propertyId || item.listingId,
+                            primary: item.title,
+                            secondary: [
+                                item.city,
+                                item.listingType &&
+                                    translateValue(t, "contactActions.listingTypes", item.listingType),
+                                t("contactActions.channelSplit", "{{calls}} calls · {{whatsapp}} WhatsApp", {
+                                    calls: formatNumber(item.calls, locale),
+                                    whatsapp: formatNumber(item.whatsapp, locale),
+                                }),
+                                item.other
+                                    ? t("contactActions.otherCount", "{{count}} other", {
+                                        count: formatNumber(item.other, locale),
+                                    })
+                                    : null,
+                            ]
+                                .filter(Boolean)
+                                .join(" · "),
+                            value: item.total,
+                            valueLabel: formatNumber(item.total, locale),
+                            extra: item.clicks
+                                ? t("contactActions.conversion", "{{rate}} of {{views}} views", {
+                                    rate: formatPercent(item.conversionRate, locale),
+                                    views: formatNumber(item.clicks, locale),
+                                })
+                                : undefined,
+                            onClick: () =>
+                                navigate(`${config.detailsPath}/${item.propertyId || item.listingId}`),
+                        }))}
                     />
-                </Grid>
-            </Grid>
+                </ChartCard>
 
-            {/* Activity and distribution */}
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, lg: 8 }}>
-                    <ContactActivityChart
-                        data={analytics?.dailyActivity || []}
+                <ChartCard
+                    title={t("contactActions.topOwners", "Owners receiving most leads")}
+                    height={null}
+                >
+                    <RankedList
+                        color="#9333EA"
+                        items={(view?.topOwners || []).map((owner) => ({
+                            key: owner.ownerId,
+                            primary:
+                                getFullName(owner) ||
+                                owner.email ||
+                                t("contactActions.unknownOwner", "Unknown owner"),
+                            secondary: t("contactActions.ownerDetails", "{{properties}} listings · {{clients}} clients", {
+                                properties: formatNumber(owner.properties, locale),
+                                clients: formatNumber(owner.uniqueClients, locale),
+                            }),
+                            value: owner.total,
+                            valueLabel: formatNumber(owner.total, locale),
+                            onClick: () => navigate(`/admin/users/${owner.ownerId}`),
+                        }))}
                     />
-                </Grid>
+                </ChartCard>
+            </ChartGrid>
 
-                <Grid size={{ xs: 12, lg: 4 }}>
-                    <ContactActionBreakdown
-                        calls={callContacts}
-                        whatsapp={whatsappContacts}
-                    />
-                </Grid>
-            </Grid>
+            {/* Recent contacts */}
+            <Card elevation={0} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 3 }}>
+                <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                    <Typography variant="h6" sx={{ fontWeight: 750, mb: 2 }}>
+                        {t("contactActions.recentContacts", "Recent contacts")}
+                    </Typography>
 
-            {/* Top properties */}
-            <TopContactedProperties
-                properties={analytics?.topProperties || []}
-                onClick={handlePropertyClick}
-            />
+                    {!view?.recentContacts?.length ? (
+                        <EmptyState
+                            height={140}
+                            message={t("contactActions.empty", "No contact actions in this period.")}
+                        />
+                    ) : (
+                        <TableContainer>
+                            <Table size="small" sx={{ minWidth: 720 }}>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>{t("contactActions.table.client", "Client")}</TableCell>
+                                        <TableCell>{t("contactActions.table.property", "Property")}</TableCell>
+                                        <TableCell>{t("contactActions.table.owner", "Owner")}</TableCell>
+                                        <TableCell>{t("contactActions.table.channel", "Channel")}</TableCell>
+                                        <TableCell>{t("contactActions.table.date", "Date")}</TableCell>
+                                    </TableRow>
+                                </TableHead>
 
-            {/* Recent activity */}
-            <RecentContactActivity
-                contacts={analytics?.recentContacts || []}
-            />
+                                <TableBody>
+                                    {view.recentContacts.map((contact) => (
+                                        <TableRow key={contact._id} hover>
+                                            <TableCell>
+                                                <PersonCell
+                                                    person={contact.clientId}
+                                                    fallback={
+                                                        listingType === "property"
+                                                            ? t("contactActions.deletedUser", "Deleted user")
+                                                            : t("contactActions.anonymousVisitor", "Anonymous visitor")
+                                                    }
+                                                />
+                                            </TableCell>
+
+                                            <TableCell sx={{ maxWidth: 260 }}>
+                                                <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+                                                    {contact.propertyId?.title ||
+                                                        contact.listing?.title ||
+                                                        t("contactActions.deletedProperty", "Listing no longer available")}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                                                    {contact.propertyId?.city || contact.listing?.city}
+                                                </Typography>
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <PersonCell
+                                                    person={contact.ownerId}
+                                                    fallback={t("contactActions.deletedUser", "Deleted user")}
+                                                />
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <Chip
+                                                    size="small"
+                                                    icon={
+                                                        contact.action === "whatsapp" ? (
+                                                            <WhatsApp />
+                                                        ) : contact.action === "call" ? (
+                                                            <PhoneOutlined />
+                                                        ) : undefined
+                                                    }
+                                                    label={
+                                                        contact.target
+                                                            ? `${actionLabel(contact.action)} · ${contact.target}`
+                                                            : actionLabel(contact.action)
+                                                    }
+                                                    sx={{
+                                                        fontWeight: 700,
+                                                        color: "#fff",
+                                                        bgcolor: ACTION_COLORS[contact.action] || OTHER_COLOR,
+                                                        "& .MuiChip-icon": { color: "#fff" },
+                                                    }}
+                                                />
+                                            </TableCell>
+
+                                            <TableCell>{formatDateTime(contact.createdAt, locale)}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                </CardContent>
+            </Card>
         </Stack>
     );
 }

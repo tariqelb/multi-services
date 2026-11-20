@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Languages } from "lucide-react";
 
 export default function LanguageSwitcher() {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const currentLanguage = i18n.resolvedLanguage || "en";
 
@@ -13,13 +13,13 @@ export default function LanguageSwitcher() {
 
     return (
         <div className="flex items-center gap-2 rounded-xl border border-white/60 bg-white/85 px-3 py-2 shadow-md backdrop-blur-md">
-            <Languages size={18} className="text-gray-700" />
+            <Languages size={18} className="text-slate-700" />
 
             <select
                 value={currentLanguage}
                 onChange={handleLanguageChange}
-                aria-label="Select language"
-                className="cursor-pointer bg-transparent text-sm font-semibold text-gray-800 outline-none"
+                aria-label={t("language.select", "Select language")}
+                className="cursor-pointer bg-transparent text-sm font-semibold text-slate-800 outline-none"
             >
                 <option value="en">English</option>
                 <option value="fr">Français</option>

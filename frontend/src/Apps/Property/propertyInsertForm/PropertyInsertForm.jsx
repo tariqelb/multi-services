@@ -10,97 +10,21 @@ import {
     setErrors,
 } from "../../../redux/reducers/insertProperty/propertyFormSlice";
 
+import { Box, Snackbar, Alert } from "@mui/material";
+import AddHomeWorkRoundedIcon from "@mui/icons-material/AddHomeWorkRounded";
+
 import {
-    Box,
-    Typography,
-    Divider,
-    Stack,
-    Chip,
-    Paper,
-    Snackbar,
-    Alert,
-} from "@mui/material";
+    FormPage,
+    FormPageHeader,
+    SectionHeader,
+    SectionPaper,
+} from "../../../Components/ui/FormKit";
 
 import PropertyInsertFormOwnerInfo from "./PropertyInsertFormOwnerInfo";
 import PropertyInsertFormDetails from "./PropertyInsertFormDetails";
 import PropertyInsertFormImages from "./PropertyInsertFormImages";
 import PropertyInsertFormPublish from "./PropertyInsertFormPublish";
 import PropertyInsertFormDescription from "./PropertyInsertFormDescription";
-
-// Section header
-const SectionHeader = ({ icon, title, subtitle, number }) => (
-    <Box sx={{ mb: 3 }}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
-            <Box
-                sx={{
-                    width: 44,
-                    height: 44,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: "12px",
-                    bgcolor: "#EFF6FF",
-                    color: "#2563EB",
-                    flexShrink: 0,
-                    fontWeight: 700,
-                    fontSize: "1.1rem",
-                }}
-            >
-                {icon}
-            </Box>
-
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography
-                    variant="h6"
-                    sx={{
-                        fontWeight: 600,
-                        color: "#0F172A",
-                        fontSize: "1.08rem",
-                    }}
-                >
-                    {title}
-                </Typography>
-
-                <Typography
-                    variant="body2"
-                    sx={{ color: "#5B6577", mt: 0.3 }}
-                >
-                    {subtitle}
-                </Typography>
-            </Box>
-
-            <Chip
-                label={`0${number}`}
-                size="small"
-                sx={{
-                    fontWeight: 700,
-                    color: "#2563EB",
-                    bgcolor: "#EFF6FF",
-                    borderRadius: "8px",
-                }}
-            />
-        </Stack>
-
-        <Divider sx={{ mt: 2.5, borderColor: "#E2E8F0" }} />
-    </Box>
-);
-
-// Section container
-const SectionPaper = ({ children }) => (
-    <Paper
-        elevation={0}
-        sx={{
-            p: { xs: 2.5, sm: 3.5, md: 4 },
-            mb: 3,
-            border: "1px solid #E2E8F0",
-            borderRadius: "16px",
-            bgcolor: "#ffffff",
-            boxShadow: "0 3px 12px rgba(15, 23, 42, 0.025)",
-        }}
-    >
-        {children}
-    </Paper>
-);
 
 export default function PropertyInsertForm({ onAddProperty }) {
     const { t } = useTranslation();
@@ -263,26 +187,8 @@ export default function PropertyInsertForm({ onAddProperty }) {
         "other",
     ];
 
-    const fieldSx = {
-        "& .MuiOutlinedInput-root": {
-            borderRadius: "10px",
-            backgroundColor: "#ffffff",
-            transition: "all 0.2s ease",
-            "& fieldset": {
-                borderColor: "#D5DCE8",
-            },
-            "&:hover fieldset": {
-                borderColor: "#93C5FD",
-            },
-            "&.Mui-focused fieldset": {
-                borderColor: "#2563EB",
-                borderWidth: "1.5px",
-            },
-        },
-        "& .MuiInputLabel-root.Mui-focused": {
-            color: "#2563EB",
-        },
-    };
+    // Input styles now come from the global theme.
+    const fieldSx = {};
 
     // Update Redux form fields.
     const handleChange = (e) => {
@@ -727,87 +633,15 @@ export default function PropertyInsertForm({ onAddProperty }) {
     };
 
     return (
-        <div className="flex">
-            <Box
-                sx={{
-                    width: "100%",
-                    maxWidth: 1100,
-                    mx: "auto",
-                    py: { xs: 2, md: 4 },
-                    px: { xs: 1, sm: 2 },
-                }}
-            >
-                {/* Page heading */}
-                <Box sx={{ mb: 4, px: { xs: 1, sm: 0 } }}>
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={1}
-                        sx={{ mb: 1.5 }}
-                    >
-                        <Chip
-                            label={t("properties.insert.badge")}
-                            size="small"
-                            sx={{
-                                bgcolor: "#EFF6FF",
-                                color: "#2563EB",
-                                fontWeight: 600,
-                                fontSize: "0.68rem",
-                                letterSpacing: "0.6px",
-                                borderRadius: "6px",
-                            }}
-                        />
-                    </Stack>
-
-                    <Typography
-                        variant="h4"
-                        sx={{
-                            fontWeight: 700,
-                            letterSpacing: 0,
-                            color: "#0F172A",
-                            fontSize: "1.875rem",
-                            mb: 1,
-                        }}
-                    >
-                        {t("properties.insert.title")}
-                    </Typography>
-
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            color: "#5B6577",
-                            maxWidth: 650,
-                            lineHeight: 1.8,
-                        }}
-                    >
-                        {t("properties.insert.subtitle")}
-                    </Typography>
-
-                    <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        sx={{ mt: 2 }}
-                    >
-                        <Box
-                            component="span"
-                            sx={{
-                                color: "#10b981",
-                                fontWeight: 700,
-                                fontSize: "1.1rem",
-                            }}
-                        >
-                            ✓
-                        </Box>
-
-                        <Typography
-                            variant="caption"
-                            sx={{ color: "#5B6577" }}
-                        >
-                            {t("properties.insert.requiredFields")}
-                        </Typography>
-                    </Stack>
-                </Box>
+        <Box>
+            <FormPage>
+                <FormPageHeader
+                    icon={<AddHomeWorkRoundedIcon />}
+                    badge={t("properties.insert.badge")}
+                    title={t("properties.insert.title")}
+                    subtitle={t("properties.insert.subtitle")}
+                    requiredNote={t("properties.insert.requiredFields")}
+                />
 
                 {/* Property form */}
                 <Box component="form" onSubmit={handleSubmit}>
@@ -854,7 +688,7 @@ export default function PropertyInsertForm({ onAddProperty }) {
                         loading={loading || profileLoading}
                     />
                 </Box>
-            </Box>
+            </FormPage>
 
             {/* Success and error notifications */}
             <Snackbar
@@ -885,6 +719,6 @@ export default function PropertyInsertForm({ onAddProperty }) {
                     {notification.message}
                 </Alert>
             </Snackbar>
-        </div>
+        </Box>
     );
 }

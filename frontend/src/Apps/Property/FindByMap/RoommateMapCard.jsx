@@ -76,7 +76,7 @@ export default function RoommateMapCard({
                 overflow: "hidden",
                 backgroundColor: "#fff",
                 borderRadius: 2,
-                color: "#1f2937",
+                color: "#1E293B",
             }}
         >
             {imageUrl && (
@@ -97,14 +97,12 @@ export default function RoommateMapCard({
             )}
 
             <Box sx={{ p: 1.5 }}>
-                <Typography fontWeight={700} fontSize={14}>
+                <Typography sx={{ fontWeight: 700, fontSize: 14 }}>
                     {roommate.title || t("findMap.cards.roommateAnnouncement")}
                 </Typography>
 
                 <Typography
-                    color="text.secondary"
-                    fontSize={12}
-                    sx={{ mt: 0.5 }}
+                    sx={{ color: "text.secondary", fontSize: 12, mt: 0.5 }}
                 >
                     {roommate.neighborhood
                         ? `${roommate.neighborhood}, `
@@ -114,8 +112,7 @@ export default function RoommateMapCard({
 
                 {roommate.purpose && (
                     <Typography
-                        fontSize={12}
-                        sx={{ mt: 1 }}
+                        sx={{ fontSize: 12, mt: 1 }}
                     >
                         {roommate.purpose}
                     </Typography>
@@ -123,10 +120,7 @@ export default function RoommateMapCard({
 
                 {formattedPrice !== null && (
                     <Typography
-                        fontWeight={700}
-                        color="success.main"
-                        fontSize={14}
-                        sx={{ mt: 1 }}
+                        sx={{ fontWeight: 700, color: "success.main", fontSize: 14, mt: 1 }}
                     >
                         {formattedPrice} MAD
                         {roommate.rentalPeriod
@@ -139,9 +133,7 @@ export default function RoommateMapCard({
                 )}
 
                 <Typography
-                    color="text.secondary"
-                    fontSize={12}
-                    sx={{ mt: 0.5 }}
+                    sx={{ color: "text.secondary", fontSize: 12, mt: 0.5 }}
                 >
                     {t("findMap.cards.availablePlaces", {
                         count: availablePlaces,
@@ -236,7 +228,7 @@ export default function RoommateMapCard({
 //                 overflow: "hidden",
 //                 backgroundColor: "#fff",
 //                 borderRadius: 2,
-//                 color: "#1f2937",
+//                 color: "#1E293B",
 //             }}
 //         >
 //             {imageUrl && (

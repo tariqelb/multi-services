@@ -245,7 +245,7 @@ export default function KnowledgeForm({
         >
             <Box component="form" onSubmit={handleSubmit}>
                 <DialogTitle>
-                    <Stack direction="row" alignItems="center" spacing={1}>
+                    <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                         {form.type === "article" ? (
                             <ArticleOutlinedIcon color="primary" />
                         ) : (
@@ -253,13 +253,13 @@ export default function KnowledgeForm({
                         )}
 
                         <Box>
-                            <Typography variant="h6" fontWeight={700}>
+                            <Typography variant="h6" sx={{ fontWeight: 700 }}>
                                 {isEditing
                                     ? t("editTitle")
                                     : t("addTitle")}
                             </Typography>
 
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                 {t("subtitle")}
                             </Typography>
                         </Box>
@@ -383,8 +383,7 @@ export default function KnowledgeForm({
                                     <Box>
                                         <Typography
                                             variant="body2"
-                                            color="text.secondary"
-                                            sx={{ mb: 1 }}
+                                            sx={{ color: "text.secondary", mb: 1 }}
                                         >
                                             {t("thumbnailPreview")}
                                         </Typography>

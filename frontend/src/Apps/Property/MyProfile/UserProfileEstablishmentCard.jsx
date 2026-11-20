@@ -253,19 +253,17 @@ export default function UserProfileEstablishmentCard({
                                 xs: "column",
                                 md: "row",
                             }}
-                            justifyContent="space-between"
-                            alignItems={{
+                            spacing={1}
+                            sx={{ justifyContent: "space-between", alignItems: {
                                 xs: "flex-start",
                                 md: "center",
-                            }}
-                            spacing={1}
-                            sx={{ mb: 1 }}
+                            }, mb: 1 }}
                         >
                             <Box sx={{ minWidth: 0 }}>
                                 <Typography
                                     variant="caption"
                                     sx={{
-                                        color: "#5B6577",
+                                        color: "#64748B",
                                         fontWeight: 600,
                                     }}
                                 >
@@ -315,9 +313,8 @@ export default function UserProfileEstablishmentCard({
                             <Stack
                                 direction="row"
                                 spacing={0.5}
-                                alignItems="center"
-                                sx={{
-                                    color: "#5B6577",
+                                sx={{ alignItems: "center",
+                                    color: "#64748B",
                                     mb: 2,
                                 }}
                             >
@@ -353,8 +350,7 @@ export default function UserProfileEstablishmentCard({
                             {numberOfRooms != null && (
                                 <Stack
                                     direction="row"
-                                    spacing={0.7}
-                                    alignItems="center"
+                                    spacing={0.7} sx={{ alignItems: "center" }}
                                 >
                                     <MeetingRoom
                                         sx={{ fontSize: 18 }}
@@ -389,16 +385,13 @@ export default function UserProfileEstablishmentCard({
                             {formattedPrice !== null ? (
                                 <>
                                     <Typography
-                                        variant="h6"
-                                        fontWeight={800}
-                                        color="#2563EB"
+                                        variant="h6" sx={{ fontWeight: 800, color: "#2563EB" }}
                                     >
                                         {formattedPrice} MAD
                                     </Typography>
 
                                     <Typography
-                                        variant="caption"
-                                        color="text.secondary"
+                                        variant="caption" sx={{ color: "text.secondary" }}
                                     >
                                         {t(
                                             "profileEstablishment.startingPrice",
@@ -408,8 +401,7 @@ export default function UserProfileEstablishmentCard({
                                 </>
                             ) : (
                                 <Typography
-                                    variant="body2"
-                                    color="text.secondary"
+                                    variant="body2" sx={{ color: "text.secondary" }}
                                 >
                                     {t(
                                         "profileEstablishment.contactForPrices",
@@ -435,7 +427,7 @@ export default function UserProfileEstablishmentCard({
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
-                                    borderColor: "#D5DCE8",
+                                    borderColor: "#E2E8F0",
                                     color: "#334155",
                                     whiteSpace: "nowrap",
                                 }}
@@ -503,7 +495,7 @@ export default function UserProfileEstablishmentCard({
                         sx={{
                             textTransform: "none",
                             fontWeight: 600,
-                            color: "#5B6577",
+                            color: "#64748B",
                         }}
                     >
                         {t(

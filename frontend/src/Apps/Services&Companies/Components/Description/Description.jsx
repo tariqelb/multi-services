@@ -38,15 +38,15 @@ export default function Description() {
     return (
         <div
             dir={isRTL ? "rtl" : "ltr"}
-            className="min-h-full bg-[#F4F7FB] p-4 sm:p-6 lg:p-8"
+            className="min-h-full bg-[#F5F7FB] p-4 sm:p-6 lg:p-8"
         >
             <div className="mx-auto max-w-6xl">
-                <div className="rounded-3xl bg-gradient-to-r from-sky-900 to-cyan-600 p-6 text-white sm:p-10">
+                <div className="rounded-3xl bg-gradient-to-r from-blue-900 to-cyan-600 p-6 text-white sm:p-10">
                     <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15">
                         <Building2 size={30} />
                     </div>
 
-                    <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-sky-200">
+                    <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-blue-200">
                         {t("servicesCompanies.brand")}
                     </p>
 
@@ -54,13 +54,13 @@ export default function Description() {
                         {t("servicesCompanies.heroTitle")}
                     </h1>
 
-                    <p className="max-w-2xl text-sm leading-7 text-sky-100 sm:text-base">
+                    <p className="max-w-2xl text-sm leading-7 text-blue-100 sm:text-base">
                         {t("servicesCompanies.heroDescription")}
                     </p>
                 </div>
 
                 <section className="mt-8">
-                    <h2 className="text-xl font-bold text-gray-900">
+                    <h2 className="text-xl font-bold text-slate-900">
                         {t("servicesCompanies.sectionTitle")}
                     </h2>
 
@@ -71,19 +71,19 @@ export default function Description() {
                             return (
                                 <div
                                     key={feature.key}
-                                    className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                                    className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                                 >
-                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
                                         <Icon size={24} />
                                     </div>
 
-                                    <h3 className="font-bold text-gray-900">
+                                    <h3 className="font-bold text-slate-900">
                                         {t(
                                             `servicesCompanies.features.${feature.key}.title`
                                         )}
                                     </h3>
 
-                                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                                    <p className="mt-2 text-sm leading-6 text-slate-500">
                                         {t(
                                             `servicesCompanies.features.${feature.key}.description`
                                         )}

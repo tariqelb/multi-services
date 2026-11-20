@@ -39,7 +39,7 @@ export default function Description() {
     return (
         <div
             dir={isRTL ? "rtl" : "ltr"}
-            className="min-h-full bg-[#F4F7FB] p-4 sm:p-6 lg:p-8"
+            className="min-h-full bg-[#F5F7FB] p-4 sm:p-6 lg:p-8"
         >
             <div className="mx-auto max-w-6xl">
                 <div className="rounded-3xl bg-gradient-to-r from-emerald-800 to-emerald-600 p-6 text-white sm:p-10">
@@ -61,7 +61,7 @@ export default function Description() {
                 </div>
 
                 <section className="mt-8">
-                    <h2 className="text-xl font-bold text-gray-900">
+                    <h2 className="text-xl font-bold text-slate-900">
                         {t("dailyWorker.sectionTitle")}
                     </h2>
 
@@ -72,19 +72,19 @@ export default function Description() {
                             return (
                                 <div
                                     key={feature.key}
-                                    className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                                    className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                                 >
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
                                         <Icon size={24} />
                                     </div>
 
-                                    <h3 className="font-bold text-gray-900">
+                                    <h3 className="font-bold text-slate-900">
                                         {t(
                                             `dailyWorker.features.${feature.key}.title`
                                         )}
                                     </h3>
 
-                                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                                    <p className="mt-2 text-sm leading-6 text-slate-500">
                                         {t(
                                             `dailyWorker.features.${feature.key}.description`
                                         )}

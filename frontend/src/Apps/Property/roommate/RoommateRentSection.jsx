@@ -1,14 +1,13 @@
 
 import React from "react";
 import {
-    Paper,
     Stack,
     TextField,
     MenuItem,
 } from "@mui/material";
 import PaymentsIcon from "@mui/icons-material/Payments";
 
-import { SectionHeader } from "./RoommateFormUI";
+import { SectionHeader, SectionPaper } from "./RoommateFormUI";
 
 export default function RoommateRentSection({
     formData,
@@ -76,8 +75,9 @@ export default function RoommateRentSection({
     ];
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
+        <SectionPaper>
             <SectionHeader
+                number={3}
                 icon={<PaymentsIcon />}
                 title={translate(
                     "roommates.form.rentOccupancy",
@@ -164,6 +164,6 @@ export default function RoommateRentSection({
                     InputLabelProps={{ shrink: true }}
                 />
             </Stack>
-        </Paper>
+        </SectionPaper>
     );
 }

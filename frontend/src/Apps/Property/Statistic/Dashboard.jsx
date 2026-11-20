@@ -1,10 +1,13 @@
+// admin/Dashboard.jsx
 
+import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Box } from "@mui/material";
 
 import PageLayout from "./PageLayout";
 import DashboardNavigation from "./DashboardNavigation";
+import OverviewSection from "./components/Overview/OverviewSection";
 import UsersSection from "./components/User/UsersSection";
 import VisitsSection from "./components/Visit/VisitsSection";
 import ExternalClicksSection from "./components/ExternalListingsClicks/ExternalClicksSection";
@@ -12,12 +15,25 @@ import PropertyClicksSection from "./components/PropertyClicks/PropertyClicksSec
 import PropertyDemandSection from "./components/PropertyDemand/PropertyDemandSection";
 import ClientContactActionsSection from "./components/ClientContactActions/ClientContactActionsSection";
 
+const SECTIONS = {
+    overview: OverviewSection,
+    users: UsersSection,
+    visits: VisitsSection,
+    "internal property clicks": PropertyClicksSection,
+    "external listings clicks": ExternalClicksSection,
+    "property demand": PropertyDemandSection,
+    "client call action": ClientContactActionsSection,
+};
+
 export default function Dashboard() {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState("users");
+    const [activeTab, setActiveTab] = useState("overview");
+
+    const ActiveSection = SECTIONS[activeTab] || OverviewSection;
 
     return (
         <PageLayout
+            icon={<InsightsOutlinedIcon />}
             title={t("adminDashboard.title")}
             subtitle={t("adminDashboard.subtitle")}
         >
@@ -26,26 +42,8 @@ export default function Dashboard() {
                 setActiveTab={setActiveTab}
             />
 
-            <Box mt={3}>
-                {activeTab === "users" && <UsersSection />}
-
-                {activeTab === "internal property clicks" && (
-                    <PropertyClicksSection />
-                )}
-
-                {activeTab === "external listings clicks" && (
-                    <ExternalClicksSection />
-                )}
-
-                {activeTab === "visits" && <VisitsSection />}
-
-                {activeTab === "property demand" && (
-                    <PropertyDemandSection />
-                )}
-
-                {activeTab === "client call action" && (
-                    <ClientContactActionsSection />
-                )}
+            <Box sx={{ mt: 3 }}>
+                <ActiveSection />
             </Box>
         </PageLayout>
     );

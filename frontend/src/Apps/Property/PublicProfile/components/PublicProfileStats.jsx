@@ -22,25 +22,25 @@ const statItems = [
         key: "totalProperties",
         label: "publicProfile.stats.properties",
         icon: HomeWork,
-        color: "#1976d2",
+        color: "#2563EB",
     },
     {
         key: "availableProperties",
         label: "publicProfile.stats.availableProperties",
         icon: HomeWork,
-        color: "#2e7d32",
+        color: "#16A34A",
     },
     {
         key: "totalRoommates",
         label: "publicProfile.stats.roommates",
         icon: People,
-        color: "#ed6c02",
+        color: "#EA580C",
     },
     {
         key: "totalEstablishments",
         label: "publicProfile.stats.establishments",
         icon: Hotel,
-        color: "#7b1fa2",
+        color: "#9333EA",
     },
     {
         key: "totalReviews",
@@ -89,8 +89,7 @@ export default function PublicProfileStats({ statistics = {} }) {
                                         }}
                                     />
                                     <Typography
-                                        variant="h5"
-                                        fontWeight={700}
+                                        variant="h5" sx={{ fontWeight: 700 }}
                                     >
                                         {statistics[item.key] || 0}
                                     </Typography>
@@ -98,8 +97,7 @@ export default function PublicProfileStats({ statistics = {} }) {
 
                                 <Typography
                                     variant="caption"
-                                    color="text.secondary"
-                                    sx={{
+                                    sx={{ color: "text.secondary",
                                         display: "block",
                                         lineHeight: 1.4,
                                     }}

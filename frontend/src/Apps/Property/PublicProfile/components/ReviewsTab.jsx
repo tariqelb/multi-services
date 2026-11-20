@@ -54,17 +54,16 @@ export default function ReviewsTab({
                 }}
             >
                 <CardContent>
-                    <Typography variant="h6" fontWeight={700}>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         {t("publicProfile.reviews.ratingSummary")}
                     </Typography>
 
                     <Stack
                         direction={{ xs: "column", sm: "row" }}
                         spacing={2}
-                        alignItems={{ xs: "flex-start", sm: "center" }}
-                        sx={{ mt: 2 }}
+                        sx={{ alignItems: { xs: "flex-start", sm: "center" }, mt: 2 }}
                     >
-                        <Typography variant="h3" fontWeight={700}>
+                        <Typography variant="h3" sx={{ fontWeight: 700 }}>
                             {Number(rating || 0).toFixed(1)}
                         </Typography>
 
@@ -75,8 +74,7 @@ export default function ReviewsTab({
                                 readOnly
                             />
                             <Typography
-                                variant="body2"
-                                color="text.secondary"
+                                variant="body2" sx={{ color: "text.secondary" }}
                             >
                                 {t("publicProfile.reviewCount", {
                                     count: totalReviews || 0,
@@ -97,7 +95,7 @@ export default function ReviewsTab({
                     }}
                 >
                     <CardContent>
-                        <Typography variant="h6" fontWeight={700}>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
                             {t("publicProfile.reviews.writeReview")}
                         </Typography>
 
@@ -108,8 +106,7 @@ export default function ReviewsTab({
                         >
                             <Typography
                                 variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 1 }}
+                                sx={{ color: "text.secondary", mb: 1 }}
                             >
                                 {t("publicProfile.reviews.yourRating")}
                             </Typography>
@@ -162,7 +159,7 @@ export default function ReviewsTab({
             )}
 
             <Box>
-                <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                     {t("publicProfile.reviews.allReviews")}
                 </Typography>
 
@@ -202,8 +199,7 @@ export default function ReviewsTab({
                                     <CardContent>
                                         <Stack
                                             direction="row"
-                                            spacing={1.5}
-                                            alignItems="center"
+                                            spacing={1.5} sx={{ alignItems: "center" }}
                                         >
                                             <Avatar
                                                 src={avatar || undefined}
@@ -213,14 +209,13 @@ export default function ReviewsTab({
                                             </Avatar>
 
                                             <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                <Typography fontWeight={700}>
+                                                <Typography sx={{ fontWeight: 700 }}>
                                                     {name ||
                                                         t("publicProfile.member")}
                                                 </Typography>
 
                                                 <Typography
-                                                    variant="caption"
-                                                    color="text.secondary"
+                                                    variant="caption" sx={{ color: "text.secondary" }}
                                                 >
                                                     {formatDate(
                                                         review.createdAt ||

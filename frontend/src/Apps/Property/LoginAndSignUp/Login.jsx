@@ -23,7 +23,7 @@ function Login() {
 
             {/* Welcome section */}
             <div className="flex w-full min-w-0 max-w-xl items-start justify-start overflow-hidden rounded-2xl bg-white/50 p-3 shadow-lg sm:p-5 md:mt-8 md:w-1/2 md:p-4 lg:mt-12 lg:p-6">
-                <p className="m-0 flex w-full min-w-0 flex-col items-start p-0 text-left text-lg font-bold text-black sm:text-xl lg:text-2xl">
+                <p className="m-0 flex w-full min-w-0 flex-col items-start p-0 text-start text-lg font-bold text-black sm:text-xl lg:text-2xl">
 
                     <span className="m-1 rounded-2xl border bg-white/70 p-3 opacity-0 animate-[fadeInUp_0.6s_ease-out_0.2s_forwards] sm:m-2 sm:p-5">
                         {t("login.welcome")}

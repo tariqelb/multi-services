@@ -47,23 +47,18 @@ const SummaryCard = ({
             <CardContent sx={{ p: 3 }}>
                 <Stack
                     direction="row"
-                    justifyContent="space-between"
-                    alignItems="flex-start"
-                    spacing={2}
+                    spacing={2} sx={{ justifyContent: "space-between", alignItems: "flex-start" }}
                 >
                     <Box sx={{ minWidth: 0, flex: 1 }}>
                         <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            fontWeight={600}
+                            variant="body2" sx={{ color: "text.secondary", fontWeight: 600 }}
                         >
                             {title}
                         </Typography>
 
                         <Typography
                             variant="h4"
-                            fontWeight={700}
-                            sx={{
+                            sx={{ fontWeight: 700,
                                 mt: 1,
                                 color: "primary.main",
                                 fontSize: { xs: "1.75rem", md: "2rem" },
@@ -75,8 +70,7 @@ const SummaryCard = ({
                         {subtitle && (
                             <Typography
                                 variant="caption"
-                                color="text.secondary"
-                                sx={{ mt: 0.5, display: "block" }}
+                                sx={{ color: "text.secondary", mt: 0.5, display: "block" }}
                             >
                                 {subtitle}
                             </Typography>

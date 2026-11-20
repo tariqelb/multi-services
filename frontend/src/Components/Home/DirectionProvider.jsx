@@ -1,4 +1,5 @@
-// /home/tariq/multi-services/app/frontend/src/Components/Home/DirectionProvider.jsx
+// src/Components/Home/DirectionProvider.jsx
+// Applies the app theme (LTR / RTL) and the global CSS baseline.
 
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -6,10 +7,13 @@ import { useTranslation } from "react-i18next";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 
 import { prefixer } from "stylis";
 import rtlPlugin from "stylis-plugin-rtl";
+
+import { createAppTheme } from "../../theme/theme";
 
 export default function DirectionProvider({ children }) {
     const { i18n } = useTranslation();
@@ -29,20 +33,13 @@ export default function DirectionProvider({ children }) {
         () =>
             createCache({
                 key: isRTL ? "muirtl" : "mui",
-                stylisPlugins: isRTL
-                    ? [prefixer, rtlPlugin]
-                    : [prefixer],
+                stylisPlugins: isRTL ? [prefixer, rtlPlugin] : [prefixer],
             }),
         [isRTL]
     );
 
-    const theme = useMemo(
-        () =>
-            createTheme({
-                direction,
-            }),
-        [direction]
-    );
+    // One shared design system for every page.
+    const theme = useMemo(() => createAppTheme(direction), [direction]);
 
     useEffect(() => {
         document.documentElement.dir = direction;
@@ -53,6 +50,7 @@ export default function DirectionProvider({ children }) {
     return (
         <CacheProvider value={cache}>
             <ThemeProvider theme={theme}>
+                <CssBaseline enableColorScheme />
                 {children}
             </ThemeProvider>
         </CacheProvider>

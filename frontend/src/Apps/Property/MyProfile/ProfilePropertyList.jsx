@@ -1,5 +1,7 @@
 // /home/tariq/multi-services/app/frontend/src/components/MyProfile/ProfilePropertyList.jsx
 
+import PageHeader from "../../../Components/ui/PageHeader";
+import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -498,6 +500,14 @@ export default function ProfilePropertyList({
                     : { xs: 0, md: 0 },
             }}
         >
+            {showTabs && (
+                <PageHeader
+                    icon={<LibraryBooksOutlinedIcon />}
+                    title={t("topbar.myPublication", "My publications")}
+                    subtitle={t("properties.profileList.pageSubtitle", "Manage your properties, roommate announcements and establishments.")}
+                />
+            )}
+
             {/* Property filters */}
             {activeTab !== "establishments" && (
                 <Box sx={{ mt: showTabs ? 0 : 1 }}>
@@ -629,7 +639,7 @@ export default function ProfilePropertyList({
                 <Typography
                     variant="body2"
                     sx={{
-                        color: "#5B6577",
+                        color: "#64748B",
                         fontWeight: 600,
                     }}
                 >
@@ -656,16 +666,16 @@ export default function ProfilePropertyList({
                         py: 6,
                         px: 2,
                         textAlign: "center",
-                        border: "1px dashed #d1d5db",
+                        border: "1px dashed #CBD5E1",
                         borderRadius: "16px",
-                        backgroundColor: "#F4F7FB",
+                        backgroundColor: "#F5F7FB",
                     }}
                 >
                     <Typography
                         variant="h6"
                         sx={{
                             fontWeight: 600,
-                            color: "#374151",
+                            color: "#334155",
                             mb: 1,
                         }}
                     >
@@ -689,7 +699,7 @@ export default function ProfilePropertyList({
                     <Typography
                         variant="body2"
                         sx={{
-                            color: "#5B6577",
+                            color: "#64748B",
                             mb: 2,
                         }}
                     >

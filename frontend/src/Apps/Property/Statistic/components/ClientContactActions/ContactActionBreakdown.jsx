@@ -53,17 +53,16 @@ export default function ContactActionBreakdown({
             sx={{
                 p: 3,
                 height: "100%",
-                border: "1px solid #E8EDF4",
+                border: "1px solid #E2E8F0",
                 borderRadius: 3,
             }}
         >
-            <Typography variant="h6" fontWeight={800}>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
                 {t("adminContactActions.breakdownTitle")}
             </Typography>
 
             <Typography
-                variant="caption"
-                color="text.secondary"
+                variant="caption" sx={{ color: "text.secondary" }}
             >
                 {t("adminContactActions.breakdownSubtitle")}
             </Typography>
@@ -80,7 +79,7 @@ export default function ContactActionBreakdown({
                             #0891B2 0% ${callPercentage}%,
                             #059669 ${callPercentage}% 100%
                         )`
-                        : "#E9EEF5",
+                        : "#F1F5F9",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -98,13 +97,12 @@ export default function ContactActionBreakdown({
                         justifyContent: "center",
                     }}
                 >
-                    <Typography variant="h4" fontWeight={800}>
+                    <Typography variant="h4" sx={{ fontWeight: 800 }}>
                         {total.toLocaleString()}
                     </Typography>
 
                     <Typography
-                        variant="caption"
-                        color="text.secondary"
+                        variant="caption" sx={{ color: "text.secondary" }}
                     >
                         {t("adminContactActions.total")}
                     </Typography>
@@ -115,31 +113,25 @@ export default function ContactActionBreakdown({
                 {items.map((item) => (
                     <Box key={item.label}>
                         <Stack
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            mb={0.8}
+                            direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 0.8 }}
                         >
                             <Stack
                                 direction="row"
-                                spacing={1}
-                                alignItems="center"
+                                spacing={1} sx={{ alignItems: "center" }}
                             >
                                 <Box sx={{ color: item.color }}>
                                     {item.icon}
                                 </Box>
 
                                 <Typography
-                                    variant="body2"
-                                    fontWeight={600}
+                                    variant="body2" sx={{ fontWeight: 600 }}
                                 >
                                     {item.label}
                                 </Typography>
                             </Stack>
 
                             <Typography
-                                variant="body2"
-                                fontWeight={700}
+                                variant="body2" sx={{ fontWeight: 700 }}
                             >
                                 {item.value.toLocaleString()} ({item.percentage}%)
                             </Typography>

@@ -643,13 +643,12 @@ export default function Alerts() {
             {/* Page header */}
             <Stack
                 direction="row"
-                alignItems="center"
                 spacing={{
                     xs: 1.5,
                     sm: 2.5,
                     md: 3,
                 }}
-                sx={{
+                sx={{ alignItems: "center",
                     width: "100%",
                     minWidth: 0,
                     borderBottom: "1px solid #E2E8F0",
@@ -701,9 +700,7 @@ export default function Alerts() {
                     <Typography
                         variant="h4"
                         component="h1"
-                        fontWeight={700}
-                        color="#0f172a"
-                        sx={{
+                        sx={{ fontWeight: 700, color: "#0f172a",
                             fontSize: {
                                 xs: "1.5rem",
                                 sm: "1.75rem",
@@ -718,8 +715,7 @@ export default function Alerts() {
                     </Typography>
 
                     <Typography
-                        color="text.secondary"
-                        sx={{
+                        sx={{ color: "text.secondary",
                             fontSize: {
                                 xs: "0.9rem",
                                 sm: "1rem",
@@ -847,9 +843,7 @@ export default function Alerts() {
             >
                 <Typography
                     variant="h5"
-                    fontWeight={700}
-                    color="#0f172a"
-                    sx={{
+                    sx={{ fontWeight: 700, color: "#0f172a",
                         fontSize: {
                             xs: "1.35rem",
                             sm: "1.5rem",
@@ -870,8 +864,7 @@ export default function Alerts() {
                 </Typography>
 
                 <Typography
-                    color="text.secondary"
-                    sx={{
+                    sx={{ color: "text.secondary",
                         fontSize: {
                             xs: "0.9rem",
                             sm: "1rem",
@@ -980,8 +973,7 @@ export default function Alerts() {
                         </Typography>
 
                         <Typography
-                            color="text.secondary"
-                            sx={{
+                            sx={{ color: "text.secondary",
                                 fontSize: "0.9rem",
                                 mb: 2,
                                 mt: -1.5,
@@ -1020,8 +1012,7 @@ export default function Alerts() {
                     }}
                 >
                     <Typography
-                        fontWeight={700}
-                        sx={{
+                        sx={{ fontWeight: 700,
                             fontSize: {
                                 xs: "1rem",
                                 sm: "1.1rem",
@@ -1037,8 +1028,7 @@ export default function Alerts() {
                     </Typography>
 
                     <Typography
-                        color="text.secondary"
-                        sx={{
+                        sx={{ color: "text.secondary",
                             fontSize: {
                                 xs: "0.9rem",
                                 sm: "1rem",
@@ -1142,8 +1132,7 @@ export default function Alerts() {
                         </Box>
                     ) : (
                         <Typography
-                            color="text.secondary"
-                            sx={{
+                            sx={{ color: "text.secondary",
                                 fontSize: {
                                     xs: "0.9rem",
                                     sm: "1rem",
@@ -1160,8 +1149,7 @@ export default function Alerts() {
 
                     {!isPropertyAlert && (
                         <Typography
-                            color="text.secondary"
-                            sx={{
+                            sx={{ color: "text.secondary",
                                 fontSize: "0.9rem",
                                 lineHeight: 1.7,
                             }}
@@ -1235,10 +1223,8 @@ export default function Alerts() {
             <Box sx={{ width: "100%", minWidth: 0 }}>
                 <Stack
                     direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
                     spacing={2}
-                    sx={{
+                    sx={{ alignItems: "center", justifyContent: "space-between",
                         mb: {
                             xs: 2,
                             sm: 3,
@@ -1248,9 +1234,7 @@ export default function Alerts() {
                 >
                     <Typography
                         variant="h5"
-                        fontWeight={700}
-                        color="#0f172a"
-                        sx={{
+                        sx={{ fontWeight: 700, color: "#0f172a",
                             fontSize: {
                                 xs: "1.25rem",
                                 sm: "1.45rem",
@@ -1326,9 +1310,8 @@ export default function Alerts() {
                         />
 
                         <Typography
-                            fontWeight={700}
                             variant="h6"
-                            sx={{
+                            sx={{ fontWeight: 700,
                                 fontSize: {
                                     xs: "1.05rem",
                                     sm: "1.2rem",
@@ -1343,8 +1326,7 @@ export default function Alerts() {
                         </Typography>
 
                         <Typography
-                            color="text.secondary"
-                            sx={{
+                            sx={{ color: "text.secondary",
                                 fontSize: {
                                     xs: "0.9rem",
                                     sm: "1rem",
@@ -1376,10 +1358,8 @@ export default function Alerts() {
             <Box sx={{ width: "100%", minWidth: 0 }}>
                 <Stack
                     direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
                     spacing={2}
-                    sx={{
+                    sx={{ alignItems: "center", justifyContent: "space-between",
                         mb: {
                             xs: 2,
                             sm: 3,
@@ -1389,9 +1369,7 @@ export default function Alerts() {
                 >
                     <Typography
                         variant="h5"
-                        fontWeight={700}
-                        color="#0f172a"
-                        sx={{
+                        sx={{ fontWeight: 700, color: "#0f172a",
                             fontSize: {
                                 xs: "1.15rem",
                                 sm: "1.4rem",
@@ -1431,9 +1409,7 @@ export default function Alerts() {
                             bgcolor: "#F8FAFC",
                         }}
                     >
-                        <Typography
-                            fontWeight={600}
-                            color="#475569"
+                        <Typography sx={{ fontWeight: 600, color: "#475569" }}
                         >
                             {translate(
                                 "alerts.noArchivedAlerts",
@@ -2191,7 +2167,7 @@ export default function Alerts() {
 //         },
 //         bgcolor: selected ? "#eff6ff" : "transparent",
 //         color: selected ? "#1d4ed8" : "#334155",
-//         borderColor: selected ? "#93c5fd" : "#D5DCE8",
+//         borderColor: selected ? "#93c5fd" : "#E2E8F0",
 //         "& .MuiChip-label": {
 //             whiteSpace: "normal",
 //             overflowWrap: "anywhere",

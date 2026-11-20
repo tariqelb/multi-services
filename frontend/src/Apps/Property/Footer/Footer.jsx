@@ -166,9 +166,8 @@ export default function Footer() {
                             component={Link}
                             to="/"
                             direction="row"
-                            alignItems="center"
                             spacing={1.5}
-                            sx={{
+                            sx={{ alignItems: "center",
                                 mb: 2,
                                 textDecoration: "none",
                                 width: "fit-content",
@@ -242,7 +241,7 @@ export default function Footer() {
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        bgcolor: "#F4F7FB",
+                                        bgcolor: "#F5F7FB",
                                         border: "1px solid #E2E8F0",
                                         color: "text.secondary",
                                         transition: "all 0.2s ease",
@@ -289,8 +288,7 @@ export default function Footer() {
                                 <Stack
                                     key={item.label}
                                     direction="row"
-                                    alignItems="center"
-                                    spacing={1}
+                                    spacing={1} sx={{ alignItems: "center" }}
                                 >
                                     <Box
                                         sx={{
@@ -355,8 +353,7 @@ export default function Footer() {
                         <Stack spacing={1.5} sx={{ mt: 3 }}>
                             <Stack
                                 direction="row"
-                                spacing={1}
-                                alignItems="flex-start"
+                                spacing={1} sx={{ alignItems: "flex-start" }}
                             >
                                 <EmailOutlined sx={contactIcon} />
 
@@ -380,8 +377,7 @@ export default function Footer() {
 
                             <Stack
                                 direction="row"
-                                spacing={1}
-                                alignItems="center"
+                                spacing={1} sx={{ alignItems: "center" }}
                             >
                                 <LocationOnOutlined sx={contactIcon} />
 
@@ -403,9 +399,7 @@ export default function Footer() {
                 {/* Bottom section */}
                 <Stack
                     direction={{ xs: "column", md: "row" }}
-                    alignItems={{ xs: "flex-start", md: "center" }}
-                    justifyContent="space-between"
-                    spacing={2}
+                    spacing={2} sx={{ alignItems: { xs: "flex-start", md: "center" }, justifyContent: "space-between" }}
                 >
                     <Typography sx={bottomText}>
                         © {new Date().getFullYear()} MultiServices.{" "}

@@ -1,301 +1,358 @@
-// /home/tariq/multi-services/app/frontend/src/components/admin/externalListings/ExternalClicksSection.jsx
-// /home/tariq/multi-services/app/frontend/src/components/admin/Dashboard.jsx
-import { useCallback, useEffect, useState } from "react";
+// admin/components/ExternalListingsClicks/ExternalClicksSection.jsx
+
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
-    Alert,
     Box,
-    CircularProgress,
     Grid,
     Pagination,
+    Stack,
+    ToggleButton,
+    ToggleButtonGroup,
     Typography,
 } from "@mui/material";
 
-import axiosInstance from "../../../../../api/axiosInstance";
+import {
+    HomeWorkOutlined,
+    LanguageOutlined,
+    LocationCityOutlined,
+    LoginOutlined,
+    OpenInNewOutlined,
+    PeopleAltOutlined,
+    QueryStatsOutlined,
+} from "@mui/icons-material";
 
-import SummaryCard from "../../../externalListings/SummaryCard";
-import AnalyticsChart from "./AnalyticsChart";
-import ExternalListingClickCard from "../../../externalListings/ExternalListingClickCard";
+import ExternalListingClickCard from "./ExternalListingClickCard";
 
-import { formatNumber } from "./externalClicksUtils";
+import {
+    BarChartView,
+    ChartCard,
+    ChartGrid,
+    DonutChart,
+    EmptyState,
+    ErrorBanner,
+    HourlyChart,
+    KpiGrid,
+    LoadingState,
+    RangeSelect,
+    RankedList,
+    RefreshButton,
+    SectionHeader,
+    StatCard,
+    TrendChart,
+    useAnalyticsData,
+} from "../shared/AnalyticsUI";
+
+import {
+    formatDecimal,
+    formatNumber,
+    formatPercent,
+    getLocale,
+    translateValue,
+} from "../shared/analyticsUtils";
 
 const API_URL = "/external-listings/analytics";
 const ITEMS_PER_PAGE = 6;
 
 const ExternalClicksSection = () => {
     const { t, i18n } = useTranslation();
+    const locale = getLocale(i18n.language);
 
-    const [data, setData] = useState(null);
+    const [range, setRange] = useState("30d");
+    const [sort, setSort] = useState("recent");
     const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-
-    const locale =
-        i18n.language?.startsWith("ar")
-            ? "ar"
-            : i18n.language?.startsWith("fr")
-              ? "fr-FR"
-              : "en-US";
-
-    const fetchAnalytics = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError("");
-
-            const response = await axiosInstance.get(API_URL, {
-                params: { page },
-            });
-
-            setData(response.data);
-        } catch (err) {
-            console.error("External click analytics error:", err);
-
-            setError(
-                err.response?.data?.message ||
-                    t("adminExternalClicks.errors.load")
-            );
-        } finally {
-            setLoading(false);
-        }
-    }, [page, t]);
 
     useEffect(() => {
-        fetchAnalytics();
-    }, [fetchAnalytics]);
+        setPage(1);
+    }, [range, sort]);
 
-    const summary = data?.summary || {
-        totalClicks: 0,
-        totalListings: 0,
-        totalWebsites: 0,
-        totalCities: 0,
-    };
+    const { data, loading, error, reload } = useAnalyticsData(API_URL, {
+        range,
+        sort,
+        page,
+        limit: ITEMS_PER_PAGE,
+    });
 
+    if (loading && !data) return <LoadingState />;
+
+    const summary = data?.summary || {};
     const charts = data?.charts || {};
     const listings = data?.listings || [];
+    const pagination = data?.pagination || { total: 0, totalPages: 0 };
 
-    const pagination = data?.pagination || {
-        page: 1,
-        limit: ITEMS_PER_PAGE,
-        total: 0,
-        totalPages: 0,
-    };
-
-    const handlePageChange = (_event, newPage) => {
-        setPage(newPage);
-    };
-
-    if (loading && !data) {
-        return (
-            <Box
-                minHeight={350}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
+    const clicksLabel = t("adminExternalClicks.charts.clicks", "Clicks");
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                minWidth: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: 4,
-                pb: 4,
-            }}
-        >
-            <Box mb={1}>
-                <Typography variant="h5" fontWeight={700}>
-                    {t("adminExternalClicks.title")}
-                </Typography>
+        <Stack spacing={3}>
+            <SectionHeader
+                icon={<OpenInNewOutlined />}
+                title={t("adminExternalClicks.title", "External listing clicks")}
+                subtitle={t(
+                    "adminExternalClicks.subtitle",
+                    "Traffic you send to partner websites and what visitors look for."
+                )}
+            >
+                <RangeSelect value={range} onChange={setRange} />
+                <RefreshButton onClick={reload} loading={loading} />
+            </SectionHeader>
 
-                <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    mt={0.5}
+            <ErrorBanner error={error} />
+
+            <KpiGrid>
+                <StatCard
+                    title={t("adminExternalClicks.summary.clicksInRange", "Clicks in period")}
+                    value={formatNumber(summary.clicksInRange, locale)}
+                    change={summary.clicksChange}
+                    icon={<OpenInNewOutlined />}
+                    color="#EA580C"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminExternalClicks.summary.uniqueVisitors", "Unique visitors")}
+                    value={formatNumber(summary.uniqueVisitors, locale)}
+                    description={t("adminExternalClicks.summary.perVisitor", "{{value}} clicks each", {
+                        value: formatDecimal(summary.clicksPerVisitor, locale),
+                    })}
+                    icon={<PeopleAltOutlined />}
+                    color="#16A34A"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminExternalClicks.summary.clickedListings", "Listings clicked")}
+                    value={formatNumber(summary.clickedListings, locale)}
+                    description={t("adminExternalClicks.summary.trackedTotal", "{{count}} tracked overall", {
+                        count: formatNumber(summary.totalListings, locale),
+                    })}
+                    icon={<HomeWorkOutlined />}
+                    color="#9333EA"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminExternalClicks.summary.registeredShare", "Signed-in clicks")}
+                    value={formatPercent(summary.registeredShare, locale)}
+                    icon={<LoginOutlined />}
+                    color="#2563EB"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminExternalClicks.summary.totalClicks", "Lifetime clicks")}
+                    value={formatNumber(summary.totalClicks, locale)}
+                    icon={<QueryStatsOutlined />}
+                    color="#64748B"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminExternalClicks.summary.websites", "Partner websites")}
+                    value={formatNumber(summary.totalWebsites, locale)}
+                    icon={<LanguageOutlined />}
+                    color="#0891B2"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminExternalClicks.summary.cities", "Cities")}
+                    value={formatNumber(summary.totalCities, locale)}
+                    icon={<LocationCityOutlined />}
+                    color="#EC4899"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminExternalClicks.summary.topWebsite", "Top website")}
+                    value={charts.websites?.[0]?.name || "—"}
+                    description={
+                        charts.websites?.[0]
+                            ? t("adminExternalClicks.summary.topWebsiteShare", "{{share}} of clicks", {
+                                share: formatPercent(charts.websites[0].share, locale),
+                            })
+                            : undefined
+                    }
+                    icon={<LanguageOutlined />}
+                    color="#EA580C"
+                    locale={locale}
+                />
+            </KpiGrid>
+
+            <ChartGrid template="7fr 5fr">
+                <ChartCard
+                    title={t("adminExternalClicks.charts.trend", "Clicks over time")}
+                    subtitle={t("adminExternalClicks.charts.trendDescription", "Clicks and unique visitors")}
+                    height={320}
                 >
-                    {t("adminExternalClicks.subtitle")}
-                </Typography>
-            </Box>
+                    <TrendChart
+                        data={data?.trend || []}
+                        locale={locale}
+                        series={[
+                            { key: "clicks", name: clicksLabel, color: "#EA580C" },
+                            { key: "uniqueVisitors", name: t("adminExternalClicks.summary.uniqueVisitors", "Unique visitors"), color: "#16A34A" },
+                        ]}
+                    />
+                </ChartCard>
 
-            {error && <Alert severity="error">{error}</Alert>}
+                <ChartCard
+                    title={t("adminExternalClicks.charts.websites", "Clicks by website")}
+                    subtitle={t("adminExternalClicks.charts.websitesDescription", "Share of traffic per partner")}
+                    height={320}
+                >
+                    <DonutChart data={charts.websites || []} valueKey="clicks" locale={locale} />
+                </ChartCard>
+            </ChartGrid>
 
-            <Grid container spacing={2.5}>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                    <SummaryCard
-                        title={t("adminExternalClicks.summary.totalClicks")}
-                        value={summary.totalClicks}
-                        icon="↗"
+            <ChartGrid template="1fr 1fr 1fr">
+                <ChartCard title={t("adminExternalClicks.charts.propertyTypes", "By property type")} height={300}>
+                    <BarChartView
+                        layout="vertical"
+                        data={(charts.propertyTypes || []).map((row) => ({
+                            ...row,
+                            name: translateValue(t, "adminExternalClicks.propertyTypes", row.name),
+                        }))}
+                        bars={[{ key: "clicks", name: clicksLabel, color: "#EA580C" }]}
+                        locale={locale}
+                        labelWidth={95}
+                    />
+                </ChartCard>
+
+                <ChartCard title={t("adminExternalClicks.charts.cities", "By city")} height={300}>
+                    <BarChartView
+                        layout="vertical"
+                        data={charts.cities || []}
+                        bars={[{ key: "clicks", name: clicksLabel, color: "#2563EB" }]}
+                        locale={locale}
+                        labelWidth={95}
+                    />
+                </ChartCard>
+
+                <ChartCard title={t("adminExternalClicks.charts.hourly", "Clicks by hour")} height={300}>
+                    <HourlyChart
+                        data={data?.hourly || []}
+                        valueKey="clicks"
+                        name={clicksLabel}
+                        color="#EA580C"
                         locale={locale}
                     />
-                </Grid>
+                </ChartCard>
+            </ChartGrid>
 
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                    <SummaryCard
-                        title={t("adminExternalClicks.summary.trackedListings")}
-                        value={summary.totalListings}
-                        icon="⌂"
-                        locale={locale}
+            <ChartGrid>
+                <ChartCard
+                    title={t("adminExternalClicks.topListings", "Top external listings")}
+                    subtitle={t("adminExternalClicks.topListingsDescription", "Most clicked in the selected period")}
+                    height={null}
+                >
+                    <RankedList
+                        color="#EA580C"
+                        items={(data?.topListings || []).map((item) => ({
+                            key: item.externalListingId,
+                            primary: item.title || t("adminExternalClicks.card.untitled", "Untitled listing"),
+                            secondary: [item.sourceName || item.sourceDomain, item.city]
+                                .filter(Boolean)
+                                .join(" · "),
+                            value: item.clicks,
+                            valueLabel: formatNumber(item.clicks, locale),
+                            extra: t("adminExternalClicks.visitorsCount", "{{count}} visitors", {
+                                count: formatNumber(item.uniqueVisitors, locale),
+                            }),
+                        }))}
                     />
-                </Grid>
+                </ChartCard>
 
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                    <SummaryCard
-                        title={t("adminExternalClicks.summary.websites")}
-                        value={summary.totalWebsites}
-                        icon="🌐"
-                        locale={locale}
+                <ChartCard
+                    title={t("adminExternalClicks.websiteTable", "Website performance")}
+                    subtitle={t("adminExternalClicks.websiteTableDescription", "Clicks, visitors and listings per partner")}
+                    height={null}
+                >
+                    <RankedList
+                        showRank={false}
+                        color="#0891B2"
+                        items={(charts.websites || []).map((item) => ({
+                            key: item.domain,
+                            primary: item.name,
+                            secondary: t("adminExternalClicks.websiteDetails", "{{visitors}} visitors · {{listings}} listings", {
+                                visitors: formatNumber(item.uniqueVisitors, locale),
+                                listings: formatNumber(item.listings, locale),
+                            }),
+                            value: item.clicks,
+                            valueLabel: formatNumber(item.clicks, locale),
+                            extra: formatPercent(item.share, locale),
+                        }))}
                     />
-                </Grid>
+                </ChartCard>
+            </ChartGrid>
 
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                    <SummaryCard
-                        title={t("adminExternalClicks.summary.cities")}
-                        value={summary.totalCities}
-                        icon="📍"
-                        color="#2563EB"
-                        locale={locale}
-                    />
-                </Grid>
-            </Grid>
-
-            <Box mt={2}>
-                <Box mb={3}>
-                    <Typography variant="h6" fontWeight={700}>
-                        {t("adminExternalClicks.charts.title")}
-                    </Typography>
-
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        mt={0.5}
-                    >
-                        {t("adminExternalClicks.charts.subtitle")}
-                    </Typography>
-                </Box>
-
-                <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, lg: 6 }}>
-                        <AnalyticsChart
-                            title={t("adminExternalClicks.charts.propertyTypes")}
-                            description={t("adminExternalClicks.charts.propertyTypesDescription")}
-                            data={charts.propertyTypes || []}
-                        />
-                    </Grid>
-
-                    <Grid size={{ xs: 12, lg: 6 }}>
-                        <AnalyticsChart
-                            title={t("adminExternalClicks.charts.websites")}
-                            description={t("adminExternalClicks.charts.websitesDescription")}
-                            data={charts.websites || []}
-                        />
-                    </Grid>
-
-                    <Grid size={{ xs: 12 }}>
-                        <AnalyticsChart
-                            title={t("adminExternalClicks.charts.cities")}
-                            description={t("adminExternalClicks.charts.citiesDescription")}
-                            data={charts.cities || []}
-                        />
-                    </Grid>
-                </Grid>
-            </Box>
-
-            <Box mt={2}>
-                <Box mb={3}>
-                    <Typography variant="h6" fontWeight={700}>
-                        {t("adminExternalClicks.listings.title")}
-                    </Typography>
-
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        mt={0.5}
-                    >
-                        {t("adminExternalClicks.listings.subtitle")}
-                    </Typography>
-                </Box>
-
-                {loading && (
-                    <Box display="flex" justifyContent="center" py={4}>
-                        <CircularProgress size={30} color="primary" />
+            <Stack spacing={2}>
+                <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1.5} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" } }}
+                >
+                    <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                            {t("adminExternalClicks.listings.title", "Tracked external listings")}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            {t("adminExternalClicks.listings.subtitle", "Lifetime counters with clicks in the selected period")}
+                        </Typography>
                     </Box>
-                )}
 
-                {!loading && listings.length === 0 && (
-                    <Alert severity="info">
-                        {t("adminExternalClicks.listings.empty")}
-                    </Alert>
-                )}
+                    <ToggleButtonGroup
+                        size="small"
+                        exclusive
+                        value={sort}
+                        onChange={(_event, value) => value && setSort(value)}
+                    >
+                        <ToggleButton value="recent">
+                            {t("adminExternalClicks.sort.recent", "Recently clicked")}
+                        </ToggleButton>
+                        <ToggleButton value="clicks">
+                            {t("adminExternalClicks.sort.clicks", "Most clicked")}
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Stack>
 
-                {!loading && listings.length > 0 && (
-                    <>
-                        <Grid container spacing={2.5}>
-                            {listings.map((listing) => (
-                                <Grid
-                                    key={listing._id}
-                                    size={{
-                                        xs: 12,
-                                        sm: 6,
-                                        lg: 4,
-                                        xl: 3,
-                                    }}
-                                >
-                                    <ExternalListingClickCard
-                                        listing={listing}
-                                        color="#2563EB"
-                                        locale={locale}
-                                    />
-                                </Grid>
-                            ))}
-                        </Grid>
-
-                        <Box
-                            sx={{
-                                mt: 5,
-                                pt: 3,
-                                borderTop: "1px solid",
-                                borderColor: "divider",
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                gap: 2,
-                            }}
-                        >
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                            >
-                                {t("adminExternalClicks.pagination.showing", {
-                                    from: (page - 1) * ITEMS_PER_PAGE + 1,
-                                    to:
-                                        (page - 1) * ITEMS_PER_PAGE +
-                                        listings.length,
-                                    total: formatNumber(pagination.total, locale),
-                                })}
-                            </Typography>
-
-                            {pagination.totalPages > 1 && (
-                                <Pagination
-                                    count={pagination.totalPages}
-                                    page={page}
-                                    onChange={handlePageChange}
-                                    color="primary"
-                                    shape="rounded"
-                                    siblingCount={1}
-                                    boundaryCount={1}
+                {listings.length === 0 ? (
+                    <EmptyState
+                        message={t("adminExternalClicks.listings.empty", "No external clicks recorded yet.")}
+                    />
+                ) : (
+                    <Grid container spacing={2.5}>
+                        {listings.map((listing) => (
+                            <Grid key={listing._id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                                <ExternalListingClickCard
+                                    listing={listing}
+                                    color="#2563EB"
+                                    locale={locale}
                                 />
-                            )}
-                        </Box>
-                    </>
+                            </Grid>
+                        ))}
+                    </Grid>
                 )}
-            </Box>
-        </Box>
+
+                {pagination.totalPages > 1 && (
+                    <Stack spacing={1} sx={{ alignItems: "center", pt: 1 }}>
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            {t("adminExternalClicks.pagination.showing", "Showing {{from}}–{{to}} of {{total}}", {
+                                from: (page - 1) * ITEMS_PER_PAGE + 1,
+                                to: (page - 1) * ITEMS_PER_PAGE + listings.length,
+                                total: formatNumber(pagination.total, locale),
+                            })}
+                        </Typography>
+
+                        <Pagination
+                            count={pagination.totalPages}
+                            page={page}
+                            onChange={(_event, value) => setPage(value)}
+                            color="primary"
+                            shape="rounded"
+                        />
+                    </Stack>
+                )}
+            </Stack>
+        </Stack>
     );
 };
 

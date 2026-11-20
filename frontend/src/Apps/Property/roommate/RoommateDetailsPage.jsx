@@ -7,14 +7,13 @@ import {
     Box,
     Button,
     CircularProgress,
-    Container,
     Typography,
 } from "@mui/material";
 
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import axiosInstance from "../../../api/axiosInstance";
 import RoommateDetails from "./RoommateDetails";
+import { DetailsBackButton, DetailsContainer } from "../../../Components/ui/DetailsKit";
 
 export default function RoommateDetailsPage({
     DetailsComponent = RoommateDetails,
@@ -90,26 +89,11 @@ export default function RoommateDetailsPage({
     }, [id, t]);
 
     return (
-        <Container
-            maxWidth="xl"
-            sx={{
-                py: { xs: 2, md: 4 },
-                px: { xs: 1.5, sm: 2, md: 3 },
-            }}
-        >
-            <Button
-                startIcon={<ArrowBackIcon />}
+        <DetailsContainer withMobileBar={Boolean(listing)}>
+            <DetailsBackButton
                 onClick={() => navigate(-1)}
-                sx={{
-                    mb: 3,
-                    textTransform: "none",
-                    fontWeight: 600,
-                }}
-            >
-                {t("roommates.details.back", {
-                    defaultValue: "Back",
-                })}
-            </Button>
+                label={t("roommates.details.back", { defaultValue: "Back" })}
+            />
 
             {loading && (
                 <Box
@@ -123,36 +107,22 @@ export default function RoommateDetailsPage({
                     }}
                 >
                     <CircularProgress />
-
-                    <Typography color="text.secondary">
-                        {t("roommates.details.loading", {
-                            defaultValue: "Loading announcement...",
-                        })}
+                    <Typography sx={{ color: "text.secondary" }}>
+                        {t("roommates.details.loading", { defaultValue: "Loading announcement..." })}
                     </Typography>
                 </Box>
             )}
 
             {!loading && error && (
                 <Box sx={{ maxWidth: 700, mx: "auto", mt: 4 }}>
-                    <Alert severity="error" sx={{ borderRadius: 2 }}>
-                        {error}
-                    </Alert>
-
-                    <Button
-                        variant="contained"
-                        onClick={() => navigate("/roommates")}
-                        sx={{ mt: 2, textTransform: "none" }}
-                    >
-                        {t("roommates.details.viewAnnouncements", {
-                            defaultValue: "View announcements",
-                        })}
+                    <Alert severity="error">{error}</Alert>
+                    <Button variant="contained" onClick={() => navigate("/roommates")} sx={{ mt: 2 }}>
+                        {t("roommates.details.viewAnnouncements", { defaultValue: "View announcements" })}
                     </Button>
                 </Box>
             )}
 
-            {!loading && !error && listing && (
-                <DetailsComponent listing={listing} />
-            )}
-        </Container>
+            {!loading && !error && listing && <DetailsComponent listing={listing} />}
+        </DetailsContainer>
     );
 }

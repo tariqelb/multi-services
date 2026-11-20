@@ -1,6 +1,7 @@
 
 
 
+import getImageUrl from "../../../utils/getImageUrl";
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -276,7 +277,7 @@ export default function FurnishedPropertyList({
             >
                 <CircularProgress />
 
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     {translate(
                         "properties.list.loading",
                         "Loading properties..."
@@ -330,8 +331,7 @@ export default function FurnishedPropertyList({
             >
                 <Stack
                     direction="row"
-                    alignItems="center"
-                    spacing={1.5}
+                    spacing={1.5} sx={{ alignItems: "center" }}
                 >
                     <Box
                         sx={{
@@ -477,7 +477,7 @@ export default function FurnishedPropertyList({
                         py: { xs: 4, sm: 6 },
                         px: { xs: 1.5, sm: 2 },
                         textAlign: "center",
-                        border: "1px dashed #D1D5DB",
+                        border: "1px dashed #CBD5E1",
                         borderRadius: "16px",
                         backgroundColor: "#FFFFFF",
                         width: "100%",
@@ -489,7 +489,7 @@ export default function FurnishedPropertyList({
                         variant="h6"
                         sx={{
                             fontWeight: 600,
-                            color: "#374151",
+                            color: "#334155",
                             mb: 1,
                             fontSize: {
                                 xs: "1rem",
@@ -558,14 +558,8 @@ export default function FurnishedPropertyList({
                                 property.images?.[0]?.path;
 
                             const fullImageUrl = imagePath
-                                ? /^https?:\/\//i.test(imagePath)
-                                    ? imagePath
-                                    : `http://localhost:3000${
-                                          imagePath.startsWith("/")
-                                              ? ""
-                                              : "/"
-                                      }${imagePath}`
-                                : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500";
+                                ? getImageUrl(imagePath)
+                                : "";
 
                             const formattedProperty = {
                                 ...property,

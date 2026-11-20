@@ -1,4 +1,6 @@
 
+import PageHeader from "../../../Components/ui/PageHeader";
+import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -234,7 +236,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
                 <Typography
                     variant="body1"
                     sx={{
-                        color: "#5B6577",
+                        color: "#64748B",
                         maxWidth: 420,
                         mb: 3,
                     }}
@@ -274,6 +276,12 @@ export default function SavedPropertiesList({ onViewDetails }) {
                 p: { xs: 2, md: 4 },
             }}
         >
+            <PageHeader
+                icon={<BookmarkBorderRoundedIcon />}
+                title={t("topbar.saved", "Saved")}
+                subtitle={t("properties.savedList.pageSubtitle", "Properties you bookmarked to compare and contact later.")}
+            />
+
             {validSavedRecords.length > 0 && (
                 <PropertyCategoryBar
                     properties={savedPropertyObjects}
@@ -308,7 +316,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
 
                 <Typography
                     variant="body2"
-                    sx={{ color: "#5B6577", fontWeight: 600 }}
+                    sx={{ color: "#64748B", fontWeight: 600 }}
                 >
                     {filteredSavedRecords.length}{" "}
                     {filteredSavedRecords.length === 1
@@ -341,16 +349,16 @@ export default function SavedPropertiesList({ onViewDetails }) {
                         width: "100%",
                         py: 6,
                         textAlign: "center",
-                        border: "1px dashed #d1d5db",
+                        border: "1px dashed #CBD5E1",
                         borderRadius: "16px",
-                        backgroundColor: "#F4F7FB",
+                        backgroundColor: "#F5F7FB",
                     }}
                 >
                     <Typography
                         variant="h6"
                         sx={{
                             fontWeight: 600,
-                            color: "#374151",
+                            color: "#334155",
                             mb: 1,
                         }}
                     >
@@ -359,7 +367,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
 
                     <Typography
                         variant="body2"
-                        sx={{ color: "#5B6577", mb: 2 }}
+                        sx={{ color: "#64748B", mb: 2 }}
                     >
                         {t("properties.savedList.noCategorySubtitle")}
                     </Typography>

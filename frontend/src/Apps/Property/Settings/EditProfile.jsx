@@ -144,13 +144,13 @@
 //     };
 
 //     return (
-//         <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+//         <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 //             <div className="mb-6">
-//                 <h2 className="text-lg font-semibold text-gray-900">
+//                 <h2 className="text-lg font-semibold text-slate-900">
 //                     Personal information
 //                 </h2>
 
-//                 <p className="mt-1 text-sm text-gray-500">
+//                 <p className="mt-1 text-sm text-slate-500">
 //                     Update your personal account information.
 //                 </p>
 //             </div>
@@ -160,7 +160,7 @@
 //                     <div>
 //                         <label
 //                             htmlFor="firstName"
-//                             className="mb-2 block text-sm font-medium text-gray-700"
+//                             className="mb-2 block text-sm font-medium text-slate-700"
 //                         >
 //                             First name
 //                         </label>
@@ -174,14 +174,14 @@
 //                             required
 //                             minLength={2}
 //                             maxLength={50}
-//                             className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+//                             className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
 //                         />
 //                     </div>
 
 //                     <div>
 //                         <label
 //                             htmlFor="lastName"
-//                             className="mb-2 block text-sm font-medium text-gray-700"
+//                             className="mb-2 block text-sm font-medium text-slate-700"
 //                         >
 //                             Last name
 //                         </label>
@@ -195,14 +195,14 @@
 //                             required
 //                             minLength={2}
 //                             maxLength={50}
-//                             className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+//                             className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
 //                         />
 //                     </div>
 
 //                     <div className="sm:col-span-2">
 //                         <label
 //                             htmlFor="email"
-//                             className="mb-2 block text-sm font-medium text-gray-700"
+//                             className="mb-2 block text-sm font-medium text-slate-700"
 //                         >
 //                             Email address
 //                         </label>
@@ -212,10 +212,10 @@
 //                             type="email"
 //                             value={formData.email}
 //                             readOnly
-//                             className="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-500"
+//                             className="w-full cursor-not-allowed rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-500"
 //                         />
 
-//                         <p className="mt-1 text-xs text-gray-500">
+//                         <p className="mt-1 text-xs text-slate-500">
 //                             Your email address cannot be edited here.
 //                         </p>
 //                     </div>
@@ -223,7 +223,7 @@
 //                     <div className="sm:col-span-2">
 //                         <label
 //                             htmlFor="phoneNumber"
-//                             className="mb-2 block text-sm font-medium text-gray-700"
+//                             className="mb-2 block text-sm font-medium text-slate-700"
 //                         >
 //                             Phone number
 //                         </label>
@@ -237,14 +237,14 @@
 //                             onChange={handleChange}
 //                             maxLength={20}
 //                             placeholder="Enter your phone number"
-//                             className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+//                             className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
 //                         />
 //                     </div>
 
 //                     <div className="sm:col-span-2">
 //                         <label
 //                             htmlFor="address"
-//                             className="mb-2 block text-sm font-medium text-gray-700"
+//                             className="mb-2 block text-sm font-medium text-slate-700"
 //                         >
 //                             Address
 //                         </label>
@@ -257,14 +257,14 @@
 //                             onChange={handleChange}
 //                             maxLength={300}
 //                             placeholder="Enter your address"
-//                             className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+//                             className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
 //                         />
 //                     </div>
 
 //                     <div className="sm:col-span-2">
 //                         <label
 //                             htmlFor="bio"
-//                             className="mb-2 block text-sm font-medium text-gray-700"
+//                             className="mb-2 block text-sm font-medium text-slate-700"
 //                         >
 //                             Bio
 //                         </label>
@@ -277,7 +277,7 @@
 //                             maxLength={1000}
 //                             rows={4}
 //                             placeholder="Tell us a little about yourself"
-//                             className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+//                             className="w-full resize-y rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
 //                         />
 //                     </div>
 //                 </div>
@@ -288,11 +288,11 @@
 //                     </p>
 //                 )}
 
-//                 <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-gray-100 pt-5">
+//                 <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-slate-100 pt-5">
 //                     <button
 //                         type="button"
 //                         onClick={onCancel}
-//                         className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+//                         className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
 //                     >
 //                         Cancel
 //                     </button>
@@ -300,7 +300,7 @@
 //                     <button
 //                         type="submit"
 //                         disabled={loading}
-//                         className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+//                         className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
 //                     >
 //                         {loading ? "Saving..." : "Save changes"}
 //                     </button>
@@ -310,6 +310,7 @@
 //     );
 // }
 
+import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -339,6 +340,7 @@ export default function EditProfile({
     onCancel,
     onSaved,
 }) {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
     const imageInputRef = useRef(null);
 
@@ -394,14 +396,14 @@ export default function EditProfile({
 
         if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
             setFormError(
-                "Please select a JPG, PNG, or WEBP image."
+                t("settings.editProfile.pleaseSelectAJpgPng", "Please select a JPG, PNG, or WEBP image.")
             );
             return;
         }
 
         if (file.size > MAX_IMAGE_SIZE) {
             setFormError(
-                "The profile image must be smaller than 2 MB."
+                t("settings.editProfile.theProfileImageMustBe", "The profile image must be smaller than 2 MB.")
             );
             return;
         }
@@ -410,7 +412,7 @@ export default function EditProfile({
 
         reader.onload = () => {
             if (typeof reader.result !== "string") {
-                setFormError("Unable to read the selected image.");
+                setFormError(t("settings.editProfile.unableToReadTheSelected", "Unable to read the selected image."));
                 return;
             }
 
@@ -423,7 +425,7 @@ export default function EditProfile({
         };
 
         reader.onerror = () => {
-            setFormError("Unable to read the selected image.");
+            setFormError(t("settings.editProfile.unableToReadTheSelected", "Unable to read the selected image."));
         };
 
         reader.readAsDataURL(file);
@@ -472,7 +474,7 @@ export default function EditProfile({
         }
 
         if (Object.keys(payload).length === 0) {
-            setFormError("No changes to save.");
+            setFormError(t("settings.editProfile.noChangesToSave", "No changes to save."));
             return;
         }
 
@@ -483,7 +485,7 @@ export default function EditProfile({
                 payload.firstName.length > 50)
         ) {
             setFormError(
-                "First name must contain 2–50 characters."
+                t("settings.editProfile.firstNameMustContain250", "First name must contain 2–50 characters.")
             );
             return;
         }
@@ -495,7 +497,7 @@ export default function EditProfile({
                 payload.lastName.length > 50)
         ) {
             setFormError(
-                "Last name must contain 2–50 characters."
+                t("settings.editProfile.lastNameMustContain250", "Last name must contain 2–50 characters.")
             );
             return;
         }
@@ -508,7 +510,7 @@ export default function EditProfile({
                 payload.phoneNumber
             )
         ) {
-            setFormError("Please enter a valid phone number.");
+            setFormError(t("settings.editProfile.pleaseEnterAValidPhone", "Please enter a valid phone number."));
             return;
         }
 
@@ -518,7 +520,7 @@ export default function EditProfile({
             payload.address.length > 300
         ) {
             setFormError(
-                "Address cannot exceed 300 characters."
+                t("settings.editProfile.addressCannotExceed300Characters", "Address cannot exceed 300 characters.")
             );
             return;
         }
@@ -528,7 +530,7 @@ export default function EditProfile({
             "bio" in payload &&
             payload.bio.length > 1000
         ) {
-            setFormError("Bio cannot exceed 1000 characters.");
+            setFormError(t("settings.editProfile.bioCannotExceed1000Characters", "Bio cannot exceed 1000 characters."));
             return;
         }
 
@@ -539,14 +541,14 @@ export default function EditProfile({
 
             onSaved(
                 result?.message ||
-                    "Profile updated successfully."
+                    t("settings.editProfile.profileUpdatedSuccessfully", "Profile updated successfully.")
             );
         } catch (err) {
             setFormError(
                 typeof err === "string"
                     ? err
                     : err?.message ||
-                        "Unable to update your profile."
+                        t("settings.editProfile.unableToUpdateYourProfile", "Unable to update your profile.")
             );
         }
     };
@@ -556,39 +558,39 @@ export default function EditProfile({
             .toUpperCase() || "?";
 
     return (
-        <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">
-                    Personal information
+                <h2 className="text-lg font-semibold text-slate-900">
+                    {t("settings.editProfile.personalInformation", "Personal information")}
                 </h2>
 
-                <p className="mt-1 text-sm text-gray-500">
-                    Update your personal account information.
+                <p className="mt-1 text-sm text-slate-500">
+                    {t("settings.editProfile.updateYourPersonalAccountInformation", "Update your personal account information.")}
                 </p>
             </div>
 
             <form onSubmit={handleSave}>
                 {/* Profile Image */}
-                <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <h3 className="text-sm font-semibold text-gray-900">
-                        Profile picture
+                <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-5">
+                    <h3 className="text-sm font-semibold text-slate-900">
+                        {t("settings.editProfile.profilePicture", "Profile picture")}
                     </h3>
 
-                    <p className="mt-1 text-sm text-gray-500">
-                        Upload or change your profile picture.
+                    <p className="mt-1 text-sm text-slate-500">
+                        {t("settings.editProfile.uploadOrChangeYourProfile", "Upload or change your profile picture.")}
                     </p>
 
                     <div className="mt-4 flex flex-wrap items-center gap-5">
                         {/* Image preview */}
-                        <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white">
+                        <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white">
                             {formData.profileImage ? (
                                 <img
                                     src={formData.profileImage}
-                                    alt="Profile preview"
+                                    alt={t("settings.editProfile.profilePreview", "Profile preview")}
                                     className="h-full w-full object-cover"
                                 />
                             ) : (
-                                <span className="text-2xl font-bold text-indigo-600">
+                                <span className="text-2xl font-bold text-blue-600">
                                     {initials}
                                 </span>
                             )}
@@ -608,25 +610,25 @@ export default function EditProfile({
                                 onClick={() =>
                                     imageInputRef.current?.click()
                                 }
-                                className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+                                className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
                             >
-                                Upload image
+                                {t("settings.editProfile.uploadImage", "Upload image")}
                             </button>
 
                             {formData.profileImage && (
                                 <button
                                     type="button"
                                     onClick={handleRemoveImage}
-                                    className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-white"
+                                    className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-white"
                                 >
-                                    Remove image
+                                    {t("settings.editProfile.removeImage", "Remove image")}
                                 </button>
                             )}
                         </div>
                     </div>
 
-                    <p className="mt-3 text-xs text-gray-500">
-                        JPG, PNG, or WEBP. Maximum file size: 2 MB.
+                    <p className="mt-3 text-xs text-slate-500">
+                        {t("settings.editProfile.jpgPngOrWebpMaximum", "JPG, PNG, or WEBP. Maximum file size: 2 MB.")}
                     </p>
                 </div>
 
@@ -635,9 +637,9 @@ export default function EditProfile({
                     <div>
                         <label
                             htmlFor="firstName"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            First name
+                            {t("settings.editProfile.firstName", "First name")}
                         </label>
 
                         <input
@@ -649,16 +651,16 @@ export default function EditProfile({
                             required
                             minLength={2}
                             maxLength={50}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
                     </div>
 
                     <div>
                         <label
                             htmlFor="lastName"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            Last name
+                            {t("settings.editProfile.lastName", "Last name")}
                         </label>
 
                         <input
@@ -670,16 +672,16 @@ export default function EditProfile({
                             required
                             minLength={2}
                             maxLength={50}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
                     </div>
 
                     <div className="sm:col-span-2">
                         <label
                             htmlFor="email"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            Email address
+                            {t("settings.editProfile.emailAddress", "Email address")}
                         </label>
 
                         <input
@@ -687,20 +689,20 @@ export default function EditProfile({
                             type="email"
                             value={formData.email}
                             readOnly
-                            className="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-500"
+                            className="w-full cursor-not-allowed rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-500"
                         />
 
-                        <p className="mt-1 text-xs text-gray-500">
-                            Your email address cannot be edited here.
+                        <p className="mt-1 text-xs text-slate-500">
+                            {t("settings.editProfile.yourEmailAddressCannotBe", "Your email address cannot be edited here.")}
                         </p>
                     </div>
 
                     <div className="sm:col-span-2">
                         <label
                             htmlFor="phoneNumber"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            Phone number
+                            {t("settings.editProfile.phoneNumber", "Phone number")}
                         </label>
 
                         <input
@@ -711,17 +713,17 @@ export default function EditProfile({
                             value={formData.phoneNumber}
                             onChange={handleChange}
                             maxLength={20}
-                            placeholder="Enter your phone number"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                            placeholder={t("settings.editProfile.enterYourPhoneNumber", "Enter your phone number")}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
                     </div>
 
                     <div className="sm:col-span-2">
                         <label
                             htmlFor="address"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            Address
+                            {t("settings.editProfile.address", "Address")}
                         </label>
 
                         <input
@@ -731,17 +733,17 @@ export default function EditProfile({
                             value={formData.address}
                             onChange={handleChange}
                             maxLength={300}
-                            placeholder="Enter your address"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                            placeholder={t("settings.editProfile.enterYourAddress", "Enter your address")}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
                     </div>
 
                     <div className="sm:col-span-2">
                         <label
                             htmlFor="bio"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            Bio
+                            {t("settings.editProfile.bio", "Bio")}
                         </label>
 
                         <textarea
@@ -751,8 +753,8 @@ export default function EditProfile({
                             onChange={handleChange}
                             maxLength={1000}
                             rows={4}
-                            placeholder="Tell us a little about yourself"
-                            className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                            placeholder={t("settings.editProfile.tellUsALittleAbout", "Tell us a little about yourself")}
+                            className="w-full resize-y rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
                     </div>
                 </div>
@@ -768,22 +770,22 @@ export default function EditProfile({
                 )}
 
                 {/* Actions */}
-                <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-gray-100 pt-5">
+                <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-slate-100 pt-5">
                     <button
                         type="button"
                         onClick={onCancel}
                         disabled={loading}
-                        className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        Cancel
+                        {t("settings.editProfile.cancel", "Cancel")}
                     </button>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        {loading ? "Saving..." : "Save changes"}
+                        {loading ? t("settings.editProfile.saving", "Saving...") : t("settings.editProfile.saveChanges", "Save changes")}
                     </button>
                 </div>
             </form>

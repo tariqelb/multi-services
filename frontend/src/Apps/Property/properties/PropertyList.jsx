@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import getImageUrl from "../../../utils/getImageUrl";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -276,6 +277,21 @@ export default function PropertyList({
 
     const handleSelectProperty = (property) => {
         if (!property) return;
+
+        const propertyId = property._id || property.id;
+
+        // Send click statistics without delaying navigation.
+        if (propertyId) {
+            axiosInstance
+                .post(`/property/${propertyId}/click`)
+                .catch((error) => {
+                    console.error(
+                        "Unable to track property click:",
+                        error.message
+                    );
+                });
+        }
+
         onSelectProperty?.(property);
     };
 
@@ -319,7 +335,7 @@ export default function PropertyList({
             >
                 <CircularProgress />
 
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     {t("properties.list.loading")}
                 </Typography>
             </Box>
@@ -420,7 +436,7 @@ export default function PropertyList({
                 <Typography
                     variant="body2"
                     sx={{
-                        color: "#5B6577",
+                        color: "#64748B",
                         flexShrink: 0,
                     }}
                 >
@@ -437,9 +453,9 @@ export default function PropertyList({
                         py: { xs: 4, sm: 6 },
                         px: { xs: 1.5, sm: 2 },
                         textAlign: "center",
-                        border: "1px dashed #d1d5db",
+                        border: "1px dashed #CBD5E1",
                         borderRadius: "16px",
-                        backgroundColor: "#F4F7FB",
+                        backgroundColor: "#F5F7FB",
                         width: "100%",
                         boxSizing: "border-box",
                         overflowWrap: "anywhere",
@@ -449,7 +465,7 @@ export default function PropertyList({
                         variant="h6"
                         sx={{
                             fontWeight: 600,
-                            color: "#374151",
+                            color: "#334155",
                             mb: 1,
                             fontSize: {
                                 xs: "1rem",
@@ -463,7 +479,7 @@ export default function PropertyList({
                     <Typography
                         variant="body2"
                         sx={{
-                            color: "#5B6577",
+                            color: "#64748B",
                             mb: 2,
                         }}
                     >
@@ -509,14 +525,8 @@ export default function PropertyList({
                                 property.images?.[0]?.path;
 
                             const fullImageUrl = imagePath
-                                ? /^https?:\/\//i.test(imagePath)
-                                    ? imagePath
-                                    : `http://localhost:3000${
-                                          imagePath.startsWith("/")
-                                              ? ""
-                                              : "/"
-                                      }${imagePath}`
-                                : "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500";
+                                ? getImageUrl(imagePath)
+                                : "";
 
                             const formattedProperty = {
                                 ...property,

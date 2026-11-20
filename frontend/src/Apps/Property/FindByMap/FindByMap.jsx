@@ -506,13 +506,12 @@ export default function FindByMap() {
             {/* Header */}
             <Box className="find-map-header">
                 <Box>
-                    <Typography variant="h5" fontWeight={700}>
+                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
                         {t("findMap.title")}
                     </Typography>
 
                     <Typography
-                        variant="body2"
-                        color="text.secondary"
+                        variant="body2" sx={{ color: "text.secondary" }}
                     >
                         {t("findMap.subtitle")}
                     </Typography>
@@ -538,7 +537,7 @@ export default function FindByMap() {
                 <Box className="find-map-loading">
                     <CircularProgress />
 
-                    <Typography color="text.secondary">
+                    <Typography sx={{ color: "text.secondary" }}>
                         {t("findMap.loading")}
                     </Typography>
                 </Box>
@@ -550,11 +549,11 @@ export default function FindByMap() {
                 </Box>
             ) : totalDisplayed === 0 ? (
                 <Box className="find-map-message">
-                    <Typography fontWeight={600}>
+                    <Typography sx={{ fontWeight: 600 }}>
                         {t("findMap.empty.title")}
                     </Typography>
 
-                    <Typography color="text.secondary">
+                    <Typography sx={{ color: "text.secondary" }}>
                         {t("findMap.empty.subtitle")}
                     </Typography>
                 </Box>

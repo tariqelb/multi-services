@@ -82,7 +82,7 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
                     "&:last-child": { pb: 3 },
                 }}
             >
-                <Stack direction="row" alignItems="center" spacing={2}>
+                <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
                     <Box
                         sx={{
                             width: 48,
@@ -101,11 +101,10 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
                         ↗
                     </Box>
 
-                    <Box minWidth={0} flex={1}>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
                         <Typography
                             variant="subtitle1"
-                            fontWeight={700}
-                            sx={{
+                            sx={{ fontWeight: 700,
                                 overflowWrap: "anywhere",
                                 lineHeight: 1.4,
                             }}
@@ -116,9 +115,7 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
 
                         <Typography
                             variant="body2"
-                            color="text.secondary"
-                            mt={0.5}
-                            noWrap
+                            noWrap sx={{ color: "text.secondary", mt: 0.5 }}
                         >
                             {listing.sourceName ||
                                 listing.sourceDomain ||
@@ -142,9 +139,7 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
                     <Box>
                         <Typography
                             variant="caption"
-                            color={`${color}10`}
-                            fontWeight={700}
-                            sx={{
+                            sx={{ color: `${color}10`, fontWeight: 700,
                                 textTransform: "uppercase",
                                 letterSpacing: 0.5,
                             }}
@@ -153,19 +148,14 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
                         </Typography>
 
                         <Typography
-                            variant="h5"
-                            fontWeight={700}
-                            color="primary.main"
-                            mt={0.5}
+                            variant="h5" sx={{ fontWeight: 700, color: "primary.main", mt: 0.5 }}
                         >
                             {formatNumber(listing.clickCount, locale)}
                         </Typography>
                     </Box>
 
                     <Typography
-                        variant="body2"
-                        color="primary.main"
-                        fontWeight={700}
+                        variant="body2" sx={{ color: "primary.main", fontWeight: 700 }}
                     >
                         {Number(listing.clickCount) === 1
                             ? t("adminExternalClicks.card.click")
@@ -201,19 +191,14 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
                             }}
                         >
                             <Typography
-                                variant="caption"
-                                color="text.primary"
-                                fontWeight={700}
-                                display="block"
-                                mb={0.5}
+                                variant="caption" sx={{ color: "text.primary", fontWeight: 700, display: "block", mb: 0.5 }}
                             >
                                 {item.label}
                             </Typography>
 
                             <Typography
                                 variant="body2"
-                                color="text.secondary"
-                                sx={{
+                                sx={{ color: "text.secondary",
                                     overflowWrap: "anywhere",
                                     lineHeight: 1.5,
                                 }}
@@ -237,8 +222,7 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
                 >
                     <Typography
                         variant="caption"
-                        color="text.secondary"
-                        sx={{ overflowWrap: "anywhere" }}
+                        sx={{ color: "text.secondary", overflowWrap: "anywhere" }}
                     >
                         {t("adminExternalClicks.card.externalListingId")}:{" "}
                         {listing.externalListingId ||
@@ -247,8 +231,7 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
 
                     <Typography
                         variant="caption"
-                        color="text.secondary"
-                        sx={{ overflowWrap: "anywhere" }}
+                        sx={{ color: "text.secondary", overflowWrap: "anywhere" }}
                     >
                         {t("adminExternalClicks.card.sourceDomain")}:{" "}
                         {listing.sourceDomain ||
@@ -256,7 +239,7 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
                     </Typography>
                 </Box>
 
-                <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
                     {listing.sourceUrl ? (
                         <Button
                             component="a"
@@ -272,8 +255,7 @@ const ExternalListingClickCard = ({ listing, color = "", locale }) => {
                         </Button>
                     ) : (
                         <Typography
-                            variant="body2"
-                            color="text.secondary"
+                            variant="body2" sx={{ color: "text.secondary" }}
                         >
                             {t("adminExternalClicks.card.sourceUnavailable")}
                         </Typography>

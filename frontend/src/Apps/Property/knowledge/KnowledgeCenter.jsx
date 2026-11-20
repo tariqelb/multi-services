@@ -160,9 +160,7 @@ function KnowledgeCard({ item, onClick, t, locale }) {
                     <Stack
                         direction="row"
                         spacing={1}
-                        alignItems="center"
-                        flexWrap="wrap"
-                        sx={{ mb: 1 }}
+                        sx={{ alignItems: "center", flexWrap: "wrap", mb: 1 }}
                     >
                         <Chip
                             size="small"
@@ -207,8 +205,7 @@ function KnowledgeCard({ item, onClick, t, locale }) {
                     <Typography
                         variant="h6"
                         component="h2"
-                        fontWeight={700}
-                        sx={{
+                        sx={{ fontWeight: 700,
                             mb: 1,
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
@@ -223,8 +220,7 @@ function KnowledgeCard({ item, onClick, t, locale }) {
 
                     <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{
+                        sx={{ color: "text.secondary",
                             display: "-webkit-box",
                             WebkitLineClamp: 3,
                             WebkitBoxOrient: "vertical",
@@ -238,16 +234,14 @@ function KnowledgeCard({ item, onClick, t, locale }) {
 
                     <Stack
                         direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
                         spacing={1}
-                        sx={{ mt: 2 }}
+                        sx={{ justifyContent: "space-between", alignItems: "center", mt: 2 }}
                     >
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: "text.secondary" }}>
                             {item.language?.toUpperCase()}
                         </Typography>
 
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: "text.secondary" }}>
                             {formatDate(item.publishedAt, locale)}
                         </Typography>
                     </Stack>
@@ -451,15 +445,14 @@ export default function KnowledgeCenter() {
                     }}
                 >
                     <Stack spacing={2}>
-                        <Typography variant="h6" fontWeight={700}>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
                             {t("searchHeading")}
                         </Typography>
 
                         {/* Search */}
                         <Stack
                             direction={{ xs: "column", sm: "row" }}
-                            spacing={1}
-                            alignItems="flex-start"
+                            spacing={1} sx={{ alignItems: "flex-start" }}
                         >
                             <Box
                                 sx={{
@@ -579,8 +572,7 @@ export default function KnowledgeCenter() {
                                             }}
                                         >
                                             <Typography
-                                                variant="body2"
-                                                color="text.secondary"
+                                                variant="body2" sx={{ color: "text.secondary" }}
                                             >
                                                 {t("noMatchingContent")}
                                             </Typography>
@@ -697,11 +689,9 @@ export default function KnowledgeCenter() {
                 {submittedSearch && (
                     <Stack
                         direction="row"
-                        alignItems="center"
-                        flexWrap="wrap"
-                        spacing={1}
+                        spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}
                     >
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             {t("searchResultsFor")}
                         </Typography>
 
@@ -714,7 +704,7 @@ export default function KnowledgeCenter() {
                             }}
                         />
 
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             {t("results", { count: totalItems })}
                         </Typography>
                     </Stack>
@@ -724,10 +714,10 @@ export default function KnowledgeCenter() {
 
                 {/* Content list */}
                 {loading ? (
-                    <Stack alignItems="center" spacing={1} sx={{ py: 8 }}>
+                    <Stack spacing={1} sx={{ alignItems: "center", py: 8 }}>
                         <CircularProgress />
 
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             {t("loading")}
                         </Typography>
                     </Stack>
@@ -759,13 +749,13 @@ export default function KnowledgeCenter() {
                             />
                         )}
 
-                        <Typography variant="h6" fontWeight={700}>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
                             {activeTab === "article"
                                 ? t("noArticles")
                                 : t("noVideos")}
                         </Typography>
 
-                        <Typography color="text.secondary" sx={{ mt: 1 }}>
+                        <Typography sx={{ color: "text.secondary", mt: 1 }}>
                             {t("emptyHint")}
                         </Typography>
                     </Paper>
@@ -790,7 +780,7 @@ export default function KnowledgeCenter() {
                         </Grid>
 
                         {totalPages > 1 && (
-                            <Stack alignItems="center" sx={{ pt: 2 }}>
+                            <Stack sx={{ alignItems: "center", pt: 2 }}>
                                 <Pagination
                                     count={totalPages}
                                     page={page}

@@ -270,12 +270,12 @@ export default function PropertyMap({
             markerElement.title = markerLabel;
 
             const markerColor = isRoommate
-                ? "#2e9d50"
+                ? "#16A34A"
                 : isEstablishment
                     ? "#7e22ce"
                     : isFurnished
                         ? "#f59e0b"
-                        : "#1976d2";
+                        : "#2563EB";
 
             Object.assign(markerElement.style, {
                 width: isEstablishment ? "40px" : "34px",
@@ -533,7 +533,7 @@ export default function PropertyMap({
     if (mapError) {
         return (
             <Alert severity="error">
-                <Typography fontWeight={700}>
+                <Typography sx={{ fontWeight: 700 }}>
                     {t("findMap.map.loadFailed")}
                 </Typography>
 
@@ -559,7 +559,7 @@ export default function PropertyMap({
                     }}
                 >
                     <CircularProgress />
-                    <Typography color="text.secondary">
+                    <Typography sx={{ color: "text.secondary" }}>
                         {t("findMap.map.loading")}
                     </Typography>
                 </Box>
@@ -577,13 +577,13 @@ export default function PropertyMap({
             />
 
             <Box className="property-map-legend">
-                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
                     <Box
                         sx={{
                             width: 12,
                             height: 12,
                             borderRadius: "50%",
-                            backgroundColor: "#1976d2",
+                            backgroundColor: "#2563EB",
                         }}
                     />
                     <Typography variant="caption">
@@ -593,7 +593,7 @@ export default function PropertyMap({
                     </Typography>
                 </Box>
 
-                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
                     <Box
                         sx={{
                             width: 12,
@@ -609,12 +609,12 @@ export default function PropertyMap({
                     </Typography>
                 </Box>
 
-                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
                     <Box
                         sx={{
                             width: 11,
                             height: 11,
-                            backgroundColor: "#2e9d50",
+                            backgroundColor: "#16A34A",
                             transform: "rotate(45deg)",
                         }}
                     />
@@ -625,7 +625,7 @@ export default function PropertyMap({
                     </Typography>
                 </Box>
 
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Box
                         sx={{
                             width: 13,
@@ -910,12 +910,12 @@ export default function PropertyMap({
 //             markerElement.title = markerLabel;
 
 //             const markerColor = isRoommate
-//                 ? "#2e9d50"
+//                 ? "#16A34A"
 //                 : isEstablishment
 //                     ? "#7e22ce"
 //                     : isFurnished
 //                         ? "#f59e0b"
-//                         : "#1976d2";
+//                         : "#2563EB";
 
 //             Object.assign(markerElement.style, {
 //                 width: isEstablishment ? "40px" : "34px",
@@ -1223,7 +1223,7 @@ export default function PropertyMap({
 //                             width: 12,
 //                             height: 12,
 //                             borderRadius: "50%",
-//                             backgroundColor: "#1976d2",
+//                             backgroundColor: "#2563EB",
 //                         }}
 //                     />
 //                     <Typography variant="caption">
@@ -1250,7 +1250,7 @@ export default function PropertyMap({
 //                         sx={{
 //                             width: 11,
 //                             height: 11,
-//                             backgroundColor: "#2e9d50",
+//                             backgroundColor: "#16A34A",
 //                             transform: "rotate(45deg)",
 //                         }}
 //                     />

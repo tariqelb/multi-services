@@ -98,32 +98,28 @@ export default function ContactActivityChart({ data = [] }) {
             sx={{
                 p: { xs: 2, md: 3 },
                 height: "100%",
-                border: "1px solid #E8EDF4",
+                border: "1px solid #E2E8F0",
                 borderRadius: 3,
             }}
         >
             <Stack
                 direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-                alignItems={{ xs: "flex-start", sm: "center" }}
-                spacing={1}
-                mb={2}
+                spacing={1} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, mb: 2 }}
             >
                 <Box>
-                    <Typography fontWeight={800} variant="h6">
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>
                         {t("adminContactActions.activityTitle")}
                     </Typography>
 
                     <Typography
-                        variant="caption"
-                        color="text.secondary"
+                        variant="caption" sx={{ color: "text.secondary" }}
                     >
                         {t("adminContactActions.activitySubtitle")}
                     </Typography>
                 </Box>
 
                 <Stack direction="row" spacing={2}>
-                    <Stack direction="row" spacing={0.7} alignItems="center">
+                    <Stack direction="row" spacing={0.7} sx={{ alignItems: "center" }}>
                         <Box
                             sx={{
                                 width: 9,
@@ -137,7 +133,7 @@ export default function ContactActivityChart({ data = [] }) {
                         </Typography>
                     </Stack>
 
-                    <Stack direction="row" spacing={0.7} alignItems="center">
+                    <Stack direction="row" spacing={0.7} sx={{ alignItems: "center" }}>
                         <Box
                             sx={{
                                 width: 9,
@@ -154,13 +150,9 @@ export default function ContactActivityChart({ data = [] }) {
             </Stack>
 
             {safeData.length === 0 ? (
-                <Box
-                    minHeight={250}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
+                <Box sx={{ minHeight: 250, display: "flex", alignItems: "center", justifyContent: "center" }}
                 >
-                    <Typography color="text.secondary">
+                    <Typography sx={{ color: "text.secondary" }}>
                         {t("adminContactActions.noActivity")}
                     </Typography>
                 </Box>
@@ -188,7 +180,7 @@ export default function ContactActivityChart({ data = [] }) {
                                         x2={CHART_WIDTH - PADDING.right}
                                         y1={y}
                                         y2={y}
-                                        stroke="#E9EEF5"
+                                        stroke="#F1F5F9"
                                         strokeDasharray="4 5"
                                     />
 

@@ -154,7 +154,7 @@ export default function FurnishedSimilarProperties({
                 {displayedProperties.map((property) => {
                     const fullImageUrl =
                         getImageUrl(property.images?.[0]) ||
-                        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500";
+                        "";
 
                     const formattedProperty = {
                         ...property,

@@ -70,7 +70,7 @@ export default function SavedPropertyCard({
 
     const fullImageUrl =
         getImageUrl(imagePath) ||
-        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500";
+        "";
 
     const locationText = [neighborhood, city]
         .filter(Boolean)
@@ -207,16 +207,14 @@ export default function SavedPropertyCard({
                     {/* Title, Price and Chips */}
                     <Stack
                         direction={{ xs: "column", md: "row" }}
-                        justifyContent="space-between"
-                        alignItems="flex-start"
                         spacing={1.5}
-                        sx={{ mb: 1 }}
+                        sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}
                     >
                         <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                             <Typography
                                 variant="caption"
                                 sx={{
-                                    color: "#5B6577",
+                                    color: "#64748B",
                                     fontWeight: 600,
                                 }}
                             >
@@ -252,8 +250,7 @@ export default function SavedPropertyCard({
                         <Stack
                             direction="row"
                             spacing={1}
-                            flexWrap="wrap"
-                            useFlexGap
+                            useFlexGap sx={{ flexWrap: "wrap" }}
                         >
                             <Chip
                                 label={getListingTypeLabel(listingType)}
@@ -295,9 +292,8 @@ export default function SavedPropertyCard({
                         <Stack
                             direction="row"
                             spacing={0.5}
-                            alignItems="center"
-                            sx={{
-                                color: "#5B6577",
+                            sx={{ alignItems: "center",
+                                color: "#64748B",
                                 mb: 2,
                             }}
                         >
@@ -367,9 +363,7 @@ export default function SavedPropertyCard({
                     <Stack
                         direction="row"
                         spacing={1.5}
-                        justifyContent="flex-end"
-                        alignItems="center"
-                        sx={{
+                        sx={{ justifyContent: "flex-end", alignItems: "center",
                             flexWrap: "wrap",
                             rowGap: 1,
                         }}

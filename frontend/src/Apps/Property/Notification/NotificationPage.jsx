@@ -245,9 +245,8 @@ export default function NotificationsPage() {
             <Stack
                 direction="row"
                 spacing={1}
-                flexWrap="wrap"
                 useFlexGap
-                sx={{ mb: 3 }}
+                sx={{ flexWrap: "wrap", mb: 3 }}
             >
                 <StatusBadge
                     icon={<NotificationsNone />}
@@ -317,8 +316,7 @@ export default function NotificationsPage() {
                     </Typography>
 
                     <Typography
-                        color="text.secondary"
-                        sx={{ mt: 1 }}
+                        sx={{ color: "text.secondary", mt: 1 }}
                     >
                         {t("notifications.emptySubtitle")}
                     </Typography>
@@ -351,12 +349,10 @@ export default function NotificationsPage() {
                                     xs: "column",
                                     sm: "row",
                                 }}
-                                justifyContent="space-between"
-                                alignItems={{
+                                spacing={2} sx={{ justifyContent: "space-between", alignItems: {
                                     xs: "stretch",
                                     sm: "flex-start",
-                                }}
-                                spacing={2}
+                                } }}
                             >
                                 <Box
                                     sx={{
@@ -367,8 +363,7 @@ export default function NotificationsPage() {
                                     <Stack
                                         direction="row"
                                         spacing={1}
-                                        alignItems="center"
-                                        sx={{ mb: 0.75 }}
+                                        sx={{ alignItems: "center", mb: 0.75 }}
                                     >
                                         <StatusBadge
                                             label={
@@ -384,8 +379,7 @@ export default function NotificationsPage() {
                                         />
 
                                         <Typography
-                                            variant="caption"
-                                            color="text.secondary"
+                                            variant="caption" sx={{ color: "text.secondary" }}
                                         >
                                             {formatDate(
                                                 notification.createdAt
@@ -404,8 +398,7 @@ export default function NotificationsPage() {
                                     </Typography>
 
                                     <Typography
-                                        color="text.secondary"
-                                        sx={{
+                                        sx={{ color: "text.secondary",
                                             mt: 0.5,
                                             lineHeight: 1.6,
                                             overflowWrap: "anywhere",
@@ -418,10 +411,8 @@ export default function NotificationsPage() {
                                 <Stack
                                     direction="row"
                                     spacing={1}
-                                    alignItems="center"
-                                    flexWrap="wrap"
                                     useFlexGap
-                                    sx={{ flexShrink: 0 }}
+                                    sx={{ alignItems: "center", flexWrap: "wrap", flexShrink: 0 }}
                                 >
                                     {!notification.isRead && (
                                         <Button

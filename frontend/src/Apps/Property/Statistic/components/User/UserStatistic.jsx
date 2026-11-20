@@ -9,7 +9,7 @@ export default function UserStatistic({ icon, label, value }) {
                 alignItems: "center",
                 gap: 1.5,
                 p: 2,
-                bgcolor: "#F4F7FB",
+                bgcolor: "#F5F7FB",
                 borderRadius: 2,
                 minWidth: 0,
             }}
@@ -27,11 +27,11 @@ export default function UserStatistic({ icon, label, value }) {
             </Box>
 
             <Box sx={{ minWidth: 0 }}>
-                <Typography variant="h6" fontWeight={700} lineHeight={1.3}>
+                <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
                     {value}
                 </Typography>
 
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     {label}
                 </Typography>
             </Box>

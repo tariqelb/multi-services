@@ -228,7 +228,7 @@ export default function FurnishedCategoryBar({
                                         : "#fff",
                                     borderColor: active
                                         ? "#2563EB"
-                                        : "#D5DCE8",
+                                        : "#E2E8F0",
                                     boxShadow: active
                                         ? "0 4px 12px rgba(37, 99, 235, 0.2)"
                                         : "none",
@@ -278,7 +278,7 @@ export default function FurnishedCategoryBar({
                             sm: 1.5,
                         },
                         borderRadius: "16px",
-                        backgroundColor: "#F4F7FB",
+                        backgroundColor: "#F5F7FB",
                         boxSizing: "border-box",
                         width: "100%",
                         minWidth: 0,
@@ -371,7 +371,7 @@ export default function FurnishedCategoryBar({
                                             : "#fff",
                                         borderColor: active
                                             ? "#2563EB"
-                                            : "#D5DCE8",
+                                            : "#E2E8F0",
                                         "&:hover": {
                                             backgroundColor: active
                                                 ? "#1D4ED8"
@@ -421,7 +421,7 @@ export default function FurnishedCategoryBar({
                                 },
                                 px: 2.5,
                                 borderRadius: "10px",
-                                borderColor: "#D5DCE8",
+                                borderColor: "#E2E8F0",
                                 color: "#475569",
                                 fontWeight: 700,
                                 textTransform: "none",

@@ -21,7 +21,7 @@ export default function ContactStatCard({
             sx={{
                 p: 2.5,
                 height: "100%",
-                border: "1px solid #E8EDF4",
+                border: "1px solid #E2E8F0",
                 borderRadius: 3,
                 transition: "0.2s ease",
                 "&:hover": {
@@ -32,24 +32,18 @@ export default function ContactStatCard({
         >
             <Stack
                 direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                spacing={2}
+                spacing={2} sx={{ justifyContent: "space-between", alignItems: "center" }}
             >
-                <Box minWidth={0}>
+                <Box sx={{ minWidth: 0 }}>
                     <Typography
                         variant="body2"
-                        color="text.secondary"
-                        fontWeight={600}
-                        sx={{ mb: 1 }}
+                        sx={{ color: "text.secondary", fontWeight: 600, mb: 1 }}
                     >
                         {title}
                     </Typography>
 
                     <Typography
-                        variant="h4"
-                        fontWeight={800}
-                        color="text.primary"
+                        variant="h4" sx={{ fontWeight: 800, color: "text.primary" }}
                     >
                         {Number(value).toLocaleString()}
                     </Typography>

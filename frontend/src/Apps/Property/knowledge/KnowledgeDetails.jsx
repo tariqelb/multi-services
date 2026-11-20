@@ -135,8 +135,7 @@ function RelatedContentCard({ item, onClick, t }) {
                 <CardContent>
                     <Typography
                         variant="subtitle1"
-                        fontWeight={700}
-                        sx={{
+                        sx={{ fontWeight: 700,
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: "vertical",
@@ -150,9 +149,7 @@ function RelatedContentCard({ item, onClick, t }) {
 
                     <Stack
                         direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        flexWrap="wrap"
+                        spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}
                     >
                         <Chip
                             size="small"
@@ -165,8 +162,7 @@ function RelatedContentCard({ item, onClick, t }) {
 
                         {item.category && (
                             <Typography
-                                variant="caption"
-                                color="text.secondary"
+                                variant="caption" sx={{ color: "text.secondary" }}
                             >
                                 {categoryKey
                                     ? t(`categories.${categoryKey}`)
@@ -252,13 +248,12 @@ export default function KnowledgeDetails() {
                 icon={<MenuBookOutlinedIcon color="primary" />}
             >
                 <Stack
-                    alignItems="center"
                     spacing={2}
-                    sx={{ py: 10 }}
+                    sx={{ alignItems: "center", py: 10 }}
                 >
                     <CircularProgress />
 
-                    <Typography color="text.secondary">
+                    <Typography sx={{ color: "text.secondary" }}>
                         {t("loading")}
                     </Typography>
                 </Stack>
@@ -330,9 +325,7 @@ export default function KnowledgeDetails() {
                     <Stack spacing={2.5}>
                         <Stack
                             direction="row"
-                            spacing={1}
-                            alignItems="center"
-                            flexWrap="wrap"
+                            spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}
                         >
                             <Chip
                                 icon={
@@ -379,15 +372,13 @@ export default function KnowledgeDetails() {
                         <Typography
                             variant="h4"
                             component="h1"
-                            fontWeight={700}
-                            sx={{ overflowWrap: "anywhere" }}
+                            sx={{ fontWeight: 700, overflowWrap: "anywhere" }}
                         >
                             {item.title}
                         </Typography>
 
                         <Typography
-                            variant="body2"
-                            color="text.secondary"
+                            variant="body2" sx={{ color: "text.secondary" }}
                         >
                             {formatDate(item.publishedAt, locale)}
                         </Typography>
@@ -435,13 +426,12 @@ export default function KnowledgeDetails() {
                             >
                                 <Stack spacing={1.5}>
                                     <Typography
-                                        variant="h6"
-                                        fontWeight={700}
+                                        variant="h6" sx={{ fontWeight: 700 }}
                                     >
                                         {t("originalArticle")}
                                     </Typography>
 
-                                    <Typography color="text.secondary">
+                                    <Typography sx={{ color: "text.secondary" }}>
                                         {item.sourceName
                                             ? t("publishedBy", {
                                                   source: item.sourceName,
@@ -474,8 +464,7 @@ export default function KnowledgeDetails() {
                             <Box>
                                 <Typography
                                     variant="h6"
-                                    fontWeight={700}
-                                    sx={{ mb: 1 }}
+                                    sx={{ fontWeight: 700, mb: 1 }}
                                 >
                                     {t(
                                         item.type === "video"
@@ -485,8 +474,7 @@ export default function KnowledgeDetails() {
                                 </Typography>
 
                                 <Typography
-                                    color="text.secondary"
-                                    sx={{
+                                    sx={{ color: "text.secondary",
                                         whiteSpace: "pre-line",
                                         overflowWrap: "anywhere",
                                         lineHeight: 1.8,
@@ -500,8 +488,7 @@ export default function KnowledgeDetails() {
                         {item.tags?.length > 0 && (
                             <Stack spacing={1}>
                                 <Typography
-                                    variant="subtitle2"
-                                    fontWeight={700}
+                                    variant="subtitle2" sx={{ fontWeight: 700 }}
                                 >
                                     {t("relatedKeywords")}
                                 </Typography>
@@ -509,8 +496,7 @@ export default function KnowledgeDetails() {
                                 <Stack
                                     direction="row"
                                     spacing={1}
-                                    flexWrap="wrap"
-                                    useFlexGap
+                                    useFlexGap sx={{ flexWrap: "wrap" }}
                                 >
                                     {item.tags.map((tag) => (
                                         <Chip
@@ -534,8 +520,7 @@ export default function KnowledgeDetails() {
                     <Box>
                         <Typography
                             variant="h5"
-                            fontWeight={700}
-                            sx={{ mb: 2 }}
+                            sx={{ fontWeight: 700, mb: 2 }}
                         >
                             {t("relatedContent")}
                         </Typography>

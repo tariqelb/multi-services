@@ -1,7 +1,6 @@
 
 import React from "react";
 import {
-    Paper,
     Stack,
     TextField,
     MenuItem,
@@ -10,7 +9,7 @@ import {
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 
-import { SectionHeader } from "./RoommateFormUI";
+import { SectionHeader, SectionPaper } from "./RoommateFormUI";
 
 export default function RoommatePreferencesSection({
     formData,
@@ -32,8 +31,9 @@ export default function RoommatePreferencesSection({
     };
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
+        <SectionPaper>
             <SectionHeader
+                number={4}
                 icon={<TuneIcon />}
                 title={translate(
                     "roommates.form.preferences",
@@ -94,6 +94,6 @@ export default function RoommatePreferencesSection({
                     )}
                 />
             </Stack>
-        </Paper>
+        </SectionPaper>
     );
 }

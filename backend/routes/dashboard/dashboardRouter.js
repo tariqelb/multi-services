@@ -30,7 +30,28 @@ import {
     getSavedPropertyDemandAnalytics,
 } from "../../controllers/dashboard/savedPropertyDemandController.js";
 
+import { getDashboardOverview } from "../../controllers/dashboard/dashboardOverviewController.js";
+
+import {
+    createListingContact,
+    getListingContactAnalytics,
+} from "../../controllers/dashboard/listingContactsController.js";
+
 const router = express.Router();
+
+
+// Public contact tracking: anonymous visitors count, logged-in users are recognised.
+router.post("/listing-contacts", optionalAuthMiddleware, createListingContact);
+
+// Admin-only contact analytics.
+router.get(
+    "/listing-contacts",
+    authMiddleware,
+    adminMiddleware,
+    getListingContactAnalytics
+);
+
+router.get("/overview", authMiddleware, adminMiddleware, getDashboardOverview);
 
 // Admin user management
 router.get(

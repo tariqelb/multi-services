@@ -1,96 +1,49 @@
-
 import React from "react";
-import {
-    Paper,
-    Stack,
-    Button,
-    Typography,
-    Alert,
-    CircularProgress,
-} from "@mui/material";
+import { Stack, Alert } from "@mui/material";
 
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import RocketLaunchOutlinedIcon from "@mui/icons-material/RocketLaunchOutlined";
+
+import { FormSubmitBar } from "../../../Components/ui/FormKit";
 
 export default function RoommatePublishSection({
     loading,
     profileLoading,
     profile,
     onSubmit,
+    onReset,
     t,
 }) {
-    const translate = (key, fallback) =>
-        t(key, { defaultValue: fallback });
+    const translate = (key, fallback) => t(key, { defaultValue: fallback });
 
-    const emailVerified = Boolean(
-        profile?.emailVerified ||
-        profile?.isEmailVerified
-    );
-
-    const whatsappVerified = Boolean(
-        profile?.whatsappVerified ||
-        profile?.whatsapp?.verified
-    );
-
+    const emailVerified = Boolean(profile?.emailVerified || profile?.isEmailVerified);
+    const whatsappVerified = Boolean(profile?.whatsappVerified || profile?.whatsapp?.verified);
     const canPublish = emailVerified && whatsappVerified;
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
-            <Stack spacing={2}>
-                <Typography variant="h6" fontWeight={700}>
+        <Stack spacing={2}>
+            {!profileLoading && !canPublish && (
+                <Alert severity="warning" variant="outlined">
                     {translate(
-                        "roommates.form.publishTitle",
-                        "Publish your announcement"
+                        "roommates.form.verificationRequired",
+                        "Please verify your email address and WhatsApp number before publishing."
                     )}
-                </Typography>
+                </Alert>
+            )}
 
-                <Typography color="text.secondary">
-                    {translate(
-                        "roommates.form.publishDescription",
-                        "Review your information before publishing your roommate announcement."
-                    )}
-                </Typography>
-
-                {!profileLoading && !canPublish && (
-                    <Alert severity="warning">
-                        {translate(
-                            "roommates.form.verificationRequired",
-                            "Please verify your email address and WhatsApp number before publishing."
-                        )}
-                    </Alert>
+            <FormSubmitBar
+                title={translate("roommates.form.publishTitle", "Publish your announcement")}
+                subtitle={translate(
+                    "roommates.form.publishDescription",
+                    "Review your information before publishing your roommate announcement."
                 )}
-
-                <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    onClick={onSubmit}
-                    disabled={
-                        loading ||
-                        profileLoading ||
-                        !canPublish
-                    }
-                    startIcon={
-                        loading ? (
-                            <CircularProgress
-                                size={20}
-                                color="inherit"
-                            />
-                        ) : (
-                            <CloudUploadIcon />
-                        )
-                    }
-                >
-                    {loading
-                        ? translate(
-                              "roommates.form.publishing",
-                              "Publishing..."
-                          )
-                        : translate(
-                              "roommates.form.publish",
-                              "Publish announcement"
-                          )}
-                </Button>
-            </Stack>
-        </Paper>
+                loading={loading}
+                disabled={profileLoading || !canPublish}
+                submitLabel={translate("roommates.form.publish", "Publish announcement")}
+                loadingLabel={translate("roommates.form.publishing", "Publishing...")}
+                submitIcon={<RocketLaunchOutlinedIcon />}
+                onSubmit={onSubmit}
+                onReset={onReset}
+            />
+        </Stack>
     );
 }

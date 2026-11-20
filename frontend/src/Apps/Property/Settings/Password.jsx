@@ -1,8 +1,10 @@
 
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 
 export default function Password() {
+    const { t } = useTranslation();
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -18,28 +20,28 @@ export default function Password() {
         setPasswordMessageType("");
 
         if (!currentPassword || !newPassword || !confirmPassword) {
-            setPasswordMessage("Please fill in all password fields.");
+            setPasswordMessage(t("settings.password.pleaseFillInAllPassword", "Please fill in all password fields."));
             setPasswordMessageType("error");
             return;
         }
 
         if (newPassword.length < 8) {
             setPasswordMessage(
-                "Your new password must contain at least 8 characters."
+                t("settings.password.yourNewPasswordMustContain", "Your new password must contain at least 8 characters.")
             );
             setPasswordMessageType("error");
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setPasswordMessage("The new passwords do not match.");
+            setPasswordMessage(t("settings.password.theNewPasswordsDoNot", "The new passwords do not match."));
             setPasswordMessageType("error");
             return;
         }
 
         if (currentPassword === newPassword) {
             setPasswordMessage(
-                "Your new password must be different from your current password."
+                t("settings.password.yourNewPasswordMustBe", "Your new password must be different from your current password.")
             );
             setPasswordMessageType("error");
             return;
@@ -59,7 +61,7 @@ export default function Password() {
 
             setPasswordMessage(
                 response.data?.message ||
-                    "Password updated successfully."
+                    t("settings.password.passwordUpdatedSuccessfully", "Password updated successfully.")
             );
             setPasswordMessageType("success");
         } catch (err) {
@@ -72,7 +74,7 @@ export default function Password() {
                 err.response?.data?.message ||
                     (err.response
                         ? `Request failed (${err.response.status}).`
-                        : "Unable to connect to the server. Check your API connection.")
+                        : t("settings.password.unableToConnectToThe", "Unable to connect to the server. Check your API connection."))
             );
             setPasswordMessageType("error");
         } finally {
@@ -84,14 +86,14 @@ export default function Password() {
     };
 
     return (
-        <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">
-                    Change password
+                <h2 className="text-lg font-semibold text-slate-900">
+                    {t("settings.password.changePassword", "Change password")}
                 </h2>
 
-                <p className="mt-1 text-sm text-gray-500">
-                    Update your password securely using your current password.
+                <p className="mt-1 text-sm text-slate-500">
+                    {t("settings.password.updateYourPasswordSecurelyUsing", "Update your password securely using your current password.")}
                 </p>
             </div>
 
@@ -100,9 +102,9 @@ export default function Password() {
                     <div>
                         <label
                             htmlFor="currentPassword"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            Current password
+                            {t("settings.password.currentPassword", "Current password")}
                         </label>
 
                         <input
@@ -114,16 +116,16 @@ export default function Password() {
                                 setCurrentPassword(event.target.value)
                             }
                             disabled={passwordLoading}
-                            className="w-full rounded-[10px] border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50"
+                            className="w-full rounded-[10px] border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50"
                         />
                     </div>
 
                     <div>
                         <label
                             htmlFor="newPassword"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            New password
+                            {t("settings.password.newPassword", "New password")}
                         </label>
 
                         <input
@@ -135,16 +137,16 @@ export default function Password() {
                                 setNewPassword(event.target.value)
                             }
                             disabled={passwordLoading}
-                            className="w-full rounded-[10px] border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50"
+                            className="w-full rounded-[10px] border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50"
                         />
                     </div>
 
                     <div>
                         <label
                             htmlFor="confirmPassword"
-                            className="mb-2 block text-sm font-medium text-gray-700"
+                            className="mb-2 block text-sm font-medium text-slate-700"
                         >
-                            Confirm new password
+                            {t("settings.password.confirmNewPassword", "Confirm new password")}
                         </label>
 
                         <input
@@ -156,7 +158,7 @@ export default function Password() {
                                 setConfirmPassword(event.target.value)
                             }
                             disabled={passwordLoading}
-                            className="w-full rounded-[10px] border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50"
+                            className="w-full rounded-[10px] border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50"
                         />
                     </div>
                 </div>
@@ -179,13 +181,13 @@ export default function Password() {
                     </p>
                 )}
 
-                <div className="mt-6 flex justify-end border-t border-gray-100 pt-5">
+                <div className="mt-6 flex justify-end border-t border-slate-100 pt-5">
                     <button
                         type="submit"
                         disabled={passwordLoading}
                         className="rounded-[10px] bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        {passwordLoading ? "Updating..." : "Update password"}
+                        {passwordLoading ? t("settings.password.updating", "Updating...") : t("settings.password.updatePassword", "Update password")}
                     </button>
                 </div>
             </form>

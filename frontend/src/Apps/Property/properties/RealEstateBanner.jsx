@@ -1,13 +1,11 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useNavigate } from "react-router-dom";
+import { Box, Typography, Chip } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 
 import propertiesBgImage from "../../../assets/properties_bg_image.jpeg";
 
 export default function RealEstateBanner() {
-    const navigate = useNavigate();
     const { t } = useTranslation();
 
     return (
@@ -16,101 +14,56 @@ export default function RealEstateBanner() {
             sx={{
                 position: "relative",
                 width: "100%",
-                minHeight: "400px",
+                minHeight: { xs: 220, sm: 280, md: 320 },
                 backgroundImage: `url(${propertiesBgImage})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                p: { xs: 2, md: 4 },
+                alignItems: "flex-end",
+                px: { xs: 2, sm: 3, md: 5 },
+                py: { xs: 3, md: 5 },
                 overflow: "hidden",
+                boxSizing: "border-box",
                 "&::before": {
                     content: '""',
                     position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "rgba(0, 0, 0, 0.4)",
+                    inset: 0,
+                    background:
+                        "linear-gradient(180deg, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0.55) 55%, rgba(15,23,42,0.82) 100%)",
                     zIndex: 1,
                 },
             }}
         >
-            <Box
-                sx={{
-                    position: "relative",
-                    zIndex: 2,
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    flexDirection: "column",
-                    gap: 3,
-                }}
-            >
-                <Box
+            <Box sx={{ position: "relative", zIndex: 2, maxWidth: 720, color: "#fff" }}>
+                <Chip
+                    icon={<HomeWorkOutlinedIcon />}
+                    label={t("properties.banner.badge", "Real estate")}
+                    size="small"
                     sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        width: "100%",
+                        mb: 1.5,
+                        color: "#fff",
+                        bgcolor: "rgba(255,255,255,0.16)",
+                        backdropFilter: "blur(6px)",
+                        fontWeight: 600,
+                        "& .MuiChip-icon": { color: "#fff" },
+                    }}
+                />
+                <Typography
+                    variant="h4"
+                    component="h1"
+                    sx={{
+                        fontWeight: 800,
+                        lineHeight: 1.25,
+                        fontSize: { xs: "1.45rem", sm: "1.9rem", md: "2.3rem" },
+                        textShadow: "0 2px 12px rgba(0,0,0,0.25)",
                     }}
                 >
-                    <Button
-                        startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate(-1)}
-                        sx={{
-                            textTransform: "none",
-                            color: "#ffffff",
-                            backgroundColor: "rgba(37, 99, 235, 0.92)",
-                            fontWeight: 600,
-                            px: 2,
-                            py: 1,
-                            borderRadius: "10px",
-                            "&:hover": {
-                                backgroundColor: "#1D4ED8",
-                            },
-                        }}
-                    >
-                        {t("properties.banner.back")}
-                    </Button>
-                </Box>
+                    {t("properties.banner.title")}
+                </Typography>
 
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        alignItems: "center",
-                    }}
-                >
-                    <Box
-                        sx={{
-                            textAlign: "left",
-                            color: "#ffef45",
-                            maxWidth: "600px",
-                        }}
-                    >
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                fontWeight: 700,
-                                mb: 2,
-                                lineHeight: 1.4,
-                            }}
-                        >
-                            {t("properties.banner.title")}
-                        </Typography>
-
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                color: "#ffef45",
-                                fontWeight: 500,
-                            }}
-                        >
-                            {t("properties.banner.description")}
-                        </Typography>
-                    </Box>
-                </Box>
+                <Typography sx={{ mt: 1.25, color: "rgba(255,255,255,0.86)", fontSize: { xs: "0.92rem", md: "1.02rem" } }}>
+                    {t("properties.banner.description")}
+                </Typography>
             </Box>
         </Box>
     );

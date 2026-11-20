@@ -1,258 +1,385 @@
+// admin/components/User/UsersSection.jsx
+
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import {
-    Alert,
     Box,
     Chip,
-    CircularProgress,
     FormControl,
     InputAdornment,
     InputLabel,
     MenuItem,
+    Pagination,
     Select,
     Stack,
     TextField,
     Typography,
 } from "@mui/material";
-import { useTranslation } from "react-i18next";
 
-import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
+import {
+    BlockOutlined,
+    HomeWorkOutlined,
+    PeopleAltOutlined,
+    PersonAddAltOutlined,
+    SearchOutlined,
+    VerifiedUserOutlined,
+} from "@mui/icons-material";
 
-import axiosInstance from "../../../../../api/axiosInstance";
 import UserCard from "./UserCard";
 
+import {
+    ChartCard,
+    ChartGrid,
+    DonutChart,
+    EmptyState,
+    ErrorBanner,
+    KpiGrid,
+    LoadingState,
+    RateBar,
+    RefreshButton,
+    SectionHeader,
+    StatCard,
+    TrendChart,
+    useAnalyticsData,
+} from "../shared/AnalyticsUI";
+
+import {
+    formatNumber,
+    getFullName,
+    getLocale,
+} from "../shared/analyticsUtils";
+
+const PAGE_SIZE = 10;
+
+const getUserStatus = (user) =>
+    String(user.accountStatus || "active").toLowerCase();
+
+const getUserRole = (user) => String(user.role || "user").toLowerCase();
+
+const SORTERS = {
+    newest: (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
+    oldest: (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0),
+    name: (a, b) => getFullName(a).localeCompare(getFullName(b)),
+    publications: (a, b) =>
+        (b.publishedProperties || 0) - (a.publishedProperties || 0),
+    saved: (a, b) => (b.savedProperties || 0) - (a.savedProperties || 0),
+    reports: (a, b) => (b.reports || 0) - (a.reports || 0),
+};
+
+const capitalize = (value = "") =>
+    value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, " ");
+
 export default function UsersSection() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = getLocale(i18n.language);
     const navigate = useNavigate();
 
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const { data, loading, error, reload } = useAnalyticsData("/dashboard/users");
 
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
+    const [verificationFilter, setVerificationFilter] = useState("all");
+    const [activityFilter, setActivityFilter] = useState("all");
     const [sortBy, setSortBy] = useState("newest");
+    const [page, setPage] = useState(1);
 
-    const fetchUsers = async () => {
-        try {
-            setLoading(true);
-            setError("");
+    const users = useMemo(() => data?.users ?? [], [data]);
+    const summary = data?.summary || {};
 
-            const response = await axiosInstance.get("/dashboard/users");
+    // Build role/status options from real data (no hard-coded mismatch).
+    const roleOptions = useMemo(
+        () => [...new Set(users.map(getUserRole))].sort(),
+        [users]
+    );
 
-            setUsers(response.data.users ?? []);
-        } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                    t("usersSection.loadError")
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
-    const getUserStatus = (user) =>
-        String(user.accountStatus || "active").toLowerCase();
-
-    const getUserRole = (user) =>
-        String(user.role || "User").toLowerCase();
+    const statusOptions = useMemo(
+        () => [...new Set(users.map(getUserStatus))].sort(),
+        [users]
+    );
 
     const filteredUsers = useMemo(() => {
-        const normalizedSearch = search.trim().toLowerCase();
+        const query = search.trim().toLowerCase();
 
         const result = users.filter((user) => {
-            const fullName =
-                `${user.firstName || ""} ${user.lastName || ""}`.trim();
-
             const matchesSearch =
-                !normalizedSearch ||
+                !query ||
                 [
-                    fullName,
-                    user.firstName,
-                    user.lastName,
+                    getFullName(user),
                     user.email,
                     user.phoneNumber,
                     user.address,
                 ].some((value) =>
-                    String(value || "")
-                        .toLowerCase()
-                        .includes(normalizedSearch)
+                    String(value || "").toLowerCase().includes(query)
                 );
 
             const matchesRole =
-                roleFilter === "all" ||
-                getUserRole(user) === roleFilter.toLowerCase();
+                roleFilter === "all" || getUserRole(user) === roleFilter;
 
             const matchesStatus =
-                statusFilter === "all" ||
-                getUserStatus(user) === statusFilter.toLowerCase();
+                statusFilter === "all" || getUserStatus(user) === statusFilter;
 
-            return matchesSearch && matchesRole && matchesStatus;
+            const matchesVerification =
+                verificationFilter === "all" ||
+                (verificationFilter === "emailVerified" && user.emailVerified) ||
+                (verificationFilter === "emailUnverified" && !user.emailVerified) ||
+                (verificationFilter === "pendingDeletion" && user.deletionRequestedAt);
+
+            const matchesActivity =
+                activityFilter === "all" ||
+                (activityFilter === "publishers" && user.publishedProperties > 0) ||
+                (activityFilter === "savers" && user.savedProperties > 0) ||
+                (activityFilter === "reporters" && user.reports > 0) ||
+                (activityFilter === "inactive" &&
+                    !user.publishedProperties &&
+                    !user.savedProperties);
+
+            return (
+                matchesSearch &&
+                matchesRole &&
+                matchesStatus &&
+                matchesVerification &&
+                matchesActivity
+            );
         });
 
-        result.sort((a, b) => {
-            if (sortBy === "name") {
-                const nameA =
-                    `${a.firstName || ""} ${a.lastName || ""}`.trim();
-                const nameB =
-                    `${b.firstName || ""} ${b.lastName || ""}`.trim();
+        return result.sort(SORTERS[sortBy] || SORTERS.newest);
+    }, [users, search, roleFilter, statusFilter, verificationFilter, activityFilter, sortBy]);
 
-                return nameA.localeCompare(nameB);
-            }
+    // Back to page 1 whenever filters change.
+    useEffect(() => {
+        setPage(1);
+    }, [search, roleFilter, statusFilter, verificationFilter, activityFilter, sortBy]);
 
-            const dateA = new Date(a.createdAt || 0).getTime();
-            const dateB = new Date(b.createdAt || 0).getTime();
+    const pageCount = Math.ceil(filteredUsers.length / PAGE_SIZE);
 
-            return sortBy === "oldest"
-                ? dateA - dateB
-                : dateB - dateA;
-        });
-
-        return result;
-    }, [users, search, roleFilter, statusFilter, sortBy]);
-
-    const activeUsers = users.filter(
-        (user) => getUserStatus(user) === "active"
-    ).length;
-
-    const suspendedUsers = users.filter(
-        (user) => getUserStatus(user) === "suspended"
-    ).length;
+    const pagedUsers = filteredUsers.slice(
+        (page - 1) * PAGE_SIZE,
+        page * PAGE_SIZE
+    );
 
     const handleViewProfile = (user) => {
         if (!user?._id) return;
 
-        navigate(`/admin/users/${user._id}`, {
-            state: { user },
-        });
+        navigate(`/admin/users/${user._id}`, { state: { user } });
     };
 
     const clearFilters = () => {
         setSearch("");
         setRoleFilter("all");
         setStatusFilter("all");
+        setVerificationFilter("all");
+        setActivityFilter("all");
         setSortBy("newest");
     };
 
-    return (
-        <Box sx={{ mb: 3, minWidth: 0 }}>
-            {/* Header */}
-            <Stack
-                direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-                alignItems={{ xs: "flex-start", sm: "center" }}
-                spacing={2}
-                mb={3}
+    if (loading && !data) return <LoadingState />;
+
+    const filterSelect = (label, value, onChange, options) => (
+        <FormControl fullWidth size="small">
+            <InputLabel>{label}</InputLabel>
+
+            <Select
+                value={value}
+                label={label}
+                onChange={(event) => onChange(event.target.value)}
             >
-                <Box>
-                    <Typography variant="h5" fontWeight={700}>
-                        {t("usersSection.title")}
-                    </Typography>
+                {options.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
+    );
 
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        mt={0.5}
-                    >
-                        {t("usersSection.subtitle")}
-                    </Typography>
-                </Box>
-
+    return (
+        <Stack spacing={3} sx={{ mb: 3, minWidth: 0 }}>
+            <SectionHeader
+                icon={<PeopleAltOutlined />}
+                title={t("usersSection.title", "Users")}
+                subtitle={t(
+                    "usersSection.subtitle",
+                    "Accounts, growth, verification and activity."
+                )}
+            >
                 <Chip
-                    icon={<PeopleAltOutlinedIcon />}
-                    label={t("usersSection.userCount", {
+                    icon={<PeopleAltOutlined />}
+                    label={t("usersSection.userCount", "{{count}} users", {
                         count: users.length,
                     })}
                     variant="outlined"
                     sx={{ fontWeight: 700 }}
                 />
-            </Stack>
 
-            {/* User statistics */}
-            <Box
-                sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                        xs: "1fr",
-                        sm: "repeat(3, minmax(0, 1fr))",
-                    },
-                    gap: 1.5,
-                    mb: 3,
-                }}
-            >
-                <Box
-                    sx={{
-                        p: 2,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 2,
-                    }}
-                >
-                    <Typography variant="h5" fontWeight={700}>
-                        {users.length}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {t("usersSection.totalUsers")}
-                    </Typography>
-                </Box>
+                <RefreshButton onClick={reload} loading={loading} />
+            </SectionHeader>
 
-                <Box
-                    sx={{
-                        p: 2,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 2,
-                    }}
-                >
-                    <Typography
-                        variant="h5"
-                        fontWeight={700}
-                        color="success.main"
-                    >
-                        {activeUsers}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {t("usersSection.activeUsers")}
-                    </Typography>
-                </Box>
+            <ErrorBanner error={error} />
 
-                <Box
-                    sx={{
-                        p: 2,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 2,
-                    }}
+            {/* KPIs */}
+            <KpiGrid>
+                <StatCard
+                    title={t("usersSection.totalUsers", "Total users")}
+                    value={formatNumber(summary.totalUsers, locale)}
+                    description={t("usersSection.activeCount", "{{count}} active", {
+                        count: formatNumber(summary.activeUsers, locale),
+                    })}
+                    icon={<PeopleAltOutlined />}
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("usersSection.newLast30Days", "New in last 30 days")}
+                    value={formatNumber(summary.newLast30Days, locale)}
+                    change={summary.newUsersChange}
+                    description={t("usersSection.newLast7Days", "{{count}} this week", {
+                        count: formatNumber(summary.newLast7Days, locale),
+                    })}
+                    icon={<PersonAddAltOutlined />}
+                    color="#16A34A"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("usersSection.publishers", "Publishers")}
+                    value={formatNumber(summary.publishers, locale)}
+                    description={t(
+                        "usersSection.activePublishers",
+                        "{{count}} with available listings",
+                        { count: formatNumber(summary.activePublishers, locale) }
+                    )}
+                    icon={<HomeWorkOutlined />}
+                    color="#9333EA"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("usersSection.suspendedUsers", "Suspended")}
+                    value={formatNumber(summary.suspendedUsers, locale)}
+                    description={t(
+                        "usersSection.pendingDeletion",
+                        "{{count}} pending deletion",
+                        { count: formatNumber(summary.pendingDeletion, locale) }
+                    )}
+                    icon={<BlockOutlined />}
+                    color="#DC2626"
+                    locale={locale}
+                />
+            </KpiGrid>
+
+            {/* Charts */}
+            <ChartGrid template="7fr 5fr">
+                <ChartCard
+                    title={t("usersSection.signupTrend", "New accounts")}
+                    subtitle={t("usersSection.signupTrendDescription", "Daily sign-ups over the last 30 days")}
+                    height={280}
                 >
-                    <Typography variant="h5" fontWeight={700} color="error.main">
-                        {suspendedUsers}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {t("usersSection.suspendedUsers")}
-                    </Typography>
-                </Box>
-            </Box>
+                    <TrendChart
+                        data={summary.signupTrend || []}
+                        locale={locale}
+                        series={[
+                            {
+                                key: "users",
+                                name: t("usersSection.newUsers", "New users"),
+                                color: "#16A34A",
+                            },
+                        ]}
+                    />
+                </ChartCard>
+
+                <ChartCard
+                    title={t("usersSection.quality", "Account quality")}
+                    subtitle={t("usersSection.qualityDescription", "Verification and engagement rates")}
+                    height={null}
+                >
+                    <Stack spacing={2}>
+                        <RateBar
+                            label={t("usersSection.emailVerified", "Email verified")}
+                            value={summary.emailVerifiedRate}
+                            color="#16A34A"
+                            locale={locale}
+                        />
+                        <RateBar
+                            label={t("usersSection.phoneVerified", "Phone verified")}
+                            value={summary.phoneVerifiedRate}
+                            color="#0891B2"
+                            locale={locale}
+                        />
+                        <RateBar
+                            label={t("usersSection.whatsappVerified", "WhatsApp verified")}
+                            value={summary.whatsappVerifiedRate}
+                            color="#22C55E"
+                            locale={locale}
+                        />
+                        <RateBar
+                            label={t("usersSection.publisherRate", "Published at least one property")}
+                            value={summary.publisherRate}
+                            color="#9333EA"
+                            locale={locale}
+                        />
+                        <RateBar
+                            label={t("usersSection.saverRate", "Saved at least one property")}
+                            value={summary.saverRate}
+                            color="#EC4899"
+                            locale={locale}
+                        />
+                    </Stack>
+                </ChartCard>
+            </ChartGrid>
+
+            <ChartGrid>
+                <ChartCard
+                    title={t("usersSection.roles", "Roles")}
+                    height={260}
+                >
+                    <DonutChart
+                        data={(summary.roles || []).map((item) => ({
+                            ...item,
+                            name: t(`usersSection.roleNames.${item.name}`, capitalize(item.name)),
+                        }))}
+                        locale={locale}
+                    />
+                </ChartCard>
+
+                <ChartCard
+                    title={t("usersSection.statuses", "Account status")}
+                    height={260}
+                >
+                    <DonutChart
+                        data={(summary.statuses || []).map((item) => ({
+                            ...item,
+                            name: t(`usersSection.statusNames.${item.name}`, capitalize(item.name)),
+                            color:
+                                item.name === "active"
+                                    ? "#16A34A"
+                                    : item.name === "suspended"
+                                        ? "#DC2626"
+                                        : undefined,
+                        }))}
+                        locale={locale}
+                    />
+                </ChartCard>
+            </ChartGrid>
 
             {/* Search and filters */}
-            <Stack spacing={2} mb={3}>
+            <Stack spacing={2}>
                 <TextField
                     fullWidth
                     size="small"
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
-                    placeholder={t("usersSection.searchPlaceholder")}
+                    placeholder={t(
+                        "usersSection.searchPlaceholder",
+                        "Search by name, email, phone or address"
+                    )}
                     slotProps={{
                         input: {
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <SearchOutlinedIcon color="action" />
+                                    <SearchOutlined color="action" />
                                 </InputAdornment>
                             ),
                         },
@@ -264,150 +391,111 @@ export default function UsersSection() {
                         display: "grid",
                         gridTemplateColumns: {
                             xs: "1fr",
-                            sm: "repeat(3, minmax(0, 1fr))",
+                            sm: "repeat(2, minmax(0, 1fr))",
+                            lg: "repeat(5, minmax(0, 1fr))",
                         },
                         gap: 1.5,
                     }}
                 >
-                    <FormControl fullWidth size="small">
-                        <InputLabel>
-                            {t("usersSection.role")}
-                        </InputLabel>
-                        <Select
-                            value={roleFilter}
-                            label={t("usersSection.role")}
-                            onChange={(event) =>
-                                setRoleFilter(event.target.value)
-                            }
-                        >
-                            <MenuItem value="all">
-                                {t("usersSection.allRoles")}
-                            </MenuItem>
-                            <MenuItem value="client">
-                                {t("usersSection.client")}
-                            </MenuItem>
-                            <MenuItem value="admin">
-                                {t("usersSection.admin")}
-                            </MenuItem>
-                            <MenuItem value="active">
-                                {t("usersSection.active")}
-                            </MenuItem>
+                    {filterSelect(t("usersSection.role", "Role"), roleFilter, setRoleFilter, [
+                        { value: "all", label: t("usersSection.allRoles", "All roles") },
+                        ...roleOptions.map((role) => ({
+                            value: role,
+                            label: t(`usersSection.roleNames.${role}`, capitalize(role)),
+                        })),
+                    ])}
 
-                            <MenuItem value="suspended">
-                                {t("usersSection.suspended")}
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
+                    {filterSelect(t("usersSection.status", "Status"), statusFilter, setStatusFilter, [
+                        { value: "all", label: t("usersSection.allStatuses", "All statuses") },
+                        ...statusOptions.map((status) => ({
+                            value: status,
+                            label: t(`usersSection.statusNames.${status}`, capitalize(status)),
+                        })),
+                    ])}
 
-                    <FormControl fullWidth size="small">
-                        <InputLabel>
-                            {t("usersSection.status")}
-                        </InputLabel>
-                        <Select
-                            value={statusFilter}
-                            label={t("usersSection.status")}
-                            onChange={(event) =>
-                                setStatusFilter(event.target.value)
-                            }
-                        >
-                            <MenuItem value="all">
-                                {t("usersSection.allStatuses")}
-                            </MenuItem>
-                            <MenuItem value="active">
-                                {t("usersSection.active")}
-                            </MenuItem>
-                            <MenuItem value="inactive">
-                                {t("usersSection.inactive")}
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
+                    {filterSelect(
+                        t("usersSection.verification", "Verification"),
+                        verificationFilter,
+                        setVerificationFilter,
+                        [
+                            { value: "all", label: t("usersSection.allAccounts", "All accounts") },
+                            { value: "emailVerified", label: t("usersSection.emailVerified", "Email verified") },
+                            { value: "emailUnverified", label: t("usersSection.emailUnverified", "Email not verified") },
+                            { value: "pendingDeletion", label: t("usersSection.pendingDeletionFilter", "Pending deletion") },
+                        ]
+                    )}
 
-                    <FormControl fullWidth size="small">
-                        <InputLabel>
-                            {t("usersSection.sortBy")}
-                        </InputLabel>
-                        <Select
-                            value={sortBy}
-                            label={t("usersSection.sortBy")}
-                            onChange={(event) =>
-                                setSortBy(event.target.value)
-                            }
-                        >
-                            <MenuItem value="newest">
-                                {t("usersSection.newestFirst")}
-                            </MenuItem>
-                            <MenuItem value="oldest">
-                                {t("usersSection.oldestFirst")}
-                            </MenuItem>
-                            <MenuItem value="name">
-                                {t("usersSection.name")}
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
+                    {filterSelect(
+                        t("usersSection.activity", "Activity"),
+                        activityFilter,
+                        setActivityFilter,
+                        [
+                            { value: "all", label: t("usersSection.anyActivity", "Any activity") },
+                            { value: "publishers", label: t("usersSection.publishers", "Publishers") },
+                            { value: "savers", label: t("usersSection.savers", "Saved properties") },
+                            { value: "reporters", label: t("usersSection.reporters", "Sent feedback") },
+                            { value: "inactive", label: t("usersSection.noActivity", "No activity") },
+                        ]
+                    )}
+
+                    {filterSelect(t("usersSection.sortBy", "Sort by"), sortBy, setSortBy, [
+                        { value: "newest", label: t("usersSection.newestFirst", "Newest first") },
+                        { value: "oldest", label: t("usersSection.oldestFirst", "Oldest first") },
+                        { value: "name", label: t("usersSection.name", "Name") },
+                        { value: "publications", label: t("usersSection.mostPublications", "Most publications") },
+                        { value: "saved", label: t("usersSection.mostSaved", "Most saved properties") },
+                        { value: "reports", label: t("usersSection.mostFeedback", "Most feedback") },
+                    ])}
                 </Box>
 
                 <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    flexWrap="wrap"
-                    gap={1}
+                    direction="row" sx={{ justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1 }}
                 >
-                    <Typography variant="body2" color="text.secondary">
-                        {t("usersSection.filteredCount", {
+                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                        {t("usersSection.filteredCount", "{{count}} matching users", {
                             count: filteredUsers.length,
                         })}
                     </Typography>
 
-                    <Stack direction="row" spacing={1}>
-                        <Chip
-                            label={t("usersSection.clearFilters")}
-                            variant="outlined"
-                            size="small"
-                            onClick={clearFilters}
-                            clickable
-                        />
-
-                        <Chip
-                            icon={<RefreshOutlinedIcon />}
-                            label={t("usersSection.refresh")}
-                            variant="outlined"
-                            size="small"
-                            onClick={fetchUsers}
-                            clickable
-                            disabled={loading}
-                        />
-                    </Stack>
+                    <Chip
+                        icon={<VerifiedUserOutlined />}
+                        label={t("usersSection.clearFilters", "Clear filters")}
+                        variant="outlined"
+                        size="small"
+                        onClick={clearFilters}
+                        clickable
+                    />
                 </Stack>
             </Stack>
 
-            {/* Content */}
-            {loading ? (
-                <Box display="flex" justifyContent="center" py={5}>
-                    <CircularProgress />
-                </Box>
-            ) : error ? (
-                <Alert severity="error">{error}</Alert>
-            ) : filteredUsers.length === 0 ? (
-                <Box py={4} textAlign="center">
-                    <PeopleAltOutlinedIcon
-                        sx={{ fontSize: 42, color: "text.disabled", mb: 1 }}
-                    />
-                    <Typography color="text.secondary">
-                        {t("usersSection.noMatchingUsers")}
-                    </Typography>
-                </Box>
+            {/* List */}
+            {pagedUsers.length === 0 ? (
+                <EmptyState
+                    message={t("usersSection.noMatchingUsers", "No users match these filters.")}
+                />
             ) : (
                 <Stack spacing={2.5}>
-                    {filteredUsers.map((user) => (
+                    {pagedUsers.map((user) => (
                         <UserCard
                             key={user._id}
                             user={user}
                             onViewDetails={() => handleViewProfile(user)}
                         />
                     ))}
+
+                    {pageCount > 1 && (
+                        <Box sx={{ display: "flex", justifyContent: "center", pt: 1 }}>
+                            <Pagination
+                                count={pageCount}
+                                page={page}
+                                onChange={(_event, value) => setPage(value)}
+                                color="primary"
+                                shape="rounded"
+                            />
+                        </Box>
+                    )}
                 </Stack>
             )}
-        </Box>
+        </Stack>
     );
 }

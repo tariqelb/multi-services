@@ -211,7 +211,7 @@ function LoginForm() {
                         emailRef.current = event.target.value;
                         dispatch(setLoginEmail(event.target.value));
                     }}
-                    className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 text-base text-black outline-none transition-colors focus:border-blue-600 disabled:bg-gray-100"
+                    className="h-13 w-full min-w-0 rounded-[10px] border border-slate-300 bg-white px-3 text-base text-black outline-none transition-colors focus:border-blue-600 disabled:bg-slate-100"
                 />
 
                 {/* Password */}
@@ -228,7 +228,7 @@ function LoginForm() {
                                 setLoginPassword(event.target.value)
                             );
                         }}
-                        className="h-13 w-full min-w-0 rounded-[10px] border border-gray-300 bg-white px-3 pr-12 text-base text-black outline-none transition-colors focus:border-blue-600 disabled:bg-gray-100"
+                        className="h-13 w-full min-w-0 rounded-[10px] border border-slate-300 bg-white px-3 pe-12 text-base text-black outline-none transition-colors focus:border-blue-600 disabled:bg-slate-100"
                     />
 
                     <button
@@ -242,7 +242,7 @@ function LoginForm() {
                                 : t("auth.showPassword")
                         }
                         aria-pressed={showPassword}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-blue-600"
                     >
                         {showPassword ? (
                             <VisibilityOff fontSize="small" />

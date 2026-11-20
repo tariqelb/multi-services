@@ -3,31 +3,41 @@ import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Alert, Button, Snackbar } from "@mui/material";
+
+import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded";
+import BookmarkAddedRoundedIcon from "@mui/icons-material/BookmarkAddedRounded";
+import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
+import SquareFootRoundedIcon from "@mui/icons-material/SquareFootRounded";
+import BedOutlinedIcon from "@mui/icons-material/BedOutlined";
+import BathtubOutlinedIcon from "@mui/icons-material/BathtubOutlined";
+import WeekendOutlinedIcon from "@mui/icons-material/WeekendOutlined";
+import StairsOutlinedIcon from "@mui/icons-material/StairsOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import PlayCircleOutlineRoundedIcon from "@mui/icons-material/PlayCircleOutlineRounded";
+import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
+import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
+
 import {
-    Box,
-    Button,
-    Chip,
-    Divider,
-    Grid,
-    IconButton,
-    Paper,
-    Stack,
-    Typography,
-    Alert,
-    Snackbar,
-} from "@mui/material";
-
-
-
-import {
-    Bookmark,
-    BookmarkAdded,
-    ArrowBack,
-    ArrowForward,
-    LocationOn,
-    HomeWork,
-    Map as MapIcon,
-} from "@mui/icons-material";
+    DescriptionText,
+    DetailsBackButton,
+    DetailsContainer,
+    DetailsHeader,
+    DetailsLayout,
+    DetailsSection,
+    FactGrid,
+    KeyValueList,
+    MapLinkButton,
+    MediaGallery,
+    SidebarCard,
+    StatusBadge,
+    VideoEmbed,
+} from "../../../Components/ui/DetailsKit";
 
 import SimilarProperties from "./SimilarProperties";
 import PropertyContactOwner from "./PropertyContactOwner";
@@ -92,45 +102,6 @@ function getYoutubeVideoId(videoUrl) {
     } catch {
         return null;
     }
-}
-
-function InfoItem({ label, value }) {
-    if (value === undefined || value === null || value === "") {
-        return null;
-    }
-
-    return (
-        <Box
-            sx={{
-                bgcolor: "#f1f5f9",
-                borderRadius: 2,
-                p: 2,
-                minWidth: 0,
-                textAlign: "center",
-                border: "1px solid #e2e8f0",
-                height: "100%",
-                boxSizing: "border-box",
-            }}
-        >
-            <Typography
-                sx={{
-                    fontWeight: 700,
-                    fontSize: "1.15rem",
-                    color: "#0f172a",
-                    overflowWrap: "anywhere",
-                }}
-            >
-                {value}
-            </Typography>
-
-            <Typography
-                variant="caption"
-                sx={{ color: "#5B6577", fontWeight: 600 }}
-            >
-                {label}
-            </Typography>
-        </Box>
-    );
 }
 
 function getStatusStyles(status, t) {
@@ -229,6 +200,9 @@ export default function PropertyDetails({
     similarProperties = [],
     onSelectSimilar,
     showContact = true,
+    showSave = true,
+    backAction,
+    backLabel,
     onSaveProperty,
     isSaved = false,
 }) {
@@ -362,729 +336,209 @@ export default function PropertyDetails({
         }));
     };
 
-    return (
-        <Box
-            component="main"
-            sx={{
-                maxWidth: 1100,
-                mx: "auto",
-                px: { xs: 2, md: 4 },
-                py: 1,
-                width: "100%",
-                bgcolor: "#f8fafc",
-                minHeight: "calc(100vh - 64px)",
-                boxSizing: "border-box",
-            }}
+    const statusTone = (() => {
+        const s = String(property.status || "").toLowerCase();
+        if (s === "available" || s === "active") return "success";
+        if (s === "pending") return "warning";
+        if (["sold", "rented", "unavailable"].includes(s)) return "error";
+        return "default";
+    })();
+
+    const money = (value) =>
+        value === undefined || value === null || value === ""
+            ? null
+            : `${formatPrice(value, i18n.language)} ${t("common.currency", "MAD")}`;
+
+    const isRent = property.listingType === "For Rent";
+    const propertyId = property._id || property.id;
+
+    const facts = [
+        { icon: <SquareFootRoundedIcon />, label: t("properties.details.surface"), value: property.surface ? `${property.surface} m²` : null },
+        { icon: <BedOutlinedIcon />, label: t("properties.card.rooms"), value: property.rooms },
+        { icon: <BathtubOutlinedIcon />, label: t("properties.card.bathrooms"), value: property.bathrooms },
+        { icon: <WeekendOutlinedIcon />, label: t("properties.card.salons"), value: property.salons },
+        { icon: <StairsOutlinedIcon />, label: t("properties.details.floor"), value: property.floor },
+        {
+            icon: <CategoryOutlinedIcon />,
+            label: t("properties.details.propertyType"),
+            value: getTranslatedPropertyValue(property.propertyType, t, "properties.categories"),
+        },
+        {
+            icon: <BadgeOutlinedIcon />,
+            label: t("properties.details.listingBy"),
+            value: getTranslatedPropertyValue(property.role, t, "properties.details.roles"),
+        },
+        {
+            icon: <ApartmentOutlinedIcon />,
+            label: t("properties.details.syndicateFees"),
+            value: property.syndicateFees != null ? money(property.syndicateFees) : null,
+        },
+    ];
+
+    const rentalInfo = isRent
+        ? [
+            {
+                label: t("properties.details.rentalPeriod.label"),
+                value: property.rentalPeriod ? getRentalValueLabel(property.rentalPeriod, t) : null,
+            },
+            {
+                label: t("properties.details.furnishingStatus.label"),
+                value: property.furnishingStatus ? getRentalValueLabel(property.furnishingStatus, t) : null,
+            },
+            {
+                label: t("properties.details.rentalContract"),
+                value:
+                    property.rentWithContract == null
+                        ? null
+                        : property.rentWithContract
+                            ? t("properties.details.contractAvailable")
+                            : t("properties.details.noContract"),
+            },
+            {
+                label: t("properties.details.mortgageAgreement"),
+                value:
+                    property.mortgageAgreement == null
+                        ? null
+                        : property.mortgageAgreement
+                            ? t("properties.details.accepted")
+                            : t("properties.details.notAccepted"),
+            },
+            { label: t("properties.details.securityDeposit"), value: property.deposit != null ? money(property.deposit) : null },
+            { label: t("properties.details.mediatorFee"), value: property.mediatorFee != null ? money(property.mediatorFee) : null },
+        ].filter((item) => item.value !== null && item.value !== "")
+        : [];
+
+    const saveButton = (
+        <Button
+            variant={saved ? "contained" : "outlined"}
+            color="primary"
+            startIcon={saved ? <BookmarkAddedRoundedIcon /> : <BookmarkBorderRoundedIcon />}
+            disabled={saving || !propertyId}
+            onClick={handleSaveClick}
         >
-            <Button
-                onClick={() => navigate(-1)}
-                startIcon={<ArrowBack />}
-                sx={{
-                    mb: 3,
-                    textTransform: "none",
-                    fontWeight: 700,
-                    fontSize: "0.95rem",
-                }}
-            >
-                {t("properties.details.back")}
-            </Button>
+            {saving
+                ? t("properties.details.saving")
+                : saved
+                    ? t("properties.details.unsave")
+                    : t("properties.details.save")}
+        </Button>
+    );
 
-            {/* Image Gallery */}
-            <Paper
-                variant="outlined"
-                sx={{
-                    borderRadius: "16px",
-                    overflow: "hidden",
-                    mb: 4,
-                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)",
-                }}
-            >
-                <Box
-                    sx={{
-                        height: { xs: 300, sm: 450, md: 540 },
-                        position: "relative",
-                        bgcolor: "#0f172a",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    {images.length > 0 ? (
-                        <Box
-                            component="img"
-                            src={images[activeImage]}
-                            alt={title}
-                            sx={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                transition: "transform 0.3s ease",
-                            }}
-                        />
-                    ) : (
-                        <Stack alignItems="center" spacing={1}>
-                            <HomeWork
-                                sx={{ fontSize: 64, color: "#94a3b8" }}
-                            />
-                            <Typography sx={{ color: "#94a3b8" }}>
-                                {t("properties.details.noImages")}
-                            </Typography>
-                        </Stack>
-                    )}
+    const main = (
+        <>
+            <MediaGallery
+                images={images}
+                alt={title}
+                emptyIcon={<HomeWorkOutlinedIcon />}
+                emptyLabel={t("properties.details.noImages")}
+            />
 
-                    {images.length > 1 && (
-                        <>
-                            <IconButton
-                                aria-label={t("properties.details.previousImage")}
-                                onClick={() => changeImage(-1)}
-                                sx={{
-                                    position: "absolute",
-                                    left: 16,
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    bgcolor: "rgba(255,255,255,0.9)",
-                                    "&:hover": { bgcolor: "white" },
-                                    boxShadow: 2,
-                                }}
-                            >
-                                <ArrowBack />
-                            </IconButton>
+            <DetailsSection title={t("properties.details.keyFacts", "Key facts")} icon={<InfoOutlinedIcon />}>
+                <FactGrid items={facts} />
+            </DetailsSection>
 
-                            <IconButton
-                                aria-label={t("properties.details.nextImage")}
-                                onClick={() => changeImage(1)}
-                                sx={{
-                                    position: "absolute",
-                                    right: 16,
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    bgcolor: "rgba(255,255,255,0.9)",
-                                    "&:hover": { bgcolor: "white" },
-                                    boxShadow: 2,
-                                }}
-                            >
-                                <ArrowForward />
-                            </IconButton>
+            <DetailsSection title={t("properties.details.description")} icon={<DescriptionOutlinedIcon />}>
+                <DescriptionText>{description}</DescriptionText>
+            </DetailsSection>
 
-                            <Chip
-                                label={`${activeImage + 1} / ${images.length}`}
-                                size="small"
-                                sx={{
-                                    position: "absolute",
-                                    bottom: 16,
-                                    left: "50%",
-                                    transform: "translateX(-50%)",
-                                    bgcolor: "rgba(15,23,42,0.85)",
-                                    color: "white",
-                                    fontWeight: 700,
-                                }}
-                            />
-                        </>
-                    )}
-                </Box>
+            {rentalInfo.length > 0 && (
+                <DetailsSection title={t("properties.details.rentalInformation")} icon={<ReceiptLongOutlinedIcon />}>
+                    <KeyValueList items={rentalInfo} />
+                </DetailsSection>
+            )}
 
-                {images.length > 1 && (
-                    <Stack
-                        direction="row"
-                        spacing={1.5}
-                        sx={{
-                            p: 2,
-                            overflowX: "auto",
-                            bgcolor: "white",
-                        }}
-                    >
-                        {images.map((src, index) => (
-                            <Box
-                                key={`${src}-${index}`}
-                                component="button"
-                                onClick={() => setActiveImage(index)}
-                                aria-label={t("properties.details.viewImage", {
-                                    number: index + 1,
-                                })}
-                                sx={{
-                                    flex: "0 0 90px",
-                                    height: 68,
-                                    p: 0,
-                                    border:
-                                        index === activeImage
-                                            ? "3px solid #2563EB"
-                                            : "1px solid #D5DCE8",
-                                    borderRadius: 2,
-                                    overflow: "hidden",
-                                    cursor: "pointer",
-                                    bgcolor: "white",
-                                }}
-                            >
-                                <Box
-                                    component="img"
-                                    src={src}
-                                    alt=""
-                                    sx={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                        display: "block",
-                                    }}
-                                />
-                            </Box>
-                        ))}
-                    </Stack>
-                )}
-            </Paper>
-
-            {/* YouTube Video - displayed after all property images */}
             {youtubeVideoId && (
-                <Paper
-                    variant="outlined"
-                    sx={{
-                        borderRadius: "16px",
-                        overflow: "hidden",
-                        mb: 4,
-                        boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)",
-                    }}
+                <DetailsSection
+                    title={t("properties.details.propertyVideo.title")}
+                    icon={<PlayCircleOutlineRoundedIcon />}
                 >
-                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                fontWeight: 700,
-                                color: "#0f172a",
-                                mb: 2,
-                            }}
-                        >
-                            {t("properties.details.propertyVideo.title")}
-                        </Typography>
-
-                        <Box
-                            sx={{
-                                position: "relative",
-                                width: "100%",
-                                aspectRatio: "16 / 9",
-                                bgcolor: "#0f172a",
-                                borderRadius: 2,
-                                overflow: "hidden",
-                            }}
-                        >
-                            <Box
-                                component="iframe"
-                                src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}`}
-                                title={t(
-                                    "properties.details.propertyVideo.iframeTitle",
-                                    { title }
-                                )}
-                                loading="lazy"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                                referrerPolicy="strict-origin-when-cross-origin"
-                                sx={{
-                                    position: "absolute",
-                                    inset: 0,
-                                    width: "100%",
-                                    height: "100%",
-                                    border: 0,
-                                }}
-                            />
-                        </Box>
-                    </Box>
-                </Paper>
-            )}
-
-            {/* Main Property Information */}
-            <Paper
-                variant="outlined"
-                sx={{
-                    p: { xs: 3, md: 4 },
-                    borderRadius: "16px",
-                    mb: 4,
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
-                }}
-            >
-                <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    justifyContent="space-between"
-                    alignItems="flex-start"
-                    spacing={3}
-                >
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                fontWeight: 700,
-                                color: "#0f172a",
-                                mb: 1,
-                                overflowWrap: "anywhere",
-                            }}
-                        >
-                            {title}
-                        </Typography>
-
-                        {(location || fullAddress) && (
-                            <Stack spacing={0.5}>
-                                {location && (
-                                    <Stack
-                                        direction="row"
-                                        spacing={0.5}
-                                        alignItems="center"
-                                    >
-                                        <LocationOn
-                                            sx={{
-                                                fontSize: 20,
-                                                color: "#2563EB",
-                                                flexShrink: 0,
-                                            }}
-                                        />
-
-                                        <Typography
-                                            variant="body1"
-                                            sx={{
-                                                color: "#475569",
-                                                fontWeight: 600,
-                                                overflowWrap: "anywhere",
-                                            }}
-                                        >
-                                            {location}
-                                        </Typography>
-                                    </Stack>
-                                )}
-
-                                {fullAddress && (
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: "#5B6577",
-                                            pl: 3,
-                                            overflowWrap: "anywhere",
-                                        }}
-                                    >
-                                        {fullAddress}
-                                    </Typography>
-                                )}
-                            </Stack>
-                        )}
-                    </Box>
-
-                    <Box
-                        sx={{
-                            textAlign: { xs: "left", sm: "right" },
-                            minWidth: 0,
-                        }}
-                    >
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                fontWeight: 700,
-                                color: "#1D4ED8",
-                                mb: 0.5,
-                                overflowWrap: "anywhere",
-                            }}
-                        >
-                            {price} MAD
-                        </Typography>
-
-                        <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center"
-                            justifyContent={{
-                                xs: "flex-start",
-                                sm: "flex-end",
-                            }}
-                            flexWrap="wrap"
-                            useFlexGap
-                        >
-                            <Chip
-                                label={
-                                    property.listingType === "For Rent"
-                                        ? t("properties.card.forRent")
-                                        : t("properties.card.forSale")
-                                }
-                                size="medium"
-                                sx={{
-                                    bgcolor: "#EFF6FF",
-                                    color: "#2563EB",
-                                    fontWeight: 700,
-                                    fontSize: "1rem",
-                                }}
-                            />
-
-                            {statusInfo && (
-                                <Chip
-                                    label={statusInfo.label}
-                                    size="medium"
-                                    sx={{
-                                        bgcolor: statusInfo.bgcolor,
-                                        color: statusInfo.color,
-                                        fontWeight: 700,
-                                        textTransform: "capitalize",
-                                        fontSize: "1rem",
-                                    }}
-                                />
-                            )}
-                        </Stack>
-                    </Box>
-                </Stack>
-
-                <Divider sx={{ my: 3 }} />
-
-                {/* Property Statistics */}
-                <Grid container spacing={2}>
-                    <Grid item xs={6} sm={4}>
-                        <InfoItem
-                            label={t("properties.details.surface")}
-                            value={property.surface}
-                        />
-                    </Grid>
-
-                    <Grid item xs={6} sm={4}>
-                        <InfoItem
-                            label={t("properties.card.rooms")}
-                            value={property.rooms}
-                        />
-                    </Grid>
-
-                    <Grid item xs={6} sm={4}>
-                        <InfoItem
-                            label={t("properties.card.bathrooms")}
-                            value={property.bathrooms}
-                        />
-                    </Grid>
-
-                    <Grid item xs={6} sm={4}>
-                        <InfoItem
-                            label={t("properties.card.salons")}
-                            value={property.salons}
-                        />
-                    </Grid>
-
-                    <Grid item xs={6} sm={4}>
-                        <InfoItem
-                            label={t("properties.details.floor")}
-                            value={property.floor}
-                        />
-                    </Grid>
-
-                    <Grid item xs={6} sm={4}>
-                        <InfoItem
-                            label={t("properties.details.propertyType")}
-                            value={getTranslatedPropertyValue(
-                                property.propertyType,
-                                t,
-                                "properties.categories"
-                            )}
-                        />
-                    </Grid>
-
-                    <Grid item xs={6} sm={4}>
-                        <InfoItem
-                            label={t("properties.details.listingBy")}
-                            value={getTranslatedPropertyValue(
-                                property.role,
-                                t,
-                                "properties.details.roles"
-                            )}
-                        />
-                    </Grid>
-
-                    {property.syndicateFees != null && (
-                        <Grid item xs={6} sm={4}>
-                            <InfoItem
-                                label={t("properties.details.syndicateFees")}
-                                value={`${formatPrice(
-                                    property.syndicateFees,
-                                    i18n.language
-                                )} MAD`}
-                            />
-                        </Grid>
-                    )}
-                </Grid>
-
-                {/* Location and Save Actions */}
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: {
-                            xs: "column",
-                            sm: "row",
-                        },
-                        justifyContent: "space-between",
-                        alignItems: {
-                            xs: "stretch",
-                            sm: "center",
-                        },
-                        gap: 2,
-                        width: "100%",
-                        mt: 2,
-                    }}
-                >
-                    {googleMapLink && (
-                        <Box>
-                            <Button
-                                component="a"
-                                href={googleMapLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                variant="outlined"
-                                startIcon={<MapIcon />}
-                                sx={{
-                                    textTransform: "none",
-                                    fontWeight: 700,
-                                    maxWidth: "100%",
-                                }}
-                            >
-                                {t("properties.details.viewOnMaps")}
-                            </Button>
-                        </Box>
-                    )}
-
-                    <Box
-                        sx={{
-                            textAlign: {
-                                xs: "left",
-                                sm: "right",
-                            },
-                        }}
-                    >
-                        <Button
-                            variant="outlined"
-                            color="success"
-                            startIcon={
-                                saving
-                                    ? null
-                                    : saved
-                                        ? <BookmarkAdded />
-                                        : <Bookmark />
-                            }
-                            disabled={
-                                saving ||
-                                !(property._id || property.id)
-                            }
-                            onClick={handleSaveClick}
-                            sx={{
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderRadius: 1,
-                                px: 2,
-                                py: 0.75,
-                                borderColor: "#2563EB",
-                                color: "#2563EB",
-                                bgcolor: "transparent",
-                                boxShadow: "none",
-                                "&:hover": {
-                                    borderColor: "#1D4ED8",
-                                    bgcolor: "#EFF6FF",
-                                    boxShadow: "none",
-                                },
-                                "&.Mui-disabled": {
-                                    borderColor: "#D5DCE8",
-                                    color: "#94a3b8",
-                                },
-                            }}
-                        >
-                            {saving
-                                ? t("properties.details.saving")
-                                : saved
-                                    ? t("properties.details.unsave")
-                                    : t("properties.details.save")}
-                        </Button>
-                    </Box>
-                </Box>
-
-                {/* Owner Email */}
-                {ownerEmail && (
-                    <Box
-                        sx={{
-                            mt: 3,
-                            p: 2,
-                            bgcolor: "#f8fafc",
-                            border: "1px solid #e2e8f0",
-                            borderRadius: 2,
-                        }}
-                    >
-                        <Typography
-                            variant="body2"
-                            sx={{
-                                color: "#5B6577",
-                                fontWeight: 600,
-                                mb: 0.5,
-                            }}
-                        >
-                            {t("properties.details.contactEmail")}
-                        </Typography>
-
-                        <Typography
-                            component="a"
-                            href={`mailto:${ownerEmail}`}
-                            sx={{
-                                color: "#1D4ED8",
-                                fontWeight: 600,
-                                textDecoration: "none",
-                                overflowWrap: "anywhere",
-                                "&:hover": {
-                                    textDecoration: "underline",
-                                },
-                            }}
-                        >
-                            {ownerEmail}
-                        </Typography>
-                    </Box>
-                )}
-            </Paper>
-
-            {/* Property Description and Additional Information */}
-            <Paper
-                variant="outlined"
-                sx={{
-                    p: { xs: 3, md: 4 },
-                    borderRadius: "16px",
-                    mb: 4,
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
-                }}
-            >
-                <Typography
-                    variant="h6"
-                    sx={{
-                        fontWeight: 700,
-                        mb: 2,
-                        color: "#0f172a",
-                    }}
-                >
-                    {t("properties.details.description")}
-                </Typography>
-
-                <Typography
-                    variant="body1"
-                    sx={{
-                        color: "#334155",
-                        whiteSpace: "pre-line",
-                        lineHeight: 1.8,
-                        overflowWrap: "anywhere",
-                    }}
-                >
-                    {description}
-                </Typography>
-
-                {/* Rental Information */}
-                {property.listingType === "For Rent" && (
-                    <>
-                        <Divider sx={{ my: 3 }} />
-
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                fontWeight: 700,
-                                mb: 2,
-                                color: "#0f172a",
-                            }}
-                        >
-                            {t("properties.details.rentalInformation")}
-                        </Typography>
-
-                        <Grid container spacing={2}>
-                            {property.rentalPeriod && (
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <InfoItem
-                                        label={t("properties.details.rentalPeriod.label")}
-                                        value={getRentalValueLabel(property.rentalPeriod, t)}
-                                    />
-                                </Grid>
-                            )}
-
-                            {property.furnishingStatus && (
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <InfoItem
-                                        label={t("properties.details.furnishingStatus.label")}
-                                        value={getRentalValueLabel(property.furnishingStatus, t)}
-                                    />
-                                </Grid>
-                            )}
-                            {property.rentWithContract != null && (
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <InfoItem
-                                        label={t("properties.details.rentalContract")}
-                                        value={
-                                            property.rentWithContract
-                                                ? t("properties.details.contractAvailable")
-                                                : t("properties.details.noContract")
-                                        }
-                                    />
-                                </Grid>
-                            )}
-
-                            {property.mortgageAgreement != null && (
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <InfoItem
-                                        label={t("properties.details.mortgageAgreement")}
-                                        value={
-                                            property.mortgageAgreement
-                                                ? t("properties.details.accepted")
-                                                : t("properties.details.notAccepted")
-                                        }
-                                    />
-                                </Grid>
-                            )}
-
-                            {property.deposit != null && (
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <InfoItem
-                                        label={t("properties.details.securityDeposit")}
-                                        value={`${formatPrice(
-                                            property.deposit,
-                                            i18n.language
-                                        )} MAD`}
-                                    />
-                                </Grid>
-                            )}
-
-                            {property.mediatorFee != null && (
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <InfoItem
-                                        label={t("properties.details.mediatorFee")}
-                                        value={`${formatPrice(
-                                            property.mediatorFee,
-                                            i18n.language
-                                        )} MAD`}
-                                    />
-                                </Grid>
-                            )}
-                        </Grid>
-                    </>
-                )}
-            </Paper>
-
-            {/* Owner Contact Component */}
-            {showContact && (
-                <PropertyContactOwner property={property} />
-            )}
-
-            {/* Similar Properties */}
-            {similarProperties.length > 0 && (
-                <Box sx={{ mt: 4, width: "100%" }}>
-                    <SimilarProperties
-                        properties={similarProperties}
-                        onSelectProperty={onSelectSimilar}
+                    <VideoEmbed
+                        src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}`}
+                        title={title}
+                        externalUrl={`https://www.youtube.com/watch?v=${youtubeVideoId}`}
                     />
-                </Box>
+                </DetailsSection>
+            )}
+        </>
+    );
+
+    const sidebar = (
+        <>
+            {showContact && <PropertyContactOwner property={property} withMobileBar />}
+
+            {(googleMapLink || fullAddress || location) && (
+                <SidebarCard>
+                    <KeyValueList
+                        items={[
+                            { icon: <PlaceOutlinedIcon />, label: t("properties.details.location", "Location"), value: location },
+                            { label: t("properties.details.address", "Address"), value: fullAddress },
+                        ]}
+                    />
+                    {googleMapLink && (
+                        <MapLinkButton
+                            href={googleMapLink}
+                            label={t("properties.details.viewOnMaps")}
+                            fullWidth
+                        />
+                    )}
+                </SidebarCard>
             )}
 
-            {/* Save/Unsave Feedback */}
+            {ownerEmail && (
+                <SidebarCard>
+                    <Button
+                        component="a"
+                        href={`mailto:${ownerEmail}`}
+                        variant="text"
+                        startIcon={<MailOutlineRoundedIcon />}
+                        sx={{ justifyContent: "flex-start", overflowWrap: "anywhere", textAlign: "start" }}
+                        fullWidth
+                    >
+                        {ownerEmail}
+                    </Button>
+                </SidebarCard>
+            )}
+        </>
+    );
+
+    return (
+        <DetailsContainer withMobileBar={showContact}>
+            <DetailsBackButton onClick={backAction || (() => navigate(-1))} label={backLabel || t("properties.details.back")} />
+
+            <DetailsHeader
+                badges={
+                    <>
+                        <StatusBadge
+                            tone="primary"
+                            label={isRent ? t("properties.card.forRent") : t("properties.card.forSale")}
+                        />
+                        {statusInfo && <StatusBadge tone={statusTone} label={statusInfo.label} />}
+                    </>
+                }
+                title={title}
+                location={location}
+                price={price ? `${price} ${t("common.currency", "MAD")}` : null}
+                priceCaption={isRent && property.rentalPeriod ? getRentalValueLabel(property.rentalPeriod, t) : undefined}
+                actions={showSave ? saveButton : null}
+            />
+
+            <DetailsLayout main={main} sidebar={sidebar} />
+
+            {similarProperties.length > 0 && (
+                <SimilarProperties properties={similarProperties} onSelectProperty={onSelectSimilar} />
+            )}
+
             <Snackbar
                 open={feedback.open}
                 autoHideDuration={3500}
                 onClose={handleCloseFeedback}
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                sx={{ bottom: { xs: 96, lg: 24 } }}
             >
-                <Alert
-                    onClose={handleCloseFeedback}
-                    severity={feedback.severity}
-                    variant="filled"
-                    sx={{ width: "100%" }}
-                >
+                <Alert onClose={handleCloseFeedback} severity={feedback.severity} variant="filled" sx={{ width: "100%" }}>
                     {feedback.message}
                 </Alert>
             </Snackbar>
-        </Box>
+        </DetailsContainer>
     );
 }

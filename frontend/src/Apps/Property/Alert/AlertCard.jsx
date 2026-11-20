@@ -89,10 +89,8 @@ export default function AlertCard({
         >
             <Stack
                 direction="row"
-                alignItems="center"
-                justifyContent="space-between"
                 spacing={1.5}
-                sx={{
+                sx={{ alignItems: "center", justifyContent: "space-between",
                     width: "100%",
                     minWidth: 0,
                     flexWrap: {
@@ -103,12 +101,11 @@ export default function AlertCard({
             >
                 <Stack
                     direction="row"
-                    alignItems="center"
                     spacing={{
                         xs: 1.5,
                         sm: 2.5,
                     }}
-                    sx={{
+                    sx={{ alignItems: "center",
                         minWidth: 0,
                         flex: 1,
                     }}
@@ -163,9 +160,8 @@ export default function AlertCard({
 
                     <Box sx={{ minWidth: 0 }}>
                         <Typography
-                            fontWeight={700}
                             variant="h6"
-                            sx={{
+                            sx={{ fontWeight: 700,
                                 fontSize: {
                                     xs: "1.05rem",
                                     sm: "1.2rem",
@@ -178,8 +174,7 @@ export default function AlertCard({
                         </Typography>
 
                         <Typography
-                            color="text.secondary"
-                            sx={{
+                            sx={{ color: "text.secondary",
                                 fontSize: {
                                     xs: "0.85rem",
                                     sm: "0.95rem",

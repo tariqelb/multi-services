@@ -110,7 +110,7 @@ function SignUpForm() {
         `h-13 w-full min-w-0 rounded-[10px] border bg-white px-3 text-base text-black outline-none transition-colors focus:border-blue-600 ${
             validation[field]
                 ? "border-red-500"
-                : "border-gray-300"
+                : "border-slate-300"
         }`;
 
     const passwordInputClass = (field) =>
@@ -244,7 +244,7 @@ function SignUpForm() {
                                     : t("auth.showPassword")
                             }
                             aria-pressed={showPassword}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-blue-600"
                         >
                             {showPassword ? (
                                 <VisibilityOff fontSize="small" />
@@ -300,7 +300,7 @@ function SignUpForm() {
                                     : t("auth.showConfirmPassword")
                             }
                             aria-pressed={showConfirmPassword}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-blue-600"
                         >
                             {showConfirmPassword ? (
                                 <VisibilityOff fontSize="small" />

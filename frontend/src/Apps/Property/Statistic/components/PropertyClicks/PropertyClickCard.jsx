@@ -1,52 +1,66 @@
+// admin/components/PropertyClicks/PropertyClickCard.jsx
 
 import {
+    Box,
+    Button,
     Card,
     CardContent,
-    Box,
-    Typography,
+    Chip,
     Divider,
-    Button,
+    Stack,
+    Typography,
 } from "@mui/material";
 
 import {
-    LocationOn,
-    CalendarMonth,
-    Visibility,
-    HomeWork,
     AttachMoney,
+    CalendarMonth,
+    HomeWork,
+    LocationOn,
+    PhoneInTalkOutlined,
+    Visibility,
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { formatDate, formatPrice } from "./propertyClickUtils";
+
 import {
-    formatDate,
-    formatPrice,
-} from "./propertyClickUtils";
+    formatNumber,
+    formatPercent,
+    getLocale,
+    translateValue,
+} from "../shared/analyticsUtils";
+
+function InfoRow({ icon, children }) {
+    return (
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center", minWidth: 0 }}>
+            <Box sx={{ color: "action.active", display: "flex" }}>{icon}</Box>
+
+            <Typography variant="body2" noWrap sx={{ color: "text.secondary" }}>
+                {children}
+            </Typography>
+        </Stack>
+    );
+}
+
+function Metric({ label, value, color = "text.primary" }) {
+    return (
+        <Box sx={{ textAlign: "center", minWidth: 0 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: color }}>
+                {value}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                {label}
+            </Typography>
+        </Box>
+    );
+}
 
 const PropertyClickCard = ({ property }) => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
-
-    const locale = i18n.language?.startsWith("ar")
-        ? "ar"
-        : i18n.language?.startsWith("fr")
-            ? "fr-FR"
-            : "en-US";
-
-    const translateValue = (value, category) => {
-        if (!value) return "";
-
-        const normalized = String(value)
-            .toLowerCase()
-            .replaceAll(" ", "_")
-            .replaceAll("-", "_");
-
-        return t(
-            `adminPropertyClicks.${category}.${normalized}`,
-            value
-        );
-    };
+    const locale = getLocale(i18n.language);
 
     const handleViewProperty = () => {
         if (!property?.propertyId) return;
@@ -70,200 +84,105 @@ const PropertyClickCard = ({ property }) => {
                 },
             }}
         >
-            <CardContent
-                sx={{
-                    p: 2.5,
-                    "&:last-child": {
-                        pb: 2.5,
-                    },
-                }}
-            >
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        gap: 2,
-                        mb: 2,
-                    }}
-                >
+            <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
+                <Stack direction="row" spacing={2} sx={{ justifyContent: "space-between", mb: 2 }}>
                     <Box sx={{ minWidth: 0 }}>
-                        <Typography
-                            variant="h6"
-                            fontWeight={700}
-                            noWrap
-                        >
+                        <Typography variant="h6" noWrap sx={{ fontWeight: 700 }}>
                             {property.title ||
-                                t("adminPropertyClicks.properties.untitled")}
+                                t("adminPropertyClicks.properties.untitled", "Untitled property")}
                         </Typography>
 
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                        >
-                            {translateValue(
-                                property.propertyType,
-                                "propertyTypes"
-                            ) ||
-                                t("adminPropertyClicks.properties.unknownType")}
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            {translateValue(t, "adminPropertyClicks.propertyTypes", property.propertyType)}
                         </Typography>
                     </Box>
 
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.75,
-                            px: 1.5,
-                            py: 1,
-                            borderRadius: 2,
-                            bgcolor: "#DBEAFE",
-                            color: "primary.dark",
-                            flexShrink: 0,
-                        }}
-                    >
-                        <Visibility fontSize="small" />
-
-                        <Typography
-                            variant="body2"
-                            fontWeight={700}
-                        >
-                            {property.clickCount || 0}
-                        </Typography>
-                    </Box>
-                </Box>
-
-                <Divider sx={{ mb: 2 }} />
+                    {property.clicksInRange > 0 && (
+                        <Chip
+                            size="small"
+                            color="primary"
+                            label={t("adminPropertyClicks.properties.inPeriod", "+{{count}} in period", {
+                                count: formatNumber(property.clicksInRange, locale),
+                            })}
+                            sx={{ fontWeight: 700, flexShrink: 0 }}
+                        />
+                    )}
+                </Stack>
 
                 <Box
                     sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 1.5,
+                        display: "grid",
+                        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                        gap: 1,
+                        p: 1.5,
+                        mb: 2,
+                        borderRadius: 2,
+                        bgcolor: "#EFF6FF",
                     }}
                 >
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                        }}
-                    >
-                        <LocationOn
-                            fontSize="small"
-                            color="action"
-                        />
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                        >
-                            {[property.neighborhood, property.city]
-                                .filter(Boolean)
-                                .join(", ") ||
-                                t("adminPropertyClicks.properties.locationUnavailable")}
-                        </Typography>
-                    </Box>
-
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                        }}
-                    >
-                        <HomeWork
-                            fontSize="small"
-                            color="action"
-                        />
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                        >
-                            {translateValue(
-                                property.listingType,
-                                "listingTypes"
-                            ) ||
-                                t("adminPropertyClicks.properties.unknownListingType")}
-                        </Typography>
-                    </Box>
-
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                        }}
-                    >
-                        <AttachMoney
-                            fontSize="small"
-                            color="action"
-                        />
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                        >
-                            {formatPrice(property.price, locale)}
-                        </Typography>
-                    </Box>
-
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                        }}
-                    >
-                        <CalendarMonth
-                            fontSize="small"
-                            color="action"
-                        />
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                        >
-                            {t("adminPropertyClicks.properties.lastClicked", {
-                                date: formatDate(property.lastClickedAt, locale),
-                            })}
-                        </Typography>
-                    </Box>
+                    <Metric
+                        label={t("adminPropertyClicks.properties.views", "Views")}
+                        value={formatNumber(property.clickCount, locale)}
+                        color="primary.main"
+                    />
+                    <Metric
+                        label={t("adminPropertyClicks.properties.contacts", "Contacts")}
+                        value={formatNumber(property.contacts, locale)}
+                        color="success.main"
+                    />
+                    <Metric
+                        label={t("adminPropertyClicks.properties.conversion", "Conversion")}
+                        value={formatPercent(property.conversionRate, locale)}
+                        color="secondary.main"
+                    />
                 </Box>
+
+                <Stack spacing={1.25}>
+                    <InfoRow icon={<LocationOn fontSize="small" />}>
+                        {[property.neighborhood, property.city].filter(Boolean).join(", ") ||
+                            t("adminPropertyClicks.properties.locationUnavailable", "Location unavailable")}
+                    </InfoRow>
+
+                    <InfoRow icon={<HomeWork fontSize="small" />}>
+                        {translateValue(t, "adminPropertyClicks.listingTypes", property.listingType)}
+                    </InfoRow>
+
+                    <InfoRow icon={<AttachMoney fontSize="small" />}>
+                        {formatPrice(property.price, locale)}
+                    </InfoRow>
+
+                    <InfoRow icon={<CalendarMonth fontSize="small" />}>
+                        {t("adminPropertyClicks.properties.lastClicked", "Last viewed {{date}}", {
+                            date: formatDate(property.lastClickedAt, locale),
+                        })}
+                    </InfoRow>
+                </Stack>
 
                 <Divider sx={{ my: 2 }} />
 
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: 1,
-                    }}
-                >
-                    <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                        }}
-                    >
-                        {t("adminPropertyClicks.properties.id", {
-                            id: property.propertyId,
-                        })}
-                    </Typography>
+                <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between", alignItems: "center" }}>
+                    <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+                        {property.contacts > 0 ? (
+                            <PhoneInTalkOutlined fontSize="small" color="success" />
+                        ) : (
+                            <Visibility fontSize="small" color="disabled" />
+                        )}
+
+                        <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                            {property.contacts > 0
+                                ? t("adminPropertyClicks.properties.generatesLeads", "Generates leads")
+                                : t("adminPropertyClicks.properties.noLeads", "No contacts yet")}
+                        </Typography>
+                    </Stack>
 
                     <Button
                         size="small"
-                        color="primary"
                         onClick={handleViewProperty}
                         disabled={!property.propertyId}
                     >
-                        {t("adminPropertyClicks.properties.view")} →
+                        {t("adminPropertyClicks.properties.view", "View")} →
                     </Button>
-                </Box>
+                </Stack>
             </CardContent>
         </Card>
     );

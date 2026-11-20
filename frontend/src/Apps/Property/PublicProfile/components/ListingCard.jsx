@@ -108,9 +108,8 @@ export default function ListingCard({
             >
                 <Typography
                     variant="subtitle1"
-                    fontWeight={700}
                     noWrap
-                    title={title}
+                    title={title} sx={{ fontWeight: 700 }}
                 >
                     {title || t("publicProfile.untitled")}
                 </Typography>
@@ -118,8 +117,7 @@ export default function ListingCard({
                 {subtitle && (
                     <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 0.3 }}
+                        sx={{ color: "text.secondary", mt: 0.3 }}
                     >
                         {subtitle}
                     </Typography>
@@ -129,8 +127,7 @@ export default function ListingCard({
                     <Stack
                         direction="row"
                         spacing={0.5}
-                        alignItems="center"
-                        sx={{ mt: 1 }}
+                        sx={{ alignItems: "center", mt: 1 }}
                     >
                         <LocationOn
                             fontSize="small"
@@ -138,8 +135,7 @@ export default function ListingCard({
                         />
                         <Typography
                             variant="caption"
-                            color="text.secondary"
-                            noWrap
+                            noWrap sx={{ color: "text.secondary" }}
                         >
                             {location}
                         </Typography>
@@ -149,8 +145,7 @@ export default function ListingCard({
                 {description && (
                     <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{
+                        sx={{ color: "text.secondary",
                             mt: 1.2,
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
@@ -168,8 +163,7 @@ export default function ListingCard({
                         direction="row"
                         spacing={1}
                         useFlexGap
-                        flexWrap="wrap"
-                        sx={{ mt: 1.5 }}
+                        sx={{ flexWrap: "wrap", mt: 1.5 }}
                     >
                         {details.map((detail, index) => (
                             <Chip
@@ -187,16 +181,13 @@ export default function ListingCard({
                 {price !== null && price !== undefined && (
                     <Typography
                         variant="subtitle1"
-                        fontWeight={700}
-                        color="primary.main"
-                        sx={{ mt: 2 }}
+                        sx={{ fontWeight: 700, color: "primary.main", mt: 2 }}
                     >
                         {priceLabel || ""}
                         {formatPrice(price, i18n.language)}
                         <Typography
                             component="span"
-                            variant="caption"
-                            color="text.secondary"
+                            variant="caption" sx={{ color: "text.secondary" }}
                         >
                             {priceLabel ? "" : ""}
                         </Typography>

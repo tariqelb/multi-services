@@ -32,6 +32,7 @@ const corsOptions = {
     allowedHeaders: [
         "Content-Type",
         "Authorization",
+        "X-Visitor-Id",
     ],
     optionsSuccessStatus: 204,
 };

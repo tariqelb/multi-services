@@ -39,10 +39,10 @@ export default function Description() {
     return (
         <div
             dir={isRTL ? "rtl" : "ltr"}
-            className="min-h-full bg-[#F4F7FB] p-4 sm:p-6 lg:p-8"
+            className="min-h-full bg-[#F5F7FB] p-4 sm:p-6 lg:p-8"
         >
             <div className="mx-auto max-w-6xl">
-                <div className="rounded-3xl bg-gradient-to-r from-[#0B2E5C] to-[#1764A5] p-6 text-white sm:p-10">
+                <div className="rounded-3xl bg-gradient-to-r from-[#0B2E5C] to-[#1D4ED8] p-6 text-white sm:p-10">
                     <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15">
                         <CarFront size={30} />
                     </div>
@@ -61,11 +61,11 @@ export default function Description() {
                 </div>
 
                 <div className="mt-8">
-                    <h2 className="text-xl font-bold text-gray-900">
+                    <h2 className="text-xl font-bold text-slate-900">
                         {t("cars.sectionTitle")}
                     </h2>
 
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="mt-2 text-sm text-slate-500">
                         {t("cars.sectionDescription")}
                     </p>
 
@@ -76,19 +76,19 @@ export default function Description() {
                             return (
                                 <div
                                     key={feature.key}
-                                    className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                                    className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                                 >
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-[#0B2E5C]">
                                         <Icon size={24} />
                                     </div>
 
-                                    <h3 className="font-bold text-gray-900">
+                                    <h3 className="font-bold text-slate-900">
                                         {t(
                                             `cars.features.${feature.key}.title`
                                         )}
                                     </h3>
 
-                                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                                    <p className="mt-2 text-sm leading-6 text-slate-500">
                                         {t(
                                             `cars.features.${feature.key}.description`
                                         )}

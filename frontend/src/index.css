@@ -1,4 +1,9 @@
+/* Fonts (Inter for Latin, IBM Plex Sans Arabic for Arabic). Safe if index.html also loads them. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap");
+
 @import "tailwindcss";
+
+/* Base layout ------------------------------------------------------------- */
 
 html,
 body,
@@ -7,13 +12,63 @@ body,
     min-height: 100%;
     margin: 0;
 }
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    background-color: #f5f7fb;
+    color: #0f172a;
+    font-family: "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif;
+}
+
+html[dir="rtl"] body {
+    font-family: "IBM Plex Sans Arabic", "Inter", "Segoe UI", Tahoma, sans-serif;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Keyboard focus visible everywhere (accessibility) */
+:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Animations ---------------------------------------------------------------- */
+
 @keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }

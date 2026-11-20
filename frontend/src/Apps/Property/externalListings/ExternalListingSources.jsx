@@ -162,7 +162,7 @@ export default function ExternalListingSources() {
                     {t("externalSources.title")}
                 </h1>
 
-                <p className="mt-1.5 max-w-3xl text-base text-[#5B6577]">
+                <p className="mt-1.5 max-w-3xl text-base text-[#64748B]">
                     {t("externalSources.subtitle")}
                 </p>
             </div>
@@ -345,7 +345,7 @@ export default function ExternalListingSources() {
                                         href={sourceUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="mr-2 flex h-10 min-w-0 flex-1 items-center justify-center rounded-[10px] border border-slate-300 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none"
+                                        className="me-2 flex h-10 min-w-0 flex-1 items-center justify-center rounded-[10px] border border-slate-300 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none"
                                     >
                                         {t("externalSources.actions.openLink")}
                                     </a>

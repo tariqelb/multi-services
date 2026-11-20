@@ -157,16 +157,11 @@ function VerificationStep({
             }}
         >
             <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                gap={2}
+                direction="row" sx={{ alignItems: "center", justifyContent: "space-between", gap: 2 }}
             >
                 <Stack
                     direction="row"
-                    alignItems="center"
-                    gap={1.5}
-                    sx={{ minWidth: 0 }}
+                    sx={{ alignItems: "center", gap: 1.5, minWidth: 0 }}
                 >
                     <Box
                         sx={{
@@ -184,13 +179,12 @@ function VerificationStep({
                     </Box>
 
                     <Box sx={{ minWidth: 0 }}>
-                        <Typography fontWeight={700}>
+                        <Typography sx={{ fontWeight: 700 }}>
                             {label}
                         </Typography>
 
                         <Typography
-                            color="text.secondary"
-                            sx={{ overflowWrap: "anywhere" }}
+                            sx={{ color: "text.secondary", overflowWrap: "anywhere" }}
                         >
                             {value ||
                                 t("settings.verification.noContact", {
@@ -221,8 +215,7 @@ function VerificationStep({
                         <>
                             <Typography
                                 variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 1.5 }}
+                                sx={{ color: "text.secondary", mb: 1.5 }}
                             >
                                 {isEmail
                                     ? t("settings.verification.emailStepOne")
@@ -246,8 +239,7 @@ function VerificationStep({
                     ) : (
                         <Stack spacing={2}>
                             <Typography
-                                variant="body2"
-                                color="text.secondary"
+                                variant="body2" sx={{ color: "text.secondary" }}
                             >
                                 {t("settings.verification.stepTwo")}
                             </Typography>
@@ -346,18 +338,18 @@ export default function ContactVerification({
                 bgcolor: "white",
             }}
         >
-            <Stack direction="row" alignItems="center" gap={1.5} mb={1}>
+            <Stack direction="row" sx={{ alignItems: "center", gap: 1.5, mb: 1 }}>
                 <VerifiedUserOutlinedIcon
                     sx={{ color: "#1D4ED8", fontSize: 30 }}
                 />
 
-                <Typography variant="h6" fontWeight={700}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                     {t("settings.verification.title")}
                 </Typography>
             </Stack>
 
             <Box sx={{ pt: 2, pb: 2 }}>
-                <Typography color="text.secondary" mb={3}>
+                <Typography sx={{ color: "text.secondary", mb: 3 }}>
                     {t("settings.verification.subtitle")}
                 </Typography>
             </Box>

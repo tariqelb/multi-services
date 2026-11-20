@@ -36,8 +36,7 @@ const AnalyticsChart = ({ title, data = [] }) => {
             <CardContent sx={{ p: 2.5 }}>
                 <Typography
                     variant="h6"
-                    fontWeight={700}
-                    sx={{ mb: 3 }}
+                    sx={{ fontWeight: 700, mb: 3 }}
                 >
                     {title}
                 </Typography>
@@ -106,8 +105,7 @@ const AnalyticsChart = ({ title, data = [] }) => {
                         }}
                     >
                         <Typography
-                            color="text.secondary"
-                            variant="body2"
+                            variant="body2" sx={{ color: "text.secondary" }}
                         >
                             {t("adminPropertyClicks.charts.noData")}
                         </Typography>

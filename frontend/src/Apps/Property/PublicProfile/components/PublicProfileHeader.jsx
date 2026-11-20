@@ -53,8 +53,7 @@ export default function PublicProfileHeader({
             <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
                 <Stack
                     direction={{ xs: "column", sm: "row" }}
-                    spacing={2.5}
-                    alignItems={{ xs: "center", sm: "flex-start" }}
+                    spacing={2.5} sx={{ alignItems: { xs: "center", sm: "flex-start" } }}
                 >
                     <Avatar
                         src={avatar || undefined}
@@ -76,7 +75,7 @@ export default function PublicProfileHeader({
                             textAlign: { xs: "center", sm: "left" },
                         }}
                     >
-                        <Typography variant="h5" fontWeight={700}>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
                             {fullName || t("publicProfile.unknownUser")}
                         </Typography>
 
@@ -97,8 +96,7 @@ export default function PublicProfileHeader({
                         {user?.bio && (
                             <Typography
                                 variant="body2"
-                                color="text.secondary"
-                                sx={{
+                                sx={{ color: "text.secondary",
                                     mt: 2,
                                     whiteSpace: "pre-line",
                                     overflowWrap: "anywhere",
@@ -112,27 +110,22 @@ export default function PublicProfileHeader({
                             direction="row"
                             spacing={2}
                             useFlexGap
-                            flexWrap="wrap"
-                            justifyContent={{
+                            sx={{ flexWrap: "wrap", justifyContent: {
                                 xs: "center",
                                 sm: "flex-start",
-                            }}
-                            alignItems="center"
-                            sx={{ mt: 2 }}
+                            }, alignItems: "center", mt: 2 }}
                         >
                             {memberSince && (
                                 <Stack
                                     direction="row"
-                                    spacing={0.7}
-                                    alignItems="center"
+                                    spacing={0.7} sx={{ alignItems: "center" }}
                                 >
                                     <CalendarMonth
                                         fontSize="small"
                                         color="action"
                                     />
                                     <Typography
-                                        variant="caption"
-                                        color="text.secondary"
+                                        variant="caption" sx={{ color: "text.secondary" }}
                                     >
                                         {t("publicProfile.memberSince", {
                                             date: memberSince,
@@ -143,8 +136,7 @@ export default function PublicProfileHeader({
 
                             <Stack
                                 direction="row"
-                                spacing={0.7}
-                                alignItems="center"
+                                spacing={0.7} sx={{ alignItems: "center" }}
                             >
                                 <Rating
                                     value={Number(rating) || 0}
@@ -154,8 +146,7 @@ export default function PublicProfileHeader({
                                 />
 
                                 <Typography
-                                    variant="body2"
-                                    fontWeight={600}
+                                    variant="body2" sx={{ fontWeight: 600 }}
                                 >
                                     {Number(rating || 0).toFixed(1)}
                                 </Typography>
@@ -163,16 +154,14 @@ export default function PublicProfileHeader({
 
                             <Stack
                                 direction="row"
-                                spacing={0.7}
-                                alignItems="center"
+                                spacing={0.7} sx={{ alignItems: "center" }}
                             >
                                 <RateReview
                                     fontSize="small"
                                     color="action"
                                 />
                                 <Typography
-                                    variant="caption"
-                                    color="text.secondary"
+                                    variant="caption" sx={{ color: "text.secondary" }}
                                 >
                                     {t("publicProfile.reviewCount", {
                                         count: totalReviews || 0,

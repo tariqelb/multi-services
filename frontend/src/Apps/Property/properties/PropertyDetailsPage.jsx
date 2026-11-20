@@ -104,7 +104,7 @@ export default function PropertyDetailsPage() {
     }
 
     return (
-        <Box component="main" sx={{ flex: 1, minWidth: 0, pb: 6 }}>
+        <Box component="main" sx={{ flex: 1, minWidth: 0 }}>
             <PropertyDetails
                 property={property}
                 onBack={() => navigate("/properties")}
@@ -112,10 +112,12 @@ export default function PropertyDetailsPage() {
 
             {/* Render Similar Properties below details if available */}
             {similarProperties.length > 0 && (
+                <Box sx={{ maxWidth: 1240, mx: "auto", px: { xs: 1.5, sm: 3, md: 4 }, pb: { xs: 12, lg: 6 } }}>
                 <SimilarProperties
                     properties={similarProperties}
                     onSelectProperty={handleSelectSimilar}
                 />
+                </Box>
             )}
         </Box>
     );

@@ -1,6 +1,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
 
 import {
     Typography,
@@ -29,7 +30,7 @@ export default function PropertyInsertFormOwnerInfo({
     return (
         <SectionPaper>
             <SectionHeader
-                icon="👤"
+                icon={<PersonOutlineRoundedIcon />}
                 title={t("properties.insert.ownerInfo.title")}
                 subtitle={t("properties.insert.ownerInfo.subtitle")}
                 number={1}
@@ -39,7 +40,7 @@ export default function PropertyInsertFormOwnerInfo({
                 variant="body2"
                 sx={{
                     fontWeight: 650,
-                    color: "#344054",
+                    color: "#334155",
                     mb: 1.5,
                 }}
             >
@@ -68,8 +69,8 @@ export default function PropertyInsertFormOwnerInfo({
                             xs: "0.72rem",
                             sm: "0.88rem",
                         },
-                        color: "#667085",
-                        border: "1px solid #D5DCE8",
+                        color: "#64748B",
+                        border: "1px solid #E2E8F0",
                         borderRadius: "10px !important",
                         "&.Mui-selected": {
                             color: "#2563EB",
@@ -145,7 +146,7 @@ export default function PropertyInsertFormOwnerInfo({
                             label={
                                 <Typography
                                     variant="body2"
-                                    sx={{ color: "#475467" }}
+                                    sx={{ color: "#475569" }}
                                 >
                                     {t("properties.insert.ownerInfo.showEmail")}
                                 </Typography>

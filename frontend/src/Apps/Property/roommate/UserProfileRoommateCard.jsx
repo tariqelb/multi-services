@@ -292,16 +292,14 @@ export default function UserProfileRoommateCard({
                         {/* Title and Badges / Prices */}
                         <Stack
                             direction="row"
-                            justifyContent="space-between"
-                            alignItems="flex-start"
                             spacing={2}
-                            sx={{ mb: 1 }}
+                            sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}
                         >
                             <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                                 <Typography
                                     variant="caption"
                                     sx={{
-                                        color: "#5B6577",
+                                        color: "#64748B",
                                         fontWeight: 600,
                                     }}
                                 >
@@ -334,9 +332,7 @@ export default function UserProfileRoommateCard({
                                     {formattedRent} MAD
                                     <Typography
                                         component="span"
-                                        variant="body2"
-                                        color="text.secondary"
-                                        fontWeight={400}
+                                        variant="body2" sx={{ color: "text.secondary", fontWeight: 400 }}
                                     >
                                         {roommate.rentalPeriod ? ` / ${roommate.rentalPeriod}` : ""}
                                     </Typography>
@@ -367,9 +363,8 @@ export default function UserProfileRoommateCard({
                             <Stack
                                 direction="row"
                                 spacing={0.5}
-                                alignItems="center"
-                                sx={{
-                                    color: "#5B6577",
+                                sx={{ alignItems: "center",
+                                    color: "#64748B",
                                     mb: 2,
                                 }}
                             >
@@ -401,7 +396,7 @@ export default function UserProfileRoommateCard({
                                 rowGap: 1,
                             }}
                         >
-                            <Stack direction="row" spacing={0.6} alignItems="center">
+                            <Stack direction="row" spacing={0.6} sx={{ alignItems: "center" }}>
                                 <People fontSize="small" sx={{ color: "#2563EB" }} />
                                 <Box>
                                     {translate("profileRoommate.people", "People")}:{" "}
@@ -411,7 +406,7 @@ export default function UserProfileRoommateCard({
                                 </Box>
                             </Stack>
 
-                            <Stack direction="row" spacing={0.6} alignItems="center">
+                            <Stack direction="row" spacing={0.6} sx={{ alignItems: "center" }}>
                                 <Bed fontSize="small" sx={{ color: "#2563EB" }} />
                                 <Box>
                                     {translate("profileRoommate.placesAvailable", "Available")}:{" "}
@@ -437,9 +432,7 @@ export default function UserProfileRoommateCard({
                         <Stack
                             direction="row"
                             spacing={{ xs: 0.75, sm: 1.5 }}
-                            justifyContent="flex-end"
-                            alignItems="center"
-                            sx={{
+                            sx={{ justifyContent: "flex-end", alignItems: "center",
                                 flexWrap: "nowrap",
                                 width: "100%",
                                 minWidth: 0,
@@ -461,7 +454,7 @@ export default function UserProfileRoommateCard({
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
-                                    borderColor: "#D5DCE8",
+                                    borderColor: "#E2E8F0",
                                     color: "#0f172a",
                                     whiteSpace: "nowrap",
                                     flexShrink: 0,
@@ -520,7 +513,7 @@ export default function UserProfileRoommateCard({
                                 sx={{
                                     textTransform: "none",
                                     fontWeight: 700,
-                                    borderColor: "#D5DCE8",
+                                    borderColor: "#E2E8F0",
                                     color: "#334155",
                                     whiteSpace: "nowrap",
                                     flexShrink: 0,
@@ -593,7 +586,7 @@ export default function UserProfileRoommateCard({
                         sx={{
                             textTransform: "none",
                             fontWeight: 600,
-                            color: "#5B6577",
+                            color: "#64748B",
                         }}
                     >
                         {translate("common.cancel", "Cancel")}

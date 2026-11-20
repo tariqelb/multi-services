@@ -1,6 +1,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
+import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 
 import {
     Autocomplete,
@@ -95,7 +96,7 @@ export default function PropertyInsertFormDetails({
     return (
         <SectionPaper>
             <SectionHeader
-                icon="🏠"
+                icon={<HomeWorkOutlinedIcon />}
                 title={t("properties.insert.details.title")}
                 subtitle={t("properties.insert.details.subtitle")}
                 number={2}
@@ -120,7 +121,7 @@ export default function PropertyInsertFormDetails({
                         sx={{
                             mb: 1.2,
                             fontWeight: 650,
-                            color: "#344054",
+                            color: "#334155",
                         }}
                     >
                         {t("properties.insert.details.transactionType")}
@@ -143,11 +144,11 @@ export default function PropertyInsertFormDetails({
                                 minWidth: 0,
                                 py: 1.4,
                                 px: 2,
-                                border: "1px solid #D5DCE8",
+                                border: "1px solid #E2E8F0",
                                 borderRadius: "10px !important",
                                 textTransform: "none",
                                 fontWeight: 650,
-                                color: "#667085",
+                                color: "#64748B",
                                 transition: "all 0.2s ease",
                                 "&:hover": {
                                     bgcolor: "#EFF6FF",
@@ -192,7 +193,7 @@ export default function PropertyInsertFormDetails({
 
             {/* Property location */}
             <Box sx={{ mt: 4, mb: 2 }}>
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                     <Typography sx={{ color: "#2563EB", fontWeight: 700 }}>
                         📍
                     </Typography>
@@ -207,7 +208,7 @@ export default function PropertyInsertFormDetails({
 
                 <Typography
                     variant="body2"
-                    sx={{ color: "#5B6577", mt: 0.5 }}
+                    sx={{ color: "#64748B", mt: 0.5 }}
                 >
                     {t("properties.insert.details.location.subtitle")}
                 </Typography>
@@ -323,7 +324,7 @@ export default function PropertyInsertFormDetails({
 
             {/* Price and specifications */}
             <Box sx={{ mt: 4, mb: 2 }}>
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                     <Typography sx={{ color: "#2563EB", fontWeight: 700 }}>
                         💳
                     </Typography>
@@ -338,7 +339,7 @@ export default function PropertyInsertFormDetails({
 
                 <Typography
                     variant="body2"
-                    sx={{ color: "#5B6577", mt: 0.5 }}
+                    sx={{ color: "#64748B", mt: 0.5 }}
                 >
                     {t("properties.insert.details.specifications.subtitle")}
                 </Typography>
@@ -443,8 +444,7 @@ export default function PropertyInsertFormDetails({
                     <Box sx={{ mt: 4, mb: 2 }}>
                         <Stack
                             direction="row"
-                            alignItems="center"
-                            spacing={1}
+                            spacing={1} sx={{ alignItems: "center" }}
                         >
                             <Typography
                                 sx={{ color: "#2563EB", fontWeight: 700 }}
@@ -462,7 +462,7 @@ export default function PropertyInsertFormDetails({
 
                         <Typography
                             variant="body2"
-                            sx={{ color: "#5B6577", mt: 0.5 }}
+                            sx={{ color: "#64748B", mt: 0.5 }}
                         >
                             {t("properties.insert.details.rental.subtitle")}
                         </Typography>
@@ -531,7 +531,7 @@ export default function PropertyInsertFormDetails({
                                     minHeight: 56,
                                     display: "flex",
                                     alignItems: "center",
-                                    border: "1px solid #D5DCE8",
+                                    border: "1px solid #E2E8F0",
                                     borderRadius: 2,
                                     px: 1.5,
                                 }}
@@ -561,7 +561,7 @@ export default function PropertyInsertFormDetails({
                                     minHeight: 56,
                                     display: "flex",
                                     alignItems: "center",
-                                    border: "1px solid #D5DCE8",
+                                    border: "1px solid #E2E8F0",
                                     borderRadius: 2,
                                     px: 1.5,
                                 }}

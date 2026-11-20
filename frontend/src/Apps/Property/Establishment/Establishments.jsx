@@ -31,6 +31,8 @@ import {
 } from "@mui/icons-material";
 
 import axiosInstance from "../../../api/axiosInstance";
+import PageHeader from "../../../Components/ui/PageHeader";
+import EstablishmentCard from "./EstablishmentCard";
 
 const ACCOMMODATION_TYPES = [
     "All",
@@ -153,54 +155,28 @@ export default function Establishments() {
     };
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Container maxWidth="xl" sx={{ py: { xs: 2.5, md: 4 }, px: { xs: 2, sm: 3 } }}>
             {/* Header */}
-            <Stack
-                direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-                alignItems={{ xs: "stretch", sm: "center" }}
-                spacing={2}
-                sx={{ mb: 4, width: "100%" }}
-            >
-                <Box>
-                    <Typography
-                        variant="h4"
-                        fontWeight={800}
-                        color="#0B2E5C"
+            <PageHeader
+                icon={<Hotel />}
+                title={t("establishments.title")}
+                subtitle={t("establishments.subtitle")}
+                action={
+                    <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => navigate("/establishments/publish")}
                     >
-                        {t("establishments.title")}
-                    </Typography>
-
-                    <Typography color="text.secondary" sx={{ mt: 1 }}>
-                        {t("establishments.subtitle")}
-                    </Typography>
-                </Box>
-
-                <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => navigate("/establishments/publish")}
-                    sx={{
-                        bgcolor: "#0B2E5C",
-                        borderRadius: 2,
-                        px: 3,
-                        py: 1.2,
-                        alignSelf: { xs: "flex-start", sm: "center" },
-                        ml: { sm: "auto" },
-                        "&:hover": {
-                            bgcolor: "#16477f",
-                        },
-                    }}
-                >
-                    {t("establishments.publish")}
-                </Button>
-            </Stack>
+                        {t("establishments.publish")}
+                    </Button>
+                }
+            />
 
             {/* Filters */}
             <Card
                 elevation={0}
                 sx={{
-                    border: "1px solid #e5e7eb",
+                    border: "1px solid #E2E8F0",
                     borderRadius: 3,
                     mb: 4,
                 }}
@@ -305,11 +281,11 @@ export default function Establishments() {
                         }}
                     />
 
-                    <Typography variant="h6" fontWeight={700}>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         {t("establishments.empty.title")}
                     </Typography>
 
-                    <Typography color="text.secondary" sx={{ mt: 1 }}>
+                    <Typography sx={{ color: "text.secondary", mt: 1 }}>
                         {t("establishments.empty.subtitle")}
                     </Typography>
 
@@ -342,237 +318,12 @@ export default function Establishments() {
                                     key={establishment._id}
                                     size={{ xs: 12, sm: 6, lg: 4 }}
                                 >
-                                    <Card
-                                        onClick={() =>
-                                            handleOpenEstablishment(
-                                                establishment._id
-                                            )
-                                        }
-                                        sx={{
-                                            height: "100%",
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            borderRadius: 3,
-                                            overflow: "hidden",
-                                            cursor: "pointer",
-                                            border: "1px solid #e5e7eb",
-                                            transition:
-                                                "transform 0.2s, box-shadow 0.2s",
-                                            "&:hover": {
-                                                transform: "translateY(-4px)",
-                                                boxShadow:
-                                                    "0 10px 25px rgba(0,0,0,0.10)",
-                                            },
-                                        }}
-                                    >
-                                        <Box
-                                            sx={{
-                                                position: "relative",
-                                                height: 220,
-                                                bgcolor: "#e2e8f0",
-                                            }}
-                                        >
-                                            {coverImage ? (
-                                                <CardMedia
-                                                    component="img"
-                                                    image={coverImage}
-                                                    alt={establishment.name}
-                                                    sx={{
-                                                        width: "100%",
-                                                        height: "100%",
-                                                        objectFit: "contain",
-                                                        display: "block",
-                                                        bgcolor: "#e2e8f0",
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Box
-                                                    sx={{
-                                                        height: "100%",
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
-                                                    }}
-                                                >
-                                                    <Hotel
-                                                        sx={{
-                                                            fontSize: 65,
-                                                            color: "#94a3b8",
-                                                        }}
-                                                    />
-                                                </Box>
-                                            )}
-
-                                            <Chip
-                                                label={
-                                                    establishment.accommodationType
-                                                        ? t(
-                                                            `establishments.types.${establishment.accommodationType.toLowerCase()}`,
-                                                            {
-                                                                defaultValue:
-                                                                    establishment.accommodationType,
-                                                            }
-                                                        )
-                                                        : t("establishments.accommodation")
-                                                }
-                                                size="small"
-                                                sx={{
-                                                    position: "absolute",
-                                                    top: 12,
-                                                    left: 12,
-                                                    bgcolor: "white",
-                                                    fontWeight: 700,
-                                                }}
-                                            />
-                                        </Box>
-
-                                        <CardContent
-                                            sx={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                flex: 1,
-                                                p: 2.5,
-                                            }}
-                                        >
-                                            <Typography
-                                                variant="h6"
-                                                fontWeight={800}
-                                                color="#0B2E5C"
-                                                sx={{
-                                                    mb: 1,
-                                                    overflowWrap: "anywhere",
-                                                }}
-                                            >
-                                                {establishment.name}
-                                            </Typography>
-
-                                            <Stack
-                                                direction="row"
-                                                alignItems="center"
-                                                spacing={0.5}
-                                                sx={{ mb: 1 }}
-                                            >
-                                                <LocationOn
-                                                    fontSize="small"
-                                                    color="action"
-                                                />
-
-                                                <Typography
-                                                    variant="body2"
-                                                    color="text.secondary"
-                                                >
-                                                    {[
-                                                        establishment.location
-                                                            ?.neighborhood,
-                                                        establishment.location
-                                                            ?.city,
-                                                    ]
-                                                        .filter(Boolean)
-                                                        .join(", ") ||
-                                                        t("establishments.locationNotSpecified")}
-                                                </Typography>
-                                            </Stack>
-
-                                            <Typography
-                                                variant="body2"
-                                                color="text.secondary"
-                                                sx={{
-                                                    mb: 2,
-                                                    display: "-webkit-box",
-                                                    WebkitLineClamp: 2,
-                                                    WebkitBoxOrient: "vertical",
-                                                    overflow: "hidden",
-                                                    minHeight: 40,
-                                                }}
-                                            >
-                                                {establishment.shortDescription ||
-                                                    t("establishments.descriptionFallback")}
-                                            </Typography>
-
-                                            <Stack
-                                                direction="row"
-                                                spacing={1}
-                                                flexWrap="wrap"
-                                                useFlexGap
-                                                sx={{ mb: 2 }}
-                                            >
-                                                {establishment.numberOfRooms ? (
-                                                    <Chip
-                                                        size="small"
-                                                        variant="outlined"
-                                                        label={t(
-                                                            "establishments.rooms",
-                                                            {
-                                                                count: establishment.numberOfRooms,
-                                                            }
-                                                        )}
-                                                    />
-                                                ) : null}
-
-                                                {establishment.officialClassification ? (
-                                                    <Chip
-                                                        size="small"
-                                                        variant="outlined"
-                                                        label={
-                                                            establishment.officialClassification
-                                                        }
-                                                    />
-                                                ) : null}
-                                            </Stack>
-
-                                            <Box sx={{ flex: 1 }} />
-
-                                            <Stack
-                                                direction="row"
-                                                justifyContent="space-between"
-                                                alignItems="center"
-                                                sx={{ width: "100%" }}
-                                            >
-                                                <Box>
-                                                    {startingPrice !== null ? (
-                                                        <>
-                                                            <Typography
-                                                                variant="h6"
-                                                                fontWeight={800}
-                                                                color="#0B2E5C"
-                                                            >
-                                                                {startingPrice.toLocaleString()} MAD
-                                                            </Typography>
-
-                                                            <Typography
-                                                                variant="caption"
-                                                                color="text.secondary"
-                                                            >
-                                                                {t("establishments.startingPrice")}
-                                                            </Typography>
-                                                        </>
-                                                    ) : (
-                                                        <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                        >
-                                                            {t("establishments.contactForPrices")}
-                                                        </Typography>
-                                                    )}
-                                                </Box>
-
-                                                <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    sx={{
-                                                        bgcolor: "#0B2E5C",
-                                                        ml: "auto",
-                                                        flexShrink: 0,
-                                                        "&:hover": {
-                                                            bgcolor: "#16477f",
-                                                        },
-                                                    }}
-                                                >
-                                                    {t("establishments.viewDetails")}
-                                                </Button>
-                                            </Stack>
-                                        </CardContent>
-                                    </Card>
+                                    <EstablishmentCard
+                                        establishment={establishment}
+                                        image={coverImage}
+                                        startingPrice={startingPrice}
+                                        onClick={() => handleOpenEstablishment(establishment._id)}
+                                    />
                                 </Grid>
                             );
                         })}
@@ -580,8 +331,7 @@ export default function Establishments() {
 
                     {totalPages > 1 && (
                         <Stack
-                            alignItems="center"
-                            sx={{ mt: 5 }}
+                            sx={{ alignItems: "center", mt: 5 }}
                         >
                             <Pagination
                                 count={totalPages}

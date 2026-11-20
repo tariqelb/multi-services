@@ -104,7 +104,7 @@ function ResetPassword() {
                     {t("auth.resetPassword.title")}
                 </h2>
 
-                <p className="mb-6 text-center text-sm leading-6 text-gray-600">
+                <p className="mb-6 text-center text-sm leading-6 text-slate-600">
                     {t("auth.resetPassword.description")}
                 </p>
 
@@ -125,7 +125,7 @@ function ResetPassword() {
                             minLength={8}
                             required
                             disabled={loading}
-                            className="h-13 w-full rounded-[10px] border border-gray-300 bg-white px-3 pr-12 text-base text-black outline-none focus:border-blue-600 disabled:bg-gray-100"
+                            className="h-13 w-full rounded-[10px] border border-slate-300 bg-white px-3 pe-12 text-base text-black outline-none focus:border-blue-600 disabled:bg-slate-100"
                         />
 
                         <button
@@ -138,7 +138,7 @@ function ResetPassword() {
                                     ? t("auth.hidePassword")
                                     : t("auth.showPassword")
                             }
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-blue-600"
                         >
                             {showPassword
                                 ? <VisibilityOff fontSize="small" />
@@ -163,7 +163,7 @@ function ResetPassword() {
                             minLength={8}
                             required
                             disabled={loading}
-                            className="h-13 w-full rounded-[10px] border border-gray-300 bg-white px-3 pr-12 text-base text-black outline-none focus:border-blue-600 disabled:bg-gray-100"
+                            className="h-13 w-full rounded-[10px] border border-slate-300 bg-white px-3 pe-12 text-base text-black outline-none focus:border-blue-600 disabled:bg-slate-100"
                         />
 
                         <button
@@ -176,7 +176,7 @@ function ResetPassword() {
                                     ? t("auth.hidePassword")
                                     : t("auth.showPassword")
                             }
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-blue-600"
                         >
                             {showConfirmPassword
                                 ? <VisibilityOff fontSize="small" />

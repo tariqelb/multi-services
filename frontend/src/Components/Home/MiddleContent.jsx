@@ -1,6 +1,7 @@
 // /home/tariq/multi-services/app/frontend/src/Components/Home/MiddleContent.jsx
 
 
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import React from "react";
 import PageLayout from "./PageLayout";
 
@@ -86,8 +87,9 @@ export default function MiddleContent({ activeNav }) {
     };
 
     return (
-        <Box dir={isRTL ? "rtl" : "ltr"} sx={{ width: "100%", minWidth: 0 }}>
+        <Box dir={isRTL ? "rtl" : "ltr"} sx={{ width: "100%", maxWidth: "100%", minWidth: 0, overflowX: "hidden",}}>
             <PageLayout
+            icon={<DashboardOutlinedIcon />}
                 title={t("middleContent.overview", {
                     section: activeNav,
                 })}
@@ -307,7 +309,7 @@ export default function MiddleContent({ activeNav }) {
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#5B6577",
+                                                color: "#64748B",
                                                 mt: 0.5,
                                                 fontSize: {
                                                     xs: "0.8rem",

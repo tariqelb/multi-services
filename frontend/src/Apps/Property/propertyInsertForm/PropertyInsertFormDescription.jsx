@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
 import {
     Box,
@@ -20,7 +21,7 @@ export default function PropertyInsertFormDescription({
     return (
         <SectionPaper>
             <SectionHeader
-                icon="📝"
+                icon={<DescriptionOutlinedIcon />}
                 title={t("properties.insert.description.title")}
                 subtitle={t("properties.insert.description.subtitle")}
                 number={3}
@@ -68,8 +69,7 @@ export default function PropertyInsertFormDescription({
 
                 {errors?.description && (
                     <Typography
-                        variant="caption"
-                        color="error"
+                        variant="caption" sx={{ color: "error" }}
                     >
                         {errors.description}
                     </Typography>

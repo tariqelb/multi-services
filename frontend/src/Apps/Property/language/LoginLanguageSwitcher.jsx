@@ -6,7 +6,7 @@ import { Languages, ChevronDown, Check } from "lucide-react";
 export default function LoginLanguageSwitcher({
     variant = "default",
 }) {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -67,13 +67,13 @@ export default function LoginLanguageSwitcher({
             <button
                 type="button"
                 onClick={() => setOpen((previous) => !previous)}
-                aria-label="Select language"
+                aria-label={t("language.select", "Select language")}
                 aria-expanded={open}
                 aria-haspopup="listbox"
                 className={`flex items-center gap-2 rounded-xl transition-all duration-200 ${
                     isLogin
                         ? "min-w-[150px] border border-white/70 bg-white/90 px-3 py-2.5 shadow-lg backdrop-blur-md hover:bg-white"
-                        : "rounded-[10px] bg-white px-2 py-2 text-gray-600 shadow-sm hover:bg-gray-100 hover:text-gray-900"
+                        : "rounded-[10px] bg-white px-2 py-2 text-slate-600 shadow-sm hover:bg-slate-100 hover:text-slate-900"
                 }`}
             >
                 <Languages
@@ -81,9 +81,9 @@ export default function LoginLanguageSwitcher({
                     className={isLogin ? "text-blue-600" : ""}
                 />
 
-                <span className={`flex-1 text-left ${
+                <span className={`flex-1 text-start ${
                     isLogin
-                        ? "text-sm font-semibold text-gray-800"
+                        ? "text-sm font-semibold text-slate-800"
                         : "text-sm font-medium uppercase"
                 }`}>
                     {isLogin
@@ -93,7 +93,7 @@ export default function LoginLanguageSwitcher({
 
                 <ChevronDown
                     size={16}
-                    className={`shrink-0 text-gray-500 transition-transform duration-200 ${
+                    className={`shrink-0 text-slate-500 transition-transform duration-200 ${
                         open ? "rotate-180" : ""
                     }`}
                 />
@@ -103,8 +103,8 @@ export default function LoginLanguageSwitcher({
             {open && (
                 <div
                     role="listbox"
-                    aria-label="Available languages"
-                    className={`absolute right-0 z-[100] mt-2 overflow-hidden rounded-xl border border-gray-200 bg-white py-1.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 ${
+                    aria-label={t("language.available", "Available languages")}
+                    className={`absolute end-0 z-[100] mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white py-1.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 ${
                         isLogin ? "w-48" : "w-40"
                     }`}
                 >
@@ -124,7 +124,7 @@ export default function LoginLanguageSwitcher({
                                 className={`flex w-full items-center justify-between px-4 py-3 text-sm transition-colors ${
                                     selected
                                         ? "bg-blue-50 font-semibold text-blue-700"
-                                        : "text-gray-700 hover:bg-gray-50"
+                                        : "text-slate-700 hover:bg-slate-50"
                                 }`}
                             >
                                 <span>{language.label}</span>

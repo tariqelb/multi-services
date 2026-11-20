@@ -168,7 +168,6 @@ export default function FurnishedPropertyDetailsPage() {
             sx={{
                 flex: 1,
                 minWidth: 0,
-                pb: 6,
             }}
         >
             <FurnishedPropertyDetails
@@ -178,11 +177,13 @@ export default function FurnishedPropertyDetailsPage() {
             />
 
             {similarProperties.length > 0 && (
+                <Box sx={{ maxWidth: 1240, mx: "auto", px: { xs: 1.5, sm: 3, md: 4 }, pb: { xs: 12, lg: 6 } }}>
                 <FurnishedSimilarProperties
                     properties={similarProperties}
                     currentProperty={property}
                     onSelectProperty={handleSelectSimilar}
                 />
+                </Box>
             )}
         </Box>
     );

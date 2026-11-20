@@ -1,7 +1,6 @@
 
 import React from "react";
 import {
-    Paper,
     Stack,
     TextField,
     MenuItem,
@@ -9,7 +8,7 @@ import {
 } from "@mui/material";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
 
-import { SectionHeader } from "./RoommateFormUI";
+import { SectionHeader, SectionPaper } from "./RoommateFormUI";
 
 export default function RoommateAnnouncementSection({
     formData,
@@ -21,8 +20,9 @@ export default function RoommateAnnouncementSection({
         t(key, { defaultValue: fallback });
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
+        <SectionPaper>
             <SectionHeader
+                number={1}
                 icon={<HomeWorkIcon />}
                 title={translate(
                     "roommates.form.announcement",
@@ -119,6 +119,6 @@ export default function RoommateAnnouncementSection({
                     ))}
                 </TextField>
             </Stack>
-        </Paper>
+        </SectionPaper>
     );
 }

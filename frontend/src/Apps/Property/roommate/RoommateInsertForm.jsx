@@ -22,6 +22,8 @@ import RoommateRentSection from "./RoommateRentSection";
 import RoommatePreferencesSection from "./RoommatePreferencesSection";
 import RoommateMediaSection from "./RoommateMediaSection";
 import RoommatePublishSection from "./RoommatePublishSection";
+import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
+import { FormPage, FormPageHeader } from "../../../Components/ui/FormKit";
 
 // -----------------------------------------------------------------------------
 // Initial form values
@@ -123,7 +125,7 @@ export default function RoommateInsertForm({ onAddListing }) {
             transition: "all 0.2s ease",
 
             "& fieldset": {
-                borderColor: "#D5DCE8",
+                borderColor: "#E2E8F0",
             },
 
             "&:hover fieldset": {
@@ -939,96 +941,20 @@ export default function RoommateInsertForm({ onAddListing }) {
 
     return (
         <Box>
-            <Box
-                sx={{
-                    width: "100%",
-                    maxWidth: 1100,
-                    mx: "auto",
-                    py: { xs: 2, md: 4 },
-                    px: { xs: 1, sm: 2 },
-                }}
-            >
-                {/* Page heading */}
-                <Box sx={{ mb: 4, px: { xs: 1, sm: 0 } }}>
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={1}
-                        sx={{ mb: 1.5 }}
-                    >
-                        <Chip
-                            label={translate(
-                                "roommates.insert.badge",
-                                "ROOMMATE ANNOUNCEMENT"
-                            )}
-                            size="small"
-                            sx={{
-                                bgcolor: "#EFF6FF",
-                                color: "#2563EB",
-                                fontWeight: 600,
-                                fontSize: "0.68rem",
-                                letterSpacing: "0.6px",
-                                borderRadius: "6px",
-                            }}
-                        />
-                    </Stack>
-
-                    <Typography
-                        variant="h4"
-                        sx={{
-                            fontWeight: 700,
-                            color: "#0F172A",
-                            fontSize: "1.875rem",
-                            mb: 1,
-                        }}
-                    >
-                        {translate(
-                            "roommates.insert.title",
-                            "Create a roommate announcement"
-                        )}
-                    </Typography>
-
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            color: "#5B6577",
-                            maxWidth: 700,
-                            lineHeight: 1.8,
-                        }}
-                    >
-                        {translate(
-                            "roommates.insert.subtitle",
-                            "Share your accommodation, find a room, or connect with people who want to rent together."
-                        )}
-                    </Typography>
-
-                    <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        sx={{ mt: 2 }}
-                    >
-                        <Typography
-                            sx={{
-                                color: "#10b981",
-                                fontWeight: 700,
-                                fontSize: "1.1rem",
-                            }}
-                        >
-                            ✓
-                        </Typography>
-
-                        <Typography
-                            variant="caption"
-                            sx={{ color: "#5B6577" }}
-                        >
-                            {translate(
-                                "roommates.insert.requiredFields",
-                                "Fields marked with * are required."
-                            )}
-                        </Typography>
-                    </Stack>
-                </Box>
+            <FormPage>
+                <FormPageHeader
+                    icon={<GroupAddOutlinedIcon />}
+                    badge={translate("roommates.insert.badge", "ROOMMATE ANNOUNCEMENT")}
+                    title={translate("roommates.insert.title", "Create a roommate announcement")}
+                    subtitle={translate(
+                        "roommates.insert.subtitle",
+                        "Share your accommodation, find a room, or connect with people who want to rent together."
+                    )}
+                    requiredNote={translate(
+                        "roommates.insert.requiredFields",
+                        "Fields marked with * are required."
+                    )}
+                />
 
                 {/* Form */}
                 <Box component="form" onSubmit={handleSubmit}>
@@ -1088,11 +1014,12 @@ export default function RoommateInsertForm({ onAddListing }) {
                             profileLoading={profileLoading}
                             profile={profile}
                             onSubmit={handleSubmit}
+                            onReset={resetForm}
                             t={t}
                         />
                     </Stack>
                 </Box>
-            </Box>
+            </FormPage>
 
             {/* Notifications */}
             <Snackbar

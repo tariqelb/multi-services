@@ -69,7 +69,7 @@ export default function DisplayProfile({ profile = {} }) {
         >
             <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
                 <Stack spacing={0.5} sx={{ mb: 3 }}>
-                    <Typography variant="h6" fontWeight={700}>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         {t(
                             "myProfile.personalInformation.title",
                             "Personal information"
@@ -77,8 +77,7 @@ export default function DisplayProfile({ profile = {} }) {
                     </Typography>
 
                     <Typography
-                        variant="body2"
-                        color="text.secondary"
+                        variant="body2" sx={{ color: "text.secondary" }}
                     >
                         {t(
                             "myProfile.personalInformation.subtitle",
@@ -118,8 +117,7 @@ export default function DisplayProfile({ profile = {} }) {
                                     <Stack
                                         direction="row"
                                         spacing={1}
-                                        alignItems="center"
-                                        sx={{ mb: 1.2 }}
+                                        sx={{ alignItems: "center", mb: 1.2 }}
                                     >
                                         <Icon
                                             fontSize="small"
@@ -127,9 +125,7 @@ export default function DisplayProfile({ profile = {} }) {
                                         />
 
                                         <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                            fontWeight={700}
+                                            variant="caption" sx={{ color: "text.secondary", fontWeight: 700 }}
                                         >
                                             {t(
                                                 `myProfile.personalInformation.${field.key}`,
@@ -140,8 +136,7 @@ export default function DisplayProfile({ profile = {} }) {
 
                                     <Typography
                                         variant="body2"
-                                        fontWeight={500}
-                                        sx={{
+                                        sx={{ fontWeight: 500,
                                             minHeight: 24,
                                             whiteSpace: "pre-line",
                                             overflowWrap: "anywhere",

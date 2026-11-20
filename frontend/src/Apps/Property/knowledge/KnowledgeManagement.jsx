@@ -325,8 +325,7 @@ export default function KnowledgeManagement() {
                 >
                     <Stack
                         direction={{ xs: "column", md: "row" }}
-                        spacing={2}
-                        alignItems={{ md: "center" }}
+                        spacing={2} sx={{ alignItems: { md: "center" } }}
                     >
                         <TextField
                             label={t("searchContent")}
@@ -394,11 +393,9 @@ export default function KnowledgeManagement() {
                 </Paper>
 
                 <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
+                    direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}
                 >
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
                         {t("contentCount", { count: pagination.total })}
                     </Typography>
                 </Stack>
@@ -428,14 +425,12 @@ export default function KnowledgeManagement() {
                                 <TableRow>
                                     <TableCell colSpan={7}>
                                         <Stack
-                                            alignItems="center"
                                             spacing={1}
-                                            sx={{ py: 5 }}
+                                            sx={{ alignItems: "center", py: 5 }}
                                         >
                                             <CircularProgress />
                                             <Typography
-                                                variant="body2"
-                                                color="text.secondary"
+                                                variant="body2" sx={{ color: "text.secondary" }}
                                             >
                                                 {t("loading")}
                                             </Typography>
@@ -447,15 +442,13 @@ export default function KnowledgeManagement() {
                                     <TableCell colSpan={7}>
                                         <Box sx={{ py: 5, textAlign: "center" }}>
                                             <Typography
-                                                fontWeight={600}
-                                                gutterBottom
+                                                gutterBottom sx={{ fontWeight: 600 }}
                                             >
                                                 {t("emptyTitle")}
                                             </Typography>
 
                                             <Typography
-                                                variant="body2"
-                                                color="text.secondary"
+                                                variant="body2" sx={{ color: "text.secondary" }}
                                             >
                                                 {t("emptySubtitle")}
                                             </Typography>
@@ -475,8 +468,7 @@ export default function KnowledgeManagement() {
                                             <TableCell sx={{ minWidth: 220 }}>
                                                 <Stack
                                                     direction="row"
-                                                    spacing={1}
-                                                    alignItems="center"
+                                                    spacing={1} sx={{ alignItems: "center" }}
                                                 >
                                                     {item.type === "article" ? (
                                                         <ArticleOutlinedIcon
@@ -491,12 +483,10 @@ export default function KnowledgeManagement() {
                                                     <Box sx={{ minWidth: 0 }}>
                                                         <Stack
                                                             direction="row"
-                                                            spacing={0.5}
-                                                            alignItems="center"
+                                                            spacing={0.5} sx={{ alignItems: "center" }}
                                                         >
                                                             <Typography
-                                                                fontWeight={600}
-                                                                sx={{
+                                                                sx={{ fontWeight: 600,
                                                                     overflowWrap: "anywhere",
                                                                 }}
                                                             >
@@ -514,8 +504,7 @@ export default function KnowledgeManagement() {
                                                         </Stack>
 
                                                         <Typography
-                                                            variant="caption"
-                                                            color="text.secondary"
+                                                            variant="caption" sx={{ color: "text.secondary" }}
                                                         >
                                                             {item.tags?.slice(0, 3).join(", ") || t("noTags")}
                                                         </Typography>
@@ -557,8 +546,7 @@ export default function KnowledgeManagement() {
 
                                             <TableCell>
                                                 <Typography
-                                                    variant="body2"
-                                                    color="text.secondary"
+                                                    variant="body2" sx={{ color: "text.secondary" }}
                                                 >
                                                     {formatDate(item.updatedAt, locale)}
                                                 </Typography>
@@ -567,8 +555,7 @@ export default function KnowledgeManagement() {
                                             <TableCell align="right">
                                                 <Stack
                                                     direction="row"
-                                                    spacing={0.25}
-                                                    justifyContent="flex-end"
+                                                    spacing={0.25} sx={{ justifyContent: "flex-end" }}
                                                 >
                                                     <Tooltip title={t("actions.edit")}>
                                                         <IconButton
@@ -661,7 +648,7 @@ export default function KnowledgeManagement() {
                 </TableContainer>
 
                 {!loading && pagination.totalPages > 1 && (
-                    <Stack alignItems="center" sx={{ py: 1 }}>
+                    <Stack sx={{ alignItems: "center", py: 1 }}>
                         <Pagination
                             count={pagination.totalPages}
                             page={pagination.page}

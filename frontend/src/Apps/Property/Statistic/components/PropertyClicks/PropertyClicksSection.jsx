@@ -1,309 +1,344 @@
-///home/tariq/multi-services/app/frontend/src/components/admin/components/PropertyClicks/PropertyClicksSection.jsx
+// admin/components/PropertyClicks/PropertyClicksSection.jsx
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import {
     Box,
-    Typography,
     Grid,
-    CircularProgress,
-    Alert,
     Pagination,
+    Stack,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
 } from "@mui/material";
 
 import {
-    Visibility,
     HomeWork,
     LocationCity,
+    LoginOutlined,
+    PeopleAltOutlined,
+    PhoneInTalkOutlined,
+    QueryStatsOutlined,
+    TouchAppOutlined,
+    Visibility,
 } from "@mui/icons-material";
 
-import axiosInstance from "../../../../../api/axiosInstance";
-
-import SummaryCard from "./SummaryCard";
-import AnalyticsChart from "./AnalyticsChart";
 import PropertyClickCard from "./PropertyClickCard";
 
-import { formatNumber } from "./propertyClickUtils";
+import {
+    BarChartView,
+    ChartCard,
+    ChartGrid,
+    DonutChart,
+    EmptyState,
+    ErrorBanner,
+    HourlyChart,
+    KpiGrid,
+    LoadingState,
+    RangeSelect,
+    RankedList,
+    RefreshButton,
+    SectionHeader,
+    StatCard,
+    TrendChart,
+    useAnalyticsData,
+} from "../shared/AnalyticsUI";
+
+import {
+    formatDecimal,
+    formatNumber,
+    formatPercent,
+    getLocale,
+    translateValue,
+} from "../shared/analyticsUtils";
 
 const API_URL = "/property/clicks";
 const ITEMS_PER_PAGE = 6;
 
-const PropertyClicksSection = () => {
+export default function PropertyClicksSection() {
     const { t, i18n } = useTranslation();
+    const locale = getLocale(i18n.language);
+    const navigate = useNavigate();
 
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [range, setRange] = useState("30d");
+    const [sort, setSort] = useState("recent");
     const [page, setPage] = useState(1);
 
-    const locale = i18n.language?.startsWith("ar")
-        ? "ar"
-        : i18n.language?.startsWith("fr")
-            ? "fr-FR"
-            : "en-US";
-
-    const fetchAnalytics = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError("");
-
-            const response = await axiosInstance.get(API_URL, {
-                params: {
-                    page,
-                    limit: ITEMS_PER_PAGE,
-                },
-            });
-
-            setData(response.data);
-        } catch (err) {
-            console.error("Property click analytics error:", err);
-
-            setError(
-                err.response?.data?.message ||
-                t("adminPropertyClicks.errors.load")
-            );
-        } finally {
-            setLoading(false);
-        }
-    }, [page, t]);
-
     useEffect(() => {
-        fetchAnalytics();
-    }, [fetchAnalytics]);
+        setPage(1);
+    }, [range, sort]);
 
-    const summary = data?.summary || {
-        totalClicks: 0,
-        totalProperties: 0,
-        totalCities: 0,
-    };
+    const { data, loading, error, reload } = useAnalyticsData(API_URL, {
+        range,
+        sort,
+        page,
+        limit: ITEMS_PER_PAGE,
+    });
 
+    if (loading && !data) return <LoadingState />;
+
+    const summary = data?.summary || {};
     const charts = data?.charts || {};
     const properties = data?.properties || [];
+    const pagination = data?.pagination || { total: 0, totalPages: 0 };
 
-    const pagination = data?.pagination || {
-        total: 0,
-        page: 1,
-        limit: ITEMS_PER_PAGE,
-        totalPages: 0,
-    };
-
-    const handlePageChange = (_event, newPage) => {
-        setPage(newPage);
-    };
-
-    if (loading && !data) {
-        return (
-            <Box
-                sx={{
-                    minHeight: 350,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
+    const translateChart = (rows = [], namespace) =>
+        rows.map((row) => ({
+            ...row,
+            name: translateValue(t, `adminPropertyClicks.${namespace}`, row.name),
+        }));
 
     return (
-        <Box sx={{ width: "100%" }}>
-            {/* Header */}
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h5" fontWeight={700} sx={{ mb: 1 }}>
-                    {t("adminPropertyClicks.title")}
-                </Typography>
+        <Stack spacing={3}>
+            <SectionHeader
+                icon={<Visibility />}
+                title={t("adminPropertyClicks.title", "Property views")}
+                subtitle={t(
+                    "adminPropertyClicks.subtitle",
+                    "Which internal listings attract attention and convert into contacts."
+                )}
+            >
+                <RangeSelect value={range} onChange={setRange} />
+                <RefreshButton onClick={reload} loading={loading} />
+            </SectionHeader>
 
-                <Typography variant="body2" color="text.secondary">
-                    {t("adminPropertyClicks.subtitle")}
-                </Typography>
-            </Box>
+            <ErrorBanner error={error} />
 
-            {/* Error */}
-            {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                    {error}
-                </Alert>
-            )}
+            <KpiGrid>
+                <StatCard
+                    title={t("adminPropertyClicks.summary.clicksInRange", "Views in period")}
+                    value={formatNumber(summary.clicksInRange, locale)}
+                    change={summary.clicksChange}
+                    icon={<Visibility />}
+                    locale={locale}
+                />
 
-            {/* Loading during pagination */}
-            {loading && data && (
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        mb: 3,
-                    }}
+                <StatCard
+                    title={t("adminPropertyClicks.summary.uniqueVisitors", "Unique viewers")}
+                    value={formatNumber(summary.uniqueVisitors, locale)}
+                    description={t("adminPropertyClicks.summary.perVisitor", "{{value}} views each", {
+                        value: formatDecimal(summary.clicksPerVisitor, locale),
+                    })}
+                    icon={<PeopleAltOutlined />}
+                    color="#16A34A"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminPropertyClicks.summary.contacts", "Owner contacts")}
+                    value={formatNumber(summary.contacts, locale)}
+                    icon={<PhoneInTalkOutlined />}
+                    color="#0891B2"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminPropertyClicks.summary.conversionRate", "View → contact rate")}
+                    value={formatPercent(summary.conversionRate, locale)}
+                    description={t("adminPropertyClicks.summary.conversionDescription", "Contacts per 100 views")}
+                    icon={<TouchAppOutlined />}
+                    color="#9333EA"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminPropertyClicks.summary.clickedProperties", "Properties viewed")}
+                    value={formatNumber(summary.clickedProperties, locale)}
+                    description={t("adminPropertyClicks.summary.trackedTotal", "{{count}} tracked overall", {
+                        count: formatNumber(summary.totalProperties, locale),
+                    })}
+                    icon={<HomeWork />}
+                    color="#EA580C"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminPropertyClicks.summary.registeredShare", "Signed-in viewers")}
+                    value={formatPercent(summary.registeredShare, locale)}
+                    icon={<LoginOutlined />}
+                    color="#2563EB"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminPropertyClicks.summary.totalClicks", "Lifetime views")}
+                    value={formatNumber(summary.totalClicks, locale)}
+                    icon={<QueryStatsOutlined />}
+                    color="#64748B"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("adminPropertyClicks.summary.cities", "Cities")}
+                    value={formatNumber(summary.totalCities, locale)}
+                    icon={<LocationCity />}
+                    color="#EC4899"
+                    locale={locale}
+                />
+            </KpiGrid>
+
+            <ChartGrid template="7fr 5fr">
+                <ChartCard
+                    title={t("adminPropertyClicks.charts.trend", "Views over time")}
+                    subtitle={t("adminPropertyClicks.charts.trendDescription", "Views and unique viewers")}
+                    height={320}
                 >
-                    <CircularProgress size={25} />
-                </Box>
-            )}
-
-            {/* Summary cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
-                    <SummaryCard
-                        title={t("adminPropertyClicks.summary.totalClicks")}
-                        value={formatNumber(summary.totalClicks, locale)}
-                        icon={<Visibility />}
-                        color="#2563EB"
+                    <TrendChart
+                        data={data?.trend || []}
+                        locale={locale}
+                        series={[
+                            { key: "clicks", name: t("adminPropertyClicks.charts.clicks", "Views"), color: "#2563EB" },
+                            { key: "uniqueVisitors", name: t("adminPropertyClicks.summary.uniqueVisitors", "Unique viewers"), color: "#16A34A" },
+                        ]}
                     />
-                </Grid>
+                </ChartCard>
 
-                <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
-                    <SummaryCard
-                        title={t("adminPropertyClicks.summary.trackedProperties")}
-                        value={formatNumber(summary.totalProperties, locale)}
-                        icon={<HomeWork />}
+                <ChartCard
+                    title={t("adminPropertyClicks.charts.hourly", "Views by hour")}
+                    subtitle={t("adminPropertyClicks.charts.hourlyDescription", "Best time to publish or boost listings")}
+                    height={320}
+                >
+                    <HourlyChart
+                        data={data?.hourly || []}
+                        valueKey="clicks"
+                        name={t("adminPropertyClicks.charts.clicks", "Views")}
                         color="#2563EB"
+                        locale={locale}
                     />
-                </Grid>
+                </ChartCard>
+            </ChartGrid>
 
-                <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
-                    <SummaryCard
-                        title={t("adminPropertyClicks.summary.cities")}
-                        value={formatNumber(summary.totalCities, locale)}
-                        icon={<LocationCity />}
-                        color="#2563EB"
+            <ChartGrid template="1fr 1fr 1fr">
+                <ChartCard title={t("adminPropertyClicks.charts.propertyTypes", "By property type")} height={300}>
+                    <BarChartView
+                        layout="vertical"
+                        data={translateChart(charts.propertyTypes, "propertyTypes")}
+                        bars={[{ key: "clicks", name: t("adminPropertyClicks.charts.clicks", "Views"), color: "#2563EB" }]}
+                        locale={locale}
+                        labelWidth={95}
                     />
-                </Grid>
-            </Grid>
+                </ChartCard>
 
-            {/* Charts */}
-            <Box sx={{ mb: 5 }}>
-                <Typography variant="h6" fontWeight={700} sx={{ mb: 2.5 }}>
-                    {t("adminPropertyClicks.charts.title")}
-                </Typography>
+                <ChartCard title={t("adminPropertyClicks.charts.listingTypes", "Sale vs rent")} height={300}>
+                    <DonutChart
+                        data={translateChart(charts.listingTypes, "listingTypes")}
+                        valueKey="clicks"
+                        locale={locale}
+                    />
+                </ChartCard>
 
-                <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, lg: 4 }}>
-                        <AnalyticsChart
-                            title={t("adminPropertyClicks.charts.propertyTypes")}
-                            data={charts.propertyTypes || []}
-                        />
-                    </Grid>
+                <ChartCard title={t("adminPropertyClicks.charts.cities", "By city")} height={300}>
+                    <BarChartView
+                        layout="vertical"
+                        data={charts.cities || []}
+                        bars={[{ key: "clicks", name: t("adminPropertyClicks.charts.clicks", "Views"), color: "#16A34A" }]}
+                        locale={locale}
+                        labelWidth={95}
+                    />
+                </ChartCard>
+            </ChartGrid>
 
-                    <Grid size={{ xs: 12, lg: 4 }}>
-                        <AnalyticsChart
-                            title={t("adminPropertyClicks.charts.listingTypes")}
-                            data={charts.listingTypes || []}
-                        />
-                    </Grid>
-
-                    <Grid size={{ xs: 12, lg: 4 }}>
-                        <AnalyticsChart
-                            title={t("adminPropertyClicks.charts.cities")}
-                            data={charts.cities || []}
-                        />
-                    </Grid>
-                </Grid>
-            </Box>
+            <ChartCard
+                title={t("adminPropertyClicks.topProperties", "Top properties in this period")}
+                subtitle={t(
+                    "adminPropertyClicks.topPropertiesDescription",
+                    "Most viewed listings with their contact conversion"
+                )}
+                height={null}
+            >
+                <RankedList
+                    items={(data?.topProperties || []).map((item) => ({
+                        key: item.propertyId,
+                        primary: item.title || t("adminPropertyClicks.properties.untitled", "Untitled property"),
+                        secondary: [
+                            item.city,
+                            translateValue(t, "adminPropertyClicks.propertyTypes", item.propertyType),
+                            translateValue(t, "adminPropertyClicks.listingTypes", item.listingType),
+                        ]
+                            .filter(Boolean)
+                            .join(" · "),
+                        value: item.clicks,
+                        valueLabel: t("adminPropertyClicks.viewsCount", "{{count}} views", {
+                            count: formatNumber(item.clicks, locale),
+                        }),
+                        extra: t("adminPropertyClicks.contactsConversion", "{{contacts}} contacts · {{rate}}", {
+                            contacts: formatNumber(item.contacts, locale),
+                            rate: formatPercent(item.conversionRate, locale),
+                        }),
+                        onClick: () => navigate(`/properties/${item.propertyId}`),
+                    }))}
+                />
+            </ChartCard>
 
             {/* All tracked properties */}
-            <Box>
-                <Box sx={{ mb: 2.5 }}>
-                    <Typography variant="h6" fontWeight={700}>
-                        {t("adminPropertyClicks.properties.title")}
-                    </Typography>
-
-                    <Typography variant="body2" color="text.secondary">
-                        {t("adminPropertyClicks.properties.subtitle")}
-                    </Typography>
-                </Box>
-
-                {properties.length > 0 ? (
-                    <>
-                        <Grid container spacing={3}>
-                            {properties.map((property) => (
-                                <Grid
-                                    key={property.propertyId}
-                                    size={{
-                                        xs: 12,
-                                        sm: 6,
-                                        lg: 4,
-                                        xl: 3,
-                                    }}
-                                >
-                                    <PropertyClickCard property={property} />
-                                </Grid>
-                            ))}
-                        </Grid>
-
-                        {/* Pagination */}
-                        <Box
-                            sx={{
-                                mt: 5,
-                                pt: 3,
-                                borderTop: "1px solid",
-                                borderColor: "divider",
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                gap: 2,
-                            }}
-                        >
-                            <Typography variant="body2" color="text.secondary">
-                                {t("adminPropertyClicks.pagination.showing", {
-                                    from: (page - 1) * ITEMS_PER_PAGE + 1,
-                                    to:
-                                        (page - 1) * ITEMS_PER_PAGE +
-                                        properties.length,
-                                    total: formatNumber(pagination.total, locale),
-                                })}
-                            </Typography>
-
-                            {pagination.totalPages > 1 && (
-                                <Pagination
-                                    count={pagination.totalPages}
-                                    page={page}
-                                    onChange={handlePageChange}
-                                    color="primary"
-                                    shape="rounded"
-                                    siblingCount={1}
-                                    boundaryCount={1}
-                                />
-                            )}
-                        </Box>
-                    </>
-                ) : (
-                    <Box
-                        sx={{
-                            minHeight: 220,
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            border: "1px dashed",
-                            borderColor: "divider",
-                            borderRadius: "16px",
-                            p: 3,
-                        }}
-                    >
-                        <Visibility
-                            sx={{
-                                fontSize: 45,
-                                color: "text.disabled",
-                                mb: 1.5,
-                            }}
-                        />
-
-                        <Typography variant="h6" fontWeight={600}>
-                            {t("adminPropertyClicks.empty.title")}
+            <Stack spacing={2}>
+                <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1.5} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" } }}
+                >
+                    <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                            {t("adminPropertyClicks.properties.title", "All tracked properties")}
                         </Typography>
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            textAlign="center"
-                        >
-                            {t("adminPropertyClicks.empty.description")}
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            {t("adminPropertyClicks.properties.subtitle", "Lifetime counters with views in the selected period")}
                         </Typography>
                     </Box>
-                )}
-            </Box>
-        </Box>
-    );
-};
 
-export default PropertyClicksSection;
+                    <ToggleButtonGroup
+                        size="small"
+                        exclusive
+                        value={sort}
+                        onChange={(_event, value) => value && setSort(value)}
+                    >
+                        <ToggleButton value="recent">
+                            {t("adminPropertyClicks.sort.recent", "Recently viewed")}
+                        </ToggleButton>
+                        <ToggleButton value="clicks">
+                            {t("adminPropertyClicks.sort.clicks", "Most viewed")}
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Stack>
+
+                {properties.length === 0 ? (
+                    <EmptyState
+                        message={t(
+                            "adminPropertyClicks.empty.description",
+                            "No property views have been recorded yet."
+                        )}
+                    />
+                ) : (
+                    <Grid container spacing={2.5}>
+                        {properties.map((property) => (
+                            <Grid key={property.propertyId} size={{ xs: 12, sm: 6, lg: 4 }}>
+                                <PropertyClickCard property={property} />
+                            </Grid>
+                        ))}
+                    </Grid>
+                )}
+
+                {pagination.totalPages > 1 && (
+                    <Stack spacing={1} sx={{ alignItems: "center", pt: 1 }}>
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            {t("adminPropertyClicks.pagination.showing", "Showing {{from}}–{{to}} of {{total}}", {
+                                from: (page - 1) * ITEMS_PER_PAGE + 1,
+                                to: (page - 1) * ITEMS_PER_PAGE + properties.length,
+                                total: formatNumber(pagination.total, locale),
+                            })}
+                        </Typography>
+
+                        <Pagination
+                            count={pagination.totalPages}
+                            page={page}
+                            onChange={(_event, value) => setPage(value)}
+                            color="primary"
+                            shape="rounded"
+                        />
+                    </Stack>
+                )}
+            </Stack>
+        </Stack>
+    );
+}

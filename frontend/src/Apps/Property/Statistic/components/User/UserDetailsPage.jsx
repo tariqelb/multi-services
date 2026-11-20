@@ -137,13 +137,12 @@ function getRecordDescription(record, tab) {
 function InfoItem({ label, value }) {
     return (
         <Box sx={{ minWidth: 0 }}>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 {label}
             </Typography>
             <Typography
                 variant="body2"
-                fontWeight={600}
-                sx={{ overflowWrap: "anywhere" }}
+                sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
             >
                 {value || "—"}
             </Typography>
@@ -155,10 +154,10 @@ function StatCard({ label, value }) {
     return (
         <Card variant="outlined" sx={{ height: "100%", borderRadius: 2 }}>
             <CardContent>
-                <Typography variant="h5" fontWeight={700}>
+                <Typography variant="h5" sx={{ fontWeight: 700 }}>
                     {value ?? 0}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     {label}
                 </Typography>
             </CardContent>
@@ -277,7 +276,7 @@ export default function UserDetailsPage() {
 
         if (loadingTab) {
             return (
-                <Box display="flex" justifyContent="center" py={5}>
+                <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
                     <CircularProgress />
                 </Box>
             );
@@ -289,8 +288,8 @@ export default function UserDetailsPage() {
 
         if (items.length === 0) {
             return (
-                <Box textAlign="center" py={5}>
-                    <Typography color="text.secondary">
+                <Box sx={{ textAlign: "center", py: 5 }}>
+                    <Typography sx={{ color: "text.secondary" }}>
                         {t("userDetails.noRecords")}
                     </Typography>
                 </Box>
@@ -312,19 +311,16 @@ export default function UserDetailsPage() {
                             <CardContent>
                                 <Stack
                                     direction={{ xs: "column", sm: "row" }}
-                                    justifyContent="space-between"
-                                    alignItems={{ xs: "flex-start", sm: "center" }}
-                                    spacing={1}
+                                    spacing={1} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" } }}
                                 >
                                     <Box sx={{ minWidth: 0 }}>
-                                        <Typography fontWeight={700}>
+                                        <Typography sx={{ fontWeight: 700 }}>
                                             {title}
                                         </Typography>
 
                                         <Typography
                                             variant="body2"
-                                            color="text.secondary"
-                                            sx={{ mt: 0.5, overflowWrap: "anywhere" }}
+                                            sx={{ color: "text.secondary", mt: 0.5, overflowWrap: "anywhere" }}
                                         >
                                             {description}
                                         </Typography>
@@ -345,12 +341,9 @@ export default function UserDetailsPage() {
                                 <Divider sx={{ my: 1.5 }} />
 
                                 <Stack
-                                    direction="row"
-                                    justifyContent="space-between"
-                                    flexWrap="wrap"
-                                    gap={1}
+                                    direction="row" sx={{ justifyContent: "space-between", flexWrap: "wrap", gap: 1 }}
                                 >
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
                                         {t("userDetails.createdAt")}: {formatDate(record.createdAt)}
                                     </Typography>
 
@@ -382,7 +375,7 @@ export default function UserDetailsPage() {
             </Button>
 
             {loadingOverview && !user ? (
-                <Box display="flex" justifyContent="center" py={8}>
+                <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
                     <CircularProgress />
                 </Box>
             ) : overviewError && !user ? (
@@ -400,8 +393,7 @@ export default function UserDetailsPage() {
                         <CardContent>
                             <Stack
                                 direction={{ xs: "column", sm: "row" }}
-                                alignItems={{ xs: "flex-start", sm: "center" }}
-                                spacing={2}
+                                spacing={2} sx={{ alignItems: { xs: "flex-start", sm: "center" } }}
                             >
                                 <Avatar
                                     src={user?.profileImage || undefined}
@@ -416,16 +408,12 @@ export default function UserDetailsPage() {
                                 </Avatar>
 
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                                    <Typography variant="h5" fontWeight={700}>
+                                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
                                         {getFullName(user)}
                                     </Typography>
 
                                     <Stack
-                                        direction="row"
-                                        alignItems="center"
-                                        flexWrap="wrap"
-                                        gap={1}
-                                        mt={1}
+                                        direction="row" sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: 1 }}
                                     >
                                         <Chip
                                             size="small"
@@ -575,11 +563,11 @@ export default function UserDetailsPage() {
                         <Box sx={{ p: { xs: 2, md: 3 } }}>
                             {activeTab === "overview" ? (
                                 <Stack spacing={2}>
-                                    <Typography variant="h6" fontWeight={700}>
+                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
                                         {t("userDetails.accountOverview")}
                                     </Typography>
 
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                         {user?.bio || t("userDetails.noBio")}
                                     </Typography>
 
@@ -596,11 +584,11 @@ export default function UserDetailsPage() {
                                     {statistics.feedbackByStatus && (
                                         <>
                                             <Divider />
-                                            <Typography fontWeight={700}>
+                                            <Typography sx={{ fontWeight: 700 }}>
                                                 {t("userDetails.feedbackByStatus")}
                                             </Typography>
 
-                                            <Stack direction="row" flexWrap="wrap" gap={1}>
+                                            <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }}>
                                                 {Object.entries(statistics.feedbackByStatus).map(
                                                     ([status, count]) => (
                                                         <Chip

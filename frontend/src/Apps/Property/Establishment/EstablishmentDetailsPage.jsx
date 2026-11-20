@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -7,37 +6,51 @@ import {
     Alert,
     Box,
     Button,
-    Card,
-    CardContent,
     Chip,
     CircularProgress,
-    Container,
-    Divider,
-    Grid,
-    IconButton,
     Paper,
     Rating,
     Stack,
     Typography,
 } from "@mui/material";
 
+import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
+import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
+import HotelOutlinedIcon from "@mui/icons-material/HotelOutlined";
+import BedOutlinedIcon from "@mui/icons-material/BedOutlined";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import MeetingRoomOutlinedIcon from "@mui/icons-material/MeetingRoomOutlined";
+import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import RoomServiceOutlinedIcon from "@mui/icons-material/RoomServiceOutlined";
+import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
+import PlayCircleOutlineRoundedIcon from "@mui/icons-material/PlayCircleOutlineRounded";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+
 import {
-    ArrowBack,
-    Bed,
-    Language,
-    LocationOn,
-    Phone,
-    Email,
-    Hotel,
-    OpenInNew,
-    WhatsApp,
-    MeetingRoom,
-    ChevronLeft,
-    ChevronRight,
-} from "@mui/icons-material";
-import { OndemandVideo } from "@mui/icons-material";
+    DescriptionText,
+    DetailsBackButton,
+    DetailsContainer,
+    DetailsHeader,
+    DetailsLayout,
+    DetailsSection,
+    FactGrid,
+    KeyValueList,
+    MapLinkButton,
+    MediaGallery,
+    MobileActionBar,
+    SidebarCard,
+    StatusBadge,
+    VideoEmbed,
+} from "../../../Components/ui/DetailsKit";
 
 import axiosInstance from "../../../api/axiosInstance";
+import { trackListingContact } from "../../../api/trackContact";
 
 const API_BASE_URL =
     import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -117,240 +130,6 @@ function getStarRating(classification) {
 
     const match = String(classification).match(/[1-5]/);
     return match ? Number(match[0]) : 0;
-}
-
-function FacilityItem({ label, enabled }) {
-    if (!enabled) return null;
-
-    return (
-        <Chip
-            label={label}
-            variant="outlined"
-            color="success"
-            sx={{ borderRadius: 2 }}
-        />
-    );
-}
-
-function SectionTitle({ children }) {
-    return (
-        <Typography
-            variant="h5"
-            fontWeight={800}
-            color="#0B2E5C"
-            sx={{ mb: 2.5 }}
-        >
-            {children}
-        </Typography>
-    );
-}
-
-function EstablishmentGallery({ images, name, t }) {
-    const [selectedIndex, setSelectedIndex] = useState(0);
-
-    useEffect(() => {
-        setSelectedIndex(0);
-    }, [images.join("|")]);
-
-    const selectedImage = images[selectedIndex];
-
-    const sideImages = images
-        .map((image, index) => ({ image, index }))
-        .filter((item) => item.index !== selectedIndex)
-        .slice(0, 4);
-
-    const showPrevious = () => {
-        setSelectedIndex((current) =>
-            current === 0 ? images.length - 1 : current - 1
-        );
-    };
-
-    const showNext = () => {
-        setSelectedIndex((current) =>
-            current === images.length - 1 ? 0 : current + 1
-        );
-    };
-
-    if (!images.length) {
-        return (
-            <Paper
-                elevation={0}
-                sx={{
-                    height: 280,
-                    bgcolor: "#e2e8f0",
-                    borderRadius: 3,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mb: 4,
-                }}
-            >
-                <Hotel sx={{ fontSize: 80, color: "#94a3b8" }} />
-            </Paper>
-        );
-    }
-
-    return (
-        <Grid container spacing={1} sx={{ mb: 4 }}>
-            {/* Main selected image */}
-            <Grid size={{ xs: 12, md: 8 }}>
-                <Box
-                    sx={{
-                        position: "relative",
-                        height: { xs: 260, sm: 350, md: 430 },
-                        borderRadius: 3,
-                        overflow: "hidden",
-                        bgcolor: "#e2e8f0",
-                    }}
-                >
-                    <Box
-                        component="img"
-                        src={selectedImage}
-                        alt={name}
-                        sx={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "contain",
-                            display: "block",
-                        }}
-                    />
-
-                    {images.length > 1 && (
-                        <>
-                            <IconButton
-                                onClick={showPrevious}
-                                aria-label={t("establishments.details.previousImage", {
-                                    defaultValue: "Previous image",
-                                })}
-                                sx={{
-                                    position: "absolute",
-                                    left: 12,
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    bgcolor: "rgba(255,255,255,0.9)",
-                                    "&:hover": {
-                                        bgcolor: "#fff",
-                                    },
-                                }}
-                            >
-                                <ChevronLeft />
-                            </IconButton>
-
-                            <IconButton
-                                onClick={showNext}
-                                aria-label={t("establishments.details.nextImage", {
-                                    defaultValue: "Next image",
-                                })}
-                                sx={{
-                                    position: "absolute",
-                                    right: 12,
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    bgcolor: "rgba(255,255,255,0.9)",
-                                    "&:hover": {
-                                        bgcolor: "#fff",
-                                    },
-                                }}
-                            >
-                                <ChevronRight />
-                            </IconButton>
-
-                            <Chip
-                                label={`${selectedIndex + 1} / ${images.length}`}
-                                size="small"
-                                sx={{
-                                    position: "absolute",
-                                    bottom: 14,
-                                    right: 14,
-                                    bgcolor: "rgba(15,23,42,0.75)",
-                                    color: "#fff",
-                                    fontWeight: 700,
-                                }}
-                            />
-                        </>
-                    )}
-                </Box>
-            </Grid>
-
-            {/* Smaller images beside the main image */}
-            <Grid size={{ xs: 12, md: 4 }}>
-                <Grid container spacing={1}>
-                    {sideImages.map(({ image, index }) => (
-                        <Grid
-                            key={`${image}-${index}`}
-                            size={{ xs: 6, md: 6 }}
-                        >
-                            <Box
-                                onClick={() => setSelectedIndex(index)}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(event) => {
-                                    if (
-                                        event.key === "Enter" ||
-                                        event.key === " "
-                                    ) {
-                                        event.preventDefault();
-                                        setSelectedIndex(index);
-                                    }
-                                }}
-                                sx={{
-                                    position: "relative",
-                                    height: {
-                                        xs: 130,
-                                        sm: 170,
-                                        md: 212,
-                                    },
-                                    borderRadius: 2,
-                                    overflow: "hidden",
-                                    cursor: "pointer",
-                                    outline:
-                                        "2px solid transparent",
-                                    "&:hover": {
-                                        outline: "2px solid #2563EB",
-                                    },
-                                    "&:focus-visible": {
-                                        outline: "2px solid #2563EB",
-                                    },
-                                }}
-                            >
-                                <Box
-                                    component="img"
-                                    src={image}
-                                    alt={`${name} ${index + 1}`}
-                                    sx={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "contain",
-                                        display: "block",
-                                        bgcolor: "#e2e8f0",
-                                        transition: "transform 0.25s",
-                                    }}
-                                />
-                            </Box>
-                        </Grid>
-                    ))}
-
-                    {images.length > 5 && (
-                        <Grid size={12}>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={showNext}
-                                sx={{
-                                    textTransform: "none",
-                                    borderRadius: 2,
-                                }}
-                            >
-                                {t("establishments.details.morePhotos", {
-                                    defaultValue: "View more photos",
-                                })}
-                            </Button>
-                        </Grid>
-                    )}
-                </Grid>
-            </Grid>
-        </Grid>
-    );
 }
 
 export default function EstablishmentDetailsPage() {
@@ -434,14 +213,7 @@ export default function EstablishmentDetailsPage() {
 
     if (loading) {
         return (
-            <Box
-                sx={{
-                    minHeight: "60vh",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
+            <Box sx={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <CircularProgress />
             </Box>
         );
@@ -449,18 +221,10 @@ export default function EstablishmentDetailsPage() {
 
     if (error || !establishment) {
         return (
-            <Container maxWidth="lg" sx={{ py: 5 }}>
-                <Alert severity="error" sx={{ mb: 3 }}>
-                    {error || tr("notFound", "Establishment not found.")}
-                </Alert>
-
-                <Button
-                    startIcon={<ArrowBack />}
-                    onClick={() => navigate(-1)}
-                >
-                    {tr("back", "Back")}
-                </Button>
-            </Container>
+            <DetailsContainer maxWidth={800}>
+                <DetailsBackButton onClick={() => navigate(-1)} label={tr("back", "Back")} />
+                <Alert severity="error">{error || tr("notFound", "Establishment not found.")}</Alert>
+            </DetailsContainer>
         );
     }
 
@@ -497,6 +261,16 @@ export default function EstablishmentDetailsPage() {
               )}`
             : "");
 
+    // Record the contact without delaying the link / call.
+    const trackContact = (action, target = "") => {
+        trackListingContact(
+            "establishment",
+            establishment._id || id,
+            action,
+            target
+        );
+    };
+
     const facilityLabels = {
         swimmingPool: tr("facilities.swimmingPool", "Swimming pool"),
         restaurant: tr("facilities.restaurant", "Restaurant"),
@@ -511,671 +285,387 @@ export default function EstablishmentDetailsPage() {
         roomService: tr("facilities.roomService", "Room service"),
     };
 
-    return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
-            {/* Back button */}
-            <Button
-                startIcon={<ArrowBack />}
-                onClick={() => navigate(-1)}
-                sx={{ mb: 3 }}
-            >
-                {tr("back", "Back")}
-            </Button>
+    const translateOption = (value) =>
+        value
+            ? t(`establishmentForm.options.${String(value).toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, {
+                defaultValue: value,
+            })
+            : "";
 
-            {/* Main heading */}
-            <Stack
-                direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-                alignItems={{ xs: "flex-start", sm: "center" }}
-                spacing={2}
-                sx={{ mb: 3 }}
-            >
-                <Box>
-                    <Typography
-                        variant="h4"
-                        fontWeight={800}
-                        color="#0B2E5C"
-                    >
-                        {name}
-                    </Typography>
+    const locationLabel =
+        [location.neighborhood, location.city].filter(Boolean).join(", ") ||
+        tr("locationNotSpecified", "Location not specified");
 
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={1}
-                        sx={{ mt: 1 }}
-                    >
-                        <LocationOn color="action" />
+    const otherServices = Array.isArray(facilities.otherServices)
+        ? facilities.otherServices
+        : facilities.otherServices
+            ? [facilities.otherServices]
+            : [];
 
-                        <Typography color="text.secondary">
-                            {[
-                                location.neighborhood,
-                                location.city,
-                            ]
-                                .filter(Boolean)
-                                .join(", ") ||
-                                tr("locationNotSpecified", "Location not specified")}
-                        </Typography>
-                    </Stack>
+    const enabledFacilities = Object.entries(facilityLabels).filter(([key]) => facilities[key]);
 
-                    {starRating > 0 && (
-                        <Stack
-                            direction="row"
-                            alignItems="center"
-                            spacing={1}
-                            sx={{ mt: 1 }}
-                        >
-                            <Rating
-                                value={starRating}
-                                readOnly
-                                precision={1}
-                                sx={{
-                                    color: "#F59E0B",
-                                    fontSize: "1.5rem",
-                                }}
-                            />
+    const roomPrices = rooms.map((room) => Number(room.pricePerNight)).filter((value) => Number.isFinite(value) && value > 0);
+    const fromPrice = roomPrices.length ? Math.min(...roomPrices) : null;
 
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                            >
-                                {starRating}{" "}
-                                {tr("starClassification", "star classification")}
-                            </Typography>
-                        </Stack>
-                    )}
-                </Box>
+    const whatsappSx = { bgcolor: "#16A34A", color: "#fff", "&:hover": { bgcolor: "#15803D" } };
 
-                <Stack
-                    direction="row"
-                    spacing={1}
-                    flexWrap="wrap"
-                    useFlexGap
-                >
-                    {accommodationType && (
-                        <Chip
-                            icon={<Hotel />}
-                            label={accommodationType}
-                            color="primary"
-                        />
-                    )}
-                </Stack>
-            </Stack>
+    const openCall = () => {
+        if (!phone) return;
+        trackContact("call");
+        window.location.href = `tel:${phone}`;
+    };
 
-            {/* Interactive cover image and gallery */}
-            <EstablishmentGallery
+    const openWhatsApp = () => {
+        if (!whatsapp) return;
+        trackContact("whatsapp");
+        window.open(`https://wa.me/${whatsapp.replace(/\D/g, "")}`, "_blank", "noopener,noreferrer");
+    };
+
+    const overviewFacts = [
+        { icon: <MeetingRoomOutlinedIcon />, label: tr("numberOfRooms", "Number of rooms"), value: numberOfRooms },
+        { icon: <LayersOutlinedIcon />, label: tr("numberOfFloors", "Number of floors"), value: numberOfFloors },
+        { icon: <CalendarMonthOutlinedIcon />, label: tr("established", "Established"), value: yearEstablished },
+    ];
+
+    const main = (
+        <>
+            <MediaGallery
                 images={allImages}
-                name={name}
-                t={t}
+                alt={name}
+                emptyIcon={<HotelOutlinedIcon />}
+                emptyLabel={tr("noImages", "No photos available")}
             />
 
-            <Grid container spacing={3}>
-                {/* Main information */}
-                <Grid size={{ xs: 12, md: 8 }}>
-                    {/* Description */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 2, md: 3 },
-                            border: "1px solid #e5e7eb",
-                            borderRadius: 3,
-                            mb: 3,
-                        }}
-                    >
-                        <SectionTitle>
-                            {tr("about", "About this establishment")}
-                        </SectionTitle>
+            <DetailsSection title={tr("about", "About this establishment")} icon={<InfoOutlinedIcon />}>
+                {shortDescription && (
+                    <Typography variant="subtitle1" sx={{ mb: 1.5 }}>
+                        {shortDescription}
+                    </Typography>
+                )}
+                <DescriptionText>
+                    {fullDescription || tr("noDescription", "No additional description provided.")}
+                </DescriptionText>
+                {overviewFacts.some((item) => item.value != null && item.value !== "") && (
+                    <Box sx={{ mt: 2.5 }}>
+                        <FactGrid items={overviewFacts} />
+                    </Box>
+                )}
+            </DetailsSection>
 
-                        {shortDescription && (
-                            <Typography
-                                fontWeight={600}
-                                sx={{ mb: 2 }}
-                            >
-                                {shortDescription}
-                            </Typography>
-                        )}
+            <DetailsSection title={tr("rooms", "Rooms & accommodation")} icon={<BedOutlinedIcon />}>
+                {rooms.length === 0 ? (
+                    <Typography sx={{ color: "text.secondary" }}>{tr("noRooms", "No room information provided.")}</Typography>
+                ) : (
+                    <Stack spacing={2}>
+                        {rooms.map((room, index) => {
+                            const roomPhotos = (room.photos || []).map(getImageUrl).filter(Boolean);
+                            const roomTitle = room.roomType ? translateOption(room.roomType) : `${tr("room", "Room")} ${index + 1}`;
 
-                        <Typography
-                            color="text.secondary"
-                            sx={{
-                                whiteSpace: "pre-line",
-                                lineHeight: 1.8,
-                            }}
-                        >
-                            {fullDescription ||
-                                tr("noDescription", "No additional description provided.")}
-                        </Typography>
-
-                        <Divider sx={{ my: 3 }} />
-
-                        <Grid container spacing={2}>
-                            {[
-                                {
-                                    label: tr("numberOfRooms", "Number of rooms"),
-                                    value: numberOfRooms,
-                                },
-                                {
-                                    label: tr("numberOfFloors", "Number of floors"),
-                                    value: numberOfFloors,
-                                },
-                                {
-                                    label: tr("established", "Established"),
-                                    value: yearEstablished,
-                                },
-                            ]
-                                .filter((item) => item.value != null)
-                                .map((item) => (
-                                    <Grid
-                                        key={item.label}
-                                        size={{ xs: 12, sm: 4 }}
-                                    >
-                                        <Typography
-                                            variant="body2"
-                                            color="text.secondary"
-                                        >
-                                            {item.label}
-                                        </Typography>
-
-                                        <Typography
-                                            variant="h6"
-                                            fontWeight={700}
-                                        >
-                                            {item.value}
-                                        </Typography>
-                                    </Grid>
-                                ))}
-                        </Grid>
-                    </Paper>
-
-                    {/* Rooms */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 2, md: 3 },
-                            border: "1px solid #e5e7eb",
-                            borderRadius: 3,
-                            mb: 3,
-                        }}
-                    >
-                        <SectionTitle>
-                            {tr("rooms", "Rooms & accommodation")}
-                        </SectionTitle>
-
-                        {rooms.length === 0 ? (
-                            <Typography color="text.secondary">
-                                {tr("noRooms", "No room information provided.")}
-                            </Typography>
-                        ) : (
-                            <Stack spacing={2}>
-                                {rooms.map((room, index) => {
-                                    const roomPhotos = (
-                                        room.photos || []
-                                    )
-                                        .map(getImageUrl)
-                                        .filter(Boolean);
-
-                                    return (
-                                        <Card
-                                            key={room._id || index}
-                                            variant="outlined"
+                            return (
+                                <Paper
+                                    key={room._id || index}
+                                    variant="outlined"
+                                    sx={{
+                                        borderRadius: 3,
+                                        overflow: "hidden",
+                                        display: "flex",
+                                        flexDirection: { xs: "column", sm: "row" },
+                                    }}
+                                >
+                                    {roomPhotos.length > 0 && (
+                                        <Box
                                             sx={{
-                                                borderRadius: 2,
-                                                overflow: "hidden",
+                                                width: { xs: "100%", sm: 220 },
+                                                flexShrink: 0,
+                                                display: "flex",
+                                                overflowX: "auto",
+                                                scrollSnapType: "x mandatory",
+                                                bgcolor: "background.muted",
                                             }}
                                         >
-                                            {roomPhotos.length > 0 && (
+                                            {roomPhotos.map((src, photoIndex) => (
                                                 <Box
+                                                    key={`${src}-${photoIndex}`}
+                                                    component="img"
+                                                    src={src}
+                                                    alt={`${roomTitle} ${photoIndex + 1}`}
+                                                    loading="lazy"
                                                     sx={{
-                                                        display: "flex",
-                                                        gap: 1,
-                                                        overflowX: "auto",
-                                                        p: 1,
+                                                        width: "100%",
+                                                        flex: "0 0 100%",
+                                                        height: { xs: 190, sm: "100%" },
+                                                        minHeight: { sm: 170 },
+                                                        objectFit: "cover",
+                                                        scrollSnapAlign: "start",
                                                     }}
-                                                >
-                                                    {roomPhotos.map(
-                                                        (photo, photoIndex) => (
-                                                            <Box
-                                                                key={`${photo}-${photoIndex}`}
-                                                                component="img"
-                                                                src={photo}
-                                                                alt={`${tr("room", "Room")} ${index + 1}`}
-                                                                sx={{
-                                                                    width: 160,
-                                                                    height: 110,
-                                                                    objectFit: "contain",
-                                                                    bgcolor: "#e2e8f0",
-                                                                    borderRadius: 1,
-                                                                    flexShrink: 0,
-                                                                }}
-                                                            />
-                                                        )
-                                                    )}
-                                                </Box>
-                                            )}
+                                                />
+                                            ))}
+                                        </Box>
+                                    )}
 
-                                            <CardContent>
-                                                <Stack
-                                                    direction={{
-                                                        xs: "column",
-                                                        sm: "row",
-                                                    }}
-                                                    justifyContent="space-between"
-                                                    spacing={1}
-                                                >
-                                                    <Box>
-                                                        <Typography
-                                                            variant="h6"
-                                                            fontWeight={700}
-                                                        >
-                                                            {room.roomType ||
-                                                                `${tr("room", "Room")} ${index + 1}`}
-                                                        </Typography>
+                                    <Box sx={{ p: { xs: 2, sm: 2.5 }, flex: 1, minWidth: 0 }}>
+                                        <Stack
+                                            direction="row"
+                                            spacing={2}
+                                            useFlexGap sx={{ justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap" }}
+                                        >
+                                            <Box sx={{ minWidth: 0 }}>
+                                                <Typography variant="subtitle1">{roomTitle}</Typography>
+                                                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                                                    {room.quantity || 1} {tr("roomCount", "room(s)")}
+                                                </Typography>
+                                            </Box>
 
-                                                        <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                        >
-                                                            {room.quantity || 1}{" "}
-                                                            {tr("roomCount", "room(s)")}
-                                                        </Typography>
-                                                    </Box>
-
-                                                    {room.pricePerNight != null && (
-                                                        <Typography
-                                                            variant="h6"
-                                                            color="#0B2E5C"
-                                                            fontWeight={800}
-                                                        >
-                                                            {Number(
-                                                                room.pricePerNight
-                                                            ).toLocaleString()}{" "}
-                                                            MAD / {tr("night", "night")}
-                                                        </Typography>
-                                                    )}
-                                                </Stack>
-
-                                                {room.description && (
-                                                    <Typography
-                                                        color="text.secondary"
-                                                        sx={{ mt: 2 }}
-                                                    >
-                                                        {room.description}
+                                            {room.pricePerNight != null && (
+                                                <Typography sx={{ fontWeight: 800, color: "primary.main", whiteSpace: "nowrap" }}>
+                                                    {Number(room.pricePerNight).toLocaleString()} {t("common.currency", "MAD")}
+                                                    <Typography component="span" variant="caption" sx={{ color: "text.secondary" }}>
+                                                        {" "}/ {tr("night", "night")}
                                                     </Typography>
-                                                )}
+                                                </Typography>
+                                            )}
+                                        </Stack>
 
-                                                <Stack
-                                                    direction="row"
-                                                    spacing={1}
-                                                    flexWrap="wrap"
-                                                    useFlexGap
-                                                    sx={{ mt: 2 }}
-                                                >
-                                                    {room.maxGuests && (
-                                                        <Chip
-                                                            size="small"
-                                                            icon={<MeetingRoom />}
-                                                            label={`${room.maxGuests} ${tr("guests", "guests")}`}
-                                                        />
-                                                    )}
+                                        {room.description && (
+                                            <Typography variant="body2" sx={{ color: "text.secondary", mt: 1.25 }}>
+                                                {room.description}
+                                            </Typography>
+                                        )}
 
-                                                    {room.bedConfiguration?.map(
-                                                        (bed, bedIndex) => (
-                                                            <Chip
-                                                                key={`${bed}-${bedIndex}`}
-                                                                size="small"
-                                                                icon={<Bed />}
-                                                                label={bed}
-                                                            />
-                                                        )
-                                                    )}
+                                        <Stack direction="row" useFlexGap sx={{ flexWrap: "wrap", gap: 1, mt: 1.5 }}>
+                                            {room.maxGuests && (
+                                                <Chip size="small" icon={<PeopleAltOutlinedIcon />} label={`${room.maxGuests} ${tr("guests", "guests")}`} />
+                                            )}
+                                            {room.bedConfiguration?.map((bed, bedIndex) => (
+                                                <Chip key={`${bed}-${bedIndex}`} size="small" icon={<BedOutlinedIcon />} label={translateOption(bed)} />
+                                            ))}
+                                            {room.privateBathroom && <Chip size="small" label={tr("privateBathroom", "Private bathroom")} />}
+                                            {room.airConditioning && <Chip size="small" label={tr("airConditioning", "Air conditioning")} />}
+                                            {room.balconyOrTerrace && <Chip size="small" label={tr("balcony", "Balcony / terrace")} />}
+                                        </Stack>
+                                    </Box>
+                                </Paper>
+                            );
+                        })}
+                    </Stack>
+                )}
+            </DetailsSection>
 
-                                                    {room.privateBathroom && (
-                                                        <Chip
-                                                            size="small"
-                                                            label={tr("privateBathroom", "Private bathroom")}
-                                                            color="success"
-                                                            variant="outlined"
-                                                        />
-                                                    )}
+            {(enabledFacilities.length > 0 || otherServices.length > 0) && (
+                <DetailsSection title={tr("facilitiesTitle", "Facilities & services")} icon={<RoomServiceOutlinedIcon />}>
+                    <Stack direction="row" useFlexGap sx={{ flexWrap: "wrap", gap: 1 }}>
+                        {enabledFacilities.map(([key, label]) => (
+                            <Chip
+                                key={key}
+                                icon={<CheckCircleRoundedIcon />}
+                                label={label}
+                                sx={{ bgcolor: "success.light", color: "success.dark", "& .MuiChip-icon": { color: "inherit" } }}
+                            />
+                        ))}
+                        {otherServices.map((service, index) => (
+                            <Chip key={`${service}-${index}`} label={service} variant="outlined" />
+                        ))}
+                    </Stack>
+                </DetailsSection>
+            )}
 
-                                                    {room.airConditioning && (
-                                                        <Chip
-                                                            size="small"
-                                                            label={tr("airConditioning", "Air conditioning")}
-                                                            color="success"
-                                                            variant="outlined"
-                                                        />
-                                                    )}
-
-                                                    {room.balconyOrTerrace && (
-                                                        <Chip
-                                                            size="small"
-                                                            label={tr("balcony", "Balcony / terrace")}
-                                                            color="success"
-                                                            variant="outlined"
-                                                        />
-                                                    )}
-                                                </Stack>
-                                            </CardContent>
-                                        </Card>
-                                    );
-                                })}
-                            </Stack>
-                        )}
-                    </Paper>
-
-                    {/* Facilities */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 2, md: 3 },
-                            border: "1px solid #e5e7eb",
-                            borderRadius: 3,
-                            mb: 3,
-                        }}
-                    >
-                        <SectionTitle>
-                            {tr("facilitiesTitle", "Facilities & services")}
-                        </SectionTitle>
-
-                        <Stack
-                            direction="row"
-                            spacing={1}
-                            flexWrap="wrap"
-                            useFlexGap
+            {media.videoUrl && (
+                <DetailsSection title={tr("video", "Establishment video")} icon={<PlayCircleOutlineRoundedIcon />}>
+                    {youtubeVideoId ? (
+                        <VideoEmbed
+                            src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}`}
+                            title={`${name} - ${tr("video", "Establishment video")}`}
+                            externalUrl={`https://www.youtube.com/watch?v=${youtubeVideoId}`}
+                        />
+                    ) : (
+                        <Alert
+                            severity="info"
+                            action={
+                                <Button
+                                    component="a"
+                                    href={media.videoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    size="small"
+                                    color="inherit"
+                                >
+                                    {tr("openVideo", "Open video")}
+                                </Button>
+                            }
                         >
-                            {Object.entries(facilityLabels).map(
-                                ([key, label]) => (
-                                    <FacilityItem
-                                        key={key}
-                                        label={label}
-                                        enabled={facilities[key]}
-                                    />
-                                )
-                            )}
+                            {tr("invalidVideo", "This video link could not be embedded. You can try opening it directly.")}
+                        </Alert>
+                    )}
+                </DetailsSection>
+            )}
+        </>
+    );
 
-                            {(Array.isArray(facilities.otherServices)
-                                ? facilities.otherServices
-                                : facilities.otherServices
-                                  ? [facilities.otherServices]
-                                  : []
-                            ).map((service, index) => (
+    const contactLinks = [
+        contact.email && {
+            key: "email",
+            icon: <MailOutlineRoundedIcon />,
+            label: tr("sendEmail", "Send email"),
+            href: `mailto:${contact.email}`,
+        },
+        website && {
+            key: "website",
+            icon: <LanguageRoundedIcon />,
+            label: tr("officialWebsite", "Official website"),
+            href: website,
+            external: true,
+        },
+        bookingWebsite && {
+            key: "booking",
+            icon: <EventAvailableOutlinedIcon />,
+            label: tr("bookingWebsite", "Visit booking website"),
+            href: bookingWebsite,
+            external: true,
+        },
+    ].filter(Boolean);
+
+    const sidebar = (
+        <>
+            <SidebarCard>
+                <Typography variant="h6" sx={{ mb: 0.5 }}>
+                    {tr("contactReservation", "Contact & reservation")}
+                </Typography>
+                {fromPrice != null && (
+                    <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
+                        {tr("fromPrice", "From")}{" "}
+                        <Box component="span" sx={{ fontWeight: 800, color: "primary.main", fontSize: "1.1rem" }}>
+                            {fromPrice.toLocaleString()} {t("common.currency", "MAD")}
+                        </Box>{" "}
+                        / {tr("night", "night")}
+                    </Typography>
+                )}
+
+                <Stack spacing={1.25} sx={{ mt: fromPrice != null ? 0 : 1.5 }}>
+                    {phone && (
+                        <Button variant="contained" size="large" startIcon={<PhoneRoundedIcon />} onClick={openCall} fullWidth>
+                            {tr("call", "Call establishment")}
+                        </Button>
+                    )}
+                    {whatsapp && (
+                        <Button
+                            variant="contained"
+                            size="large"
+                            startIcon={<WhatsAppIcon />}
+                            onClick={openWhatsApp}
+                            fullWidth
+                            sx={whatsappSx}
+                        >
+                            {tr("whatsapp", "Contact on WhatsApp")}
+                        </Button>
+                    )}
+                    {contactLinks.map((link) => (
+                        <Button
+                            key={link.key}
+                            component="a"
+                            href={link.href}
+                            target={link.external ? "_blank" : undefined}
+                            rel={link.external ? "noopener noreferrer" : undefined}
+                            onClick={() => trackContact(link.key)}
+                            variant="outlined"
+                            startIcon={link.icon}
+                            endIcon={link.external ? <OpenInNewRoundedIcon sx={{ fontSize: "16px !important" }} /> : null}
+                            fullWidth
+                        >
+                            {link.label}
+                        </Button>
+                    ))}
+                    {!phone && !whatsapp && contactLinks.length === 0 && (
+                        <Alert severity="info">{tr("noContact", "No contact information provided.")}</Alert>
+                    )}
+                </Stack>
+
+                {contact.socialMedia?.length > 0 && (
+                    <Box sx={{ mt: 2.5 }}>
+                        <Typography variant="overline" sx={{ color: "text.secondary" }}>
+                            {tr("followUs", "Follow us")}
+                        </Typography>
+                        <Stack direction="row" useFlexGap sx={{ flexWrap: "wrap", gap: 1, mt: 0.5 }}>
+                            {contact.socialMedia.map((social, index) => (
                                 <Chip
-                                    key={`${service}-${index}`}
-                                    label={service}
+                                    key={`${social.url}-${index}`}
+                                    component="a"
+                                    href={social.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    clickable
+                                    onClick={() => trackContact("social", social.platform || "")}
+                                    label={social.platform || tr("socialMedia", "Social media")}
                                     variant="outlined"
                                 />
                             ))}
                         </Stack>
-                    </Paper>
+                    </Box>
+                )}
+            </SidebarCard>
 
-                    {/* Location */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 2, md: 3 },
-                            border: "1px solid #e5e7eb",
-                            borderRadius: 3,
-                            mb: 3,
-                        }}
-                    >
-                        <SectionTitle>
-                            {tr("location", "Location")}
-                        </SectionTitle>
+            <SidebarCard>
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
+                    <PlaceOutlinedIcon color="primary" fontSize="small" />
+                    <Typography variant="h6">{tr("location", "Location")}</Typography>
+                </Stack>
+                <KeyValueList
+                    items={[
+                        { label: t("common.city", "City"), value: location.city },
+                        { label: t("common.neighborhood", "Neighborhood"), value: location.neighborhood },
+                    ]}
+                />
+                <Typography variant="body2" sx={{ color: "text.secondary", mt: 1, mb: 2, overflowWrap: "anywhere" }}>
+                    {location.fullAddress || tr("addressNotProvided", "Address not provided")}
+                </Typography>
+                {mapLink && (
+                    <MapLinkButton href={mapLink} label={tr("viewMap", "View on Google Maps")} fullWidth />
+                )}
+            </SidebarCard>
+        </>
+    );
 
-                        <Typography color="text.secondary">
-                            {location.fullAddress ||
-                                tr("addressNotProvided", "Address not provided")}
-                        </Typography>
+    return (
+        <DetailsContainer withMobileBar={Boolean(phone || whatsapp)}>
+            <DetailsBackButton onClick={() => navigate(-1)} label={tr("back", "Back")} />
 
-                        {location.neighborhood && (
-                            <Typography sx={{ mt: 1 }}>
-                                {location.neighborhood}
-                            </Typography>
+            <DetailsHeader
+                badges={
+                    <>
+                        {accommodationType && (
+                            <StatusBadge tone="primary" icon={<HotelOutlinedIcon />} label={translateOption(accommodationType)} />
                         )}
+                    </>
+                }
+                title={name}
+                location={locationLabel}
+                subtitle={
+                    starRating > 0 ? (
+                        <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 1 }}>
+                            <Rating value={starRating} readOnly size="small" sx={{ color: "#F59E0B" }} />
+                            {starRating} {tr("starClassification", "star classification")}
+                        </Box>
+                    ) : null
+                }
+                price={fromPrice != null ? `${fromPrice.toLocaleString()} ${t("common.currency", "MAD")}` : null}
+                priceCaption={fromPrice != null ? `${tr("fromPrice", "From")} / ${tr("night", "night")}` : undefined}
+            />
 
-                        {mapLink && (
-                            <Button
-                                component="a"
-                                href={mapLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                startIcon={<LocationOn />}
-                                sx={{ mt: 2 }}
-                            >
-                                {tr("viewMap", "View on Google Maps")}
-                                <OpenInNew sx={{ fontSize: 15, ml: 1 }} />
-                            </Button>
-                        )}
-                    </Paper>
+            <DetailsLayout main={main} sidebar={sidebar} />
 
-                    {/* YouTube video */}
-                    {media.videoUrl && (
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: { xs: 2, md: 3 },
-                                border: "1px solid #e5e7eb",
-                                borderRadius: 3,
-                                mb: 3,
-                            }}
-                        >
-                            <SectionTitle>
-                                {tr("video", "Establishment video")}
-                            </SectionTitle>
-
-                            {youtubeVideoId ? (
-                                <>
-                                    <Box
-                                        sx={{
-                                            position: "relative",
-                                            width: "100%",
-                                            aspectRatio: "16 / 9",
-                                            overflow: "hidden",
-                                            borderRadius: 2,
-                                            bgcolor: "#0F172A",
-                                        }}
-                                    >
-                                        <Box
-                                            component="iframe"
-                                            src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}`}
-                                            title={`${name} - ${tr("video", "Establishment video")}`}
-                                            loading="lazy"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                            allowFullScreen
-                                            referrerPolicy="strict-origin-when-cross-origin"
-                                            sx={{
-                                                position: "absolute",
-                                                inset: 0,
-                                                width: "100%",
-                                                height: "100%",
-                                                border: 0,
-                                            }}
-                                        />
-                                    </Box>
-
-                                    <Button
-                                        component="a"
-                                        href={`https://www.youtube.com/watch?v=${youtubeVideoId}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        startIcon={<OndemandVideo />}
-                                        endIcon={<OpenInNew />}
-                                        sx={{
-                                            mt: 1.5,
-                                            textTransform: "none",
-                                        }}
-                                    >
-                                        {tr("watchOnYoutube", "Watch on YouTube")}
-                                    </Button>
-                                </>
-                            ) : (
-                                <Alert severity="warning">
-                                    {tr("invalidVideo", "This video link could not be embedded. You can try opening it directly.")}
-                                    <Button
-                                        component="a"
-                                        href={media.videoUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        endIcon={<OpenInNew />}
-                                        sx={{ ml: 1 }}
-                                    >
-                                        {tr("openVideo", "Open video")}
-                                    </Button>
-                                </Alert>
-                            )}
-                        </Paper>
+            {(phone || whatsapp) && (
+                <MobileActionBar>
+                    {phone && (
+                        <Button variant="contained" startIcon={<PhoneRoundedIcon />} onClick={openCall}>
+                            {tr("callShort", "Call")}
+                        </Button>
                     )}
-                </Grid>
-
-                {/* Contact sidebar */}
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: 3,
-                            border: "1px solid #e5e7eb",
-                            borderRadius: 3,
-                            position: { md: "sticky" },
-                            top: 90,
-                        }}
-                    >
-                        <SectionTitle>
-                            {tr("contactReservation", "Contact & reservation")}
-                        </SectionTitle>
-
-                        <Stack spacing={2}>
-                            {phone && (
-                                <Button
-                                    component="a"
-                                    href={`tel:${phone}`}
-                                    variant="contained"
-                                    startIcon={<Phone />}
-                                    fullWidth
-                                    sx={{
-                                        bgcolor: "#0B2E5C",
-                                        py: 1.3,
-                                        "&:hover": {
-                                            bgcolor: "#16477f",
-                                        },
-                                    }}
-                                >
-                                    {tr("call", "Call establishment")}
-                                </Button>
-                            )}
-
-                            {whatsapp && (
-                                <Button
-                                    component="a"
-                                    href={`https://wa.me/${whatsapp.replace(
-                                        /^\+/,
-                                        ""
-                                    )}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    variant="contained"
-                                    startIcon={<WhatsApp />}
-                                    fullWidth
-                                    sx={{
-                                        bgcolor: "#16a34a",
-                                        py: 1.3,
-                                        "&:hover": {
-                                            bgcolor: "#15803d",
-                                        },
-                                    }}
-                                >
-                                    {tr("whatsapp", "Contact on WhatsApp")}
-                                </Button>
-                            )}
-
-                            {contact.email && (
-                                <Button
-                                    component="a"
-                                    href={`mailto:${contact.email}`}
-                                    variant="outlined"
-                                    startIcon={<Email />}
-                                    fullWidth
-                                >
-                                    {tr("sendEmail", "Send email")}
-                                </Button>
-                            )}
-
-                            {website && (
-                                <Button
-                                    component="a"
-                                    href={website}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    variant="outlined"
-                                    startIcon={<Language />}
-                                    fullWidth
-                                >
-                                    {tr("officialWebsite", "Official website")}
-                                    <OpenInNew sx={{ fontSize: 15, ml: 1 }} />
-                                </Button>
-                            )}
-
-                            {bookingWebsite && (
-                                <Button
-                                    component="a"
-                                    href={bookingWebsite}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    variant="contained"
-                                    fullWidth
-                                    sx={{
-                                        bgcolor: "#e99b22",
-                                        color: "#172033",
-                                        py: 1.3,
-                                        "&:hover": {
-                                            bgcolor: "#d58a16",
-                                        },
-                                    }}
-                                >
-                                    {tr("bookingWebsite", "Visit booking website")}
-                                    <OpenInNew sx={{ fontSize: 15, ml: 1 }} />
-                                </Button>
-                            )}
-                        </Stack>
-
-                        {/* Social media */}
-                        {contact.socialMedia?.length > 0 && (
-                            <>
-                                <Divider sx={{ my: 3 }} />
-
-                                <Typography
-                                    fontWeight={700}
-                                    sx={{ mb: 2 }}
-                                >
-                                    {tr("followUs", "Follow us")}
-                                </Typography>
-
-                                <Stack spacing={1}>
-                                    {contact.socialMedia.map(
-                                        (social, index) => (
-                                            <Button
-                                                key={`${social.url}-${index}`}
-                                                component="a"
-                                                href={social.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                endIcon={<OpenInNew />}
-                                                sx={{
-                                                    justifyContent: "flex-start",
-                                                    textTransform: "none",
-                                                }}
-                                            >
-                                                {social.platform ||
-                                                    tr("socialMedia", "Social media")}
-                                            </Button>
-                                        )
-                                    )}
-                                </Stack>
-                            </>
-                        )}
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Container>
+                    {whatsapp && (
+                        <Button variant="contained" startIcon={<WhatsAppIcon />} onClick={openWhatsApp} sx={whatsappSx}>
+                            {tr("whatsappShort", "WhatsApp")}
+                        </Button>
+                    )}
+                </MobileActionBar>
+            )}
+        </DetailsContainer>
     );
 }

@@ -83,8 +83,7 @@ export default function ChangePassword({
                 <Stack
                     direction="row"
                     spacing={2.5}
-                    alignItems="center"
-                    sx={{ mb: 4.5 }}
+                    sx={{ alignItems: "center", mb: 4.5 }}
                 >
                     <Box
                         sx={{
@@ -105,13 +104,12 @@ export default function ChangePassword({
                     <Box>
                         <Typography
                             variant="h6"
-                            fontWeight={700}
-                            sx={{ mb: 0.5 }}
+                            sx={{ fontWeight: 700, mb: 0.5 }}
                         >
                             {t("settings.password.sectionTitle")}
                         </Typography>
 
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             {t("settings.password.sectionSubtitle")}
                         </Typography>
                     </Box>

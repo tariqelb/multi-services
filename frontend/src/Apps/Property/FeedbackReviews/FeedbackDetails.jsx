@@ -67,8 +67,7 @@ function DetailRow({ icon, label, children }) {
         <Stack
             direction="row"
             spacing={1.5}
-            alignItems="flex-start"
-            sx={{ minWidth: 0 }}
+            sx={{ alignItems: "flex-start", minWidth: 0 }}
         >
             <Box sx={{ color: "#64748b", pt: 0.2, flexShrink: 0 }}>
                 {icon}
@@ -76,9 +75,7 @@ function DetailRow({ icon, label, children }) {
 
             <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    fontWeight={600}
+                    variant="caption" sx={{ color: "text.secondary", fontWeight: 600 }}
                 >
                     {label}
                 </Typography>
@@ -127,8 +124,7 @@ function AttachmentItem({
             <Stack
                 direction="row"
                 spacing={1.5}
-                alignItems="center"
-                sx={{ minWidth: 0, flex: 1 }}
+                sx={{ alignItems: "center", minWidth: 0, flex: 1 }}
             >
                 <Box
                     sx={{
@@ -153,9 +149,7 @@ function AttachmentItem({
                 <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography
                         variant="body2"
-                        fontWeight={600}
-                        color="#334155"
-                        sx={{
+                        sx={{ fontWeight: 600, color: "#334155",
                             overflowWrap: "anywhere",
                             wordBreak: "break-word",
                         }}
@@ -165,8 +159,7 @@ function AttachmentItem({
 
                     <Typography
                         variant="caption"
-                        color="text.secondary"
-                        sx={{ overflowWrap: "anywhere" }}
+                        sx={{ color: "text.secondary", overflowWrap: "anywhere" }}
                     >
                         {formatFileSize(attachment.size)}
                         {attachment.mimetype
@@ -348,7 +341,7 @@ export default function FeedbackDetails({
                     borderColor: "#e2e8f0",
                 }}
             >
-                <Typography color="text.secondary">
+                <Typography sx={{ color: "text.secondary" }}>
                     {t("adminFeedback.details.selectSubmission")}
                 </Typography>
             </Card>
@@ -391,20 +384,15 @@ export default function FeedbackDetails({
                         direction={{
                             xs: "column",
                             sm: "row",
-                        }}
-                        justifyContent="space-between"
-                        alignItems={{
+                        }} sx={{ justifyContent: "space-between", alignItems: {
                             xs: "stretch",
                             sm: "flex-start",
-                        }}
-                        gap={{ xs: 2, sm: 2 }}
+                        }, gap: { xs: 2, sm: 2 } }}
                     >
                         <Box sx={{ minWidth: 0, flex: 1 }}>
                             <Typography
                                 variant="overline"
-                                color="primary"
-                                fontWeight={700}
-                                sx={{
+                                sx={{ color: "primary", fontWeight: 700,
                                     fontSize: { xs: "0.65rem", sm: "0.75rem" },
                                     lineHeight: 1.5,
                                 }}
@@ -414,9 +402,7 @@ export default function FeedbackDetails({
 
                             <Typography
                                 component="h2"
-                                fontWeight={700}
-                                color="#0f172a"
-                                sx={{
+                                sx={{ fontWeight: 700, color: "#0f172a",
                                     fontSize: {
                                         xs: "1.2rem",
                                         sm: "1.35rem",
@@ -539,12 +525,11 @@ export default function FeedbackDetails({
                     <Stack
                         direction="row"
                         spacing={1}
-                        alignItems="center"
-                        sx={{ mb: 1.5 }}
+                        sx={{ alignItems: "center", mb: 1.5 }}
                     >
                         <SubjectOutlinedIcon color="primary" />
 
-                        <Typography fontWeight={700} color="#334155">
+                        <Typography sx={{ fontWeight: 700, color: "#334155" }}>
                             {t("adminFeedback.details.description")}
                         </Typography>
                     </Stack>
@@ -560,8 +545,7 @@ export default function FeedbackDetails({
                     >
                         <Typography
                             variant="body2"
-                            color="#334155"
-                            sx={{
+                            sx={{ color: "#334155",
                                 whiteSpace: "pre-wrap",
                                 overflowWrap: "anywhere",
                                 wordBreak: "break-word",
@@ -582,14 +566,11 @@ export default function FeedbackDetails({
                             <Stack
                                 direction="row"
                                 spacing={1}
-                                alignItems="center"
-                                sx={{ mb: 1.5 }}
+                                sx={{ alignItems: "center", mb: 1.5 }}
                             >
                                 <AttachFileIcon color="primary" />
 
-                                <Typography
-                                    fontWeight={700}
-                                    color="#334155"
+                                <Typography sx={{ fontWeight: 700, color: "#334155" }}
                                 >
                                     {t("adminFeedback.attachments.title", {
                                         count: attachments.length,
@@ -627,7 +608,7 @@ export default function FeedbackDetails({
                 <Divider />
 
                 {/* Submission information */}
-                <Typography fontWeight={700} color="#334155">
+                <Typography sx={{ fontWeight: 700, color: "#334155" }}>
                     {t("adminFeedback.details.submissionInformation")}
                 </Typography>
 
@@ -648,8 +629,7 @@ export default function FeedbackDetails({
                     >
                         <Typography
                             variant="body2"
-                            fontWeight={600}
-                            sx={{ overflowWrap: "anywhere" }}
+                            sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
                         >
                             {userName}
                         </Typography>
@@ -661,8 +641,7 @@ export default function FeedbackDetails({
                     >
                         <Typography
                             variant="body2"
-                            fontWeight={600}
-                            sx={{ overflowWrap: "anywhere" }}
+                            sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
                         >
                             {feedback.email}
                         </Typography>
@@ -674,8 +653,7 @@ export default function FeedbackDetails({
                     >
                         <Typography
                             variant="body2"
-                            fontWeight={600}
-                            sx={{ overflowWrap: "anywhere" }}
+                            sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
                         >
                             {formatDate(feedback.createdAt)}
                         </Typography>
@@ -687,8 +665,7 @@ export default function FeedbackDetails({
                     >
                         <Typography
                             variant="body2"
-                            fontWeight={600}
-                            sx={{ overflowWrap: "anywhere" }}
+                            sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
                         >
                             {formatDate(feedback.updatedAt)}
                         </Typography>
@@ -701,8 +678,7 @@ export default function FeedbackDetails({
                         >
                             <Typography
                                 variant="body2"
-                                fontWeight={600}
-                                sx={{ overflowWrap: "anywhere" }}
+                                sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
                             >
                                 {feedback.reportedUser}
                             </Typography>

@@ -1,26 +1,67 @@
-import mongoose from "mongoose";
+// backend/controllers/dashboard/visitsController.js
 
 import VisitSession from "../../DatabaseModels/Schema/VisitSession.js";
 import User from "../../DatabaseModels/Schema/User.js";
 
-const HEARTBEAT_INTERVAL_SECONDS = 30;
+import {
+    bucketExpression,
+    buildPagination,
+    changeFor,
+    currentMatch,
+    fillHours,
+    fillSeries,
+    getPagination,
+    getRangeWindow,
+    hourExpression,
+    isBotRequest,
+    previousMatch,
+    rate,
+    round,
+    startOfDay,
+} from "../../utils/analytics.js";
+
 const MAX_COUNTED_INTERVAL_SECONDS = 45;
 const SESSION_TIMEOUT_MINUTES = 30;
+const ACTIVE_WINDOW_SECONDS = 90;
+const MAX_PAGE_HISTORY = 200;
+
+const VISITOR_FILTERS = ["all", "registered", "anonymous", "active"];
+
+const isValidVisitorId = (visitorId) =>
+    typeof visitorId === "string" &&
+    visitorId.length >= 10 &&
+    visitorId.length <= 100;
+
+const sanitizePage = (page) =>
+    typeof page === "string" && page.startsWith("/") && !page.startsWith("//")
+        ? page.slice(0, 300)
+        : "";
+
+// "/properties?city=Agadir" -> "/properties"
+const stripQuery = (pathExpression) => ({
+    $arrayElemAt: [
+        { $split: [{ $ifNull: [pathExpression, ""] }, "?"] },
+        0,
+    ],
+});
+
+const getSessionTimeoutStart = (now = new Date()) =>
+    new Date(now.getTime() - SESSION_TIMEOUT_MINUTES * 60 * 1000);
 
 // POST /api/dashboard/visits/heartbeat
 export const trackVisit = async (req, res) => {
     try {
         const { visitorId, page } = req.body;
 
-        if (
-            typeof visitorId !== "string" ||
-            visitorId.length < 10 ||
-            visitorId.length > 100
-        ) {
+        if (!isValidVisitorId(visitorId)) {
             return res.status(400).json({
                 success: false,
                 message: "A valid visitor ID is required.",
             });
+        }
+
+        if (isBotRequest(req)) {
+            return res.status(200).json({ success: true, ignored: true });
         }
 
         const now = new Date();
@@ -37,24 +78,15 @@ export const trackVisit = async (req, res) => {
             ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
             : "";
 
-        const currentPage =
-            typeof page === "string" &&
-            page.startsWith("/") &&
-            !page.startsWith("//")
-                ? page.slice(0, 300)
-                : "";
+        const currentPage = sanitizePage(page);
 
+        // A session ends after 30 minutes of inactivity (not 30 minutes
+        // after it started), matching common analytics tools.
         let session = await VisitSession.findOne({
             visitorId,
-            startedAt: {
-                $gte: new Date(
-                    now.getTime() -
-                    SESSION_TIMEOUT_MINUTES * 60 * 1000
-                ),
-            },
-        }).sort({ startedAt: -1 });
+            lastActivityAt: { $gte: getSessionTimeoutStart(now) },
+        }).sort({ lastActivityAt: -1 });
 
-        // Start a new session.
         if (!session) {
             session = await VisitSession.create({
                 visitorId,
@@ -78,94 +110,90 @@ export const trackVisit = async (req, res) => {
                     ]
                     : [],
             });
-        } else {
-            const previousHeartbeat = session.lastHeartbeatAt;
 
-            let elapsedSeconds = 0;
+            return res.status(200).json({
+                success: true,
+                sessionId: session._id,
+            });
+        }
 
-            if (previousHeartbeat) {
-                elapsedSeconds = Math.floor(
-                    (now.getTime() -
-                        previousHeartbeat.getTime()) /
-                        1000
-                );
-            }
+        const previousHeartbeat = session.lastHeartbeatAt;
 
-            const isCountedInterval =
-                elapsedSeconds > 0 &&
-                elapsedSeconds <= MAX_COUNTED_INTERVAL_SECONDS;
+        const elapsedSeconds = previousHeartbeat
+            ? Math.floor((now.getTime() - previousHeartbeat.getTime()) / 1000)
+            : 0;
 
-            if (isCountedInterval) {
-                session.activeSeconds += elapsedSeconds;
-            }
+        // Long gaps (tab hidden, computer asleep) are not counted as activity.
+        const isCountedInterval =
+            elapsedSeconds > 0 &&
+            elapsedSeconds <= MAX_COUNTED_INTERVAL_SECONDS;
 
-            // Associate anonymous browsing with the authenticated user.
-            if (user) {
-                session.userId = user._id;
-                session.fullName = fullName;
-                session.email = user.email || "";
-            }
+        if (isCountedInterval) {
+            session.activeSeconds += elapsedSeconds;
+        }
 
-            if (!session.pageHistory) {
-                session.pageHistory = [];
-            }
+        // Associate anonymous browsing with the authenticated user.
+        if (user) {
+            session.userId = user._id;
+            session.fullName = fullName;
+            session.email = user.email || "";
+        }
 
-            const lastHistoryEntry =
-                session.pageHistory[
-                    session.pageHistory.length - 1
-                ];
+        if (!session.pageHistory) {
+            session.pageHistory = [];
+        }
 
-            if (currentPage && currentPage !== session.lastPage) {
-                // Finish the previous page's recorded activity.
-                if (lastHistoryEntry) {
-                    lastHistoryEntry.lastSeenAt =
-                        previousHeartbeat || now;
+        const lastHistoryEntry =
+            session.pageHistory[session.pageHistory.length - 1];
 
-                    if (isCountedInterval) {
-                        lastHistoryEntry.durationSeconds +=
-                            elapsedSeconds;
-                    }
-                }
-
-                // Record the newly visited page.
-                session.pageHistory.push({
-                    path: currentPage,
-                    visitedAt: now,
-                    lastSeenAt: now,
-                    durationSeconds: 0,
-                });
-
-                session.pageViews += 1;
-                session.lastPage = currentPage;
-            } else if (lastHistoryEntry) {
-                // Same page: update its last activity and duration.
-                lastHistoryEntry.lastSeenAt = now;
+        if (currentPage && currentPage !== session.lastPage) {
+            if (lastHistoryEntry) {
+                lastHistoryEntry.lastSeenAt = previousHeartbeat || now;
 
                 if (isCountedInterval) {
-                    lastHistoryEntry.durationSeconds +=
-                        elapsedSeconds;
+                    lastHistoryEntry.durationSeconds += elapsedSeconds;
                 }
-            } else if (currentPage) {
-                session.pageHistory.push({
-                    path: currentPage,
-                    visitedAt: now,
-                    lastSeenAt: now,
-                    durationSeconds: 0,
-                });
-
-                session.pageViews = Math.max(
-                    session.pageViews || 0,
-                    1
-                );
-
-                session.lastPage = currentPage;
             }
 
-            session.lastActivityAt = now;
-            session.lastHeartbeatAt = now;
+            session.pageHistory.push({
+                path: currentPage,
+                visitedAt: now,
+                lastSeenAt: now,
+                durationSeconds: 0,
+            });
 
-            await session.save();
+            session.pageViews += 1;
+            session.lastPage = currentPage;
+        } else if (lastHistoryEntry) {
+            lastHistoryEntry.lastSeenAt = now;
+
+            if (isCountedInterval) {
+                lastHistoryEntry.durationSeconds += elapsedSeconds;
+            }
+        } else if (currentPage) {
+            session.pageHistory.push({
+                path: currentPage,
+                visitedAt: now,
+                lastSeenAt: now,
+                durationSeconds: 0,
+            });
+
+            session.pageViews = Math.max(session.pageViews || 0, 1);
+            session.lastPage = currentPage;
         }
+
+        // Prevent unbounded document growth on very long sessions.
+        if (session.pageHistory.length > MAX_PAGE_HISTORY) {
+            session.pageHistory.splice(
+                0,
+                session.pageHistory.length - MAX_PAGE_HISTORY
+            );
+        }
+
+        session.lastActivityAt = now;
+        session.lastHeartbeatAt = now;
+
+        await session.save();
 
         return res.status(200).json({
             success: true,
@@ -186,37 +214,21 @@ export const endVisit = async (req, res) => {
     try {
         const { visitorId } = req.body;
 
-        if (
-            typeof visitorId !== "string" ||
-            visitorId.length < 10 ||
-            visitorId.length > 100
-        ) {
+        if (!isValidVisitorId(visitorId)) {
             return res.status(400).json({
                 success: false,
                 message: "A valid visitor ID is required.",
             });
         }
 
-        // Do not add elapsed time here: heartbeat already records it.
-        // This endpoint is only a best-effort activity marker.
-        await VisitSession.updateOne(
+        // Best-effort activity marker. Elapsed time is recorded by heartbeats.
+        await VisitSession.findOneAndUpdate(
             {
                 visitorId,
-                lastActivityAt: {
-                    $gte: new Date(
-                        Date.now() -
-                        SESSION_TIMEOUT_MINUTES * 60 * 1000
-                    ),
-                },
+                lastActivityAt: { $gte: getSessionTimeoutStart() },
             },
-            {
-                $set: {
-                    lastActivityAt: new Date(),
-                },
-            },
-            {
-                sort: { startedAt: -1 },
-            }
+            { $set: { lastActivityAt: new Date() } },
+            { sort: { lastActivityAt: -1 } }
         );
 
         return res.status(200).json({ success: true });
@@ -230,91 +242,341 @@ export const endVisit = async (req, res) => {
     }
 };
 
-// GET /api/dashboard/visits
+// GET /api/dashboard/visits?range=30d&page=1&limit=10&filter=all
 export const getVisitAnalytics = async (req, res) => {
     try {
         const now = new Date();
+        const window = getRangeWindow(req.query.range);
 
-        // Daily totals use UTC calendar days.
-        const startOfDay = new Date(
-            Date.UTC(
-                now.getUTCFullYear(),
-                now.getUTCMonth(),
-                now.getUTCDate()
-            )
+        const { page, limit, skip } = getPagination(req.query, {
+            defaultLimit: 10,
+            maxLimit: 50,
+        });
+
+        const visitorFilter = VISITOR_FILTERS.includes(req.query.filter)
+            ? req.query.filter
+            : "all";
+
+        const sessionMatch = currentMatch(window, "startedAt");
+        const previousSessionMatch = previousMatch(window, "startedAt");
+
+        const activeThreshold = new Date(
+            now.getTime() - ACTIVE_WINDOW_SECONDS * 1000
         );
 
+        const listFilter = { ...sessionMatch };
+
+        if (visitorFilter === "registered") listFilter.userId = { $ne: null };
+        if (visitorFilter === "anonymous") listFilter.userId = null;
+        if (visitorFilter === "active") {
+            listFilter.lastActivityAt = { $gte: activeThreshold };
+        }
+
         const [
-            totalVisits,
-            dailyVisits,
-            totalActiveSeconds,
-            dailyActiveSeconds,
+            [facets],
+            previousTotals,
+            activeNow,
+            todayTotals,
             visitors,
+            totalVisitors,
         ] = await Promise.all([
-            VisitSession.countDocuments(),
+            VisitSession.aggregate([
+                { $match: sessionMatch },
+                {
+                    $facet: {
+                        totals: [
+                            {
+                                $group: {
+                                    _id: null,
+                                    sessions: { $sum: 1 },
+                                    visitors: { $addToSet: "$visitorId" },
+                                    users: { $addToSet: "$userId" },
+                                    registeredSessions: {
+                                        $sum: {
+                                            $cond: [
+                                                { $ifNull: ["$userId", false] },
+                                                1,
+                                                0,
+                                            ],
+                                        },
+                                    },
+                                    activeSeconds: {
+                                        $sum: { $ifNull: ["$activeSeconds", 0] },
+                                    },
+                                    pageViews: {
+                                        $sum: { $ifNull: ["$pageViews", 0] },
+                                    },
+                                    bounces: {
+                                        $sum: {
+                                            $cond: [
+                                                {
+                                                    $lte: [
+                                                        { $ifNull: ["$pageViews", 0] },
+                                                        1,
+                                                    ],
+                                                },
+                                                1,
+                                                0,
+                                            ],
+                                        },
+                                    },
+                                },
+                            },
+                            {
+                                $project: {
+                                    _id: 0,
+                                    sessions: 1,
+                                    registeredSessions: 1,
+                                    activeSeconds: 1,
+                                    pageViews: 1,
+                                    bounces: 1,
+                                    uniqueVisitors: { $size: "$visitors" },
+                                    registeredUsers: {
+                                        $size: {
+                                            $setDifference: ["$users", [null]],
+                                        },
+                                    },
+                                },
+                            },
+                        ],
+
+                        trend: [
+                            {
+                                $group: {
+                                    _id: bucketExpression("$startedAt", window.unit),
+                                    sessions: { $sum: 1 },
+                                    visitors: { $addToSet: "$visitorId" },
+                                    activeSeconds: {
+                                        $sum: { $ifNull: ["$activeSeconds", 0] },
+                                    },
+                                },
+                            },
+                            {
+                                $project: {
+                                    _id: 0,
+                                    date: "$_id",
+                                    sessions: 1,
+                                    activeSeconds: 1,
+                                    uniqueVisitors: { $size: "$visitors" },
+                                },
+                            },
+                        ],
+
+                        hourly: [
+                            {
+                                $group: {
+                                    _id: hourExpression("$startedAt"),
+                                    sessions: { $sum: 1 },
+                                },
+                            },
+                            { $project: { _id: 0, hour: "$_id", sessions: 1 } },
+                        ],
+
+                        topPages: [
+                            { $unwind: "$pageHistory" },
+                            {
+                                $group: {
+                                    _id: stripQuery("$pageHistory.path"),
+                                    views: { $sum: 1 },
+                                    visitors: { $addToSet: "$visitorId" },
+                                    durationSeconds: {
+                                        $sum: {
+                                            $ifNull: ["$pageHistory.durationSeconds", 0],
+                                        },
+                                    },
+                                },
+                            },
+                            { $match: { _id: { $nin: ["", null] } } },
+                            { $sort: { views: -1 } },
+                            { $limit: 10 },
+                            {
+                                $project: {
+                                    _id: 0,
+                                    path: "$_id",
+                                    views: 1,
+                                    durationSeconds: 1,
+                                    uniqueVisitors: { $size: "$visitors" },
+                                    avgDurationSeconds: {
+                                        $round: [
+                                            { $divide: ["$durationSeconds", "$views"] },
+                                            0,
+                                        ],
+                                    },
+                                },
+                            },
+                        ],
+
+                        entryPages: [
+                            {
+                                $project: {
+                                    path: stripQuery({
+                                        $arrayElemAt: ["$pageHistory.path", 0],
+                                    }),
+                                },
+                            },
+                            { $match: { path: { $nin: ["", null] } } },
+                            { $group: { _id: "$path", sessions: { $sum: 1 } } },
+                            { $sort: { sessions: -1 } },
+                            { $limit: 8 },
+                            { $project: { _id: 0, path: "$_id", sessions: 1 } },
+                        ],
+
+                        exitPages: [
+                            { $project: { path: stripQuery("$lastPage") } },
+                            { $match: { path: { $nin: ["", null] } } },
+                            { $group: { _id: "$path", sessions: { $sum: 1 } } },
+                            { $sort: { sessions: -1 } },
+                            { $limit: 8 },
+                            { $project: { _id: 0, path: "$_id", sessions: 1 } },
+                        ],
+                    },
+                },
+            ]),
+
+            previousSessionMatch
+                ? VisitSession.aggregate([
+                    { $match: previousSessionMatch },
+                    {
+                        $group: {
+                            _id: null,
+                            sessions: { $sum: 1 },
+                            visitors: { $addToSet: "$visitorId" },
+                            activeSeconds: {
+                                $sum: { $ifNull: ["$activeSeconds", 0] },
+                            },
+                            bounces: {
+                                $sum: {
+                                    $cond: [
+                                        { $lte: [{ $ifNull: ["$pageViews", 0] }, 1] },
+                                        1,
+                                        0,
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            sessions: 1,
+                            activeSeconds: 1,
+                            bounces: 1,
+                            uniqueVisitors: { $size: "$visitors" },
+                        },
+                    },
+                ])
+                : Promise.resolve([]),
 
             VisitSession.countDocuments({
-                startedAt: { $gte: startOfDay },
+                lastActivityAt: { $gte: activeThreshold },
             }),
 
             VisitSession.aggregate([
+                { $match: { startedAt: { $gte: startOfDay(now) } } },
                 {
                     $group: {
                         _id: null,
-                        total: { $sum: "$activeSeconds" },
+                        sessions: { $sum: 1 },
+                        activeSeconds: {
+                            $sum: { $ifNull: ["$activeSeconds", 0] },
+                        },
                     },
                 },
             ]),
 
-            VisitSession.aggregate([
-                {
-                    $match: {
-                        startedAt: { $gte: startOfDay },
-                    },
-                },
-                {
-                    $group: {
-                        _id: null,
-                        total: { $sum: "$activeSeconds" },
-                    },
-                },
-            ]),
-
-            VisitSession.find()
+            VisitSession.find(listFilter)
                 .sort({ startedAt: -1 })
-                .limit(100)
+                .skip(skip)
+                .limit(limit)
                 .select(
                     "visitorId userId fullName email startedAt lastActivityAt activeSeconds pageViews lastPage pageHistory"
                 )
                 .lean(),
+
+            VisitSession.countDocuments(listFilter),
         ]);
 
-        const totalTime =
-            totalActiveSeconds[0]?.total || 0;
+        const totals = facets.totals[0] || {
+            sessions: 0,
+            registeredSessions: 0,
+            activeSeconds: 0,
+            pageViews: 0,
+            bounces: 0,
+            uniqueVisitors: 0,
+            registeredUsers: 0,
+        };
 
-        const dailyTime =
-            dailyActiveSeconds[0]?.total || 0;
+        const previous = previousTotals[0] || {
+            sessions: 0,
+            activeSeconds: 0,
+            bounces: 0,
+            uniqueVisitors: 0,
+        };
 
-        const activeThreshold = new Date(
-            now.getTime() - 90 * 1000
-        );
+        const today = todayTotals[0] || { sessions: 0, activeSeconds: 0 };
 
-        const formattedVisitors = visitors.map((visitor) => ({
-            ...visitor,
-            isActive:
-                visitor.lastActivityAt >= activeThreshold,
-            pageHistory: visitor.pageHistory || [],
-        }));
+        const avgSessionSeconds = totals.sessions
+            ? Math.round(totals.activeSeconds / totals.sessions)
+            : 0;
+
+        const previousAvgSessionSeconds = previous.sessions
+            ? Math.round(previous.activeSeconds / previous.sessions)
+            : 0;
+
+        const bounceRate = rate(totals.bounces, totals.sessions);
+        const previousBounceRate = rate(previous.bounces, previous.sessions);
 
         return res.status(200).json({
             success: true,
+            range: window.range,
+
             summary: {
-                totalVisits,
-                dailyVisits,
-                totalActiveSeconds: totalTime,
-                dailyActiveSeconds: dailyTime,
+                totalVisits: totals.sessions,
+                uniqueVisitors: totals.uniqueVisitors,
+                registeredUsers: totals.registeredUsers,
+                registeredShare: rate(totals.registeredSessions, totals.sessions),
+                totalActiveSeconds: totals.activeSeconds,
+                avgSessionSeconds,
+                pagesPerSession: totals.sessions
+                    ? round(totals.pageViews / totals.sessions)
+                    : 0,
+                bounceRate,
+                activeNow,
+                dailyVisits: today.sessions,
+                dailyActiveSeconds: today.activeSeconds,
+
+                visitsChange: changeFor(window, totals.sessions, previous.sessions),
+                uniqueVisitorsChange: changeFor(
+                    window,
+                    totals.uniqueVisitors,
+                    previous.uniqueVisitors
+                ),
+                avgSessionChange: changeFor(
+                    window,
+                    avgSessionSeconds,
+                    previousAvgSessionSeconds
+                ),
+                bounceRateChange: changeFor(window, bounceRate, previousBounceRate),
             },
-            visitors: formattedVisitors,
+
+            trend: fillSeries(facets.trend, window, {
+                sessions: 0,
+                uniqueVisitors: 0,
+                activeSeconds: 0,
+            }),
+
+            hourly: fillHours(facets.hourly, "sessions"),
+            topPages: facets.topPages,
+            entryPages: facets.entryPages,
+            exitPages: facets.exitPages,
+
+            visitors: visitors.map((visitor) => ({
+                ...visitor,
+                isActive: visitor.lastActivityAt >= activeThreshold,
+                pageHistory: visitor.pageHistory || [],
+            })),
+
+            pagination: buildPagination(page, limit, totalVisitors),
         });
     } catch (error) {
         console.error("Get visit analytics error:", error);

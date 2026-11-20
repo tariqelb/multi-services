@@ -49,15 +49,13 @@ const AnalyticsChart = ({ title, data = [], description }) => {
                     "&:last-child": { pb: 3 },
                 }}
             >
-                <Box mb={2.5}>
-                    <Typography variant="h6" fontWeight={700}>
+                <Box sx={{ mb: 2.5 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         {title}
                     </Typography>
 
                     <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        mt={0.5}
+                        variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}
                     >
                         {description}
                     </Typography>
@@ -100,9 +98,9 @@ const AnalyticsChart = ({ title, data = [], description }) => {
                                     height={65}
                                     tick={{
                                         fontSize: 12,
-                                        fill: "#5B6577",
+                                        fill: "#64748B",
                                     }}
-                                    axisLine={{ stroke: "#D5DCE8" }}
+                                    axisLine={{ stroke: "#E2E8F0" }}
                                     tickLine={false}
                                 />
 
@@ -110,7 +108,7 @@ const AnalyticsChart = ({ title, data = [], description }) => {
                                     allowDecimals={false}
                                     tick={{
                                         fontSize: 12,
-                                        fill: "#5B6577",
+                                        fill: "#64748B",
                                     }}
                                     axisLine={false}
                                     tickLine={false}
@@ -144,15 +142,10 @@ const AnalyticsChart = ({ title, data = [], description }) => {
                             </BarChart>
                         </ResponsiveContainer>
                     ) : (
-                        <Box
-                            height="100%"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
+                        <Box sx={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
                         >
                             <Typography
-                                variant="body2"
-                                color="text.secondary"
+                                variant="body2" sx={{ color: "text.secondary" }}
                             >
                                 {t("adminExternalClicks.charts.noData")}
                             </Typography>

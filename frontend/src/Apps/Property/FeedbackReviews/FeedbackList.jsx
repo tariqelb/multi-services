@@ -99,10 +99,9 @@ export default function FeedbackList({
             >
                 <Stack
                     direction="row"
-                    spacing={1}
-                    alignItems="center"
+                    spacing={1} sx={{ alignItems: "center" }}
                 >
-                    <Typography fontWeight={700} color="#0f172a">
+                    <Typography sx={{ fontWeight: 700, color: "#0f172a" }}>
                         {t("adminFeedback.list.submissions")}
                     </Typography>
 
@@ -199,16 +198,12 @@ export default function FeedbackList({
                             >
                                 <Stack spacing={1.2}>
                                     <Stack
-                                        direction="row"
-                                        justifyContent="space-between"
-                                        alignItems="flex-start"
-                                        gap={1}
+                                        direction="row" sx={{ justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}
                                     >
                                         <Stack
                                             direction="row"
                                             spacing={1}
-                                            alignItems="center"
-                                            sx={{
+                                            sx={{ alignItems: "center",
                                                 minWidth: 0,
                                                 flex: 1,
                                             }}
@@ -222,9 +217,7 @@ export default function FeedbackList({
                                             />
 
                                             <Typography
-                                                fontWeight={700}
-                                                color="#1e293b"
-                                                sx={{
+                                                sx={{ fontWeight: 700, color: "#1e293b",
                                                     minWidth: 0,
                                                     overflow: "hidden",
                                                     textOverflow: "ellipsis",
@@ -237,8 +230,7 @@ export default function FeedbackList({
 
                                         <Typography
                                             variant="caption"
-                                            color="text.secondary"
-                                            sx={{
+                                            sx={{ color: "text.secondary",
                                                 flexShrink: 0,
                                                 whiteSpace: "nowrap",
                                             }}
@@ -249,8 +241,7 @@ export default function FeedbackList({
 
                                     <Typography
                                         variant="body2"
-                                        color="text.secondary"
-                                        sx={{
+                                        sx={{ color: "text.secondary",
                                             display: "-webkit-box",
                                             WebkitLineClamp: 2,
                                             WebkitBoxOrient: "vertical",
@@ -264,8 +255,7 @@ export default function FeedbackList({
                                     <Stack
                                         direction="row"
                                         spacing={0.75}
-                                        flexWrap="wrap"
-                                        useFlexGap
+                                        useFlexGap sx={{ flexWrap: "wrap" }}
                                     >
                                         <Chip
                                             label={translateValue(
@@ -303,8 +293,7 @@ export default function FeedbackList({
 
                                     <Typography
                                         variant="caption"
-                                        color="text.secondary"
-                                        noWrap
+                                        noWrap sx={{ color: "text.secondary" }}
                                     >
                                         {feedback.email}
                                     </Typography>

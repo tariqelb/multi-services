@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Alert, Stack } from "@mui/material";
@@ -710,6 +711,7 @@ export default function SettingsPage() {
 
     return (
         <PageLayout
+            icon={<SettingsOutlinedIcon />}
             title={t("settings.title")}
             subtitle={t("settings.subtitle")}
             maxWidth={900}

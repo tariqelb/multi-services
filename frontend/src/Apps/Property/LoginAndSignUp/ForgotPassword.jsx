@@ -63,7 +63,7 @@ function ForgotPassword() {
                     {t("auth.forgotPassword.title")}
                 </h2>
 
-                <p className="mb-6 text-center text-sm leading-6 text-gray-600">
+                <p className="mb-6 text-center text-sm leading-6 text-slate-600">
                     {t("auth.forgotPassword.description")}
                 </p>
 
@@ -79,7 +79,7 @@ function ForgotPassword() {
                         autoComplete="email"
                         required
                         disabled={loading}
-                        className="h-13 w-full rounded-[10px] border border-gray-300 bg-white px-3 text-base text-black outline-none transition-colors focus:border-blue-600 disabled:bg-gray-100"
+                        className="h-13 w-full rounded-[10px] border border-slate-300 bg-white px-3 text-base text-black outline-none transition-colors focus:border-blue-600 disabled:bg-slate-100"
                     />
 
                     {status && (

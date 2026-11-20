@@ -1,14 +1,34 @@
+// backend/controllers/dashboard/externalListingClickController.js
+
+import mongoose from "mongoose";
 
 import ExternalListing from "../../DatabaseModels/Schema/ExternalListing.js";
 import ExternalListingClick from "../../DatabaseModels/Schema/ExternalListingClick.js";
+import ExternalListingClickEvent from "../../DatabaseModels/Schema/ExternalListingClickEvent.js";
 
+import {
+    getReferrer,
+    getVisitorKey,
+    isBotRequest,
+} from "../../utils/analytics.js";
+
+const DUPLICATE_WINDOW_MS = 30 * 1000;
+
+// POST /api/external-listings/:id/click
 export const trackExternalListingClick = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        if (!mongoose.isValidObjectId(id)) {
             return res.status(400).json({
                 message: "Invalid external listing ID.",
+            });
+        }
+
+        if (isBotRequest(req)) {
+            return res.status(200).json({
+                message: "Automated traffic ignored.",
+                counted: false,
             });
         }
 
@@ -21,58 +41,86 @@ export const trackExternalListingClick = async (req, res) => {
         }
 
         const clickedAt = new Date();
-
         const userId = req.user?.userId || null;
+        const visitorKey = getVisitorKey(req);
+        const referrer = getReferrer(req);
 
-        const referrer = req.get("referer") || "";
+        const isDuplicate = await ExternalListingClickEvent.exists({
+            externalListingId: listing._id,
+            visitorKey,
+            createdAt: {
+                $gte: new Date(clickedAt.getTime() - DUPLICATE_WINDOW_MS),
+            },
+        });
 
-        const analytics = await ExternalListingClick.findOneAndUpdate(
-            {
+        if (isDuplicate) {
+            const current = await ExternalListingClick.findOne({
                 externalListingId: listing._id,
-            },
-            {
-                $inc: {
-                    clickCount: 1,
-                },
+            })
+                .select("clickCount lastClickedAt")
+                .lean();
 
-                $set: {
-                    sourceUrl: listing.sourceUrl,
-                    sourceDomain: listing.sourceDomain,
-                    sourceName: listing.sourceName,
-                    title: listing.title,
-                    listingType: listing.listingType,
-                    propertyType: listing.propertyType,
-                    city: listing.city,
-                    neighborhood: listing.neighborhood,
-                    lastClickedAt: clickedAt,
-                    lastClickedBy: userId,
-                    lastReferrer: referrer,
+            return res.status(200).json({
+                message: "Repeated click ignored.",
+                counted: false,
+                analytics: {
+                    clickCount: current?.clickCount || 0,
+                    lastClickedAt: current?.lastClickedAt || null,
                 },
+            });
+        }
 
-                $setOnInsert: {
-                    firstClickedAt: clickedAt,
+        const details = {
+            sourceDomain: listing.sourceDomain || "",
+            sourceName: listing.sourceName || "",
+            title: listing.title || "",
+            listingType: listing.listingType || "",
+            propertyType: listing.propertyType || "",
+            city: listing.city || "",
+            neighborhood: listing.neighborhood || "",
+        };
+
+        const [analytics] = await Promise.all([
+            ExternalListingClick.findOneAndUpdate(
+                { externalListingId: listing._id },
+                {
+                    $inc: { clickCount: 1 },
+                    $set: {
+                        ...details,
+                        sourceUrl: listing.sourceUrl,
+                        lastClickedAt: clickedAt,
+                        lastClickedBy: userId,
+                        lastReferrer: referrer,
+                    },
+                    $setOnInsert: { firstClickedAt: clickedAt },
                 },
-            },
-            {
-                new: true,
-                upsert: true,
-                runValidators: true,
-                setDefaultsOnInsert: true,
-            }
-        );
+                {
+                    new: true,
+                    upsert: true,
+                    runValidators: true,
+                    setDefaultsOnInsert: true,
+                }
+            ),
+
+            ExternalListingClickEvent.create({
+                ...details,
+                externalListingId: listing._id,
+                userId,
+                visitorKey,
+                referrer,
+            }),
+        ]);
 
         return res.status(200).json({
             message: "External listing click recorded.",
+            counted: true,
             analytics: {
                 clickCount: analytics.clickCount,
                 lastClickedAt: analytics.lastClickedAt,
             },
         });
     } catch (error) {
-        console.error(
-            "External listing click tracking error:",
-            error.message
-        );
+        console.error("External listing click tracking error:", error.message);
 
         return res.status(500).json({
             message: "Unable to record external listing click.",

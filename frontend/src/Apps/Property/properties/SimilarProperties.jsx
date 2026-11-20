@@ -82,7 +82,8 @@ export default function SimilarProperties({
                     gridTemplateColumns: {
                         xs: "minmax(0, 1fr)",
                         sm: "repeat(2, minmax(0, 1fr))",
-                        lg: "repeat(4, minmax(0, 1fr))",
+                        lg: "repeat(3, minmax(0, 1fr))",
+                        xl: "repeat(4, minmax(0, 1fr))",
                     },
                     gap: {
                         xs: 3,
@@ -96,7 +97,7 @@ export default function SimilarProperties({
                 {displayedProperties.map((property) => {
                     const fullImageUrl =
                         getImageUrl(property.images?.[0]) ||
-                        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500";
+                        "";
 
                     const formattedProperty = {
                         ...property,

@@ -1,8 +1,8 @@
-// /home/tariq/multi-services/app/frontend/src/Components/Home/MainSideBar.jsx
-
 
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import {
     LayoutDashboard,
     House,
@@ -75,6 +75,7 @@ const services = [
 ];
 
 export default function MainSideBar() {
+    const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -95,16 +96,41 @@ export default function MainSideBar() {
     return (
         <aside
             className="
-                sticky top-16 z-30
-                flex h-[calc(100vh-4rem)] w-[64px] shrink-0
-                flex-col items-center
+                relative z-30
+                flex h-14 w-full shrink-0
+                box-border
+                overflow-hidden
                 bg-[#0B2E5C]
-                py-4
                 shadow-sm
+
+                md:sticky md:top-16
+                md:h-[calc(100vh-4rem)]
+                md:w-[64px]
+                md:min-w-[64px]
+                md:flex-col
+                md:overflow-visible
             "
-            aria-label="Main services navigation"
+            aria-label={t("navigation.mainServices", "Main services navigation")}
         >
-            <nav className="flex w-full flex-col items-center gap-3">
+            <nav
+                className="
+                    flex h-full w-full min-w-0
+                    flex-row items-center
+                    justify-start gap-1
+                    overflow-x-auto
+                    px-2
+
+                    md:flex-col
+                    md:justify-start
+                    md:gap-3
+                    md:overflow-visible
+                    md:px-0
+                    md:py-4
+                "
+                style={{
+                    scrollbarWidth: "none",
+                }}
+            >
                 {services.map((service) => {
                     const Icon = service.icon;
                     const active = isServiceActive(service);
@@ -118,9 +144,14 @@ export default function MainSideBar() {
                             aria-current={active ? "page" : undefined}
                             onClick={() => navigate(service.path)}
                             className={`
-                                group relative flex h-11 w-11
+                                group relative
+                                flex h-10 w-10 min-w-10 shrink-0
                                 items-center justify-center
-                                rounded-xl transition-all duration-200
+                                rounded-xl
+                                transition-all duration-200
+
+                                md:h-11 md:w-11 md:min-w-11
+
                                 ${
                                     active
                                         ? "bg-white text-[#0B2E5C] shadow-md"
@@ -129,22 +160,25 @@ export default function MainSideBar() {
                             `}
                         >
                             <Icon
-                                size={21}
+                                size={20}
                                 strokeWidth={active ? 2.4 : 1.9}
                             />
 
+                            {/* Desktop tooltip */}
                             <span
                                 className="
                                     pointer-events-none absolute
-                                    left-full top-1/2 z-50 ml-3
-                                    -translate-y-1/2 translate-x-1
+                                    start-full top-1/2 z-50 ms-3
+                                    hidden -translate-y-1/2 translate-x-1
                                     whitespace-nowrap rounded-lg
-                                    bg-gray-900 px-3 py-2
+                                    bg-slate-900 px-3 py-2
                                     text-xs font-medium text-white
                                     opacity-0 shadow-lg
                                     transition-all duration-200
                                     group-hover:translate-x-0
                                     group-hover:opacity-100
+
+                                    md:block
                                 "
                             >
                                 {service.label}

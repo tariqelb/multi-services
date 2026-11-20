@@ -369,7 +369,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     ];
 
     return (
-        <header className="sticky top-0 z-[60] flex h-16 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2 sm:px-4 md:px-6">
+        <header className="sticky top-0 z-[60] flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white px-2 sm:px-4 md:px-6">
 
             {/* Brand and mobile sidebar button */}
             <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
@@ -385,7 +385,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                             : "Open sidebar"
                     }
                     aria-expanded={sidebarOpen}
-                    className="shrink-0 rounded-[10px] p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 md:hidden"
+                    className="shrink-0 rounded-[10px] p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 md:hidden"
                 >
                     {sidebarOpen ? (
                         <X size={20} />
@@ -406,7 +406,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                         />
                     </div>
 
-                    <span className="truncate text-base font-bold tracking-tight text-gray-900 sm:text-xl">
+                    <span className="truncate text-base font-bold tracking-tight text-slate-900 sm:text-xl">
                         MultiServices
                     </span>
                 </Link>
@@ -426,10 +426,10 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                             setProfileOpen(false);
                             setLanguageOpen((open) => !open);
                         }}
-                        aria-label="Change language"
+                        aria-label={t("language.change", "Change language")}
                         aria-expanded={languageOpen}
                         aria-haspopup="menu"
-                        className="flex items-center gap-1.5 rounded-[10px] px-2 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 sm:gap-2"
+                        className="flex items-center gap-1.5 rounded-[10px] px-2 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:gap-2"
                     >
                         <Languages size={19} />
 
@@ -448,11 +448,11 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                     {languageOpen && (
                         <div
                             role="menu"
-                            aria-label="Select language"
+                            aria-label={t("language.select", "Select language")}
                             onPointerDown={(event) =>
                                 event.stopPropagation()
                             }
-                            className="absolute right-0 z-[70] mt-2 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
+                            className="absolute end-0 z-[70] mt-2 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl"
                         >
                             {languages.map((language) => {
                                 const selected =
@@ -470,10 +470,10 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                                 language.code
                                             )
                                         }
-                                        className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 disabled:cursor-wait disabled:opacity-50 ${
+                                        className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-slate-50 disabled:cursor-wait disabled:opacity-50 ${
                                             selected
                                                 ? "bg-blue-50 font-semibold text-blue-700"
-                                                : "text-gray-700"
+                                                : "text-slate-700"
                                         }`}
                                     >
                                         <span>
@@ -498,7 +498,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                 {/* User profile */}
                 <div
                     ref={profileRef}
-                    className="relative border-l border-gray-200 pl-2 sm:pl-3 md:pl-4"
+                    className="relative border-s border-slate-200 ps-2 sm:ps-3 md:ps-4"
                 >
                     <button
                         type="button"
@@ -509,7 +509,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                         }}
                         aria-expanded={profileOpen}
                         aria-haspopup="menu"
-                        className="flex items-center gap-1.5 rounded-[10px] p-1 transition-colors hover:bg-gray-100 sm:gap-3 sm:p-1.5"
+                        className="flex items-center gap-1.5 rounded-[10px] p-1 transition-colors hover:bg-slate-100 sm:gap-3 sm:p-1.5"
                     >
                         {avatarUrl && !avatarError ? (
                             <img
@@ -531,19 +531,19 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                             </div>
                         )}
 
-                        <div className="hidden max-w-36 text-left leading-tight sm:block">
-                            <p className="truncate text-sm font-semibold text-gray-800">
+                        <div className="hidden max-w-36 text-start leading-tight sm:block">
+                            <p className="truncate text-sm font-semibold text-slate-800">
                                 {displayName}
                             </p>
 
-                            <p className="truncate text-xs text-gray-500">
+                            <p className="truncate text-xs text-slate-500">
                                 {role}
                             </p>
                         </div>
 
                         <ChevronDown
                             size={16}
-                            className={`hidden shrink-0 text-gray-500 transition-transform sm:block ${
+                            className={`hidden shrink-0 text-slate-500 transition-transform sm:block ${
                                 profileOpen ? "rotate-180" : ""
                             }`}
                         />
@@ -552,14 +552,14 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                     {profileOpen && (
                         <div
                             role="menu"
-                            className="absolute right-0 mt-3 w-[min(16rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-gray-200 bg-white py-2 shadow-xl"
+                            className="absolute end-0 mt-3 w-[min(16rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-slate-200 bg-white py-2 shadow-xl"
                         >
-                            <div className="border-b border-gray-100 px-4 py-3">
-                                <p className="truncate text-sm font-semibold text-gray-900">
+                            <div className="border-b border-slate-100 px-4 py-3">
+                                <p className="truncate text-sm font-semibold text-slate-900">
                                     {displayName}
                                 </p>
 
-                                <p className="truncate text-xs text-gray-500">
+                                <p className="truncate text-xs text-slate-500">
                                     {email}
                                 </p>
                             </div>
@@ -578,7 +578,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                             onClick={() =>
                                                 setProfileOpen(false)
                                             }
-                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-blue-600"
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-600"
                                         >
                                             <Icon size={18} />
                                             {label}
@@ -587,7 +587,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
                                 )}
                             </div>
 
-                            <div className="border-t border-gray-100 pt-2">
+                            <div className="border-t border-slate-100 pt-2">
                                 <button
                                     type="button"
                                     role="menuitem"

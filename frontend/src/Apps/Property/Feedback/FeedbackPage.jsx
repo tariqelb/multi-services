@@ -376,16 +376,14 @@ export default function FeedbackPage() {
                         <CardContent sx={{ p: { xs: 2.5, md: 3.5 } }}>
                             <Typography
                                 variant="h6"
-                                fontWeight={700}
-                                sx={{ mb: 0.75 }}
+                                sx={{ fontWeight: 700, mb: 0.75 }}
                             >
                                 {t("feedback.chooseType")}
                             </Typography>
 
                             <Typography
                                 variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 3 }}
+                                sx={{ color: "text.secondary", mb: 3 }}
                             >
                                 {t("feedback.chooseTypeSubtitle")}
                             </Typography>
@@ -431,8 +429,7 @@ export default function FeedbackPage() {
                                             <CardContent sx={{ p: 2.5 }}>
                                                 <Stack
                                                     direction="row"
-                                                    spacing={1.5}
-                                                    alignItems="flex-start"
+                                                    spacing={1.5} sx={{ alignItems: "flex-start" }}
                                                 >
                                                     <Box
                                                         sx={{
@@ -456,8 +453,7 @@ export default function FeedbackPage() {
 
                                                     <Box sx={{ flex: 1 }}>
                                                         <Typography
-                                                            fontWeight={700}
-                                                            sx={{ mb: 0.5 }}
+                                                            sx={{ fontWeight: 700, mb: 0.5 }}
                                                         >
                                                             {t(
                                                                 `feedback.${type.labelKey}`
@@ -466,8 +462,7 @@ export default function FeedbackPage() {
 
                                                         <Typography
                                                             variant="body2"
-                                                            color="text.secondary"
-                                                            sx={{ lineHeight: 1.6 }}
+                                                            sx={{ color: "text.secondary", lineHeight: 1.6 }}
                                                         >
                                                             {t(
                                                                 `feedback.${type.descriptionKey}`
@@ -511,16 +506,14 @@ export default function FeedbackPage() {
                         <CardContent sx={{ p: { xs: 2.5, md: 3.5 } }}>
                             <Typography
                                 variant="h6"
-                                fontWeight={700}
-                                sx={{ mb: 0.75 }}
+                                sx={{ fontWeight: 700, mb: 0.75 }}
                             >
                                 {t("feedback.detailsTitle")}
                             </Typography>
 
                             <Typography
                                 variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 3 }}
+                                sx={{ color: "text.secondary", mb: 3 }}
                             >
                                 {t("feedback.detailsSubtitle")}
                             </Typography>
@@ -663,9 +656,7 @@ export default function FeedbackPage() {
 
                                     <Typography
                                         variant="caption"
-                                        display="block"
-                                        color="text.secondary"
-                                        sx={{ mt: 1 }}
+                                        sx={{ display: "block", color: "text.secondary", mt: 1 }}
                                     >
                                         {t("feedback.attachments.helper")}
                                     </Typography>
@@ -673,10 +664,8 @@ export default function FeedbackPage() {
                                     {attachments.length > 0 && (
                                         <Stack
                                             direction="row"
-                                            flexWrap="wrap"
                                             useFlexGap
-                                            gap={1}
-                                            sx={{ mt: 1.5 }}
+                                            sx={{ flexWrap: "wrap", gap: 1, mt: 1.5 }}
                                         >
                                             {attachments.map((file, index) => (
                                                 <Chip
@@ -704,7 +693,7 @@ export default function FeedbackPage() {
                             alignItems: "flex-start",
                         }}
                     >
-                        <Typography fontWeight={700} sx={{ mb: 0.5 }}>
+                        <Typography sx={{ fontWeight: 700, mb: 0.5 }}>
                             {t("feedback.reminderTitle")}
                         </Typography>
 
@@ -714,8 +703,7 @@ export default function FeedbackPage() {
                     {/* Actions */}
                     <Stack
                         direction={{ xs: "column-reverse", sm: "row" }}
-                        spacing={2}
-                        justifyContent="flex-end"
+                        spacing={2} sx={{ justifyContent: "flex-end" }}
                     >
                         <Button
                             variant="outlined"

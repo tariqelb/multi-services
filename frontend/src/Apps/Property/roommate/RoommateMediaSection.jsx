@@ -1,20 +1,18 @@
+import React, { useRef } from "react";
+import { Stack, TextField, InputAdornment } from "@mui/material";
 
-import React from "react";
+import PhotoLibraryOutlinedIcon from "@mui/icons-material/PhotoLibraryOutlined";
+import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import YouTubeIcon from "@mui/icons-material/YouTube";
+
 import {
-    Paper,
-    Stack,
-    Box,
-    Typography,
-    Button,
-    TextField,
-    IconButton,
-} from "@mui/material";
-
-import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-
-import { SectionHeader } from "./RoommateFormUI";
+    SectionHeader,
+    SectionPaper,
+} from "./RoommateFormUI";
+import {
+    UploadDropzone,
+    ImagePreviewGrid,
+} from "../../../Components/ui/FormKit";
 
 export default function RoommateMediaSection({
     images,
@@ -26,17 +24,18 @@ export default function RoommateMediaSection({
     errors,
     t,
 }) {
-    const translate = (key, fallback) =>
-        t(key, { defaultValue: fallback });
+    const inputRef = useRef(null);
+    const translate = (key, fallback, options = {}) =>
+        t(key, { defaultValue: fallback, ...options });
+
+    const count = previews?.length || 0;
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
+        <SectionPaper>
             <SectionHeader
-                icon={<PhotoLibraryIcon />}
-                title={translate(
-                    "roommates.form.photosVideo",
-                    "Photos and video"
-                )}
+                number={5}
+                icon={<PhotoLibraryOutlinedIcon />}
+                title={translate("roommates.form.photosVideo", "Photos and video")}
                 subtitle={translate(
                     "roommates.form.mediaDescription",
                     "Add photos and optionally a YouTube video."
@@ -44,111 +43,62 @@ export default function RoommateMediaSection({
             />
 
             <Stack spacing={2.5}>
-                <Box>
-                    <Button
-                        component="label"
-                        variant="outlined"
-                        startIcon={<CloudUploadIcon />}
-                        fullWidth
-                    >
-                        {translate(
-                            "roommates.form.uploadPhotos",
-                            "Upload photos"
-                        )}
+                <input
+                    ref={inputRef}
+                    hidden
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    onChange={(event) => {
+                        onImagesChange(event);
+                        event.target.value = "";
+                    }}
+                />
 
-                        <input
-                            hidden
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            multiple
-                            onChange={onImagesChange}
-                        />
-                    </Button>
+                <UploadDropzone
+                    icon={<CloudUploadOutlinedIcon />}
+                    title={translate("roommates.form.uploadPhotos", "Upload photos")}
+                    hint={translate(
+                        "roommates.form.imageRequirements",
+                        "Maximum 15 images. JPG, PNG or WEBP. Maximum 5 MB per image."
+                    )}
+                    buttonLabel={translate("ui.form.chooseFiles", "Choose files")}
+                    onClick={() => inputRef.current?.click()}
+                    disabled={count >= 15}
+                />
 
-                    <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: "block", mt: 1 }}
-                    >
-                        {translate(
-                            "roommates.form.imageRequirements",
-                            "Maximum 15 images. JPG, PNG or WEBP. Maximum 5 MB per image."
-                        )}
-                    </Typography>
-                </Box>
-
-                {previews?.length > 0 && (
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: {
-                                xs: "repeat(2, 1fr)",
-                                sm: "repeat(3, 1fr)",
-                                md: "repeat(4, 1fr)",
-                            },
-                            gap: 2,
-                        }}
-                    >
-                        {previews.map((preview, index) => (
-                            <Box
-                                key={`${preview}-${index}`}
-                                sx={{
-                                    position: "relative",
-                                    borderRadius: 2,
-                                    overflow: "hidden",
-                                    aspectRatio: "1 / 1",
-                                }}
-                            >
-                                <Box
-                                    component="img"
-                                    src={preview}
-                                    alt={`Roommate accommodation ${index + 1}`}
-                                    sx={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                    }}
-                                />
-
-                                <IconButton
-                                    size="small"
-                                    onClick={() => onRemoveImage(index)}
-                                    aria-label={translate(
-                                        "common.remove",
-                                        "Remove image"
-                                    )}
-                                    sx={{
-                                        position: "absolute",
-                                        top: 6,
-                                        right: 6,
-                                        bgcolor: "background.paper",
-                                        "&:hover": {
-                                            bgcolor: "error.light",
-                                            color: "white",
-                                        },
-                                    }}
-                                >
-                                    <DeleteOutlineOutlinedIcon fontSize="small" />
-                                </IconButton>
-                            </Box>
-                        ))}
-                    </Box>
+                {count > 0 && (
+                    <ImagePreviewGrid
+                        items={previews.map((src, index) => ({
+                            key: `${src}-${index}`,
+                            src,
+                            alt: translate("roommates.form.photoAlt", "Photo {{n}}", { n: index + 1 }),
+                        }))}
+                        onRemove={onRemoveImage}
+                        countLabel={translate("ui.form.photosCount", "{{count}} / 15 photos", { count })}
+                    />
                 )}
 
                 <TextField
                     fullWidth
-                    label={translate(
-                        "roommates.form.youtubeLink",
-                        "YouTube video link"
-                    )}
+                    label={translate("roommates.form.youtubeLink", "YouTube video link")}
                     name="youtubeLink"
                     value={formData.youtubeLink}
                     onChange={onChange}
                     error={Boolean(errors.youtubeLink)}
                     helperText={errors.youtubeLink}
                     placeholder="https://www.youtube.com/watch?v=..."
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <YouTubeIcon sx={{ color: "#FF0000" }} />
+                                </InputAdornment>
+                            ),
+                        },
+                    }}
                 />
             </Stack>
-        </Paper>
+        </SectionPaper>
     );
 }

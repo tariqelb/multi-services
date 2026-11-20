@@ -7,7 +7,7 @@ import {
     Typography,
 } from "@mui/material";
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "";
 
 function getImageUrl(property) {
     const image = property.images?.[0];
@@ -89,16 +89,10 @@ export default function PropertyMapCard({
             )}
 
             <Box sx={{ p: 1.5 }}>
-                <Box
-                    display="flex"
-                    alignItems="center"
-                    gap={1}
-                    flexWrap="wrap"
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
                 >
                     <Typography
-                        fontWeight={700}
-                        fontSize="14px"
-                        sx={{ mb: 0.5 }}
+                        sx={{ fontWeight: 700, fontSize: "14px", mb: 0.5 }}
                     >
                         {property.title || t("findMap.cards.untitledProperty")}
                     </Typography>
@@ -121,9 +115,7 @@ export default function PropertyMapCard({
                     )}
                 </Box>
 
-                <Typography
-                    color="text.secondary"
-                    fontSize="12px"
+                <Typography sx={{ color: "text.secondary", fontSize: "12px" }}
                 >
                     {property.neighborhood
                         ? `${property.neighborhood}, `
@@ -132,17 +124,12 @@ export default function PropertyMapCard({
                 </Typography>
 
                 <Typography
-                    fontWeight={700}
-                    color="primary"
-                    fontSize="14px"
-                    sx={{ mt: 1 }}
+                    sx={{ fontWeight: 700, color: "primary", fontSize: "14px", mt: 1 }}
                 >
                     {formattedPrice} MAD
                 </Typography>
 
-                <Typography
-                    fontSize="12px"
-                    color="text.secondary"
+                <Typography sx={{ fontSize: "12px", color: "text.secondary" }}
                 >
                     {t(
                         `findMap.listingTypes.${String(property.listingType || "").toLowerCase().replace(/\s+/g, "")}`,

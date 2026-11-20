@@ -36,7 +36,7 @@ export default function Properties() {
                 width: "100%",
                 maxWidth: "100%",
                 boxSizing: "border-box",
-                bgcolor: "#F4F7FB",
+                bgcolor: "#F5F7FB",
                 minHeight: "calc(100vh - 4rem)",
                 overflowX: "clip",
             }}

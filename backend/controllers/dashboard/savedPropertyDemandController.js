@@ -1,244 +1,443 @@
+// backend/controllers/dashboard/savedPropertyDemandController.js
+// Saved-property analytics computed in MongoDB (no full collection load).
 
+import Property from "../../DatabaseModels/Schema/Property.js";
+import User from "../../DatabaseModels/Schema/User.js";
 import SavedProperty from "../../DatabaseModels/Schema/SavedProperty.js";
 
-const getDateLimit = (range) => {
-    const days = {
-        "7d": 7,
-        "30d": 30,
-        "90d": 90,
-    }[range];
+import {
+    buildDateFilter,
+    bucketExpression,
+    changeFor,
+    fillSeries,
+    getRangeWindow,
+    rate,
+} from "../../utils/analytics.js";
 
-    if (!days) return null;
+// Returns `path` when it is a non-empty value, otherwise `fallback`.
+const nonEmpty = (path, fallback) => ({
+    $cond: [
+        { $gt: [{ $strLenCP: { $toString: { $ifNull: [path, ""] } } }, 0] },
+        path,
+        fallback,
+    ],
+});
 
-    const date = new Date();
-    date.setDate(date.getDate() - days);
+/**
+ * One row per save/unsave event.
+ * Older records without activityHistory produce a single "saved" event.
+ */
+const saveEventStages = (start, end) => {
+    const dateFilter = buildDateFilter(start, end);
 
-    return date;
+    return [
+        {
+            $project: {
+                userId: 1,
+                propertyId: 1,
+                propertyInfo: 1,
+                isSaved: 1,
+                events: {
+                    $cond: [
+                        {
+                            $gt: [
+                                { $size: { $ifNull: ["$activityHistory", []] } },
+                                0,
+                            ],
+                        },
+                        "$activityHistory",
+                        {
+                            $cond: [
+                                { $ne: ["$isSaved", false] },
+                                [
+                                    {
+                                        action: "saved",
+                                        at: { $ifNull: ["$savedAt", "$createdAt"] },
+                                    },
+                                ],
+                                [],
+                            ],
+                        },
+                    ],
+                },
+            },
+        },
+        { $unwind: "$events" },
+        {
+            $match: {
+                "events.at": dateFilter || { $ne: null },
+            },
+        },
+    ];
 };
 
-const getLocalDateKey = (date) =>
-    new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Africa/Casablanca",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    }).format(new Date(date));
+// Used by the dashboard overview as well.
+export const getSaveEventStats = async (start = null, end = null) => {
+    const [row] = await SavedProperty.aggregate([
+        ...saveEventStages(start, end),
+        { $match: { "events.action": "saved" } },
+        {
+            $group: {
+                _id: null,
+                saves: { $sum: 1 },
+                users: { $addToSet: "$userId" },
+            },
+        },
+        { $project: { _id: 0, saves: 1, uniqueUsers: { $size: "$users" } } },
+    ]);
 
-const addToGroup = (map, name) => {
-    const key = name || "Unknown";
-
-    if (!map.has(key)) {
-        map.set(key, {
-            name: key,
-            requests: 0,
-        });
-    }
-
-    map.get(key).requests += 1;
+    return row || { saves: 0, uniqueUsers: 0 };
 };
 
+export const getSaveTrendRows = (start, unit) =>
+    SavedProperty.aggregate([
+        ...saveEventStages(start, null),
+        { $match: { "events.action": "saved" } },
+        {
+            $group: {
+                _id: bucketExpression("$events.at", unit),
+                saves: { $sum: 1 },
+            },
+        },
+        { $project: { _id: 0, date: "$_id", saves: 1 } },
+    ]);
+
+const groupSaved = (field, limit = 0) => {
+    const stages = [
+        { $match: { isSave: true } },
+        {
+            $group: {
+                _id: { $toLower: field },
+                name: { $first: field },
+                requests: { $sum: 1 },
+            },
+        },
+        { $sort: { requests: -1 } },
+    ];
+
+    if (limit) stages.push({ $limit: limit });
+
+    stages.push({ $project: { _id: 0, name: 1, requests: 1 } });
+
+    return stages;
+};
+
+// GET /api/dashboard/saved-property-demand?range=30d
 export const getSavedPropertyDemandAnalytics = async (req, res) => {
     try {
-        const range = ["7d", "30d", "90d", "all"].includes(
-            req.query.range
-        )
-            ? req.query.range
-            : "30d";
+        const window = getRangeWindow(req.query.range);
 
-        const dateLimit = getDateLimit(range);
-
-        const records = await SavedProperty.find()
-            .populate(
-                "propertyId",
-                "title price listingType propertyType city neighborhood images status"
-            )
-            .populate(
-                "userId",
-                "firstName lastName email"
-            )
-            .lean();
-
-        const uniqueUsers = new Set();
-        const uniqueProperties = new Set();
-
-        const cities = new Map();
-        const propertyTypes = new Map();
-        const listingTypes = new Map();
-        const properties = new Map();
-        const trends = new Map();
-
-        const recentSaves = [];
-
-        let totalSaves = 0;
-        let activeSavedProperties = 0;
-
-        for (const record of records) {
-            const property = record.propertyId || {};
-            const snapshot = record.propertyInfo || {};
-            const user = record.userId || {};
-
-            const propertyId =
-                property._id?.toString() ||
-                (record.propertyId
-                    ? record.propertyId.toString()
-                    : "");
-
-            const city =
-                snapshot.city ||
-                property.city ||
-                "Unknown";
-
-            const propertyType =
-                snapshot.propertyType ||
-                property.propertyType ||
-                "Unknown";
-
-            const listingType =
-                snapshot.listingType ||
-                property.listingType ||
-                "Unknown";
-
-            const title =
-                snapshot.title ||
-                property.title ||
-                "Property no longer available";
-
-            const userId =
-                user._id?.toString() ||
-                (record.userId
-                    ? record.userId.toString()
-                    : "");
-
-            if (record.isSaved !== false) {
-                activeSavedProperties += 1;
-            }
-
-            // Support older records created before activityHistory existed.
-            const history =
-                record.activityHistory?.length
-                    ? record.activityHistory
-                    : record.isSaved !== false
-                        ? [{
-                            action: "saved",
-                            at: record.savedAt || record.createdAt,
-                        }]
-                        : [];
-
-            const saveEvents = history.filter(
-                (event) => event.action === "saved"
-            );
-
-            for (const event of saveEvents) {
-                const eventDate = new Date(event.at);
-
-                if (
-                    !event.at ||
-                    (dateLimit && eventDate < dateLimit)
-                ) {
-                    continue;
-                }
-
-                totalSaves += 1;
-
-                if (userId) uniqueUsers.add(userId);
-                if (propertyId) uniqueProperties.add(propertyId);
-
-                addToGroup(cities, city);
-                addToGroup(propertyTypes, propertyType);
-                addToGroup(listingTypes, listingType);
-
-                if (propertyId) {
-                    if (!properties.has(propertyId)) {
-                        properties.set(propertyId, {
-                            propertyId,
-                            title,
-                            city,
-                            propertyType,
-                            listingType,
-                            price:
-                                snapshot.price ??
-                                property.price ??
-                                0,
-                            image:
-                                snapshot.image ||
-                                property.images?.[0]?.path ||
-                                property.images?.[0] ||
-                                "",
-                            saves: 0,
-                        });
-                    }
-
-                    properties.get(propertyId).saves += 1;
-                }
-
-                const dateKey = getLocalDateKey(eventDate);
-
-                trends.set(
-                    dateKey,
-                    (trends.get(dateKey) || 0) + 1
-                );
-
-                recentSaves.push({
-                    _id: `${record._id}-${eventDate.getTime()}`,
-                    createdAt: eventDate,
-                    user: {
-                        firstName: user.firstName || "",
-                        lastName: user.lastName || "",
-                        email: user.email || "",
+        const [[facets], previousStats, activeSavedProperties] =
+            await Promise.all([
+                SavedProperty.aggregate([
+                    ...saveEventStages(window.start, null),
+                    {
+                        $lookup: {
+                            from: Property.collection.name,
+                            localField: "propertyId",
+                            foreignField: "_id",
+                            as: "property",
+                        },
                     },
-                    property: {
-                        title,
-                        city,
-                        propertyType,
-                        listingType,
-                        price:
-                            snapshot.price ??
-                            property.price ??
-                            0,
+                    {
+                        $addFields: {
+                            property: { $arrayElemAt: ["$property", 0] },
+                        },
                     },
-                });
-            }
-        }
+                    {
+                        $addFields: {
+                            isSave: { $eq: ["$events.action", "saved"] },
+                            city: {
+                                $trim: {
+                                    input: {
+                                        $toString: nonEmpty(
+                                            "$propertyInfo.city",
+                                            nonEmpty("$property.city", "Unknown")
+                                        ),
+                                    },
+                                },
+                            },
+                            propertyType: nonEmpty(
+                                "$propertyInfo.propertyType",
+                                nonEmpty("$property.propertyType", "Unknown")
+                            ),
+                            listingType: nonEmpty(
+                                "$propertyInfo.listingType",
+                                nonEmpty("$property.listingType", "Unknown")
+                            ),
+                            title: nonEmpty(
+                                "$propertyInfo.title",
+                                nonEmpty(
+                                    "$property.title",
+                                    "Property no longer available"
+                                )
+                            ),
+                            price: {
+                                $ifNull: [
+                                    "$propertyInfo.price",
+                                    { $ifNull: ["$property.price", 0] },
+                                ],
+                            },
+                            image: nonEmpty(
+                                "$propertyInfo.image",
+                                {
+                                    $let: {
+                                        vars: {
+                                            first: {
+                                                $arrayElemAt: [
+                                                    { $ifNull: ["$property.images", []] },
+                                                    0,
+                                                ],
+                                            },
+                                        },
+                                        in: {
+                                            $cond: [
+                                                { $eq: [{ $type: "$$first" }, "string"] },
+                                                "$$first",
+                                                { $ifNull: ["$$first.path", ""] },
+                                            ],
+                                        },
+                                    },
+                                }
+                            ),
+                        },
+                    },
+                    {
+                        $facet: {
+                            totals: [
+                                {
+                                    $group: {
+                                        _id: null,
+                                        saves: { $sum: { $cond: ["$isSave", 1, 0] } },
+                                        unsaves: { $sum: { $cond: ["$isSave", 0, 1] } },
+                                        users: {
+                                            $addToSet: {
+                                                $cond: ["$isSave", "$userId", "$$REMOVE"],
+                                            },
+                                        },
+                                        properties: {
+                                            $addToSet: {
+                                                $cond: ["$isSave", "$propertyId", "$$REMOVE"],
+                                            },
+                                        },
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        saves: 1,
+                                        unsaves: 1,
+                                        uniqueUsers: { $size: "$users" },
+                                        uniqueProperties: { $size: "$properties" },
+                                    },
+                                },
+                            ],
 
-        const sortGroups = (map) =>
-            Array.from(map.values()).sort(
-                (a, b) => b.requests - a.requests
-            );
+                            // Of the saves made in the range, how many are still saved?
+                            retention: [
+                                { $match: { isSave: true } },
+                                {
+                                    $group: {
+                                        _id: "$_id",
+                                        stillSaved: {
+                                            $first: { $ne: ["$isSaved", false] },
+                                        },
+                                    },
+                                },
+                                {
+                                    $group: {
+                                        _id: null,
+                                        pairs: { $sum: 1 },
+                                        retained: {
+                                            $sum: { $cond: ["$stillSaved", 1, 0] },
+                                        },
+                                    },
+                                },
+                            ],
 
-        const topSavedProperties = Array.from(properties.values())
-            .sort((a, b) => b.saves - a.saves)
-            .slice(0, 10);
+                            cities: groupSaved("$city", 10),
+                            propertyTypes: groupSaved("$propertyType", 10),
+                            listingTypes: groupSaved("$listingType"),
 
-        const demandTrend = Array.from(trends.entries())
-            .map(([date, saves]) => ({ date, saves }))
-            .sort((a, b) => a.date.localeCompare(b.date));
+                            priceByListingType: [
+                                { $match: { isSave: true, price: { $gt: 0 } } },
+                                {
+                                    $group: {
+                                        _id: "$listingType",
+                                        saves: { $sum: 1 },
+                                        avgPrice: { $avg: "$price" },
+                                        minPrice: { $min: "$price" },
+                                        maxPrice: { $max: "$price" },
+                                    },
+                                },
+                                { $sort: { saves: -1 } },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        name: "$_id",
+                                        saves: 1,
+                                        avgPrice: { $round: ["$avgPrice", 0] },
+                                        minPrice: 1,
+                                        maxPrice: 1,
+                                    },
+                                },
+                            ],
 
-        recentSaves.sort(
-            (a, b) =>
-                new Date(b.createdAt) - new Date(a.createdAt)
-        );
+                            topProperties: [
+                                {
+                                    $group: {
+                                        _id: "$propertyId",
+                                        saves: { $sum: { $cond: ["$isSave", 1, 0] } },
+                                        unsaves: { $sum: { $cond: ["$isSave", 0, 1] } },
+                                        users: {
+                                            $addToSet: {
+                                                $cond: ["$isSave", "$userId", "$$REMOVE"],
+                                            },
+                                        },
+                                        title: { $first: "$title" },
+                                        city: { $first: "$city" },
+                                        propertyType: { $first: "$propertyType" },
+                                        listingType: { $first: "$listingType" },
+                                        price: { $first: "$price" },
+                                        image: { $first: "$image" },
+                                    },
+                                },
+                                { $match: { saves: { $gt: 0 } } },
+                                { $sort: { saves: -1 } },
+                                { $limit: 10 },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        propertyId: "$_id",
+                                        saves: 1,
+                                        unsaves: 1,
+                                        uniqueUsers: { $size: "$users" },
+                                        title: 1,
+                                        city: 1,
+                                        propertyType: 1,
+                                        listingType: 1,
+                                        price: 1,
+                                        image: 1,
+                                    },
+                                },
+                            ],
+
+                            trend: [
+                                {
+                                    $group: {
+                                        _id: bucketExpression("$events.at", window.unit),
+                                        saves: { $sum: { $cond: ["$isSave", 1, 0] } },
+                                        unsaves: { $sum: { $cond: ["$isSave", 0, 1] } },
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        date: "$_id",
+                                        saves: 1,
+                                        unsaves: 1,
+                                    },
+                                },
+                            ],
+
+                            recent: [
+                                { $match: { isSave: true } },
+                                { $sort: { "events.at": -1 } },
+                                { $limit: 20 },
+                                {
+                                    $lookup: {
+                                        from: User.collection.name,
+                                        localField: "userId",
+                                        foreignField: "_id",
+                                        as: "user",
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        _id: {
+                                            $concat: [
+                                                { $toString: "$_id" },
+                                                "-",
+                                                { $toString: { $toLong: "$events.at" } },
+                                            ],
+                                        },
+                                        createdAt: "$events.at",
+                                        user: {
+                                            firstName: {
+                                                $ifNull: [{ $arrayElemAt: ["$user.firstName", 0] }, ""],
+                                            },
+                                            lastName: {
+                                                $ifNull: [{ $arrayElemAt: ["$user.lastName", 0] }, ""],
+                                            },
+                                            email: {
+                                                $ifNull: [{ $arrayElemAt: ["$user.email", 0] }, ""],
+                                            },
+                                        },
+                                        property: {
+                                            propertyId: "$propertyId",
+                                            title: "$title",
+                                            city: "$city",
+                                            propertyType: "$propertyType",
+                                            listingType: "$listingType",
+                                            price: "$price",
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ]),
+
+                window.start
+                    ? getSaveEventStats(window.previousStart, window.previousEnd)
+                    : Promise.resolve({ saves: 0, uniqueUsers: 0 }),
+
+                SavedProperty.countDocuments({ isSaved: { $ne: false } }),
+            ]);
+
+        const totals = facets.totals[0] || {
+            saves: 0,
+            unsaves: 0,
+            uniqueUsers: 0,
+            uniqueProperties: 0,
+        };
+
+        const retention = facets.retention[0] || { pairs: 0, retained: 0 };
 
         return res.status(200).json({
             success: true,
-            range,
+            range: window.range,
+
             summary: {
-                totalSaves,
-                uniqueUsers: uniqueUsers.size,
-                uniqueProperties: uniqueProperties.size,
+                totalSaves: totals.saves,
+                unsaves: totals.unsaves,
+                netSaves: totals.saves - totals.unsaves,
+                uniqueUsers: totals.uniqueUsers,
+                uniqueProperties: totals.uniqueProperties,
                 activeSavedProperties,
+                retentionRate: rate(retention.retained, retention.pairs),
+                savesPerUser: totals.uniqueUsers
+                    ? Math.round((totals.saves / totals.uniqueUsers) * 10) / 10
+                    : 0,
+                previousSaves: previousStats.saves,
+                savesChange: changeFor(window, totals.saves, previousStats.saves),
             },
-            topCities: sortGroups(cities).slice(0, 10),
-            propertyTypes: sortGroups(propertyTypes).slice(0, 10),
-            listingTypes: sortGroups(listingTypes),
-            topSavedProperties,
-            demandTrend,
-            recentSaves: recentSaves.slice(0, 20),
+
+            topCities: facets.cities,
+            propertyTypes: facets.propertyTypes,
+            listingTypes: facets.listingTypes,
+            priceByListingType: facets.priceByListingType,
+            topSavedProperties: facets.topProperties,
+
+            demandTrend: fillSeries(facets.trend, window, {
+                saves: 0,
+                unsaves: 0,
+            }),
+
+            recentSaves: facets.recent,
         });
     } catch (error) {
-        console.error(
-            "Get saved property demand analytics error:",
-            error
-        );
+        console.error("Get saved property demand analytics error:", error);
 
         return res.status(500).json({
             success: false,

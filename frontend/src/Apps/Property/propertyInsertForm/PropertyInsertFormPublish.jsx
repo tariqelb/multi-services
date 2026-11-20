@@ -1,91 +1,24 @@
+// src/Apps/Property/propertyInsertForm/PropertyInsertFormPublish.jsx
+// Uses the shared submit bar so every form ends the same way.
 
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-import {
-    Box,
-    Typography,
-    Button,
-    Paper,
-    Stack,
-    CircularProgress,
-} from '@mui/material';
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
-export default function PropertyInsertFormPublish({
-    loading = false,
-}) {
+import { FormSubmitBar } from "../../../Components/ui/FormKit";
+
+export default function PropertyInsertFormPublish({ loading = false }) {
     const { t } = useTranslation();
 
     return (
-        <Paper
-            elevation={0}
-            sx={{
-                p: { xs: 2.5, sm: 3 },
-                border: '1px solid #E2E8F0',
-                borderRadius: '16px',
-                bgcolor: '#ffffff',
-            }}
-        >
-            <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                alignItems={{ xs: 'stretch', sm: 'center' }}
-                justifyContent="space-between"
-                spacing={2}
-            >
-                <Box>
-                    <Typography
-                        variant="subtitle1"
-                        sx={{ fontWeight: 600, color: '#0F172A' }}
-                    >
-                        {t('properties.insert.publish.title')}
-                    </Typography>
-
-                    <Typography
-                        variant="body2"
-                        sx={{ color: '#5B6577', mt: 0.5 }}
-                    >
-                        {t('properties.insert.publish.subtitle')}
-                    </Typography>
-                </Box>
-
-                <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    disabled={loading}
-                    endIcon={
-                        loading ? (
-                            <CircularProgress size={18} color="inherit" />
-                        ) : (
-                            <Typography
-                                component="span"
-                                sx={{ fontSize: '1rem', ml: 0.5 }}
-                            >
-                                ✓
-                            </Typography>
-                        )
-                    }
-                    sx={{
-                        minWidth: { sm: 230 },
-                        py: 1.5,
-                        px: 3,
-                        borderRadius: '10px',
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        fontSize: '0.95rem',
-                        bgcolor: '#2563EB',
-                        boxShadow: '0 5px 12px rgba(37, 99, 235,0.2)',
-                        '&:hover': {
-                            bgcolor: '#1D4ED8',
-                            boxShadow: '0 7px 16px rgba(37, 99, 235,0.28)',
-                        },
-                    }}
-                >
-                    {loading
-                        ? t('properties.insert.publish.loading')
-                        : t('properties.insert.publish.button')}
-                </Button>
-            </Stack>
-        </Paper>
+        <FormSubmitBar
+            loading={loading}
+            title={t("properties.insert.publish.title")}
+            subtitle={t("properties.insert.publish.subtitle")}
+            submitLabel={t("properties.insert.publish.button")}
+            loadingLabel={t("properties.insert.publish.loading")}
+            submitIcon={<CheckCircleRoundedIcon />}
+        />
     );
 }

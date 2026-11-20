@@ -79,8 +79,7 @@ export default function DeleteAccount({
                 <Stack
                     direction="row"
                     spacing={2.5}
-                    alignItems="center"
-                    sx={{ mb: 4 }}
+                    sx={{ alignItems: "center", mb: 4 }}
                 >
                     <Box
                         sx={{
@@ -105,13 +104,12 @@ export default function DeleteAccount({
                     <Box>
                         <Typography
                             variant="h6"
-                            fontWeight={700}
-                            sx={{ mb: 0.5 }}
+                            sx={{ fontWeight: 700, mb: 0.5 }}
                         >
                             {t("settings.deleteAccount.title")}
                         </Typography>
 
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             {t(
                                 isPending
                                     ? "settings.deleteAccount.pendingSubtitle"
@@ -135,7 +133,7 @@ export default function DeleteAccount({
                             })}
                         </Alert>
 
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             {t("settings.deleteAccount.permanentDeletionInfo")}
                         </Typography>
 

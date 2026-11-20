@@ -59,24 +59,20 @@ export default function TopContactedProperties({
             elevation={0}
             sx={{
                 p: { xs: 2, md: 3 },
-                border: "1px solid #E8EDF4",
+                border: "1px solid #E2E8F0",
                 borderRadius: 3,
             }}
         >
             <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={2.5}
+                direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 2.5 }}
             >
                 <Box>
-                    <Typography variant="h6" fontWeight={800}>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>
                         {t("adminContactActions.topProperties")}
                     </Typography>
 
                     <Typography
-                        variant="caption"
-                        color="text.secondary"
+                        variant="caption" sx={{ color: "text.secondary" }}
                     >
                         {t("adminContactActions.topPropertiesSubtitle")}
                     </Typography>
@@ -91,10 +87,7 @@ export default function TopContactedProperties({
             </Stack>
 
             {properties.length === 0 ? (
-                <Typography
-                    color="text.secondary"
-                    textAlign="center"
-                    py={4}
+                <Typography sx={{ color: "text.secondary", textAlign: "center", py: 4 }}
                 >
                     {t("adminContactActions.noProperties")}
                 </Typography>
@@ -144,12 +137,11 @@ export default function TopContactedProperties({
                                 <Stack
                                     key={String(propertyId || index)}
                                     direction="row"
-                                    alignItems="center"
                                     spacing={2}
                                     onClick={() =>
                                         handlePropertyClick(propertyId)
                                     }
-                                    sx={{
+                                    sx={{ alignItems: "center",
                                         p: 1.5,
                                         borderRadius: 2,
                                         bgcolor: "#F8FAFC",
@@ -166,9 +158,7 @@ export default function TopContactedProperties({
                                     }}
                                 >
                                     <Typography
-                                        fontWeight={800}
-                                        color="text.secondary"
-                                        sx={{
+                                        sx={{ fontWeight: 800, color: "text.secondary",
                                             width: 25,
                                             textAlign: "center",
                                             flexShrink: 0,
@@ -195,10 +185,9 @@ export default function TopContactedProperties({
                                         }}
                                     />
 
-                                    <Box flex={1} minWidth={0}>
+                                    <Box sx={{ flex: 1, minWidth: 0 }}>
                                         <Typography
-                                            fontWeight={700}
-                                            noWrap
+                                            noWrap sx={{ fontWeight: 700 }}
                                         >
                                             {property?.title ||
                                                 t(
@@ -208,8 +197,7 @@ export default function TopContactedProperties({
 
                                         <Stack
                                             direction="row"
-                                            spacing={0.7}
-                                            alignItems="center"
+                                            spacing={0.7} sx={{ alignItems: "center" }}
                                         >
                                             <HomeWorkOutlined
                                                 sx={{
@@ -220,8 +208,7 @@ export default function TopContactedProperties({
 
                                             <Typography
                                                 variant="caption"
-                                                color="text.secondary"
-                                                noWrap
+                                                noWrap sx={{ color: "text.secondary" }}
                                             >
                                                 {[
                                                     property?.propertyType,
@@ -238,15 +225,11 @@ export default function TopContactedProperties({
                                         <Stack
                                             direction="row"
                                             spacing={1.5}
-                                            mt={0.75}
-                                            alignItems="center"
-                                            flexWrap="wrap"
-                                            useFlexGap
+                                            useFlexGap sx={{ mt: 0.75, alignItems: "center", flexWrap: "wrap" }}
                                         >
                                             <Stack
                                                 direction="row"
-                                                spacing={0.4}
-                                                alignItems="center"
+                                                spacing={0.4} sx={{ alignItems: "center" }}
                                             >
                                                 <Visibility
                                                     sx={{
@@ -256,8 +239,7 @@ export default function TopContactedProperties({
                                                 />
 
                                                 <Typography
-                                                    variant="caption"
-                                                    color="text.secondary"
+                                                    variant="caption" sx={{ color: "text.secondary" }}
                                                 >
                                                     {views}
                                                 </Typography>
@@ -265,8 +247,7 @@ export default function TopContactedProperties({
 
                                             <Stack
                                                 direction="row"
-                                                spacing={0.4}
-                                                alignItems="center"
+                                                spacing={0.4} sx={{ alignItems: "center" }}
                                             >
                                                 <Phone
                                                     sx={{
@@ -282,8 +263,7 @@ export default function TopContactedProperties({
 
                                             <Stack
                                                 direction="row"
-                                                spacing={0.4}
-                                                alignItems="center"
+                                                spacing={0.4} sx={{ alignItems: "center" }}
                                             >
                                                 <WhatsApp
                                                     sx={{

@@ -172,8 +172,7 @@ const RoommateList = () => {
             {!loading && !error && (
                 <Typography
                     variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
+                    sx={{ color: "text.secondary", mb: 2 }}
                 >
                     {t("roommates.pagination.results", {
                         count: totalListings,
@@ -240,8 +239,7 @@ const RoommateList = () => {
                 >
                     <Typography
                         variant="h6"
-                        fontWeight={600}
-                        gutterBottom
+                        gutterBottom sx={{ fontWeight: 600 }}
                     >
                         {t("roommates.empty.title", {
                             defaultValue:
@@ -250,8 +248,7 @@ const RoommateList = () => {
                     </Typography>
 
                     <Typography
-                        variant="body2"
-                        color="text.secondary"
+                        variant="body2" sx={{ color: "text.secondary" }}
                     >
                         {t("roommates.empty.description", {
                             defaultValue:
@@ -322,8 +319,7 @@ const RoommateList = () => {
                     />
 
                     <Typography
-                        variant="caption"
-                        color="text.secondary"
+                        variant="caption" sx={{ color: "text.secondary" }}
                     >
                         {t("roommates.pagination.pageInfo", {
                             current: page,

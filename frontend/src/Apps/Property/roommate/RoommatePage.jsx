@@ -1,4 +1,5 @@
 
+import PageHeader from "../../../Components/ui/PageHeader";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -35,49 +36,13 @@ export default function RoommatePage() {
             }}
         >
             {/* Page header */}
-            <Box sx={{ mb: 3 }}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.5,
-                        mb: 1,
-                    }}
-                >
-                    <PeopleAltIcon
-                        sx={{
-                            fontSize: 34,
-                            color: "primary.main",
-                        }}
-                    />
-
-                    <Typography
-                        variant="h4"
-                        fontWeight={700}
-                        sx={{
-                            fontSize: {
-                                xs: "1.5rem",
-                                sm: "1.8rem",
-                                md: "2rem",
-                            },
-                        }}
-                    >
-                        {t("roommates.title", {
-                            defaultValue: "Find a Roommate",
-                        })}
-                    </Typography>
-                </Box>
-
-                <Typography
-                    color="text.secondary"
-                    sx={{ maxWidth: 750 }}
-                >
-                    {t("roommates.subtitle", {
-                        defaultValue:
-                            "Find a room, share your property, or connect with people looking to rent together.",
-                    })}
-                </Typography>
-            </Box>
+            <PageHeader
+                icon={<PeopleAltIcon />}
+                title={t("roommates.title", { defaultValue: "Find a Roommate" })}
+                subtitle={t("roommates.subtitle", {
+                    defaultValue: "Find a room, share your property, or connect with people looking to rent together.",
+                })}
+            />
 
             {/* Tabs */}
             <Paper

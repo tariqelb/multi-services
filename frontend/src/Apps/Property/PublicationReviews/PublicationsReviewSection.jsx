@@ -1,4 +1,5 @@
 
+import PageHeader from "../../../Components/ui/PageHeader";
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -83,50 +84,13 @@ export default function PublicationsReviewSection() {
     };
 
     return (
-        <Box sx={{ width: "100%", minWidth: 0 , p: 10 }}>
+        <Box sx={{ width: "100%", minWidth: 0, boxSizing: "border-box", px: { xs: 2, sm: 3, md: 4 }, py: { xs: 3, md: 4 } }}>
             {/* Heading and date filter */}
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: {
-                        xs: "flex-start",
-                        sm: "center",
-                    },
-                    flexDirection: {
-                        xs: "column",
-                        sm: "row",
-                    },
-                    gap: 2,
-                    mb: 3,
-                }}
-            >
-                <Box>
-                    <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        sx={{ mb: 0.5 }}
-                    >
-                        <Article sx={{ color: "#2563EB" }} />
-
-                        <Typography
-                            variant="h5"
-                            fontWeight={700}
-                            color="#0F172A"
-                        >
-                            {t("adminPublications.title")}
-                        </Typography>
-                    </Stack>
-
-                    <Typography
-                        variant="body2"
-                        color="#64748b"
-                    >
-                        {t("adminPublications.subtitle")}
-                    </Typography>
-                </Box>
-
+            <PageHeader
+                icon={<Article />}
+                title={t("adminPublications.title")}
+                subtitle={t("adminPublications.subtitle")}
+                action={
                 <FormControl
                     size="small"
                     sx={{
@@ -168,7 +132,8 @@ export default function PublicationsReviewSection() {
                         ))}
                     </Select>
                 </FormControl>
-            </Box>
+                }
+            />
 
             {/* Publication count */}
             <Box
@@ -186,17 +151,14 @@ export default function PublicationsReviewSection() {
             >
                 <Box>
                     <Typography
-                        variant="body2"
-                        color="#475569"
-                        fontWeight={600}
+                        variant="body2" sx={{ color: "#475569", fontWeight: 600 }}
                     >
                         {t("adminPublications.count")}
                     </Typography>
 
                     <Typography
                         variant="body2"
-                        color="#64748b"
-                        sx={{ mt: 0.5 }}
+                        sx={{ color: "#64748b", mt: 0.5 }}
                     >
                         {t(`adminPublications.periods.${period}`)}
                     </Typography>
@@ -204,9 +166,7 @@ export default function PublicationsReviewSection() {
 
                 <Typography
                     variant="h4"
-                    fontWeight={800}
-                    color="#2563EB"
-                    sx={{
+                    sx={{ fontWeight: 800, color: "#2563EB",
                         fontVariantNumeric: "tabular-nums",
                     }}
                 >
@@ -267,17 +227,14 @@ export default function PublicationsReviewSection() {
                     />
 
                     <Typography
-                        variant="h6"
-                        fontWeight={700}
-                        color="#334155"
+                        variant="h6" sx={{ fontWeight: 700, color: "#334155" }}
                     >
                         {t("adminPublications.empty.title")}
                     </Typography>
 
                     <Typography
                         variant="body2"
-                        color="#64748b"
-                        sx={{ mt: 0.5 }}
+                        sx={{ color: "#64748b", mt: 0.5 }}
                     >
                         {t("adminPublications.empty.description")}
                     </Typography>

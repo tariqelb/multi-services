@@ -1,14 +1,13 @@
 
 import React from "react";
 import {
-    Paper,
     Stack,
     TextField,
     MenuItem,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
-import { SectionHeader } from "./RoommateFormUI";
+import { SectionHeader, SectionPaper } from "./RoommateFormUI";
 import RoommateCityField from "./RoommateCityField";
 
 export default function RoommateLocationSection({
@@ -30,8 +29,9 @@ export default function RoommateLocationSection({
     ];
 
     return (
-        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
+        <SectionPaper>
             <SectionHeader
+                number={2}
                 icon={<LocationOnIcon />}
                 title={translate(
                     "roommates.form.location",
@@ -198,6 +198,6 @@ export default function RoommateLocationSection({
                     />
                 ))}
             </Stack>
-        </Paper>
+        </SectionPaper>
     );
 }

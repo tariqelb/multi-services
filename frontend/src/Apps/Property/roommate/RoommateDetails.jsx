@@ -1,43 +1,55 @@
-
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import PhoneIcon from "@mui/icons-material/Phone";
+import { Alert, Button, Stack, Typography } from "@mui/material";
+
+import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import MeetingRoomOutlinedIcon from "@mui/icons-material/MeetingRoomOutlined";
+import BathtubOutlinedIcon from "@mui/icons-material/BathtubOutlined";
+import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import PetsOutlinedIcon from "@mui/icons-material/PetsOutlined";
+import SmokingRoomsOutlinedIcon from "@mui/icons-material/SmokingRoomsOutlined";
+import WcOutlinedIcon from "@mui/icons-material/WcOutlined";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import ChairOutlinedIcon from "@mui/icons-material/ChairOutlined";
+import BalconyOutlinedIcon from "@mui/icons-material/BalconyOutlined";
+import LocalParkingOutlinedIcon from "@mui/icons-material/LocalParkingOutlined";
+import KitchenOutlinedIcon from "@mui/icons-material/KitchenOutlined";
+import SquareFootRoundedIcon from "@mui/icons-material/SquareFootRounded";
+import StairsOutlinedIcon from "@mui/icons-material/StairsOutlined";
+import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
+import PlayCircleOutlineRoundedIcon from "@mui/icons-material/PlayCircleOutlineRounded";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 
 import {
-    Alert,
-    Box,
-    Button,
-    Chip,
-    Divider,
-    Grid,
-    Paper,
-    Stack,
-    Typography,
-} from "@mui/material";
-
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
-import BathtubIcon from "@mui/icons-material/Bathtub";
-import HomeWorkIcon from "@mui/icons-material/HomeWork";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import PetsIcon from "@mui/icons-material/Pets";
-import SmokingRoomsIcon from "@mui/icons-material/SmokingRooms";
-import PersonIcon from "@mui/icons-material/Person";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import ChairIcon from "@mui/icons-material/Chair";
-import BalconyIcon from "@mui/icons-material/Balcony";
-import LocalParkingIcon from "@mui/icons-material/LocalParking";
-import KitchenIcon from "@mui/icons-material/Kitchen";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+    DescriptionText,
+    DetailsHeader,
+    DetailsLayout,
+    DetailsSection,
+    FactGrid,
+    KeyValueList,
+    MapLinkButton,
+    MediaGallery,
+    MobileActionBar,
+    VideoEmbed,
+    OwnerSummary,
+    SidebarCard,
+    StatusBadge,
+} from "../../../Components/ui/DetailsKit";
 
 import getImageUrl from "../../../utils/getImageUrl";
+import { trackListingContact } from "../../../api/trackContact";
 
-const purposeColors = {
+const purposeTones = {
     "Share My Property": "success",
+    "Share My Apartment": "success",
     "Find a Room": "primary",
     "Rent Together": "warning",
 };
@@ -79,56 +91,7 @@ function getYouTubeEmbedUrl(url) {
     }
 }
 
-function DetailItem({ icon, label, value }) {
-    if (value === undefined || value === null || value === "") {
-        return null;
-    }
-
-    return (
-        <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1.5}
-            sx={{ py: 1 }}
-        >
-            <Box
-                sx={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    bgcolor: "action.hover",
-                    color: "primary.main",
-                    flexShrink: 0,
-                }}
-            >
-                {icon}
-            </Box>
-
-            <Box sx={{ minWidth: 0 }}>
-                <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    display="block"
-                >
-                    {label}
-                </Typography>
-
-                <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    sx={{ overflowWrap: "anywhere" }}
-                >
-                    {value}
-                </Typography>
-            </Box>
-        </Stack>
-    );
-}
-
-export default function RoommateDetails({ listing }) {
+export default function RoommateDetails({ listing, showContact = true }) {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
 
@@ -143,9 +106,8 @@ export default function RoommateDetails({ listing }) {
                 return path ? getImageUrl(path) : null;
             })
             .filter(Boolean);
-    }, [listing?.images]);
+    }, [listing]);
 
-    const [activeImage, setActiveImage] = useState(0);
 
     const purpose = listing?.purpose || "";
     const owner = listing?.userId;
@@ -265,6 +227,15 @@ export default function RoommateDetails({ listing }) {
         ? translateEnum("properties.types", listing.propertyType)
         : "";
 
+    // Record the contact without delaying the call / WhatsApp link.
+    const trackContact = (action) => {
+        trackListingContact(
+            "roommate",
+            listing?._id || listing?.id,
+            action
+        );
+    };
+
     const openMap = () => {
         if (!listing?.mapLink) return;
 
@@ -275,777 +246,238 @@ export default function RoommateDetails({ listing }) {
         );
     };
 
-    return (
-        <Box>
-            {/* Heading */}
-            <Box sx={{ mb: 3 }}>
-                <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    justifyContent="space-between"
-                    alignItems={{ xs: "flex-start", sm: "center" }}
-                    spacing={2}
-                    sx={{ mb: 1.5 }}
-                >
-                    <Typography
-                        variant="h4"
-                        fontWeight={800}
-                        sx={{
-                            fontSize: {
-                                xs: "1.45rem",
-                                sm: "1.8rem",
-                                md: "2rem",
-                            },
-                        }}
-                    >
-                        {listing.title}
-                    </Typography>
+    const hasValue = (value) => value !== undefined && value !== null && value !== "";
+    const optionalYesNo = (value) => (value === undefined || value === null ? null : yesNo(value));
+    const money = (value) => (hasValue(value) ? `${formatPrice(value)} ${t("common.currency", "MAD")}` : null);
 
-                    <Chip
-                        label={translateEnum(
-                            "roommates.purpose",
-                            purpose
-                        )}
-                        color={purposeColors[purpose] || "default"}
-                        sx={{ fontWeight: 700 }}
-                    />
-                </Stack>
+    const hasTotalRent = hasValue(listing.totalRent);
+    const mainPrice = money(hasTotalRent ? listing.totalRent : listing.individualRoomPrice);
+    const priceCaption = [
+        hasTotalRent
+            ? translate("roommates.details.totalRent", "Total rent")
+            : translate("roommates.details.roomPrice", "Individual room price"),
+        rentPeriod,
+    ]
+        .filter(Boolean)
+        .join(" / ");
 
-                <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={0.75}
-                    color="text.secondary"
-                >
-                    <LocationOnIcon fontSize="small" />
+    const location = [listing.neighborhood, listing.city].filter(Boolean).join(", ");
 
-                    <Typography variant="body2">
-                        {[listing.neighborhood, listing.city]
-                            .filter(Boolean)
-                            .join(", ")}
-                    </Typography>
-                </Stack>
-            </Box>
+    const accommodationFacts = [
+        { icon: <CategoryOutlinedIcon />, label: translate("roommates.fields.propertyType", "Property type"), value: propertyType },
+        {
+            icon: <ChairOutlinedIcon />,
+            label: translate("roommates.fields.furnishing", "Furnishing"),
+            value: translateEnum("roommates.furnishing", listing.furnishingStatus),
+        },
+        { icon: <MeetingRoomOutlinedIcon />, label: translate("roommates.fields.rooms", "Bedrooms"), value: listing.rooms },
+        { icon: <BathtubOutlinedIcon />, label: translate("roommates.fields.bathrooms", "Bathrooms"), value: listing.bathrooms },
+        {
+            icon: <SquareFootRoundedIcon />,
+            label: translate("roommates.fields.surface", "Surface"),
+            value: hasValue(listing.surface) ? `${listing.surface} m²` : null,
+        },
+        { icon: <StairsOutlinedIcon />, label: translate("roommates.fields.floor", "Floor"), value: listing.floor },
+        { icon: <BalconyOutlinedIcon />, label: translate("roommates.fields.balcony", "Balcony"), value: optionalYesNo(listing.hasBalcony) },
+        { icon: <KitchenOutlinedIcon />, label: translate("roommates.fields.kitchen", "Kitchen"), value: optionalYesNo(listing.hasKitchen) },
+        { icon: <LocalParkingOutlinedIcon />, label: translate("roommates.fields.parking", "Parking"), value: optionalYesNo(listing.hasParking) },
+        {
+            icon: <BuildOutlinedIcon />,
+            label: translate("roommates.fields.condition", "Property condition"),
+            value: translateEnum("roommates.condition", listing.propertyCondition),
+        },
+    ];
 
-            <Grid container spacing={3}>
-                {/* Main content */}
-                <Grid size={{ xs: 12, md: 8 }}>
-                    {/* Photos */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 1, sm: 2 },
-                            border: "1px solid",
-                            borderColor: "divider",
-                            borderRadius: 3,
-                            overflow: "hidden",
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                width: "100%",
-                                height: {
-                                    xs: 260,
-                                    sm: 400,
-                                    md: 450,
-                                },
-                                borderRadius: 2,
-                                overflow: "hidden",
-                                bgcolor: "action.hover",
-                            }}
-                        >
-                            {images.length > 0 ? (
-                                <Box
-                                    component="img"
-                                    src={images[activeImage]}
-                                    alt={listing.title}
-                                    sx={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "contain",
-                                        display: "block",
-                                    }}
-                                />
-                            ) : (
-                                <Stack
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    sx={{
-                                        height: "100%",
-                                        color: "text.secondary",
-                                    }}
-                                >
-                                    <HomeWorkIcon sx={{ fontSize: 65 }} />
+    const preferenceFacts = [
+        {
+            icon: <WcOutlinedIcon />,
+            label: translate("roommates.fields.gender", "Preferred gender"),
+            value: genderLabel[preferences.gender] || preferences.gender,
+        },
+        {
+            icon: <SmokingRoomsOutlinedIcon />,
+            label: translate("roommates.fields.smoking", "Smoking allowed"),
+            value: optionalYesNo(preferences.smokingAllowed),
+        },
+        {
+            icon: <PetsOutlinedIcon />,
+            label: translate("roommates.fields.pets", "Pets allowed"),
+            value: optionalYesNo(preferences.petsAllowed),
+        },
+    ];
 
-                                    <Typography>
-                                        {translate(
-                                            "roommates.details.noPhotos",
-                                            "No photos available"
-                                        )}
-                                    </Typography>
-                                </Stack>
-                            )}
-                        </Box>
+    const availability = [
+        { icon: <PeopleAltOutlinedIcon />, label: translate("roommates.fields.totalPeople", "Total capacity"), value: listing.totalPeople },
+        { icon: <PeopleAltOutlinedIcon />, label: translate("roommates.fields.currentPeople", "Current occupants"), value: listing.currentPeople },
+        { icon: <EventAvailableOutlinedIcon />, label: translate("roommates.fields.availablePlaces", "Available places"), value: availablePlaces },
+        { icon: <CalendarMonthOutlinedIcon />, label: translate("roommates.fields.availableFrom", "Available from"), value: listing.availableFrom ? formatDate(listing.availableFrom) : null },
+    ];
 
-                        {/* Thumbnails */}
-                        {images.length > 1 && (
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    gap: 1,
-                                    mt: 1.5,
-                                    overflowX: "auto",
-                                    pb: 1,
-                                }}
-                            >
-                                {images.map((image, index) => (
-                                    <Box
-                                        key={`${image}-${index}`}
-                                        component="button"
-                                        type="button"
-                                        onClick={() => setActiveImage(index)}
-                                        aria-label={`View photo ${index + 1}`}
-                                        sx={{
-                                            p: 0,
-                                            border: "2px solid",
-                                            borderColor:
-                                                activeImage === index
-                                                    ? "primary.main"
-                                                    : "transparent",
-                                            borderRadius: 1.5,
-                                            overflow: "hidden",
-                                            cursor: "pointer",
-                                            flexShrink: 0,
-                                            width: 90,
-                                            height: 70,
-                                            bgcolor: "transparent",
-                                        }}
-                                    >
-                                        <Box
-                                            component="img"
-                                            src={image}
-                                            alt={`Roommate property ${index + 1}`}
-                                            sx={{
-                                                width: "100%",
-                                                height: "100%",
-                                                objectFit: "cover",
-                                            }}
-                                        />
-                                    </Box>
-                                ))}
-                            </Box>
-                        )}
+    const expenses = [
+        { label: translate("roommates.details.rentPerPerson", "Estimated rent per person"), value: money(listing.rentPerPerson) },
+        { label: translate("roommates.fields.deposit", "Deposit"), value: money(listing.deposit) },
+        { label: translate("roommates.fields.syndicateFees", "Syndicate fees"), value: money(listing.syndicateFees) },
+        { label: translate("roommates.fields.otherExpenses", "Other expenses"), value: money(listing.otherExpenses) },
+    ];
 
-                        {/* YouTube video under photos */}
-                        {youtubeEmbedUrl && (
-                            <Box sx={{ mt: 3 }}>
-                                <Typography
-                                    variant="h6"
-                                    fontWeight={700}
-                                    sx={{ mb: 1.5 }}
-                                >
-                                    {translate(
-                                        "roommates.details.video",
-                                        "Property video"
-                                    )}
-                                </Typography>
+    const handleCall = () => {
+        if (!ownerPhone) return;
+        trackContact("call");
+        window.location.href = `tel:${ownerPhone}`;
+    };
 
-                                <Box
-                                    sx={{
-                                        position: "relative",
-                                        width: "100%",
-                                        aspectRatio: "16 / 9",
-                                        overflow: "hidden",
-                                        borderRadius: 2,
-                                        bgcolor: "black",
-                                    }}
-                                >
-                                    <Box
-                                        component="iframe"
-                                        src={youtubeEmbedUrl}
-                                        title="Roommate property video"
-                                        loading="lazy"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                        allowFullScreen
-                                        referrerPolicy="strict-origin-when-cross-origin"
-                                        sx={{
-                                            position: "absolute",
-                                            inset: 0,
-                                            width: "100%",
-                                            height: "100%",
-                                            border: 0,
-                                        }}
-                                    />
-                                </Box>
-                            </Box>
-                        )}
-                    </Paper>
+    const handleWhatsApp = () => {
+        if (!whatsappNumber) return;
+        trackContact("whatsapp");
+        window.open(`https://wa.me/${whatsappNumber}`, "_blank", "noopener,noreferrer");
+    };
 
-                    {/* Description */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 2, sm: 3 },
-                            mt: 3,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            borderRadius: 3,
-                        }}
-                    >
-                        <Typography variant="h6" fontWeight={700} mb={2}>
-                            {translate(
-                                "roommates.details.description",
-                                "Description"
-                            )}
+    const whatsappSx = { bgcolor: "#16A34A", color: "#fff", "&:hover": { bgcolor: "#15803D" } };
+
+    const main = (
+        <>
+            <MediaGallery
+                images={images}
+                alt={listing.title}
+                emptyIcon={<HomeWorkOutlinedIcon />}
+                emptyLabel={translate("roommates.details.noPhotos", "No photos available")}
+            />
+
+            <DetailsSection title={translate("roommates.details.description", "Description")} icon={<DescriptionOutlinedIcon />}>
+                <DescriptionText>
+                    {listing.description || translate("roommates.details.noDescription", "No description provided.")}
+                </DescriptionText>
+            </DetailsSection>
+
+            <DetailsSection
+                title={translate("roommates.details.accommodation", "Accommodation details")}
+                icon={<HomeWorkOutlinedIcon />}
+                action={
+                    listing.mapLink ? (
+                        <MapLinkButton onClick={openMap} label={translate("roommates.details.viewMap", "View location on map")} />
+                    ) : null
+                }
+            >
+                <FactGrid items={accommodationFacts} />
+            </DetailsSection>
+
+            <DetailsSection title={translate("roommates.details.preferences", "Roommate preferences")} icon={<FavoriteBorderRoundedIcon />}>
+                <FactGrid items={preferenceFacts} />
+            </DetailsSection>
+
+            {youtubeEmbedUrl && (
+                <DetailsSection title={translate("roommates.details.video", "Property video")} icon={<PlayCircleOutlineRoundedIcon />}>
+                    <VideoEmbed src={youtubeEmbedUrl} title={listing.title} externalUrl={listing.youtubeVideoUrl} />
+                </DetailsSection>
+            )}
+        </>
+    );
+
+    const sidebar = (
+        <>
+            <SidebarCard>
+                <Typography variant="h6" sx={{ mb: 1.5 }}>
+                    {translate("roommates.details.availability", "Availability")}
+                </Typography>
+                <KeyValueList items={availability} />
+            </SidebarCard>
+
+            {expenses.some((item) => item.value) && (
+                <SidebarCard>
+                    <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
+                        <ReceiptLongOutlinedIcon color="primary" fontSize="small" />
+                        <Typography variant="h6">
+                            {translate("roommates.details.additionalExpenses", "Additional expenses")}
                         </Typography>
+                    </Stack>
+                    <KeyValueList items={expenses} />
+                </SidebarCard>
+            )}
 
-                        <Typography
-                            color="text.secondary"
-                            sx={{
-                                whiteSpace: "pre-line",
-                                overflowWrap: "anywhere",
-                                lineHeight: 1.8,
-                            }}
-                        >
-                            {listing.description ||
-                                translate(
-                                    "roommates.details.noDescription",
-                                    "No description provided."
-                                )}
-                        </Typography>
-                    </Paper>
+            <SidebarCard>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                    {showContact
+                        ? translate("roommates.details.contactOwner", "Contact announcement owner")
+                        : translate("roommates.details.owner", "Announcement owner")}
+                </Typography>
 
-                    {/* Accommodation details */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 2, sm: 3 },
-                            mt: 3,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            borderRadius: 3,
-                        }}
-                    >
-                        <Typography variant="h6" fontWeight={700} mb={2}>
-                            {translate(
-                                "roommates.details.accommodation",
-                                "Accommodation details"
-                            )}
-                        </Typography>
+                <OwnerSummary
+                    name={ownerName || translate("roommates.details.owner", "Announcement owner")}
+                    avatar={typeof owner === "object" ? owner?.profileImage : undefined}
+                    subtitle={
+                        listing.createdAt
+                            ? `${translate("roommates.details.postedOn", "Posted on")} ${formatDate(listing.createdAt)}`
+                            : undefined
+                    }
+                />
 
-                        <Grid container spacing={1}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<HomeWorkIcon />}
-                                    label={translate(
-                                        "roommates.fields.propertyType",
-                                        "Property type"
-                                    )}
-                                    value={propertyType}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<ChairIcon />}
-                                    label={translate(
-                                        "roommates.fields.furnishing",
-                                        "Furnishing"
-                                    )}
-                                    value={translateEnum(
-                                        "roommates.furnishing",
-                                        listing.furnishingStatus
-                                    )}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<MeetingRoomIcon />}
-                                    label={translate(
-                                        "roommates.fields.rooms",
-                                        "Bedrooms"
-                                    )}
-                                    value={listing.rooms}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<BathtubIcon />}
-                                    label={translate(
-                                        "roommates.fields.bathrooms",
-                                        "Bathrooms"
-                                    )}
-                                    value={listing.bathrooms}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<HomeWorkIcon />}
-                                    label={translate(
-                                        "roommates.fields.surface",
-                                        "Surface"
-                                    )}
-                                    value={
-                                        listing.surface !== undefined &&
-                                        listing.surface !== null
-                                            ? `${listing.surface} m²`
-                                            : null
-                                    }
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<PersonIcon />}
-                                    label={translate(
-                                        "roommates.fields.floor",
-                                        "Floor"
-                                    )}
-                                    value={listing.floor}
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<BalconyIcon />}
-                                    label={translate(
-                                        "roommates.fields.balcony",
-                                        "Balcony"
-                                    )}
-                                    value={
-                                        listing.hasBalcony === undefined
-                                            ? null
-                                            : yesNo(listing.hasBalcony)
-                                    }
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<KitchenIcon />}
-                                    label={translate(
-                                        "roommates.fields.kitchen",
-                                        "Kitchen"
-                                    )}
-                                    value={
-                                        listing.hasKitchen === undefined
-                                            ? null
-                                            : yesNo(listing.hasKitchen)
-                                    }
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<LocalParkingIcon />}
-                                    label={translate(
-                                        "roommates.fields.parking",
-                                        "Parking"
-                                    )}
-                                    value={
-                                        listing.hasParking === undefined
-                                            ? null
-                                            : yesNo(listing.hasParking)
-                                    }
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<HomeWorkIcon />}
-                                    label={translate(
-                                        "roommates.fields.condition",
-                                        "Property condition"
-                                    )}
-                                    value={translateEnum(
-                                        "roommates.condition",
-                                        listing.propertyCondition
-                                    )}
-                                />
-                            </Grid>
-                        </Grid>
-
-                        {listing.mapLink && (
-                            <>
-                                <Divider sx={{ my: 2 }} />
-
-                                <Button
-                                    variant="outlined"
-                                    startIcon={<LocationOnIcon />}
-                                    endIcon={<OpenInNewIcon />}
-                                    onClick={openMap}
-                                    sx={{ textTransform: "none" }}
-                                >
-                                    {translate(
-                                        "roommates.details.viewMap",
-                                        "View location on map"
-                                    )}
-                                </Button>
-                            </>
-                        )}
-                    </Paper>
-
-                    {/* Roommate preferences */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 2, sm: 3 },
-                            mt: 3,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            borderRadius: 3,
-                        }}
-                    >
-                        <Typography variant="h6" fontWeight={700} mb={2}>
-                            {translate(
-                                "roommates.details.preferences",
-                                "Roommate preferences"
-                            )}
-                        </Typography>
-
-                        <Grid container spacing={1}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<PersonIcon />}
-                                    label={translate(
-                                        "roommates.fields.gender",
-                                        "Preferred gender"
-                                    )}
-                                    value={
-                                        genderLabel[preferences.gender] ||
-                                        genderLabel.Any
-                                    }
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<SmokingRoomsIcon />}
-                                    label={translate(
-                                        "roommates.fields.smoking",
-                                        "Smoking allowed"
-                                    )}
-                                    value={
-                                        preferences.smokingAllowed === undefined
-                                            ? null
-                                            : yesNo(
-                                                preferences.smokingAllowed
-                                            )
-                                    }
-                                />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <DetailItem
-                                    icon={<PetsIcon />}
-                                    label={translate(
-                                        "roommates.fields.pets",
-                                        "Pets allowed"
-                                    )}
-                                    value={
-                                        preferences.petsAllowed === undefined
-                                            ? null
-                                            : yesNo(preferences.petsAllowed)
-                                    }
-                                />
-                            </Grid>
-                        </Grid>
-                    </Paper>
-                </Grid>
-
-                {/* Sidebar information */}
-                <Grid size={{ xs: 12, md: 4 }}>
-                    {/* Rent and availability */}
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: { xs: 2, sm: 3 },
-                            border: "1px solid",
-                            borderColor: "divider",
-                            borderRadius: 3,
-                            position: { md: "sticky" },
-                            top: 20,
-                        }}
-                    >
-                        <Typography
-                            variant="h5"
-                            color="primary.main"
-                            fontWeight={800}
-                            sx={{ mb: 0.5 }}
-                        >
-                            {listing.totalRent !== undefined &&
-                            listing.totalRent !== null
-                                ? formatPrice(listing.totalRent)
-                                : formatPrice(listing.individualRoomPrice)}
-                        </Typography>
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mb: 2 }}
-                        >
-                            {listing.totalRent !== undefined &&
-                            listing.totalRent !== null
-                                ? translate(
-                                    "roommates.details.totalRent",
-                                    "Total rent"
-                                )
-                                : translate(
-                                    "roommates.details.roomPrice",
-                                    "Individual room price"
-                                )}
-
-                            {rentPeriod ? ` / ${rentPeriod}` : ""}
-                        </Typography>
-
-                        {listing.rentPerPerson !== null &&
-                            listing.rentPerPerson !== undefined && (
-                                <Alert
-                                    severity="info"
-                                    icon={false}
-                                    sx={{ mb: 2 }}
-                                >
-                                    <Typography variant="body2">
-                                        {translate(
-                                            "roommates.details.rentPerPerson",
-                                            "Estimated rent per person"
-                                        )}
-                                    </Typography>
-
-                                    <Typography fontWeight={800}>
-                                        {formatPrice(listing.rentPerPerson)}
-                                    </Typography>
-                                </Alert>
-                            )}
-
-                        <Divider sx={{ mb: 2 }} />
-
-                        <DetailItem
-                            icon={<PeopleAltIcon />}
-                            label={translate(
-                                "roommates.fields.totalPeople",
-                                "Total capacity"
-                            )}
-                            value={listing.totalPeople}
-                        />
-
-                        <DetailItem
-                            icon={<PeopleAltIcon />}
-                            label={translate(
-                                "roommates.fields.currentPeople",
-                                "Current occupants"
-                            )}
-                            value={listing.currentPeople}
-                        />
-
-                        <DetailItem
-                            icon={<PeopleAltIcon />}
-                            label={translate(
-                                "roommates.fields.availablePlaces",
-                                "Available places"
-                            )}
-                            value={availablePlaces}
-                        />
-
-                        <DetailItem
-                            icon={<CalendarMonthIcon />}
-                            label={translate(
-                                "roommates.fields.availableFrom",
-                                "Available from"
-                            )}
-                            value={formatDate(listing.availableFrom)}
-                        />
-
-                        <Divider sx={{ my: 2 }} />
-
-                        {/* Additional expenses */}
-                        <Typography fontWeight={700} mb={1}>
-                            {translate(
-                                "roommates.details.additionalExpenses",
-                                "Additional expenses"
-                            )}
-                        </Typography>
-
-                        <DetailItem
-                            icon={<HomeWorkIcon />}
-                            label={translate(
-                                "roommates.fields.deposit",
-                                "Deposit"
-                            )}
-                            value={formatPrice(listing.deposit)}
-                        />
-
-                        <DetailItem
-                            icon={<HomeWorkIcon />}
-                            label={translate(
-                                "roommates.fields.syndicateFees",
-                                "Syndicate fees"
-                            )}
-                            value={formatPrice(listing.syndicateFees)}
-                        />
-
-                        <DetailItem
-                            icon={<HomeWorkIcon />}
-                            label={translate(
-                                "roommates.fields.otherExpenses",
-                                "Other expenses"
-                            )}
-                            value={formatPrice(listing.otherExpenses)}
-                        />
-
-                        <Divider sx={{ my: 2 }} />
-
-                        {/* Owner */}
-                        <Typography fontWeight={700} mb={1.5}>
-                            {translate(
-                                "roommates.details.owner",
-                                "Announcement owner"
-                            )}
-                        </Typography>
-
-                        <Stack
-                            direction="row"
-                            alignItems="center"
-                            spacing={1.5}
-                        >
-                            <AccountCircleIcon
-                                sx={{
-                                    fontSize: 45,
-                                    color: "text.secondary",
-                                }}
-                            />
-
-                            <Box sx={{ minWidth: 0 }}>
-                                <Typography fontWeight={700}>
-                                    {ownerName ||
-                                        translate(
-                                            "roommates.details.owner",
-                                            "Announcement owner"
-                                        )}
-                                </Typography>
-
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                >
-                                    {translate(
-                                        "roommates.details.postedOn",
-                                        "Posted on"
-                                    )}{" "}
-                                    {formatDate(listing.createdAt)}
-                                </Typography>
-                            </Box>
-                        </Stack>
-                        {/* Contact Owner */}
-                        <Divider sx={{ my: 2 }} />
-
-                        <Typography fontWeight={700} mb={1.5}>
-                            {translate(
-                                "roommates.details.contactOwner",
-                                "Contact announcement owner"
-                            )}
-                        </Typography>
-
-                        {ownerPhone ? (
-                            <Stack spacing={1.5}>
-                                <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    sx={{ overflowWrap: "anywhere" }}
-                                >
-                                    {ownerPhone}
-                                </Typography>
-
-                                <Button
-                                    fullWidth
-                                    component="a"
-                                    href={`tel:${ownerPhone}`}
-                                    variant="contained"
-                                    color="primary"
-                                    startIcon={<PhoneIcon />}
-                                    sx={{
-                                        textTransform: "none",
-                                        fontWeight: 700,
-                                    }}
-                                >
-                                    {translate(
-                                        "roommates.details.callOwner",
-                                        "Call owner"
-                                    )}
-                                </Button>
-
-                                {whatsappNumber && (
-                                    <Button
-                                        fullWidth
-                                        component="a"
-                                        href={`https://wa.me/${whatsappNumber}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        variant="outlined"
-                                        color="success"
-                                        startIcon={<WhatsAppIcon />}
-                                        sx={{
-                                            textTransform: "none",
-                                            fontWeight: 700,
-                                        }}
-                                    >
-                                        {translate(
-                                            "roommates.details.whatsappOwner",
-                                            "Contact via WhatsApp"
-                                        )}
-                                    </Button>
-                                )}
-                            </Stack>
-                        ) : (
-                            <Alert severity="info">
-                                {translate(
-                                    "roommates.details.noPhone",
-                                    "The owner has not provided a phone number."
-                                )}
-                            </Alert>
-                    )}
-
-                        {ownerId && (
+                {!showContact ? null : ownerPhone ? (
+                    <Stack spacing={1.25} sx={{ mt: 2.5 }}>
+                        <Button variant="contained" size="large" startIcon={<PhoneRoundedIcon />} onClick={handleCall} fullWidth>
+                            {translate("roommates.details.callOwner", "Call owner")}
+                        </Button>
+                        {whatsappNumber && (
                             <Button
-                                fullWidth
                                 variant="contained"
-                                onClick={() =>
-                                    navigate(`/profile/${ownerId}`)
-                                }
-                                sx={{
-                                    mt: 2,
-                                    textTransform: "none",
-                                    fontWeight: 700,
-                                }}
+                                size="large"
+                                startIcon={<WhatsAppIcon />}
+                                onClick={handleWhatsApp}
+                                fullWidth
+                                sx={whatsappSx}
                             >
-                                {translate(
-                                    "roommates.details.viewProfile",
-                                    "View owner profile"
-                                )}
+                                {translate("roommates.details.whatsappOwner", "Contact via WhatsApp")}
                             </Button>
                         )}
+                    </Stack>
+                ) : (
+                    <Alert severity="info" sx={{ mt: 2 }}>
+                        {translate("roommates.details.noPhone", "The owner has not provided a phone number.")}
+                    </Alert>
+                )}
 
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            startIcon={<ArrowBackIcon />}
-                            onClick={() => navigate("/roommates")}
-                            sx={{
-                                mt: 1.5,
-                                textTransform: "none",
-                                fontWeight: 600,
-                            }}
-                        >
-                            {translate(
-                                "roommates.details.backToAnnouncements",
-                                "Back"
-                            )}
+                {ownerId && (
+                    <Button
+                        variant="outlined"
+                        startIcon={<AccountCircleOutlinedIcon />}
+                        onClick={() => navigate(`/profile/${ownerId}`)}
+                        fullWidth
+                        sx={{ mt: 1.25 }}
+                    >
+                        {translate("roommates.details.viewProfile", "View owner profile")}
+                    </Button>
+                )}
+            </SidebarCard>
+        </>
+    );
+
+    return (
+        <>
+            <DetailsHeader
+                badges={
+                    purpose ? (
+                        <StatusBadge tone={purposeTones[purpose] || "default"} label={translateEnum("roommates.purpose", purpose)} />
+                    ) : null
+                }
+                title={listing.title}
+                location={location}
+                price={mainPrice}
+                priceCaption={priceCaption}
+            />
+
+            <DetailsLayout main={main} sidebar={sidebar} />
+
+            {showContact && ownerPhone && (
+                <MobileActionBar>
+                    <Button variant="contained" startIcon={<PhoneRoundedIcon />} onClick={handleCall}>
+                        {translate("roommates.details.call", "Call")}
+                    </Button>
+                    {whatsappNumber && (
+                        <Button variant="contained" startIcon={<WhatsAppIcon />} onClick={handleWhatsApp} sx={whatsappSx}>
+                            {translate("roommates.details.whatsapp", "WhatsApp")}
                         </Button>
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Box>
+                    )}
+                </MobileActionBar>
+            )}
+        </>
     );
 }

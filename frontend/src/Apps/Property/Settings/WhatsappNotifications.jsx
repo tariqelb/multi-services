@@ -58,8 +58,7 @@ export default function WhatsappNotifications({
                 <Stack
                     direction="row"
                     spacing={2.5}
-                    alignItems="center"
-                    sx={{ mb: 4.5 }}
+                    sx={{ alignItems: "center", mb: 4.5 }}
                 >
                     <Box
                         sx={{
@@ -80,13 +79,12 @@ export default function WhatsappNotifications({
                     <Box>
                         <Typography
                             variant="h6"
-                            fontWeight={700}
-                            sx={{ mb: 0.5 }}
+                            sx={{ fontWeight: 700, mb: 0.5 }}
                         >
                             {t("settings.whatsappNotifications.title")}
                         </Typography>
 
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             {t("settings.whatsappNotifications.subtitle")}
                         </Typography>
                     </Box>
@@ -242,16 +240,14 @@ export default function WhatsappNotifications({
                         label={
                             <Box>
                                 <Typography
-                                    fontWeight={700}
-                                    sx={{ fontSize: "1.05rem" }}
+                                    sx={{ fontWeight: 700, fontSize: "1.05rem" }}
                                 >
                                     {t("settings.whatsappNotifications.enable")}
                                 </Typography>
 
                                 <Typography
                                     variant="body2"
-                                    color="text.secondary"
-                                    sx={{ mt: 0.5 }}
+                                    sx={{ color: "text.secondary", mt: 0.5 }}
                                 >
                                     {t(
                                         "settings.whatsappNotifications.enableDescription"
@@ -285,16 +281,14 @@ export default function WhatsappNotifications({
                         label={
                             <Box>
                                 <Typography
-                                    fontWeight={700}
-                                    sx={{ fontSize: "1.05rem" }}
+                                    sx={{ fontWeight: 700, fontSize: "1.05rem" }}
                                 >
                                     {t("settings.whatsappNotifications.propertyAlerts")}
                                 </Typography>
 
                                 <Typography
                                     variant="body2"
-                                    color="text.secondary"
-                                    sx={{ mt: 0.5 }}
+                                    sx={{ color: "text.secondary", mt: 0.5 }}
                                 >
                                     {t(
                                         "settings.whatsappNotifications.propertyAlertsDescription"

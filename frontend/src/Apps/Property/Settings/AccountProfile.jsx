@@ -293,8 +293,7 @@ export default function AccountProfile({
                 <Stack
                     direction="row"
                     spacing={2.5}
-                    alignItems="center"
-                    sx={{ mb: 4.5 }}
+                    sx={{ alignItems: "center", mb: 4.5 }}
                 >
                     <Box
                         sx={{
@@ -315,15 +314,13 @@ export default function AccountProfile({
                     <Box>
                         <Typography
                             variant="h6"
-                            fontWeight={700}
-                            sx={{ mb: 0.5 }}
+                            sx={{ fontWeight: 700, mb: 0.5 }}
                         >
                             {t("settings.profile.sectionTitle")}
                         </Typography>
 
                         <Typography
-                            variant="body2"
-                            color="text.secondary"
+                            variant="body2" sx={{ color: "text.secondary" }}
                         >
                             {t("settings.profile.sectionSubtitle")}
                         </Typography>
@@ -357,12 +354,10 @@ export default function AccountProfile({
                 <form onSubmit={onSave}>
                     <Stack
                         direction={{ xs: "column", sm: "row" }}
-                        spacing={3.5}
-                        alignItems={{
+                        spacing={3.5} sx={{ alignItems: {
                             xs: "flex-start",
                             sm: "center",
-                        }}
-                        mb={5}
+                        }, mb: 5 }}
                     >
                         <Avatar
                             src={profileImageUrl}
@@ -382,8 +377,7 @@ export default function AccountProfile({
 
                         <Box sx={{ flexGrow: 1 }}>
                             <Typography
-                                fontWeight={700}
-                                sx={{
+                                sx={{ fontWeight: 700,
                                     fontSize: "1.05rem",
                                     mb: 0.5,
                                 }}
@@ -393,8 +387,7 @@ export default function AccountProfile({
 
                             <Typography
                                 variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 2 }}
+                                sx={{ color: "text.secondary", mb: 2 }}
                             >
                                 {t("settings.profile.pictureDescription")}
                             </Typography>
@@ -402,10 +395,8 @@ export default function AccountProfile({
                             <Stack
                                 direction="row"
                                 spacing={1.5}
-                                alignItems="center"
-                                flexWrap="wrap"
                                 useFlexGap
-                                sx={{ mb: 1 }}
+                                sx={{ alignItems: "center", flexWrap: "wrap", mb: 1 }}
                             >
                                 <Button
                                     variant="outlined"
@@ -443,9 +434,7 @@ export default function AccountProfile({
                             </Stack>
 
                             <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                display="block"
+                                variant="caption" sx={{ color: "text.secondary", display: "block" }}
                             >
                                 {t("settings.profile.imageRequirements")}
                             </Typography>
@@ -563,8 +552,7 @@ export default function AccountProfile({
 
                     <Stack
                         direction={{ xs: "column", sm: "row" }}
-                        spacing={2.5}
-                        mt={5}
+                        spacing={2.5} sx={{ mt: 5 }}
                     >
                         <Button
                             type="submit"

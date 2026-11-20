@@ -1,5 +1,7 @@
 //app/frontend/src/components/admin/components/feedback/FeedbackSection.jsx
 
+import PageHeader from "../../../Components/ui/PageHeader";
+import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -156,47 +158,22 @@ export default function FeedbackSection() {
     };
 
     return (
-        <Box sx={{ width: "100%", minWidth: 0 , p: 10}}>
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: 2,
-                    mb: 3,
-                }}
-            >
-                <Box>
-                    <Typography
-                        variant="h5"
-                        fontWeight={700}
-                        color="#0f172a"
+        <Box sx={{ width: "100%", minWidth: 0, boxSizing: "border-box", px: { xs: 2, sm: 3, md: 4 }, py: { xs: 3, md: 4 } }}>
+            <PageHeader
+                icon={<FeedbackOutlinedIcon />}
+                title={t("adminFeedback.title")}
+                subtitle={t("adminFeedback.subtitle")}
+                action={
+                    <Button
+                        variant="outlined"
+                        startIcon={<RefreshIcon />}
+                        onClick={fetchFeedbacks}
+                        disabled={loading}
                     >
-                        {t("adminFeedback.title")}
-                    </Typography>
-
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                    >
-                        {t("adminFeedback.subtitle")}
-                    </Typography>
-                </Box>
-
-                <Button
-                    variant="outlined"
-                    startIcon={<RefreshIcon />}
-                    onClick={fetchFeedbacks}
-                    disabled={loading}
-                    sx={{
-                        textTransform: "none",
-                        fontWeight: 600,
-                    }}
-                >
-                    {t("adminFeedback.refresh")}
-                </Button>
-            </Box>
+                        {t("adminFeedback.refresh")}
+                    </Button>
+                }
+            />
 
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
@@ -224,14 +201,13 @@ export default function FeedbackSection() {
                         borderRadius: 3,
                     }}
                 >
-                    <Typography fontWeight={600} color="#334155">
+                    <Typography sx={{ fontWeight: 600, color: "#334155" }}>
                         {t("adminFeedback.empty.title")}
                     </Typography>
 
                     <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 0.5 }}
+                        sx={{ color: "text.secondary", mt: 0.5 }}
                     >
                         {t("adminFeedback.empty.description")}
                     </Typography>

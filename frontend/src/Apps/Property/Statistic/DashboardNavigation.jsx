@@ -1,3 +1,4 @@
+// admin/DashboardNavigation.jsx
 
 import { Box, Card, Tab, Tabs } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -8,8 +9,14 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import QueryStatsOutlinedIcon from "@mui/icons-material/QueryStatsOutlined";
 import PhoneInTalkOutlinedIcon from "@mui/icons-material/PhoneInTalkOutlined";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 
 const navigationItems = [
+    {
+        label: "Overview",
+        value: "overview",
+        icon: <DashboardOutlinedIcon />,
+    },
     {
         label: "Users",
         value: "users",

@@ -41,16 +41,13 @@ const SummaryCard = ({ title, value, icon, color }) => {
                     <Box>
                         <Typography
                             variant="body2"
-                            color="text.secondary"
-                            sx={{ mb: 1 }}
+                            sx={{ color: "text.secondary", mb: 1 }}
                         >
                             {title}
                         </Typography>
 
                         <Typography
-                            variant="h4"
-                            fontWeight={700}
-                            color="text.primary"
+                            variant="h4" sx={{ fontWeight: 700, color: "text.primary" }}
                         >
                             {value}
                         </Typography>

@@ -306,13 +306,12 @@ export default function NotificationMenu() {
                     }}
                 >
                     <Box sx={{ minWidth: 0 }}>
-                        <Typography fontWeight={700}>
+                        <Typography sx={{ fontWeight: 700 }}>
                             {t("notificationsMenu.title")}
                         </Typography>
 
                         <Typography
-                            variant="caption"
-                            color="text.secondary"
+                            variant="caption" sx={{ color: "text.secondary" }}
                         >
                             {t("notificationsMenu.unreadCount", {
                                 count: unreadCount,
@@ -352,7 +351,7 @@ export default function NotificationMenu() {
                 {/* Error message */}
                 {error && (
                     <Box sx={{ px: 2, py: 1 }}>
-                        <Typography color="error" variant="body2">
+                        <Typography variant="body2" sx={{ color: "error" }}>
                             {error}
                         </Typography>
 
@@ -379,9 +378,8 @@ export default function NotificationMenu() {
                 ) : notifications.length === 0 ? (
                     /* Empty state */
                     <Stack
-                        alignItems="center"
                         spacing={1}
-                        sx={{ py: 5, px: 2 }}
+                        sx={{ alignItems: "center", py: 5, px: 2 }}
                     >
                         <NotificationsNone
                             sx={{
@@ -390,14 +388,12 @@ export default function NotificationMenu() {
                             }}
                         />
 
-                        <Typography fontWeight={600}>
+                        <Typography sx={{ fontWeight: 600 }}>
                             {t("notificationsMenu.emptyTitle")}
                         </Typography>
 
                         <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            textAlign="center"
+                            variant="body2" sx={{ color: "text.secondary", textAlign: "center" }}
                         >
                             {t("notificationsMenu.emptyDescription")}
                         </Typography>
@@ -450,18 +446,14 @@ export default function NotificationMenu() {
                                 >
                                     <Typography
                                         variant="body2"
-                                        fontWeight={
-                                            notification.isRead ? 500 : 700
-                                        }
-                                        sx={{ overflowWrap: "anywhere" }}
+                                        sx={{ fontWeight: notification.isRead ? 500 : 700, overflowWrap: "anywhere" }}
                                     >
                                         {notification.title}
                                     </Typography>
 
                                     <Typography
                                         variant="body2"
-                                        color="text.secondary"
-                                        sx={{
+                                        sx={{ color: "text.secondary",
                                             mt: 0.5,
                                             overflowWrap: "anywhere",
                                         }}
@@ -471,8 +463,7 @@ export default function NotificationMenu() {
 
                                     <Typography
                                         variant="caption"
-                                        color="text.disabled"
-                                        sx={{
+                                        sx={{ color: "text.disabled",
                                             display: "block",
                                             mt: 0.75,
                                         }}

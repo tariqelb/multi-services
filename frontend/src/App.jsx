@@ -7,6 +7,7 @@ import {
     useLoaderData,
     Outlet,
     useRouteLoaderData,
+    useLocation,
 } from "react-router-dom";
 
 import { useEffect, useState } from "react";
@@ -86,6 +87,9 @@ import ScrollToTop from "./Components/Home/ScrollToTop";
 
 import PublicationsReviewSection from "./Apps/Property/PublicationReviews/PublicationsReviewSection";
 import FeedbackSection from "./Apps/Property/FeedbackReviews/FeedbackSection";
+
+import ServiceSidebar from "./Components/Home/ServiceSidebar";
+
 // -----------------------------------------------------------------------------
 // Authentication loader
 // -----------------------------------------------------------------------------
@@ -131,9 +135,11 @@ function AdminOnly({ children }) {
 }
 
 
+
 function DashboardLayout() {
     const user = useLoaderData();
     const dispatch = useDispatch();
+    const location = useLocation();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [activeNav, setActiveNav] = useState("Dashboard");
@@ -157,13 +163,53 @@ function DashboardLayout() {
             "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
     };
 
+
+    const serviceSidebarConfig = [
+        {
+            prefix: "/daily-worker",
+            title: "Daily Worker",
+            descriptionPath: "/daily-worker/description",
+            translationKey: "dailyWorker",
+        },
+        {
+            prefix: "/cars",
+            title: "Cars",
+            descriptionPath: "/cars/description",
+            translationKey: "cars",
+        },
+        {
+            prefix: "/delivery-man",
+            title: "Delivery Man",
+            descriptionPath: "/delivery-man/description",
+            translationKey: "deliveryMan",
+        },
+        {
+            prefix: "/driver",
+            title: "Driver",
+            descriptionPath: "/driver/description",
+            translationKey: "driver",
+        },
+        {
+            prefix: "/services-companies",
+            title: "Services & Companies",
+            descriptionPath: "/services-companies/description",
+            translationKey: "servicesCompanies",
+        },
+    ];
+
+    const activeServiceSidebar = serviceSidebarConfig.find((service) =>
+        location.pathname.startsWith(service.prefix)
+    );
     return (
         <Box
             sx={{
                 minHeight: "100vh",
+                width: "100%",
+                maxWidth: "100%",
                 display: "flex",
                 flexDirection: "column",
-                bgcolor: "#f9fafb",
+                overflowX: "clip",
+                bgcolor: "background.default",
             }}
         >
             <VisitTracker />
@@ -174,47 +220,112 @@ function DashboardLayout() {
                 user={userData}
             />
 
-            {/* Main layout */}
-            {/* Main layout */}
+            {/* Main application layout */}
             <Box
                 sx={{
                     display: "flex",
+
+                    // Mobile: main services bar above the content.
+                    // Desktop: main services bar on the left.
+                    flexDirection: {
+                        xs: "column",
+                        md: "row",
+                    },
+
                     flex: 1,
-                    position: "relative",
+                    minHeight: 0,
                     minWidth: 0,
+                    width: "100%",
+                    maxWidth: "100%",
+                    overflowX: "clip",
+                    position: "relative",
                 }}
             >
-                {/* Main service selector */}
+                {/* Main services navigation */}
                 <MainSideBar />
 
-                {/* Existing service sidebar */}
-                <Sidebar
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
-                    activeNav={activeNav}
-                    setActiveNav={setActiveNav}
-                />
-
-                {/* Page content and Footer */}
+                {/* Property sidebar + page content */}
                 <Box
                     sx={{
                         display: "flex",
-                        flexDirection: "column",
+                        flexDirection: "row",
                         flex: 1,
                         minWidth: 0,
+                        minHeight: 0,
+                        width: "100%",
+                        maxWidth: "100%",
+                        position: "relative",
                     }}
                 >
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <ScrollToTop />
-                        <Outlet />
-                    </Box>
+                    {/* Mobile backdrop */}
+                    {sidebarOpen && (
+                        <Box
+                            onClick={() => setSidebarOpen(false)}
+                            sx={{
+                                display: {
+                                    xs: "block",
+                                    md: "none",
+                                },
+                                position: "fixed",
+                                inset: "4rem 0 0",
+                                bgcolor: "rgba(0, 0, 0, 0.4)",
+                                zIndex: 40,
+                            }}
+                        />
+                    )}
 
-                    <Footer />
+                    {/* Property sidebar */}
+                    {activeServiceSidebar ? (
+                        <ServiceSidebar
+                            sidebarOpen={sidebarOpen}
+                            setSidebarOpen={setSidebarOpen}
+                            title={activeServiceSidebar.title}
+                            descriptionPath={activeServiceSidebar.descriptionPath}
+                            translationKey={activeServiceSidebar.translationKey}
+                        />
+                    ) : (
+                        <Sidebar
+                            sidebarOpen={sidebarOpen}
+                            setSidebarOpen={setSidebarOpen}
+                            activeNav={activeNav}
+                            setActiveNav={setActiveNav}
+                        />
+                    )}
+
+                    {/* Page content and Footer */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            flex: 1,
+                            minWidth: 0,
+                            width: "100%",
+                            maxWidth: "100%",
+                        }}
+                    >
+                        {/* Page content */}
+                        <Box
+                            sx={{
+                                flex: 1,
+                                minWidth: 0,
+                                width: "100%",
+                                maxWidth: "100%",
+                                overflowX: "clip",
+                            }}
+                        >
+                            <ScrollToTop />
+                            <Outlet />
+                        </Box>
+
+                        {/* Footer */}
+                        <Footer />
+                    </Box>
                 </Box>
             </Box>
         </Box>
     );
 }
+
 
 // -----------------------------------------------------------------------------
 // Application routes

@@ -280,16 +280,11 @@ export default function PublicationReviewCard({ property, onDeleted }) {
                         {/* Publication date and status */}
                         <Stack
                             direction="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            flexWrap="wrap"
-                            gap={1}
-                            sx={{ mb: 1 }}
+                            sx={{ justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1, mb: 1 }}
                         >
                             <Stack
                                 direction="row"
-                                spacing={0.75}
-                                alignItems="center"
+                                spacing={0.75} sx={{ alignItems: "center" }}
                             >
                                 <CalendarToday
                                     sx={{
@@ -347,9 +342,7 @@ export default function PublicationReviewCard({ property, onDeleted }) {
                         <Stack
                             direction="row"
                             spacing={1}
-                            alignItems="center"
-                            flexWrap="wrap"
-                            sx={{ mt: 1, mb: 1.5 }}
+                            sx={{ alignItems: "center", flexWrap: "wrap", mt: 1, mb: 1.5 }}
                         >
                             <Chip
                                 label={translatedListingType}
@@ -374,8 +367,7 @@ export default function PublicationReviewCard({ property, onDeleted }) {
                             <Stack
                                 direction="row"
                                 spacing={0.5}
-                                alignItems="center"
-                                sx={{
+                                sx={{ alignItems: "center",
                                     mb: 1.5,
                                     color: "#64748b",
                                 }}
@@ -388,8 +380,7 @@ export default function PublicationReviewCard({ property, onDeleted }) {
                                 />
 
                                 <Typography
-                                    variant="body2"
-                                    fontWeight={600}
+                                    variant="body2" sx={{ fontWeight: 600 }}
                                 >
                                     {location}
                                 </Typography>
@@ -400,9 +391,8 @@ export default function PublicationReviewCard({ property, onDeleted }) {
                         <Stack
                             direction="row"
                             spacing={2}
-                            flexWrap="wrap"
                             useFlexGap
-                            sx={{
+                            sx={{ flexWrap: "wrap",
                                 color: "#475569",
                                 typography: "body2",
                                 fontWeight: 600,
@@ -452,9 +442,7 @@ export default function PublicationReviewCard({ property, onDeleted }) {
                     >
                         <Stack
                             direction="row"
-                            spacing={1}
-                            alignItems="center"
-                            minWidth={0}
+                            spacing={1} sx={{ alignItems: "center", minWidth: 0 }}
                         >
                             <Person
                                 sx={{
@@ -463,20 +451,17 @@ export default function PublicationReviewCard({ property, onDeleted }) {
                                 }}
                             />
 
-                            <Box minWidth={0}>
+                            <Box sx={{ minWidth: 0 }}>
                                 <Typography
                                     variant="body2"
-                                    fontWeight={700}
-                                    color="#334155"
-                                    noWrap
+                                    noWrap sx={{ fontWeight: 700, color: "#334155" }}
                                 >
                                     {ownerName}
                                 </Typography>
 
                                 <Typography
                                     variant="caption"
-                                    color="#64748b"
-                                    noWrap
+                                    noWrap sx={{ color: "#64748b" }}
                                 >
                                     {ownerEmail}
                                 </Typography>
@@ -485,9 +470,7 @@ export default function PublicationReviewCard({ property, onDeleted }) {
 
                         <Stack
                             direction="row"
-                            spacing={1}
-                            alignItems="center"
-                            flexWrap="wrap"
+                            spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}
                         >
                             <Button
                                 variant="outlined"

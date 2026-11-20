@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
+import TravelExploreOutlinedIcon from "@mui/icons-material/TravelExploreOutlined";
 import {
     Alert,
     Box,
@@ -239,10 +240,8 @@ function PropertyImage({ listing, t }) {
                 />
             ) : (
                 <Stack
-                    alignItems="center"
-                    justifyContent="center"
                     spacing={1}
-                    sx={{
+                    sx={{ alignItems: "center", justifyContent: "center",
                         width: "100%",
                         height: "100%",
                         color: "text.secondary",
@@ -390,8 +389,7 @@ function PropertyCard({ listing, onTrackClick, t, locale }) {
 
                 <Stack
                     direction="row"
-                    spacing={0.75}
-                    alignItems="center"
+                    spacing={0.75} sx={{ alignItems: "center" }}
                 >
                     <LocationOnOutlinedIcon
                         fontSize="small"
@@ -400,8 +398,7 @@ function PropertyCard({ listing, onTrackClick, t, locale }) {
 
                     <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{
+                        sx={{ color: "text.secondary",
                             overflowWrap: "anywhere",
                             display: "-webkit-box",
                             WebkitBoxOrient: "vertical",
@@ -418,18 +415,14 @@ function PropertyCard({ listing, onTrackClick, t, locale }) {
                         <Divider />
 
                         <Stack
-                            direction="row"
-                            gap={1.5}
-                            flexWrap="wrap"
-                            alignItems="center"
+                            direction="row" sx={{ gap: 1.5, flexWrap: "wrap", alignItems: "center" }}
                         >
                             {details.map((detail) => (
                                 <Stack
                                     key={detail.label}
                                     direction="row"
-                                    alignItems="center"
                                     spacing={0.5}
-                                    sx={{ color: "text.secondary" }}
+                                    sx={{ alignItems: "center", color: "text.secondary" }}
                                 >
                                     {detail.icon}
 
@@ -458,8 +451,7 @@ function PropertyCard({ listing, onTrackClick, t, locale }) {
                 {description && (
                     <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{
+                        sx={{ color: "text.secondary",
                             lineHeight: 1.7,
                             display: "-webkit-box",
                             WebkitBoxOrient: "vertical",
@@ -477,7 +469,7 @@ function PropertyCard({ listing, onTrackClick, t, locale }) {
 
                 <Divider />
 
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                     {t("externalListings.source")}:{" "}
                     {listing.sourceName || t("externalListings.externalListing")}
                 </Typography>
@@ -566,20 +558,15 @@ function ExternalListingFilters({
             {/* Filter heading */}
             <Stack
                 direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                flexWrap="wrap"
-                gap={1}
-                sx={{ mb: 2.5 }}
+                sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1, mb: 2.5 }}
             >
                 <Stack
                     direction="row"
-                    spacing={1}
-                    alignItems="center"
+                    spacing={1} sx={{ alignItems: "center" }}
                 >
                     <FilterAltOutlinedIcon color="action" />
 
-                    <Typography fontWeight={750}>
+                    <Typography sx={{ fontWeight: 750 }}>
                         {t("externalListings.filters.title")}
                     </Typography>
 
@@ -685,9 +672,7 @@ function ExternalListingFilters({
                             <MenuItem key={city.en} value={city.en}>
                                 <Stack
                                     direction="row"
-                                    justifyContent="space-between"
-                                    alignItems="center"
-                                    sx={{
+                                    sx={{ justifyContent: "space-between", alignItems: "center",
                                         width: "100%",
                                         columnGap: 2,
                                     }}
@@ -697,8 +682,7 @@ function ExternalListingFilters({
                                     <Typography
                                         component="span"
                                         variant="body2"
-                                        color="text.secondary"
-                                        dir="rtl"
+                                        dir="rtl" sx={{ color: "text.secondary" }}
                                     >
                                         {city.ar}
                                     </Typography>
@@ -987,6 +971,7 @@ export default function ExternalListings() {
     return (
         <Box dir={isRTL ? "rtl" : "ltr"} sx={{ width: "100%" }}>
             <PageLayout
+            icon={<TravelExploreOutlinedIcon />}
                 title={t("externalListings.title")}
                 subtitle={t("externalListings.subtitle")}
                 maxWidth={1280}
@@ -1011,14 +996,12 @@ export default function ExternalListings() {
 
                 {loading ? (
                     <Stack
-                        alignItems="center"
-                        justifyContent="center"
                         spacing={2}
-                        sx={{ py: 10 }}
+                        sx={{ alignItems: "center", justifyContent: "center", py: 10 }}
                     >
                         <CircularProgress />
 
-                        <Typography color="text.secondary">
+                        <Typography sx={{ color: "text.secondary" }}>
                             {t("externalListings.loading")}
                         </Typography>
                     </Stack>
@@ -1037,15 +1020,10 @@ export default function ExternalListings() {
                         {/* Results heading */}
                         <Stack
                             direction="row"
-                            alignItems="center"
-                            justifyContent="space-between"
-                            flexWrap="wrap"
-                            gap={1}
-                            sx={{ mb: 3 }}
+                            sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1, mb: 3 }}
                         >
                             <Typography
-                                variant="h6"
-                                fontWeight={750}
+                                variant="h6" sx={{ fontWeight: 750 }}
                             >
                                 {filters.search || activeFilterCount > 0
                                     ? t("externalListings.filteredProperties")
@@ -1053,8 +1031,7 @@ export default function ExternalListings() {
                             </Typography>
 
                             <Typography
-                                variant="body2"
-                                color="text.secondary"
+                                variant="body2" sx={{ color: "text.secondary" }}
                             >
                                 {t("externalListings.resultsCount", {
                                     count: filteredListings.length,
@@ -1075,15 +1052,13 @@ export default function ExternalListings() {
                                 }}
                             >
                                 <Typography
-                                    variant="h6"
-                                    fontWeight={700}
+                                    variant="h6" sx={{ fontWeight: 700 }}
                                 >
                                     {t("externalListings.empty.title")}
                                 </Typography>
 
                                 <Typography
-                                    color="text.secondary"
-                                    sx={{ mt: 1, mb: 2 }}
+                                    sx={{ color: "text.secondary", mt: 1, mb: 2 }}
                                 >
                                     {t("externalListings.empty.description")}
                                 </Typography>

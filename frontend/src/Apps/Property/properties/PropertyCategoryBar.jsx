@@ -232,7 +232,7 @@ export default function PropertyCategoryBar({
                                         : "#fff",
                                     borderColor: active
                                         ? "#2563EB"
-                                        : "#D5DCE8",
+                                        : "#E2E8F0",
                                     boxShadow: active
                                         ? "0 4px 12px rgba(37, 99, 235, 0.2)"
                                         : "none",
@@ -276,7 +276,7 @@ export default function PropertyCategoryBar({
                                         backgroundColor: active
                                             ? "rgba(255, 255, 255, 0.2)"
                                             : "#f1f5f9",
-                                        color: active ? "#fff" : "#5B6577",
+                                        color: active ? "#fff" : "#64748B",
                                     }}
                                 >
                                     {categoryCount}
@@ -295,7 +295,7 @@ export default function PropertyCategoryBar({
                         mt: 1.5,
                         p: { xs: 1, sm: 1.5 },
                         borderRadius: "16px",
-                        backgroundColor: "#F4F7FB",
+                        backgroundColor: "#F5F7FB",
                         boxSizing: "border-box",
                         width: "100%",
                         minWidth: 0,
@@ -405,7 +405,7 @@ export default function PropertyCategoryBar({
                             width: { xs: "100%", sm: "auto" },
                             px: 2.5,
                             borderRadius: "10px",
-                            borderColor: "#D5DCE8",
+                            borderColor: "#E2E8F0",
                             color: "#475569",
                             fontWeight: 700,
                             textTransform: "none",
