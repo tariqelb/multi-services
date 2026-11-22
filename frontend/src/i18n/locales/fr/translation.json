@@ -7,7 +7,8 @@
         "saved": "Enregistrés",
         "logout": "Déconnexion",
         "member": "Membre",
-        "user": "Utilisateur"
+        "user": "Utilisateur",
+        "feedback": "Commentaires"
     },
     "sidebar": {
         "home": "Accueil",
@@ -33,7 +34,9 @@
         "publicationReviews": "Avis sur les publications",
         "feedbackReviews": "Avis des utilisateurs",
         "adminPanel": "Panneau d'administration",
-        "backToMainMenu": "Retour au menu principal"
+        "backToMainMenu": "Retour au menu principal",
+        "search": "Recherche",
+        "reviews": "Avis"
     },
     "middleContent": {
         "overview": "Tableau de bord et aperçu des services",
@@ -3407,5 +3410,137 @@
     },
     "contactVerified": {
         "badge": "Vérifié"
+    },
+    "search": {
+        "title": "Recherche",
+        "subtitle": "Biens, locations meublées, colocations, hôtels et riads : une seule recherche, les résultats sur la carte.",
+        "filters": {
+            "title": "Critères de recherche",
+            "reset": "Réinitialiser",
+            "submit": "Rechercher",
+            "service": "Que cherchez-vous ?",
+            "city": "Ville",
+            "anyCity": "Toutes les villes",
+            "transaction": "Transaction",
+            "any": "Tous",
+            "rentalPeriod": "Période de location",
+            "propertyType": "Type de bien",
+            "accommodationType": "Type d'hôtel / riad",
+            "price": "Prix",
+            "anyPrice": "Tous les prix",
+            "amount": "Montant (MAD)",
+            "priceMin": "De (MAD)",
+            "priceMax": "À (MAD)",
+            "rooms": "Pièces",
+            "roomsAtLeast": "{{count}} pièces et +",
+            "keywords": "Mots-clés (titre, quartier)",
+            "priceHelp": "Prix : total pour les ventes, par mois ou par nuit pour les locations, par personne pour les colocations, chambre la moins chère pour les hôtels."
+        },
+        "services": {
+            "unfurnished": "Bien non meublé",
+            "furnished": "Bien meublé",
+            "roommate": "Colocations",
+            "establishment": "Hôtels et riads"
+        },
+        "transaction": {
+            "sale": "À vendre",
+            "rent": "À louer"
+        },
+        "rentalPeriod": {
+            "daily": "Par jour",
+            "monthly": "Par mois"
+        },
+        "priceMode": {
+            "below": "Moins de",
+            "above": "Plus de",
+            "exact": "Exactement",
+            "between": "Entre"
+        },
+        "accommodationTypes": {
+            "hotel": "Hôtel",
+            "riad": "Riad",
+            "guesthouse": "Maison d'hôtes",
+            "hostel": "Auberge",
+            "aparthotel": "Apparthôtel",
+            "other": "Autre"
+        },
+        "kinds": {
+            "property": "Bien",
+            "furnished": "Meublé",
+            "roommate": "Colocation",
+            "establishment": "Hôtel et riad"
+        },
+        "card": {
+            "priceOnRequest": "Prix sur demande",
+            "currency": "MAD",
+            "perMonth": "/ mois",
+            "perNight": "/ nuit",
+            "perPersonMonth": "/ personne / mois",
+            "from": "À partir de",
+            "full": "Complet",
+            "places_one": "{{count}} place libre",
+            "places_other": "{{count}} places libres",
+            "rooms_one": "{{count}} pièce",
+            "rooms_other": "{{count}} pièces",
+            "noLocation": "Pas sur la carte"
+        },
+        "results": {
+            "searching": "Recherche...",
+            "count_one": "{{count}} résultat",
+            "count_other": "{{count}} résultats",
+            "emptyTitle": "Aucune annonce ne correspond à ces critères",
+            "emptyText": "Essayez une autre ville, une fourchette de prix plus large ou moins de critères."
+        },
+        "sort": {
+            "label": "Trier par",
+            "newest": "Plus récents",
+            "priceAsc": "Prix croissant",
+            "priceDesc": "Prix décroissant",
+            "mixed": "Mélangé : tous les types"
+        },
+        "map": {
+            "title": "Résultats sur la carte",
+            "titleCity": "Résultats sur la carte : {{city}}",
+            "help": "Survolez un numéro pour un aperçu, cliquez pour les détails.",
+            "seeDetails": "Voir tous les détails",
+            "close": "Fermer",
+            "missingKey": "La carte n'est pas configurée (VITE_MAPTILER_API_KEY).",
+            "error": "La carte n'a pas pu être chargée.",
+            "notLocated_one": "{{count}} résultat de cette page n'a pas de localisation et n'est pas sur la carte.",
+            "notLocated_other": "{{count}} résultats de cette page n'ont pas de localisation et ne sont pas sur la carte.",
+            "jump": "Carte"
+        },
+        "errors": {
+            "failed": "La recherche a échoué. Veuillez réessayer."
+        }
+    },
+    "reviewsRanking": {
+        "title": "Avis",
+        "subtitle": "Voyez comment les annonceurs sont notés par les autres clients avant de les contacter.",
+        "searchTitle": "Trouver un annonceur",
+        "searchPlaceholder": "Rechercher par prénom ou nom",
+        "siteAverage": "Moyenne {{value}} / 5",
+        "totalReviews_one": "{{count}} avis",
+        "totalReviews_other": "{{count}} avis",
+        "reviewCount_one": "{{count}} avis",
+        "reviewCount_other": "{{count}} avis",
+        "rankedCount_one": "{{count}} annonceur noté",
+        "rankedCount_other": "{{count}} annonceurs notés, les meilleurs d'abord",
+        "resultsFor_one": "{{count}} personne trouvée pour « {{q}} »",
+        "resultsFor_other": "{{count}} personnes trouvées pour « {{q}} »",
+        "howRanked": "Le classement tient compte de la note et du nombre d'avis : un seul avis 5 étoiles ne passe pas devant de nombreux très bons avis. Les étoiles affichent la vraie moyenne.",
+        "noReviewsYet": "Pas encore d'avis",
+        "seeReviews": "Voir les avis",
+        "memberSince": "Membre depuis le {{date}}",
+        "lastReview": "Dernier avis le {{date}}",
+        "emailVerified": "E-mail vérifié",
+        "phoneVerified": "Téléphone vérifié",
+        "empty": "Pas encore d'avis",
+        "emptyHint": "Les annonceurs notés apparaîtront ici.",
+        "emptySearch": "Personne trouvée avec ce nom",
+        "emptySearchHint": "Vérifiez l'orthographe ou essayez seulement le prénom ou le nom.",
+        "errors": {
+            "load": "Impossible de charger les avis. Veuillez réessayer."
+        }
     }
 }

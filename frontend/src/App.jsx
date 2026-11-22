@@ -62,6 +62,8 @@ import ExternalListingSources from "./Apps/Property/externalListings/ExternalLis
 import UserDetailsPage from "./Apps/Property/Statistic/components/User/UserDetailsPage";
 
 import FindByMap from "./Apps/Property/FindByMap/FindByMap";
+import SearchPage from "./Apps/Property/Search/SearchPage";
+import ReviewsRankingPage from "./Apps/Property/Reviews/ReviewsRankingPage";
 import DirectionProvider from "./Components/Home/DirectionProvider";
 
 import KnowledgeCenter from "./Apps/Property/knowledge/KnowledgeCenter";
@@ -472,6 +474,14 @@ const router = createBrowserRouter([
             {
                 path: "/findbymap",
                 element: <FindByMap />,
+            },
+            {
+                path: "/search",
+                element: <SearchPage />,
+            },
+            {
+                path: "/reviews",
+                element: <ReviewsRankingPage />,
             },
             {
                 path: "/mypublication",

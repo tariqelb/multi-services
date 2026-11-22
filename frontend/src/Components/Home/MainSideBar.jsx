@@ -34,6 +34,8 @@ const services = [
             "/establishments",
             "/roommates",
             "/findbymap",
+            "/search",
+            "/reviews",
             "/externalListings",
         ],
     },

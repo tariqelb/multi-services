@@ -30,6 +30,8 @@ import {
     FeedbackOutlined as FeedbackOutlinedIcon,
     AdminPanelSettings as AdminPanelSettingsIcon,
     ArrowBack as ArrowBackIcon,
+    ManageSearch as ManageSearchIcon,
+    ReviewsOutlined as ReviewsOutlinedIcon,
 } from "@mui/icons-material";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -101,6 +103,7 @@ export default function Sidebar({
 
     // Regular navigation items.
     const navigationItems = [
+        // One search for every kind of listing, with a map.  
         {
             name: t("sidebar.properties"),
             icon: HomeWorkIcon,
@@ -127,10 +130,16 @@ export default function Sidebar({
             path: "/externalListings",
         },
         {
+            name: t("sidebar.search", "Search"),
+            icon: ManageSearchIcon,
+            path: "/search",
+        },
+        {
             name: t("sidebar.findbymap"),
             icon: TravelExplore,
             path: "/findbymap",
         },
+
         {
             name: t("sidebar.publish"),
             icon: CloudUploadIcon,
@@ -146,16 +155,22 @@ export default function Sidebar({
             icon: NotificationsActiveIcon,
             path: "/alert",
         },
+        // Publishers ranked by their reviews, before contacting one.
         {
-            name: t("sidebar.feedback"),
-            icon: RateReviewOutlinedIcon,
-            path: "/feedback",
+            name: t("sidebar.reviews", "Reviews"),
+            icon: ReviewsOutlinedIcon,
+            path: "/reviews",
         },
-        {
-            name: t("sidebar.settings"),
-            icon: SettingsIcon,
-            path: "/setting",
-        },
+        // {
+        //     name: t("sidebar.feedback"),
+        //     icon: RateReviewOutlinedIcon,
+        //     path: "/feedback",
+        // },
+        // {
+        //     name: t("sidebar.settings"),
+        //     icon: SettingsIcon,
+        //     path: "/setting",
+        // },
         {
             name: t("sidebar.knowledge"),
             icon: MenuBookIcon,

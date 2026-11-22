@@ -1,4 +1,6 @@
 
+import searchRouter from "./search/searchRouter.js";
+import reviewsRouter from "./reviews/reviewsRouter.js";
 import express from "express";
 
 import authRouter from "./auth/AuthRoutes.js";
@@ -55,5 +57,7 @@ router.use(
 );
 
 router.use("/knowledge", knowledgeRouter);
+router.use("/search", searchRouter);
+router.use("/reviews", reviewsRouter);
 
 export default router;

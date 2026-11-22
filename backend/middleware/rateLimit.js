@@ -140,3 +140,11 @@ export const verificationCheckLimiter = createRateLimiter({
     key: userOf,
     message: "Too many attempts. Please wait 15 minutes and try again.",
 });
+
+// Search: generous, only stops scripts hammering the database.
+export const searchLimiter = createRateLimiter({
+    name: "search",
+    windowMs: MINUTE,
+    max: 90,
+    message: "Too many searches. Please wait a minute and try again.",
+});

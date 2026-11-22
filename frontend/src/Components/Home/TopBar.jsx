@@ -15,6 +15,7 @@ import {
     Bell,
     Bookmark,
     Library,
+    MessageSquare,
 } from "lucide-react";
 
 import logo from "../../assets/iconlogo.png";
@@ -360,6 +361,11 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             label: t("topbar.saved"),
             path: "/saved",
             icon: Bookmark,
+        },
+        {
+            label: t("topbar.feedback", "Feedback"),
+            path: "/feedback",
+            icon: MessageSquare,
         },
         {
             label: t("topbar.settings"),

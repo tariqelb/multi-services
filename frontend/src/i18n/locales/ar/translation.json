@@ -7,7 +7,8 @@
         "saved": "المحفوظات",
         "logout": "تسجيل الخروج",
         "member": "عضو",
-        "user": "مستخدم"
+        "user": "مستخدم",
+        "feedback": "الملاحظات"
     },
     "sidebar": {
         "home": "الرئيسية",
@@ -33,7 +34,9 @@
         "publicationReviews": "مراجعة الإعلانات",
         "feedbackReviews": "مراجعة آراء المستخدمين",
         "adminPanel": "لوحة الإدارة",
-        "backToMainMenu": "العودة إلى القائمة الرئيسية"
+        "backToMainMenu": "العودة إلى القائمة الرئيسية",
+        "search": "البحث",
+        "reviews": "التقييمات"
     },
     "middleContent": {
         "overview": "لوحة تحكم الخدمات ونظرة عامة",
@@ -3482,5 +3485,169 @@
     },
     "contactVerified": {
         "badge": "موثق"
+    },
+    "search": {
+        "title": "البحث",
+        "subtitle": "العقارات والكراء المفروش والسكن المشترك والفنادق والرياضات: بحث واحد والنتائج على الخريطة.",
+        "filters": {
+            "title": "معايير البحث",
+            "reset": "إعادة تعيين",
+            "submit": "بحث",
+            "service": "عن ماذا تبحث؟",
+            "city": "المدينة",
+            "anyCity": "جميع المدن",
+            "transaction": "نوع المعاملة",
+            "any": "الكل",
+            "rentalPeriod": "مدة الكراء",
+            "propertyType": "نوع العقار",
+            "accommodationType": "نوع الفندق / الرياض",
+            "price": "السعر",
+            "anyPrice": "كل الأسعار",
+            "amount": "المبلغ (درهم)",
+            "priceMin": "من (درهم)",
+            "priceMax": "إلى (درهم)",
+            "rooms": "الغرف",
+            "roomsAtLeast": "{{count}} غرف أو أكثر",
+            "keywords": "كلمات مفتاحية (العنوان، الحي)",
+            "priceHelp": "الأسعار: الثمن الكامل للبيع، شهرياً أو لليلة للكراء، للشخص في السكن المشترك، أرخص غرفة للفنادق."
+        },
+        "services": {
+            "unfurnished": "عقار غير مفروش",
+            "furnished": "عقار مفروش",
+            "roommate": "سكن مشترك",
+            "establishment": "فنادق ورياضات"
+        },
+        "transaction": {
+            "sale": "للبيع",
+            "rent": "للكراء"
+        },
+        "rentalPeriod": {
+            "daily": "يومي",
+            "monthly": "شهري"
+        },
+        "priceMode": {
+            "below": "أقل من",
+            "above": "أكثر من",
+            "exact": "بالضبط",
+            "between": "بين"
+        },
+        "accommodationTypes": {
+            "hotel": "فندق",
+            "riad": "رياض",
+            "guesthouse": "دار ضيافة",
+            "hostel": "نزل",
+            "aparthotel": "شقة فندقية",
+            "other": "أخرى"
+        },
+        "kinds": {
+            "property": "عقار",
+            "furnished": "مفروش",
+            "roommate": "سكن مشترك",
+            "establishment": "فندق ورياض"
+        },
+        "card": {
+            "priceOnRequest": "السعر عند الطلب",
+            "currency": "درهم",
+            "perMonth": "/ شهر",
+            "perNight": "/ ليلة",
+            "perPersonMonth": "/ شخص / شهر",
+            "from": "ابتداءً من",
+            "full": "مكتمل",
+            "places_zero": "لا توجد أماكن متاحة",
+            "places_one": "مكان واحد متاح",
+            "places_two": "مكانان متاحان",
+            "places_few": "{{count}} أماكن متاحة",
+            "places_many": "{{count}} مكاناً متاحاً",
+            "places_other": "{{count}} مكان متاح",
+            "rooms_zero": "{{count}} غرفة",
+            "rooms_one": "غرفة واحدة",
+            "rooms_two": "غرفتان",
+            "rooms_few": "{{count}} غرف",
+            "rooms_many": "{{count}} غرفة",
+            "rooms_other": "{{count}} غرفة",
+            "noLocation": "غير موجود على الخريطة"
+        },
+        "results": {
+            "searching": "جارٍ البحث...",
+            "count_zero": "لا توجد نتائج",
+            "count_one": "نتيجة واحدة",
+            "count_two": "نتيجتان",
+            "count_few": "{{count}} نتائج",
+            "count_many": "{{count}} نتيجة",
+            "count_other": "{{count}} نتيجة",
+            "emptyTitle": "لا يوجد إعلان يطابق هذه المعايير",
+            "emptyText": "جرّب مدينة أخرى أو نطاق أسعار أوسع أو معايير أقل."
+        },
+        "sort": {
+            "label": "ترتيب حسب",
+            "newest": "الأحدث",
+            "priceAsc": "السعر: من الأقل إلى الأعلى",
+            "priceDesc": "السعر: من الأعلى إلى الأقل",
+            "mixed": "مختلط: كل الأنواع"
+        },
+        "map": {
+            "title": "النتائج على الخريطة",
+            "titleCity": "النتائج على الخريطة: {{city}}",
+            "help": "مرّر المؤشر على رقم لمعاينة الإعلان، واضغط عليه للتفاصيل.",
+            "seeDetails": "عرض كل التفاصيل",
+            "close": "إغلاق",
+            "missingKey": "الخريطة غير مهيأة (VITE_MAPTILER_API_KEY).",
+            "error": "تعذر تحميل الخريطة.",
+            "notLocated_zero": "كل نتائج هذه الصفحة على الخريطة.",
+            "notLocated_one": "نتيجة واحدة في هذه الصفحة بدون موقع وليست على الخريطة.",
+            "notLocated_two": "نتيجتان في هذه الصفحة بدون موقع.",
+            "notLocated_few": "{{count}} نتائج في هذه الصفحة بدون موقع.",
+            "notLocated_many": "{{count}} نتيجة في هذه الصفحة بدون موقع.",
+            "notLocated_other": "{{count}} نتيجة في هذه الصفحة بدون موقع.",
+            "jump": "الخريطة"
+        },
+        "errors": {
+            "failed": "فشل البحث. يرجى المحاولة مرة أخرى."
+        }
+    },
+    "reviewsRanking": {
+        "title": "التقييمات",
+        "subtitle": "اطّلع على تقييمات العملاء للناشرين قبل التواصل معهم.",
+        "searchTitle": "ابحث عن ناشر",
+        "searchPlaceholder": "ابحث بالاسم الشخصي أو العائلي",
+        "siteAverage": "المعدل {{value}} / 5",
+        "totalReviews_zero": "لا توجد تقييمات",
+        "totalReviews_one": "تقييم واحد",
+        "totalReviews_two": "تقييمان",
+        "totalReviews_few": "{{count}} تقييمات",
+        "totalReviews_many": "{{count}} تقييمًا",
+        "totalReviews_other": "{{count}} تقييم",
+        "reviewCount_zero": "لا توجد تقييمات",
+        "reviewCount_one": "تقييم واحد",
+        "reviewCount_two": "تقييمان",
+        "reviewCount_few": "{{count}} تقييمات",
+        "reviewCount_many": "{{count}} تقييمًا",
+        "reviewCount_other": "{{count}} تقييم",
+        "rankedCount_zero": "لا يوجد ناشرون مقيَّمون",
+        "rankedCount_one": "ناشر مقيَّم واحد",
+        "rankedCount_two": "ناشران مقيَّمان",
+        "rankedCount_few": "{{count}} ناشرين مقيَّمين، الأفضل أولًا",
+        "rankedCount_many": "{{count}} ناشرًا مقيَّمًا، الأفضل أولًا",
+        "rankedCount_other": "{{count}} ناشر مقيَّم، الأفضل أولًا",
+        "resultsFor_zero": "لا أحد باسم «{{q}}»",
+        "resultsFor_one": "شخص واحد باسم «{{q}}»",
+        "resultsFor_two": "شخصان باسم «{{q}}»",
+        "resultsFor_few": "{{count}} أشخاص باسم «{{q}}»",
+        "resultsFor_many": "{{count}} شخصًا باسم «{{q}}»",
+        "resultsFor_other": "{{count}} شخص باسم «{{q}}»",
+        "howRanked": "يعتمد الترتيب على التقييم وعدد التقييمات: تقييم واحد بخمس نجوم لا يتقدّم على عدد كبير من التقييمات الجيدة جدًا. النجوم تعرض المعدل الحقيقي.",
+        "noReviewsYet": "لا توجد تقييمات بعد",
+        "seeReviews": "عرض التقييمات",
+        "memberSince": "عضو منذ {{date}}",
+        "lastReview": "آخر تقييم {{date}}",
+        "emailVerified": "البريد الإلكتروني موثّق",
+        "phoneVerified": "الهاتف موثّق",
+        "empty": "لا توجد تقييمات بعد",
+        "emptyHint": "سيظهر الناشرون المقيَّمون هنا.",
+        "emptySearch": "لا يوجد أحد بهذا الاسم",
+        "emptySearchHint": "تحقق من الكتابة أو جرّب الاسم الشخصي أو العائلي فقط.",
+        "errors": {
+            "load": "تعذّر تحميل التقييمات. يرجى المحاولة مرة أخرى."
+        }
     }
 }

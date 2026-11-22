@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { pagePaddingSx } from "../../../Components/ui/PageContainer";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 
@@ -26,6 +26,9 @@ import RoommateListingsTab from "./components/RoommateListingsTab";
 import EstablishmentListingsTab from "./components/EstablishmentListingsTab";
 import ReviewsTab from "./components/ReviewsTab";
 
+// Order of the tabs in PublicProfileTabs.
+const PROFILE_TABS = ["properties", "roommates", "establishments", "reviews"];
+
 const ITEMS_PER_PAGE = 12;
 const REVIEWS_PER_PAGE = 20;
 
@@ -39,13 +42,18 @@ const initialStatistics = {
 
 export default function PublicProfile() {
     const { userId } = useParams();
+
+    // ?tab=reviews (from the Reviews page) opens that tab directly.
+    const [searchParams] = useSearchParams();
+    const requestedTab = Math.max(0, PROFILE_TABS.indexOf(searchParams.get("tab")));
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const currentUser =
-        useSelector((state) => state.profile?.user) ||
-        useSelector((state) => state.auth?.user) ||
-        useSelector((state) => state.loginForm?.user);
+    // Every hook runs on every render (no short-circuit between hooks).
+    const profileUser = useSelector((state) => state.profile?.user);
+    const authUser = useSelector((state) => state.auth?.user);
+    const loginUser = useSelector((state) => state.loginForm?.user);
+    const currentUser = profileUser || authUser || loginUser;
 
     const currentUserId =
         currentUser?._id || currentUser?.id || currentUser?.userId;
@@ -389,7 +397,7 @@ export default function PublicProfile() {
         setEstablishmentsPage(1);
         setReviewsPage(1);
 
-        setActiveTab(0);
+        setActiveTab(requestedTab);
 
         setReviewForm({
             rating: 0,
@@ -402,6 +410,7 @@ export default function PublicProfile() {
         loadReviews(1, false);
     }, [
         userId,
+        requestedTab,
         loadProfile,
         loadRoommateListings,
         loadEstablishments,

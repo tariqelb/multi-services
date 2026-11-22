@@ -7,7 +7,8 @@
         "saved": "Saved",
         "logout": "Logout",
         "member": "Member",
-        "user": "User"
+        "user": "User",
+        "feedback": "Feedback"
     },
     "sidebar": {
         "home": "Home",
@@ -33,7 +34,9 @@
         "publicationReviews": "Publication Reviews",
         "feedbackReviews": "Feedback Reviews",
         "adminPanel": "Admin Panel",
-        "backToMainMenu": "Back to main menu"
+        "backToMainMenu": "Back to main menu",
+        "search": "Search",
+        "reviews": "Reviews"
     },
     "middleContent": {
         "overview": "Services Dashboard And Overview",
@@ -3407,5 +3410,137 @@
     },
     "contactVerified": {
         "badge": "Verified"
+    },
+    "search": {
+        "title": "Search",
+        "subtitle": "Properties, furnished rentals, roommates, hotels and riads: one search, results on the map.",
+        "filters": {
+            "title": "Search criteria",
+            "reset": "Reset",
+            "submit": "Search",
+            "service": "What are you looking for?",
+            "city": "City",
+            "anyCity": "All cities",
+            "transaction": "Transaction",
+            "any": "Any",
+            "rentalPeriod": "Rental period",
+            "propertyType": "Property type",
+            "accommodationType": "Hotel / riad type",
+            "price": "Price",
+            "anyPrice": "Any price",
+            "amount": "Amount (MAD)",
+            "priceMin": "From (MAD)",
+            "priceMax": "To (MAD)",
+            "rooms": "Rooms",
+            "roomsAtLeast": "{{count}}+ rooms",
+            "keywords": "Keywords (title, neighbourhood)",
+            "priceHelp": "Prices: total for sales, per month or per night for rentals, per person for roommates, cheapest room for hotels."
+        },
+        "services": {
+            "unfurnished": "Unfurnished property",
+            "furnished": "Furnished property",
+            "roommate": "Roommates",
+            "establishment": "Hotels & riads"
+        },
+        "transaction": {
+            "sale": "For sale",
+            "rent": "For rent"
+        },
+        "rentalPeriod": {
+            "daily": "Daily",
+            "monthly": "Monthly"
+        },
+        "priceMode": {
+            "below": "Less than",
+            "above": "More than",
+            "exact": "Exactly",
+            "between": "Between"
+        },
+        "accommodationTypes": {
+            "hotel": "Hotel",
+            "riad": "Riad",
+            "guesthouse": "Guesthouse",
+            "hostel": "Hostel",
+            "aparthotel": "Aparthotel",
+            "other": "Other"
+        },
+        "kinds": {
+            "property": "Property",
+            "furnished": "Furnished",
+            "roommate": "Roommates",
+            "establishment": "Hotel & riad"
+        },
+        "card": {
+            "priceOnRequest": "Price on request",
+            "currency": "MAD",
+            "perMonth": "/ month",
+            "perNight": "/ night",
+            "perPersonMonth": "/ person / month",
+            "from": "From",
+            "full": "Full",
+            "places_one": "{{count}} place left",
+            "places_other": "{{count}} places left",
+            "rooms_one": "{{count}} room",
+            "rooms_other": "{{count}} rooms",
+            "noLocation": "Not on the map"
+        },
+        "results": {
+            "searching": "Searching...",
+            "count_one": "{{count}} result",
+            "count_other": "{{count}} results",
+            "emptyTitle": "No listing matches these criteria",
+            "emptyText": "Try another city, a wider price range or fewer criteria."
+        },
+        "sort": {
+            "label": "Sort by",
+            "newest": "Newest",
+            "priceAsc": "Price: low to high",
+            "priceDesc": "Price: high to low",
+            "mixed": "Mixed: all types"
+        },
+        "map": {
+            "title": "Results on the map",
+            "titleCity": "Results on the map: {{city}}",
+            "help": "Hover a number to preview a listing, click it for details.",
+            "seeDetails": "See all details",
+            "close": "Close",
+            "missingKey": "The map is not configured (VITE_MAPTILER_API_KEY).",
+            "error": "The map could not be loaded.",
+            "notLocated_one": "{{count}} result of this page has no location and is not on the map.",
+            "notLocated_other": "{{count}} results of this page have no location and are not on the map.",
+            "jump": "Map"
+        },
+        "errors": {
+            "failed": "Search failed. Please try again."
+        }
+    },
+    "reviewsRanking": {
+        "title": "Reviews",
+        "subtitle": "See how publishers are rated by other clients before you contact them.",
+        "searchTitle": "Find a publisher",
+        "searchPlaceholder": "Search by first or last name",
+        "siteAverage": "Average {{value}} / 5",
+        "totalReviews_one": "{{count}} review",
+        "totalReviews_other": "{{count}} reviews",
+        "reviewCount_one": "{{count}} review",
+        "reviewCount_other": "{{count}} reviews",
+        "rankedCount_one": "{{count}} rated publisher",
+        "rankedCount_other": "{{count}} rated publishers, best first",
+        "resultsFor_one": "{{count}} person found for “{{q}}”",
+        "resultsFor_other": "{{count}} people found for “{{q}}”",
+        "howRanked": "Ranking uses the rating and the number of reviews: one 5-star review does not beat many very good ones. The stars show the real average.",
+        "noReviewsYet": "No reviews yet",
+        "seeReviews": "See reviews",
+        "memberSince": "Member since {{date}}",
+        "lastReview": "Last review {{date}}",
+        "emailVerified": "Email verified",
+        "phoneVerified": "Phone verified",
+        "empty": "No reviews yet",
+        "emptyHint": "Rated publishers will appear here.",
+        "emptySearch": "Nobody found with this name",
+        "emptySearchHint": "Check the spelling or try only the first or last name.",
+        "errors": {
+            "load": "Unable to load reviews. Please try again."
+        }
     }
 }
