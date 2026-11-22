@@ -1,0 +1,10 @@
+# Public pages can be indexed; the rest of the app needs a login.
+User-agent: *
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+Allow: /og-image.png
+Disallow: /
+
+Sitemap: https://multi-services-frontend.vercel.app/sitemap.xml

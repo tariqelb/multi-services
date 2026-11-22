@@ -1,4 +1,5 @@
 import Property from "../../DatabaseModels/Schema/Property.js";
+import { getExpiryInfo } from "../../services/listingExpiry.js";
 
 // @desc    Get properties published by the logged-in user
 // @route   GET /api/property/user-listings (or your chosen route path)
@@ -15,7 +16,14 @@ export  const getUserProperties = async (req, res) => {
         // Find properties belonging to this user and sort by newest first
         const properties = await Property.find({ userId }).sort({ createdAt: -1 });
 
-        res.status(200).json(properties);
+        // expiry: when the listing becomes inactive without confirmation.
+        res.status(200).json(
+            properties.map((property) => {
+                // Same JSON as before, plus the expiry information.
+                const data = property.toJSON ? property.toJSON() : property;
+                return { ...data, expiry: getExpiryInfo("property", data) };
+            })
+        );
     } catch (error) {
         console.error("Error fetching user properties:", error);
         res.status(500).json({ 

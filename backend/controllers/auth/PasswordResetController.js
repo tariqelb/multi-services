@@ -159,6 +159,7 @@ export const resetPassword = async (req, res) => {
             {
                 $set: {
                     password: hashedPassword,
+                    passwordSet: true,
                 },
             },
             {

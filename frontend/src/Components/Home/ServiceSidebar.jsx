@@ -97,7 +97,7 @@ export default function ServiceSidebar({
                 flex: "0 0 290px",
                 flexShrink: 0,
 
-                bgcolor: "#14539a",
+                bgcolor: "#1D4ED8",
                 color: "#ffffff",
 
                 display: "flex",
@@ -230,12 +230,11 @@ export default function ServiceSidebar({
                             </ListItemIcon>
 
                             <ListItemText
-                                primary={descriptionLabel}
-                                primaryTypographyProps={{
+                                primary={descriptionLabel} slotProps={{ primary: { sx: {
                                     fontSize: "0.875rem",
                                     fontWeight: isActive ? 600 : 400,
                                     textAlign: "start",
-                                }}
+                                } } }}
                             />
                         </ListItemButton>
                     </ListItem>

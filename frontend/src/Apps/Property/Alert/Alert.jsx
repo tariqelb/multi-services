@@ -1,4 +1,6 @@
 
+import PageHeader from "../../../Components/ui/PageHeader";
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -615,122 +617,23 @@ export default function Alerts() {
     return (
         <Box
             sx={{
-                width: "100%",
-                maxWidth: 1100,
-                mx: "auto",
-                px: {
-                    xs: 1.5,
-                    sm: 3,
-                    md: 4,
-                },
-                py: {
-                    xs: 3,
-                    sm: 4,
-                    md: 6,
-                },
+                ...pagePaddingSx,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "stretch",
-                gap: {
-                    xs: 3,
-                    sm: 4,
-                    md: 5,
-                },
-                boxSizing: "border-box",
-                minWidth: 0,
+                gap: { xs: 2.5, md: 3 },
             }}
         >
             {/* Page header */}
-            <Stack
-                direction="row"
-                spacing={{
-                    xs: 1.5,
-                    sm: 2.5,
-                    md: 3,
-                }}
-                sx={{ alignItems: "center",
-                    width: "100%",
-                    minWidth: 0,
-                    borderBottom: "1px solid #E2E8F0",
-                    pb: {
-                        xs: 2.5,
-                        sm: 3,
-                        md: 4,
-                    },
-                }}
-            >
-                <Box
-                    sx={{
-                        width: {
-                            xs: 46,
-                            sm: 56,
-                            md: 64,
-                        },
-                        height: {
-                            xs: 46,
-                            sm: 56,
-                            md: 64,
-                        },
-                        borderRadius: {
-                            xs: 2.5,
-                            sm: 3,
-                        },
-                        bgcolor: "#eff6ff",
-                        color: "#2563EB",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        boxShadow:
-                            "0 4px 12px rgba(37, 99, 235, 0.1)",
-                        flexShrink: 0,
-                    }}
-                >
-                    <NotificationsActiveOutlined
-                        sx={{
-                            fontSize: {
-                                xs: 27,
-                                sm: 32,
-                                md: 36,
-                            },
-                        }}
-                    />
-                </Box>
-
-                <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography
-                        variant="h4"
-                        component="h1"
-                        sx={{ fontWeight: 700, color: "#0f172a",
-                            fontSize: {
-                                xs: "1.5rem",
-                                sm: "1.75rem",
-                                md: "1.875rem",
-                            },
-                            lineHeight: 1.2,
-                            mb: 1,
-                            overflowWrap: "anywhere",
-                        }}
-                    >
-                        {translate("alerts.title", "My Alerts")}
-                    </Typography>
-
-                    <Typography
-                        sx={{ color: "text.secondary",
-                            fontSize: {
-                                xs: "0.9rem",
-                                sm: "1rem",
-                                md: "1.1rem",
-                            },
-                            lineHeight: 1.7,
-                        }}
-                    >
-                        {translate(
-                            "alerts.subtitle",
-                            "Manage your property and roommate notifications in one place."
-                        )}
-                    </Typography>
-                </Box>
-            </Stack>
+            <PageHeader
+                icon={<NotificationsActiveOutlined />}
+                title={translate("alerts.title", "My Alerts")}
+                subtitle={translate(
+                    "alerts.subtitle",
+                    "Manage your property and roommate notifications in one place."
+                )}
+                sx={{ mb: 0 }}
+            />
 
             {/* Alert type tabs */}
             <Paper

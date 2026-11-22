@@ -1,8 +1,9 @@
 
 
 
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import getImageUrl from "../../../utils/getImageUrl";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -32,23 +33,6 @@ const ALLOWED_PROPERTY_TYPES = [
     "House",
 ];
 
-const normalize = (value) =>
-    String(value ?? "")
-        .trim()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
-
-const isFurnished = (value) => {
-    const furnishing = normalize(value);
-
-    return [
-        "furnished",
-        "fully furnished",
-        "furnished property",
-    ].includes(furnishing);
-};
-
 export default function FurnishedPropertyList({
     refreshTrigger = 0,
     onSelectProperty,
@@ -69,6 +53,9 @@ export default function FurnishedPropertyList({
         useState("All");
 
     const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [serverTotalPages, setServerTotalPages] = useState(0);
+    const [hasLoaded, setHasLoaded] = useState(false);
 
     const translate = (key, fallback, options = {}) =>
         t(key, {
@@ -111,9 +98,17 @@ export default function FurnishedPropertyList({
             setError(null);
 
             try {
-                const response = await axiosInstance.get(
-                    "/property/getlist"
-                );
+                // Filtered and paged by the server.
+                const response = await axiosInstance.get("/property/getlist", {
+                    params: {
+                        page,
+                        limit: ITEMS_PER_PAGE,
+                        furnished: "only",
+                        types: ALLOWED_PROPERTY_TYPES.join(","),
+                        propertyType: selectedCategory,
+                        rentalPeriod: selectedRentalPeriod,
+                    },
+                });
 
                 const data = response.data;
 
@@ -125,7 +120,9 @@ export default function FurnishedPropertyList({
 
                 if (!cancelled) {
                     setProperties(propertyList);
-                    setPage(1);
+                    setTotal(data?.pagination?.total ?? propertyList.length);
+                    setServerTotalPages(data?.pagination?.totalPages ?? 1);
+                    setHasLoaded(true);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -150,49 +147,10 @@ export default function FurnishedPropertyList({
         return () => {
             cancelled = true;
         };
-    }, [refreshTrigger]);
+    }, [refreshTrigger, page, selectedCategory, selectedRentalPeriod]);
 
-    // Base collection: furnished properties for rent only.
-    const furnishedProperties = useMemo(() => {
-        return properties.filter((property) => {
-            const isForRent =
-                normalize(property.listingType) === "for rent";
-
-            const hasAllowedType =
-                ALLOWED_PROPERTY_TYPES.some(
-                    (type) =>
-                        normalize(type) ===
-                        normalize(property.propertyType)
-                );
-
-            return (
-                isForRent &&
-                hasAllowedType &&
-                isFurnished(property.furnishingStatus)
-            );
-        });
-    }, [properties]);
-
-    // Apply the selected property type and rental period.
-    const filteredProperties = useMemo(() => {
-        return furnishedProperties.filter((property) => {
-            const matchesCategory =
-                selectedCategory === "All" ||
-                normalize(property.propertyType) ===
-                    normalize(selectedCategory);
-
-            const matchesRentalPeriod =
-                selectedRentalPeriod === "All" ||
-                normalize(property.rentalPeriod) ===
-                    normalize(selectedRentalPeriod);
-
-            return matchesCategory && matchesRentalPeriod;
-        });
-    }, [
-        furnishedProperties,
-        selectedCategory,
-        selectedRentalPeriod,
-    ]);
+    // Already filtered and paged by the server.
+    const filteredProperties = properties;
 
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);
@@ -226,14 +184,8 @@ export default function FurnishedPropertyList({
         onSelectProperty?.(property);
     };
 
-    const totalPages = Math.ceil(
-        filteredProperties.length / ITEMS_PER_PAGE
-    );
-
-    const displayedProperties = filteredProperties.slice(
-        (page - 1) * ITEMS_PER_PAGE,
-        page * ITEMS_PER_PAGE
-    );
+    const totalPages = serverTotalPages;
+    const displayedProperties = filteredProperties;
 
     const hasActiveFilters =
         selectedCategory !== "All" ||
@@ -260,7 +212,8 @@ export default function FurnishedPropertyList({
     };
 
     // Loading state.
-    if (loading) {
+    // First load only: later pages keep the filters visible.
+    if (loading && !hasLoaded) {
         return (
             <Box
                 sx={{
@@ -307,15 +260,7 @@ export default function FurnishedPropertyList({
         <Box
             ref={listRef}
             sx={{
-                p: {
-                    xs: 1.5,
-                    sm: 2.5,
-                    md: 4,
-                },
-                width: "100%",
-                maxWidth: "100%",
-                minWidth: 0,
-                boxSizing: "border-box",
+                ...pagePaddingSx,
                 overflowX: "clip",
                 scrollMarginTop: "80px",
             }}
@@ -447,7 +392,7 @@ export default function FurnishedPropertyList({
                             "properties.list.propertyCount",
                             "{{count}} properties found",
                             {
-                                count: filteredProperties.length,
+                                count: total,
                             }
                         )}
                     </Typography>

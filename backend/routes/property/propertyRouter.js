@@ -1,5 +1,8 @@
 import express from "express";
+import { confirmStillAvailable } from "../../controllers/listingExpiryController.js";
 import authMiddleware from "../../middleware/authMiddleware.js";
+import optionalAuthMiddleware from "../../middleware/optionalAuthMiddleware.js";
+import adminMiddleware from "../../middleware/adminMiddleware.js";
 import propertyUpload from "../../middleware/propertyUpload.js";
 
 import { createProperty } from "../../controllers/property/propertyController.js";
@@ -8,6 +11,7 @@ import { getPropertyById } from "../../controllers/property/getPropertyById.js";
 import { deleteProperty } from "../../controllers/property/deletePropertyController.js";
 import { editPropertyStatus } from "../../controllers/property/editPropertyStatusController.js";
 import { getAdminListings } from "../../controllers/property/getAdminListings.js";
+import { updateProperty } from "../../controllers/property/updatePropertyController.js";
 import { getPropertyClickAnalytics, trackPropertyClick } from "../../controllers/property/propertyClickController.js";
 
 
@@ -30,13 +34,17 @@ import {
 const router = express.Router();
 
 
+// Admin only: lists every publication with the publisher's email.
+// (The admin page now uses GET /api/dashboard/publications.)
 router.get(
     "/admin-listings",
     authMiddleware,
+    adminMiddleware,
     getAdminListings
 );
 
-router.get("/clicks", getPropertyClickAnalytics);
+// Admin statistics.
+router.get("/clicks", authMiddleware, adminMiddleware, getPropertyClickAnalytics);
 
 router.post("/:id/click", trackPropertyClick);
 // Insert a property
@@ -75,6 +83,15 @@ router.get("/getlist", getProperties);
 router.get("/user-listings", authMiddleware, getUserProperties);
 router.delete("/deleteProperty/:id", authMiddleware, deleteProperty);
 router.patch("/editstatus/:id", authMiddleware, editPropertyStatus);
+router.post("/:id/still-available", authMiddleware, confirmStillAvailable("property"));
+
+// Edit a property (owner or administrator). Same fields as /insert.
+router.put(
+    "/:id",
+    authMiddleware,
+    propertyUpload.array("images", 15),
+    updateProperty
+);
 router.post("/save/:propertyId", authMiddleware, saveProperty);
 router.delete("/unsave/:propertyId", authMiddleware, unsaveProperty);
 
@@ -90,6 +107,6 @@ router.delete("/alerts/:id", authMiddleware, archivePropertyAlert);
 router.patch("/alerts/:id/restore", authMiddleware, restorePropertyAlert);
 
 // Keep this dynamic route after the specific routes
-router.get("/:id", getPropertyById);
+router.get("/:id", optionalAuthMiddleware, getPropertyById);
 
 export default router;

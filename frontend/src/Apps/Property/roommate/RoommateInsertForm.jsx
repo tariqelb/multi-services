@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "../../../api/axiosInstance";
+import getImageUrl from "../../../utils/getImageUrl";
 
 import {
     Box,
@@ -76,12 +77,66 @@ const initialFormData = {
     images: [],
 };
 
+// Saved announcement -> form values (edit mode).
+const toDateInput = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+};
+
+const textValue = (value) => (value === null || value === undefined ? "" : value);
+
+function listingToFormData(listing) {
+    const data = { ...initialFormData };
+
+    Object.keys(initialFormData).forEach((key) => {
+        if (["preferences", "images"].includes(key)) return;
+        if (listing[key] !== undefined && listing[key] !== null) data[key] = listing[key];
+    });
+
+    [
+        "totalRent", "individualRoomPrice", "deposit", "syndicateFees", "otherExpenses",
+        "surface", "rooms", "salons", "bathrooms", "floor",
+        "neighborhood", "fullAddress", "mapLink", "youtubeVideoUrl", "description",
+    ].forEach((key) => {
+        data[key] = textValue(listing[key]);
+    });
+
+    data.availableFrom = toDateInput(listing.availableFrom);
+    data.hasBalcony = listing.hasBalcony === true;
+    data.hasKitchen = listing.hasKitchen === true;
+    data.hasParking = listing.hasParking === true;
+
+    data.preferences = {
+        gender: listing.preferences?.gender || "Any",
+        smokingAllowed: listing.preferences?.smokingAllowed === true,
+        petsAllowed: listing.preferences?.petsAllowed === true,
+    };
+
+    // Photos already saved: shown with their URL, never re-uploaded.
+    data.images = (listing.images || []).map((image) => ({
+        existing: true,
+        filename: image.filename,
+        path: image.path,
+        url: getImageUrl(image),
+    }));
+
+    return data;
+}
+
 // -----------------------------------------------------------------------------
 // Main component
+// listingId: edit an existing announcement (PUT) instead of publishing one.
 // -----------------------------------------------------------------------------
 
-export default function RoommateInsertForm({ onAddListing }) {
+export default function RoommateInsertForm({ onAddListing, listingId = null, onSaved }) {
     const { t } = useTranslation();
+    const isEdit = Boolean(listingId);
+
+    const [listingLoading, setListingLoading] = useState(isEdit);
+    const [loadError, setLoadError] = useState("");
+    const [removedImages, setRemovedImages] = useState([]);
+    const originalRef = useRef(null);
 
     const fileInputRef = useRef(null);
     const imagesRef = useRef([]);
@@ -173,12 +228,57 @@ export default function RoommateInsertForm({ onAddListing }) {
     useEffect(() => {
         return () => {
             imagesRef.current.forEach((image) => {
-                if (image?.url) {
+                if (image?.file && image?.url) {
                     URL.revokeObjectURL(image.url);
                 }
             });
         };
     }, []);
+
+    // -------------------------------------------------------------------------
+    // Edit mode: load the announcement
+    // -------------------------------------------------------------------------
+
+    useEffect(() => {
+        if (!listingId) return undefined;
+
+        let cancelled = false;
+
+        const loadListing = async () => {
+            try {
+                setListingLoading(true);
+                setLoadError("");
+
+                const response = await axiosInstance.get(`/roommates/${listingId}`);
+                const listing = response.data?.listing || response.data;
+
+                if (!listing?._id) throw new Error("Announcement not found");
+
+                if (!cancelled) {
+                    const data = listingToFormData(listing);
+                    originalRef.current = data;
+                    setFormData(data);
+                    setRemovedImages([]);
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    setLoadError(
+                        error.response?.data?.message ||
+                            translate("roommates.edit.loadError", "Unable to load this announcement.")
+                    );
+                }
+            } finally {
+                if (!cancelled) setListingLoading(false);
+            }
+        };
+
+        loadListing();
+
+        return () => {
+            cancelled = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [listingId]);
 
     // -------------------------------------------------------------------------
     // Load authenticated user's profile
@@ -209,13 +309,14 @@ export default function RoommateInsertForm({ onAddListing }) {
                     lastName: user.lastName || "",
                     email: user.email || "",
 
-                    whatsappPhoneNumber:
-                        typeof whatsapp?.phoneNumber === "string"
-                            ? whatsapp.phoneNumber.trim()
-                            : "",
+                    // WhatsApp number lives next to the phone number.
+                    whatsappPhoneNumber: String(
+                        user.whatsappNumber ?? whatsapp?.phoneNumber ?? ""
+                    ).trim(),
 
                     emailVerified: user.emailVerified === true,
-                    whatsappVerified: whatsapp?.verified === true,
+                    whatsappVerified:
+                        (user.whatsappVerified ?? whatsapp?.verified) === true,
                 };
 
                 if (!cancelled) {
@@ -375,7 +476,10 @@ export default function RoommateInsertForm({ onAddListing }) {
     const handleRemoveImage = (index) => {
         const image = formData.images[index];
 
-        if (image?.url) {
+        if (image?.existing) {
+            // Deleted on the server when the changes are saved.
+            setRemovedImages((previous) => [...previous, image.filename || image.path]);
+        } else if (image?.url) {
             URL.revokeObjectURL(image.url);
         }
 
@@ -393,10 +497,22 @@ export default function RoommateInsertForm({ onAddListing }) {
 
     const resetForm = () => {
         formData.images.forEach((image) => {
-            if (image?.url) {
+            if (image?.file && image?.url) {
                 URL.revokeObjectURL(image.url);
             }
         });
+
+        // Edit mode: back to the saved announcement.
+        if (isEdit && originalRef.current) {
+            setFormData({
+                ...originalRef.current,
+                preferences: { ...originalRef.current.preferences },
+                images: [...originalRef.current.images],
+            });
+            setRemovedImages([]);
+            setErrors({});
+            return;
+        }
 
         setFormData({
             ...initialFormData,
@@ -658,11 +774,12 @@ export default function RoommateInsertForm({ onAddListing }) {
             return;
         }
 
-        // Email and WhatsApp verification.
+        // Email and WhatsApp verification (publishing only).
         if (
-            !profile.emailVerified ||
+            !isEdit &&
+            (!profile.emailVerified ||
             !profile.whatsappVerified ||
-            !profile.whatsappPhoneNumber
+            !profile.whatsappPhoneNumber)
         ) {
             const missing = [];
 
@@ -779,6 +896,33 @@ export default function RoommateInsertForm({ onAddListing }) {
                 payload.append("images", image.file);
             }
         });
+
+        if (isEdit) {
+            payload.append("removeImages", JSON.stringify(removedImages));
+
+            try {
+                setLoading(true);
+
+                const response = await axiosInstance.put(`/roommates/${listingId}`, payload);
+
+                showNotification(
+                    translate("roommates.edit.saved", "Your announcement has been updated."),
+                    "success"
+                );
+
+                onSaved?.(response.data?.listing);
+            } catch (error) {
+                showNotification(
+                    error.response?.data?.message ||
+                        translate("roommates.edit.saveError", "Unable to save your changes. Please try again."),
+                    "error"
+                );
+            } finally {
+                setLoading(false);
+            }
+
+            return;
+        }
 
         try {
             setLoading(true);
@@ -945,18 +1089,37 @@ export default function RoommateInsertForm({ onAddListing }) {
                 <FormPageHeader
                     icon={<GroupAddOutlinedIcon />}
                     badge={translate("roommates.insert.badge", "ROOMMATE ANNOUNCEMENT")}
-                    title={translate("roommates.insert.title", "Create a roommate announcement")}
-                    subtitle={translate(
-                        "roommates.insert.subtitle",
-                        "Share your accommodation, find a room, or connect with people who want to rent together."
-                    )}
+                    title={
+                        isEdit
+                            ? translate("roommates.edit.title", "Edit your announcement")
+                            : translate("roommates.insert.title", "Create a roommate announcement")
+                    }
+                    subtitle={
+                        isEdit
+                            ? translate("roommates.edit.subtitle", "Change the details, photos or availability of your announcement.")
+                            : translate(
+                                "roommates.insert.subtitle",
+                                "Share your accommodation, find a room, or connect with people who want to rent together."
+                            )
+                    }
                     requiredNote={translate(
                         "roommates.insert.requiredFields",
                         "Fields marked with * are required."
                     )}
                 />
 
+                {isEdit && listingLoading && (
+                    <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+                        <CircularProgress />
+                    </Box>
+                )}
+
+                {isEdit && !listingLoading && loadError && (
+                    <Alert severity="error">{loadError}</Alert>
+                )}
+
                 {/* Form */}
+                {!(isEdit && (listingLoading || loadError)) && (
                 <Box component="form" onSubmit={handleSubmit}>
                     <Stack
                         spacing={{ xs: 2, sm: 3, md: 3.5 }}
@@ -1015,10 +1178,12 @@ export default function RoommateInsertForm({ onAddListing }) {
                             profile={profile}
                             onSubmit={handleSubmit}
                             onReset={resetForm}
+                            isEdit={isEdit}
                             t={t}
                         />
                     </Stack>
                 </Box>
+                )}
             </FormPage>
 
             {/* Notifications */}

@@ -5,6 +5,7 @@ import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { v2 as cloudinary } from "cloudinary";
+import { getUserWhatsApp, getWhatsAppPreferencesView, isSameAsVerifiedPhone } from "../../utils/whatsapp.js";
 
 
 
@@ -197,6 +198,7 @@ export async function updateMyProfile(req, res) {
             "lastName",
             "email",
             "phoneNumber",
+            "whatsappNumber",
             "address",
             "bio",
             "profileImage",
@@ -247,7 +249,7 @@ export async function updateMyProfile(req, res) {
             const cleanValue =
                 field === "email"
                     ? value.trim().toLowerCase()
-                    : field === "phoneNumber"
+                    : field === "phoneNumber" || field === "whatsappNumber"
                     ? normalizePhoneNumber(value)
                     : value.trim();
 
@@ -272,17 +274,19 @@ export async function updateMyProfile(req, res) {
             }
 
             if (
-                field === "phoneNumber" &&
+                (field === "phoneNumber" || field === "whatsappNumber") &&
                 cleanValue !== "" &&
                 !/^\+[1-9]\d{7,14}$/.test(cleanValue)
             ) {
                 return res.status(400).json({
-                    message: "Please provide a valid international phone number.",
+                    message: field === "whatsappNumber"
+                        ? "Please provide a valid international WhatsApp number."
+                        : "Please provide a valid international phone number.",
                 });
             }
 
             if (
-                field === "phoneNumber" &&
+                (field === "phoneNumber" || field === "whatsappNumber") &&
                 cleanValue.startsWith("+212") &&
                 !/^\+212\d{9}$/.test(cleanValue)
             ) {
@@ -373,6 +377,23 @@ export async function updateMyProfile(req, res) {
             updatedUser.phoneVerificationExpires = undefined;
         }
 
+        // Handle WhatsApp number changes. The same number as a verified
+        // phone is verified at once; another number needs a WhatsApp code.
+        if (
+            Object.hasOwn(updates, "whatsappNumber") &&
+            updates.whatsappNumber !== (updatedUser.whatsappNumber || "")
+        ) {
+            updatedUser.whatsappNumber = updates.whatsappNumber;
+            updatedUser.whatsappVerified = isSameAsVerifiedPhone(updatedUser, updates.whatsappNumber);
+            updatedUser.whatsappVerificationSessionId = undefined;
+            updatedUser.whatsappVerificationExpires = undefined;
+
+            if (!updatedUser.whatsappVerified && updatedUser.notificationPreferences?.whatsapp) {
+                updatedUser.notificationPreferences.whatsapp.enabled = false;
+                updatedUser.notificationPreferences.whatsapp.propertyAlerts = false;
+            }
+        }
+
         const fieldsToUpdate = [
             "firstName",
             "lastName",
@@ -411,6 +432,8 @@ export async function updateMyProfile(req, res) {
                 emailVerified: updatedUser.emailVerified,
                 phoneNumber: updatedUser.phoneNumber ?? "",
                 phoneVerified: updatedUser.phoneVerified,
+                whatsappNumber: updatedUser.whatsappNumber ?? "",
+                whatsappVerified: getUserWhatsApp(updatedUser).verified,
                 address: updatedUser.address ?? "",
                 bio: updatedUser.bio ?? "",
                 profileImage: updatedUser.profileImage ?? "",
@@ -487,6 +510,8 @@ export async function getMyProfile(req, res) {
                     "emailVerified",
                     "phoneNumber",
                     "phoneVerified",
+                    "whatsappNumber",
+                    "whatsappVerified",
                     "notificationPreferences",
                     "address",
                     "bio",
@@ -494,6 +519,8 @@ export async function getMyProfile(req, res) {
                     "role",
                     "createdAt",
                     "updatedAt",
+                    "passwordSet",
+                    "+googleId",
                 ].join(" ")
             )
             .lean();
@@ -504,7 +531,6 @@ export async function getMyProfile(req, res) {
             });
         }
 
-        const whatsapp = user.notificationPreferences?.whatsapp || {};
         const emailNotifications =
             user.notificationPreferences?.email || {};
 
@@ -523,6 +549,9 @@ export async function getMyProfile(req, res) {
                 phoneNumber: user.phoneNumber || "",
                 phoneVerified: user.phoneVerified ?? false,
 
+                whatsappNumber: user.whatsappNumber || "",
+                whatsappVerified: getUserWhatsApp(user).verified,
+
                 notificationPreferences: {
                     email: {
                         enabled: emailNotifications.enabled ?? false,
@@ -530,13 +559,7 @@ export async function getMyProfile(req, res) {
                             emailNotifications.propertyAlerts ?? false,
                     },
 
-                    whatsapp: {
-                        enabled: whatsapp.enabled ?? false,
-                        phoneNumber: whatsapp.phoneNumber || "",
-                        propertyAlerts:
-                            whatsapp.propertyAlerts ?? false,
-                        verified: whatsapp.verified ?? false,
-                    },
+                    whatsapp: getWhatsAppPreferencesView(user),
                 },
 
                 address: user.address || "",
@@ -546,6 +569,10 @@ export async function getMyProfile(req, res) {
 
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt,
+
+                // Google accounts may have no password yet.
+                hasPassword: user.passwordSet !== false,
+                googleLinked: Boolean(user.googleId),
             },
         });
     } catch (error) {
@@ -575,8 +602,13 @@ export async function updateMyPassword(req, res) {
             confirmPassword,
         } = req.body;
 
+        // Accounts created with Google set a first password without the
+        // current one (they never had one).
+        const passwordOwner = await User.findById(userId).select("passwordSet");
+        const firstPassword = passwordOwner?.passwordSet === false;
+
         // Validate required fields.
-        if (!currentPassword || !newPassword || !confirmPassword) {
+        if ((!firstPassword && !currentPassword) || !newPassword || !confirmPassword) {
             return res.status(400).json({
                 message: "All password fields are required.",
             });
@@ -595,7 +627,7 @@ export async function updateMyPassword(req, res) {
             });
         }
 
-        if (currentPassword === newPassword) {
+        if (!firstPassword && currentPassword === newPassword) {
             return res.status(400).json({
                 message: "New password must be different from the current password.",
             });
@@ -611,10 +643,9 @@ export async function updateMyPassword(req, res) {
         }
 
         // Verify the current password.
-        const isPasswordValid = await bcrypt.compare(
-            currentPassword,
-            user.password
-        );
+        const isPasswordValid =
+            firstPassword || (await bcrypt.compare(currentPassword, user.password));
+
         if (!isPasswordValid) {
             return res.status(400).json({
                 message: "Current password is incorrect.",
@@ -623,6 +654,7 @@ export async function updateMyPassword(req, res) {
 
         // Hash and save the new password.
         user.password = await bcrypt.hash(newPassword, 12);
+        user.passwordSet = true;
         await user.save();
 
         return res.status(200).json({
@@ -648,7 +680,7 @@ export async function getMyNotificationPreferences(req, res) {
         }
 
         const user = await User.findById(userId)
-            .select("notificationPreferences phoneNumber")
+            .select("notificationPreferences phoneNumber phoneVerified whatsappNumber whatsappVerified")
             .lean();
 
         if (!user) {
@@ -659,7 +691,6 @@ export async function getMyNotificationPreferences(req, res) {
 
         const saved = user.notificationPreferences || {};
         const email = saved.email || {};
-        const whatsapp = saved.whatsapp || {};
 
         return res.status(200).json({
             message: "Notification preferences fetched successfully.",
@@ -668,13 +699,7 @@ export async function getMyNotificationPreferences(req, res) {
                     enabled: email.enabled ?? true,
                     propertyAlerts: email.propertyAlerts ?? true,
                 },
-                whatsapp: {
-                    enabled: whatsapp.enabled ?? false,
-                    propertyAlerts: whatsapp.propertyAlerts ?? false,
-                    phoneNumber:
-                        whatsapp.phoneNumber || user.phoneNumber || "",
-                    verified: whatsapp.verified ?? false,
-                },
+                whatsapp: getWhatsAppPreferencesView(user),
             },
         });
     } catch (error) {
@@ -749,74 +774,37 @@ export async function updateMyNotificationPreferences(req, res) {
             const allowedWhatsAppFields = [
                 "enabled",
                 "propertyAlerts",
-                "phoneNumber",
             ];
 
             for (const field of Object.keys(whatsapp)) {
+                // The number is managed in the profile now: ignore it here.
+                if (field === "phoneNumber") continue;
+
                 if (!allowedWhatsAppFields.includes(field)) {
                     return res.status(400).json({
                         message: `Invalid WhatsApp preference: ${field}.`,
                     });
                 }
 
-                const value = whatsapp[field];
-
-                if (
-                    field === "enabled" ||
-                    field === "propertyAlerts"
-                ) {
-                    if (typeof value !== "boolean") {
-                        return res.status(400).json({
-                            message: `${field} must be a boolean.`,
-                        });
-                    }
-
-                    updates[
-                        `notificationPreferences.whatsapp.${field}`
-                    ] = value;
+                if (typeof whatsapp[field] !== "boolean") {
+                    return res.status(400).json({
+                        message: `${field} must be a boolean.`,
+                    });
                 }
 
-                if (field === "phoneNumber") {
-                    if (typeof value !== "string") {
-                        return res.status(400).json({
-                            message: "Phone number must be a string.",
-                        });
-                    }
+                updates[`notificationPreferences.whatsapp.${field}`] = whatsapp[field];
+            }
 
-                    const phoneNumber = value.trim();
+            if (whatsapp.enabled === true) {
+                const current = await User.findById(userId)
+                    .select("phoneNumber phoneVerified whatsappNumber whatsappVerified")
+                    .lean();
 
-                    if (
-                        phoneNumber.length > 20 ||
-                        (phoneNumber !== "" &&
-                            !/^\+?[0-9\s().-]{7,20}$/.test(
-                                phoneNumber
-                            ))
-                    ) {
-                        return res.status(400).json({
-                            message: "Please provide a valid phone number.",
-                        });
-                    }
-
-                    updates[
-                        "notificationPreferences.whatsapp.phoneNumber"
-                    ] = phoneNumber;
-
-                    // A changed number must be verified again.
-                    const existingUser = await User.findById(userId)
-                        .select(
-                            "notificationPreferences.whatsapp.phoneNumber"
-                        )
-                        .lean();
-
-                    const existingPhone =
-                        existingUser?.notificationPreferences
-                            ?.whatsapp?.phoneNumber || "";
-
-                    if (phoneNumber !== existingPhone) {
-                        updates[
-                            "notificationPreferences.whatsapp.verified"
-                        ] = false;
-                    }
+                if (!getUserWhatsApp(current).verified) {
+                    return res.status(400).json({
+                        message: "Add and verify your WhatsApp number in your profile before enabling notifications.",
+                        code: "WHATSAPP_VERIFICATION_REQUIRED",
+                    });
                 }
             }
         }
@@ -835,7 +823,7 @@ export async function updateMyNotificationPreferences(req, res) {
                 runValidators: true,
                 setDefaultsOnInsert: true,
             }
-        ).select("notificationPreferences phoneNumber");
+        ).select("notificationPreferences phoneNumber phoneVerified whatsappNumber whatsappVerified");
 
         if (!updatedUser) {
             return res.status(404).json({
@@ -853,16 +841,7 @@ export async function updateMyNotificationPreferences(req, res) {
                     propertyAlerts:
                         saved?.email?.propertyAlerts ?? true,
                 },
-                whatsapp: {
-                    enabled: saved?.whatsapp?.enabled ?? false,
-                    propertyAlerts:
-                        saved?.whatsapp?.propertyAlerts ?? false,
-                    phoneNumber:
-                        saved?.whatsapp?.phoneNumber ||
-                        updatedUser.phoneNumber ||
-                        "",
-                    verified: saved?.whatsapp?.verified ?? false,
-                },
+                whatsapp: getWhatsAppPreferencesView(updatedUser),
             },
         });
     } catch (error) {

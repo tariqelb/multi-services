@@ -8,6 +8,7 @@ import {
     getAdminUserSavedProperties,
     getAdminUserFeedback,
     getPropertyDemandAnalytics,
+    updateAdminUserStatus,
 } from "../../controllers/dashboard/adminController.js";
 
 
@@ -31,6 +32,11 @@ import {
 } from "../../controllers/dashboard/savedPropertyDemandController.js";
 
 import { getDashboardOverview } from "../../controllers/dashboard/dashboardOverviewController.js";
+
+import {
+    getAdminPublications,
+    deleteAdminPublication,
+} from "../../controllers/dashboard/publicationReviewController.js";
 
 import {
     createListingContact,
@@ -134,6 +140,29 @@ router.get(
     authMiddleware,
     adminMiddleware,
     getSavedPropertyDemandAnalytics
+);
+
+// Publication reviews: properties, establishments and roommate announcements.
+router.get(
+    "/publications",
+    authMiddleware,
+    adminMiddleware,
+    getAdminPublications
+);
+
+router.delete(
+    "/publications/:kind/:id",
+    authMiddleware,
+    adminMiddleware,
+    deleteAdminPublication
+);
+
+// Suspend / reactivate a user.
+router.patch(
+    "/users/:userId/status",
+    authMiddleware,
+    adminMiddleware,
+    updateAdminUserStatus
 );
 
 export default router;

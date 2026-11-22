@@ -61,9 +61,9 @@ export default function PropertyInsertFormImages({
                     max: 15,
                 })}
                 items={images.map((image, index) => ({
-                    key: `${image.file?.name || "image"}-${index}`,
+                    key: `${image.file?.name || image.filename || "image"}-${index}`,
                     src: image.url,
-                    alt: image.file?.name,
+                    alt: image.file?.name || image.filename,
                 }))}
                 onRemove={handleRemoveImage}
                 mainLabel={t("properties.insert.images.main")}

@@ -1,145 +1,25 @@
-// import supportedSources from "./supportedSources.json" with {
-//     type: "json",
-// };
-
-// import { extractPageMetadata } from "../metadataExtractor.js";
-// import { normalizeExternalListing } from "../listingNormalizer.js";
-// import { getListingSourceUrls } from "../listingSourcesStore.js";
-
-// /**
-//  * Get the configuration for a supported listing URL.
-//  */
-// export function getSourceConfig(inputUrl) {
-//     if (typeof inputUrl !== "string" || !inputUrl.trim()) {
-//         return null;
-//     }
-
-//     try {
-//         const url = new URL(inputUrl.trim());
-
-//         if (
-//             url.protocol !== "https:" ||
-//             url.username ||
-//             url.password ||
-//             url.port
-//         ) {
-//             return null;
-//         }
-
-//         const hostname = url.hostname.toLowerCase();
-
-//         const source = supportedSources.find((item) => {
-//             const hostnameSupported =
-//                 item.hostnames.includes(hostname);
-
-//             const pathSupported =
-//                 url.pathname.toLowerCase().startsWith(
-//                     item.pathPrefix.toLowerCase()
-//                 );
-
-//             // Require a path after the configured prefix.
-//             const remainingPath = url.pathname.slice(
-//                 item.pathPrefix.length
-//             );
-
-//             return (
-//                 hostnameSupported &&
-//                 pathSupported &&
-//                 remainingPath.replaceAll("/", "").length > 0
-//             );
-//         });
-
-//         if (!source) {
-//             return null;
-//         }
-
-//         url.hash = "";
-
-//         return {
-//             sourceName: source.sourceName,
-//             hostname,
-//             normalizedUrl: url.href,
-//             sourceListingId: decodeURIComponent(url.pathname)
-//                 .split("/")
-//                 .filter(Boolean)
-//                 .pop(),
-//         };
-//     } catch {
-//         return null;
-//     }
+// services/externalListings/sources/externalListingSource.js
+//
+// Registry of the external websites the application collects listings from.
+// The list lives in supportedSources.json (next to this file).
+//
+// Each website entry:
+// {
+//     "sourceName": "Mr Semsar",
+//     "hostnames": ["mrsemsar.ma", "www.mrsemsar.ma"],
+//     "pathPrefix": "/listing/",          // listing pages start with this path
+//
+//     // Optional discovery settings (only needed when automatic discovery
+//     // cannot find the listings of a website):
+//     "listPageUrls": ["https://www.mrsemsar.ma/listings?page={page}"],
+//     "sitemapUrls": ["https://www.mrsemsar.ma/sitemap.xml"],
+//     "linkPattern": "^/listing/\\d+$",  // regular expression on the URL path
+//     "maxPages": 15,
+//
+//     // Written automatically by the collector:
+//     "lastCollectedAt": "2026-11-21T00:00:00.000Z",
+//     "lastCollectSummary": { ... }
 // }
-
-// /**
-//  * Check whether a URL belongs to any configured website.
-//  */
-// export function supportsExternalListingUrl(inputUrl) {
-//     return getSourceConfig(inputUrl) !== null;
-// }
-
-// /**
-//  * Backward-compatible Aqari validator.
-//  */
-// export function supportsAqariUrl(inputUrl) {
-//     return (
-//         getSourceConfig(inputUrl)?.sourceName === "Aqari Annonces"
-//     );
-// }
-
-// /**
-//  * Return all configured websites.
-//  */
-// export function getSupportedSources() {
-//     return supportedSources;
-// }
-
-// /**
-//  * Return the configured listing URLs.
-//  */
-// export async function discoverExternalListings() {
-//     return getListingSourceUrls();
-// }
-
-// /**
-//  * Extract and normalize a listing from any supported website.
-//  */
-// export async function extractExternalListing(inputUrl) {
-//     const source = getSourceConfig(inputUrl);
-
-//     if (!source) {
-//         throw new Error(
-//             "Unsupported URL. Only configured external listing websites are allowed."
-//         );
-//     }
-
-//     const metadata = await extractPageMetadata(
-//         source.normalizedUrl
-//     );
-
-//     if (!metadata) {
-//         return null;
-//     }
-
-//     const listing = normalizeExternalListing({
-//         ...metadata,
-//         sourceUrl: source.normalizedUrl,
-//         sourceDomain: source.hostname,
-//         sourceName: source.sourceName,
-//         sourceListingId: source.sourceListingId,
-//         extractionMethod: metadata.extractionMethod || "metadata",
-//     });
-
-//     if (!listing || !listing.imageUrl) {
-//         return null;
-//     }
-
-//     return listing;
-// }
-
-// /**
-//  * Backward-compatible alias for existing Aqari imports.
-//  */
-// export const extractAqariListing = extractExternalListing;
-
 
 import fs from "node:fs";
 import path from "node:path";
@@ -152,10 +32,11 @@ import { normalizeExternalListing } from "../listingNormalizer.js";
 const currentFile = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFile);
 
-const CONFIG_FILE = path.join(
-    currentDirectory,
-    "supportedSources.json"
-);
+const CONFIG_FILE = path.join(currentDirectory, "supportedSources.json");
+
+/* --------------------------------------------------
+   Config file
+-------------------------------------------------- */
 
 function readSupportedSources() {
     try {
@@ -164,11 +45,7 @@ function readSupportedSources() {
 
         return Array.isArray(sources) ? sources : [];
     } catch (error) {
-        console.error(
-            "Could not read supported sources:",
-            error.message
-        );
-
+        console.error("Could not read supported sources:", error.message);
         return [];
     }
 }
@@ -181,14 +58,15 @@ function writeSupportedSources(sources) {
     );
 }
 
+/* --------------------------------------------------
+   URL helpers
+-------------------------------------------------- */
+
 /**
  * Validate an HTTPS listing URL before registering or fetching it.
  */
 export function inspectListingUrl(inputUrl) {
-    if (
-        typeof inputUrl !== "string" ||
-        !inputUrl.trim()
-    ) {
+    if (typeof inputUrl !== "string" || !inputUrl.trim()) {
         return null;
     }
 
@@ -222,7 +100,50 @@ export function inspectListingUrl(inputUrl) {
 }
 
 /**
+ * Turn what an administrator typed ("mrsemsar.ma", "www.mrsemsar.ma",
+ * "https://mrsemsar.ma/listing/3", "Mr Semsar") into a bare hostname.
+ * Returns "" when the text is not a hostname.
+ */
+export function parseWebsiteInput(input) {
+    if (typeof input !== "string") return "";
+
+    let value = input.trim().toLowerCase();
+
+    if (!value) return "";
+
+    if (!/^https?:\/\//.test(value)) {
+        value = `https://${value}`;
+    }
+
+    try {
+        const url = new URL(value);
+        const hostname = url.hostname.replace(/\.$/, "");
+
+        // Must look like a real domain: "name.tld".
+        if (
+            !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(hostname) ||
+            net.isIP(hostname)
+        ) {
+            return "";
+        }
+
+        return hostname;
+    } catch {
+        return "";
+    }
+}
+
+function stripWww(hostname) {
+    return String(hostname || "").toLowerCase().replace(/^www\./, "");
+}
+
+/* --------------------------------------------------
+   Lookups
+-------------------------------------------------- */
+
+/**
  * Get configuration for an already registered website.
+ * Returns null when the URL is not a listing URL of a registered website.
  */
 export function getSourceConfig(inputUrl) {
     const inspected = inspectListingUrl(inputUrl);
@@ -236,9 +157,9 @@ export function getSourceConfig(inputUrl) {
     const source = sources.find((item) => {
         return (
             item.hostnames.includes(inspected.hostname) &&
-            inspected.pathname.toLowerCase().startsWith(
-                item.pathPrefix.toLowerCase()
-            )
+            inspected.pathname
+                .toLowerCase()
+                .startsWith(item.pathPrefix.toLowerCase())
         );
     });
 
@@ -246,9 +167,7 @@ export function getSourceConfig(inputUrl) {
         return null;
     }
 
-    const remainingPath = inspected.pathname.slice(
-        source.pathPrefix.length
-    );
+    const remainingPath = inspected.pathname.slice(source.pathPrefix.length);
 
     if (!remainingPath.replaceAll("/", "").length) {
         return null;
@@ -258,11 +177,36 @@ export function getSourceConfig(inputUrl) {
         sourceName: source.sourceName,
         hostname: inspected.hostname,
         normalizedUrl: inspected.normalizedUrl,
-        sourceListingId: remainingPath
-            .split("/")
-            .filter(Boolean)
-            .pop(),
+        sourceListingId: remainingPath.split("/").filter(Boolean).pop(),
     };
+}
+
+/**
+ * Find a registered website from a name, a hostname or any URL of the site.
+ */
+export function findSourceByWebsite(input) {
+    const sources = readSupportedSources();
+    const text = String(input || "").trim().toLowerCase();
+
+    if (!text) return null;
+
+    const hostname = parseWebsiteInput(text);
+
+    if (hostname) {
+        const bare = stripWww(hostname);
+
+        const byHost = sources.find((source) =>
+            source.hostnames.some((item) => stripWww(item) === bare)
+        );
+
+        if (byHost) return byHost;
+    }
+
+    return (
+        sources.find(
+            (source) => String(source.sourceName || "").toLowerCase() === text
+        ) || null
+    );
 }
 
 /**
@@ -276,47 +220,52 @@ export function supportsExternalListingUrl(inputUrl) {
  * Backward-compatible Aqari validator.
  */
 export function supportsAqariUrl(inputUrl) {
-    return (
-        getSourceConfig(inputUrl)?.sourceName ===
-        "Aqari Annonces"
-    );
+    return getSourceConfig(inputUrl)?.sourceName === "Aqari Annonces";
 }
+
+/* --------------------------------------------------
+   Registration / updates
+-------------------------------------------------- */
 
 /**
  * Register a new website automatically.
  *
- * New websites use "/" as their path prefix because their
- * listing URL structure is not known in advance.
+ * - With a listing URL ("https://site.ma/annonce/12"), the listing path
+ *   prefix ("/annonce/") is learned from the URL.
+ * - With a bare website ("https://site.ma/"), the prefix is "/" until the
+ *   collector detects the real one.
  */
 export async function registerSupportedSource(inputUrl) {
     const inspected = inspectListingUrl(inputUrl);
 
     if (!inspected) {
-        throw new Error(
-            "Invalid or unsafe HTTPS website URL."
-        );
+        throw new Error("Invalid or unsafe HTTPS website URL.");
     }
 
     const sources = readSupportedSources();
+    const bare = stripWww(inspected.hostname);
 
     const existing = sources.find((source) =>
-        source.hostnames.includes(inspected.hostname)
+        source.hostnames.some((item) => stripWww(item) === bare)
     );
 
     if (existing) {
         return existing;
     }
 
-    const sourceName = inspected.hostname
-        .replace(/^www\./, "")
-        .split(".")
-        .slice(0, -1)
-        .join(".") || inspected.hostname;
+    const segments = inspected.pathname.split("/").filter(Boolean);
+
+    // "/annonce/12" -> "/annonce/"; "/" -> "/".
+    const pathPrefix =
+        segments.length >= 2 ? `/${segments.slice(0, -1).join("/")}/` : "/";
+
+    const sourceName =
+        bare.split(".").slice(0, -1).join(".") || inspected.hostname;
 
     const newSource = {
         sourceName,
-        hostnames: [inspected.hostname],
-        pathPrefix: "/",
+        hostnames: [...new Set([bare, `www.${bare}`])],
+        pathPrefix,
     };
 
     sources.push(newSource);
@@ -326,27 +275,70 @@ export async function registerSupportedSource(inputUrl) {
 }
 
 /**
+ * Merge new values into a registered website (matched by hostname).
+ * Used by the collector to remember the detected listing path and the
+ * last collection summary.
+ */
+export function updateSupportedSource(hostname, changes = {}) {
+    const sources = readSupportedSources();
+    const bare = stripWww(hostname);
+
+    const index = sources.findIndex((source) =>
+        source.hostnames.some((item) => stripWww(item) === bare)
+    );
+
+    if (index === -1) {
+        return null;
+    }
+
+    sources[index] = { ...sources[index], ...changes };
+    writeSupportedSources(sources);
+
+    return sources[index];
+}
+
+/**
+ * Remove a registered website (its stored listings are kept).
+ */
+export function removeSupportedSource(hostname) {
+    const sources = readSupportedSources();
+    const bare = stripWww(hostname);
+
+    const remaining = sources.filter(
+        (source) => !source.hostnames.some((item) => stripWww(item) === bare)
+    );
+
+    if (remaining.length === sources.length) {
+        return false;
+    }
+
+    writeSupportedSources(remaining);
+    return true;
+}
+
+/**
  * Return all configured websites.
  */
 export function getSupportedSources() {
     return readSupportedSources();
 }
 
+/* --------------------------------------------------
+   Extraction
+-------------------------------------------------- */
+
 /**
  * Extract and normalize a listing from any configured website.
+ * Returns null when the page has no usable listing (e.g. no image).
  */
 export async function extractExternalListing(inputUrl) {
     const source = getSourceConfig(inputUrl);
 
     if (!source) {
-        throw new Error(
-            "This listing website has not been registered."
-        );
+        throw new Error("This listing website has not been registered.");
     }
 
-    const metadata = await extractPageMetadata(
-        source.normalizedUrl
-    );
+    const metadata = await extractPageMetadata(source.normalizedUrl);
 
     if (!metadata) {
         return null;
@@ -358,8 +350,7 @@ export async function extractExternalListing(inputUrl) {
         sourceDomain: source.hostname,
         sourceName: source.sourceName,
         sourceListingId: source.sourceListingId,
-        extractionMethod:
-            metadata.extractionMethod || "metadata",
+        extractionMethod: metadata.extractionMethod || "metadata",
     });
 
     if (!listing || !listing.imageUrl) {

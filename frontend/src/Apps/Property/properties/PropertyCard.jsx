@@ -12,6 +12,7 @@ import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import { Typography } from "@mui/material";
 import ListingCard, { CardBadge } from "../../../Components/ui/ListingCard";
 
+import { getFurnishingStatus } from "../../../utils/furnishing";
 import getImageUrl from "../../../utils/getImageUrl";
 
 const normalize = (value) =>
@@ -89,7 +90,8 @@ export default function PropertyCard({ property = {}, onClick }) {
     }[normalize(status)] || "success";
 
     const isRent = normalize(listingType) === "for rent";
-    const furnished = normalize(furnishingStatus) === "furnished";
+    // Only homes (villa, apartment, house, studio, room) show it.
+    const furnishing = getFurnishingStatus({ propertyType, furnishingStatus });
     const imageUrl = image ? getImageUrl(image) : "";
     const hasValue = (value) => value !== undefined && value !== null && value !== "";
 
@@ -127,12 +129,12 @@ export default function PropertyCard({ property = {}, onClick }) {
             bottomBadges={
                 <>
                     {typeLabel && <CardBadge tone="dark" label={typeLabel} />}
-                    {furnishingStatus && (
+                    {furnishing && (
                         <CardBadge
                             tone="light"
                             icon={<ChairOutlinedIcon />}
                             label={
-                                furnished
+                                furnishing === "Furnished"
                                     ? t("properties.card.furnished", { defaultValue: "Furnished" })
                                     : t("properties.card.unfurnished", { defaultValue: "Unfurnished" })
                             }

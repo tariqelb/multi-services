@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ReportListingLink from "../listings/ReportListingLink";
 
 import {
     Alert,
@@ -221,7 +222,7 @@ export default function EstablishmentDetailsPage() {
 
     if (error || !establishment) {
         return (
-            <DetailsContainer maxWidth={800}>
+            <DetailsContainer>
                 <DetailsBackButton onClick={() => navigate(-1)} label={tr("back", "Back")} />
                 <Alert severity="error">{error || tr("notFound", "Establishment not found.")}</Alert>
             </DetailsContainer>
@@ -621,6 +622,8 @@ export default function EstablishmentDetailsPage() {
                     <MapLinkButton href={mapLink} label={tr("viewMap", "View on Google Maps")} fullWidth />
                 )}
             </SidebarCard>
+
+            <ReportListingLink title={establishment?.name || ""} />
         </>
     );
 

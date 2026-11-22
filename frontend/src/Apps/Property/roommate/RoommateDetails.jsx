@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ReportListingLink from "../listings/ReportListingLink";
+import VerifiedContact from "../listings/VerifiedContact";
 import { Alert, Button, Stack, Typography } from "@mui/material";
 
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
@@ -91,9 +93,13 @@ function getYouTubeEmbedUrl(url) {
     }
 }
 
-export default function RoommateDetails({ listing, showContact = true }) {
+export default function RoommateDetails({ listing, showContact: showContactProp = true }) {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
+
+    // Inactive: the owner does not want to be contacted.
+    const contactClosed = listing?.status === "Inactive" || listing?.contactHidden === true;
+    const showContact = showContactProp && !contactClosed;
 
     const images = useMemo(() => {
         return (listing?.images || [])
@@ -127,14 +133,17 @@ export default function RoommateDetails({ listing, showContact = true }) {
 
     
     const ownerPhone = (
-        listing?.phone ||
         owner?.phoneNumber ||
-        owner?.notificationPreferences?.whatsapp?.phoneNumber ||
-        owner?.whatsappPhoneNumber ||
+        listing?.phone ||
+        owner?.whatsappNumber ||
         ""
     ).trim();
 
-    const whatsappNumber = ownerPhone.replace(/\D/g, "");
+    const ownerWhatsapp = String(owner?.whatsappNumber || ownerPhone).trim();
+    const verified = listing?.contactVerified || {};
+
+    // WhatsApp: the owner's WhatsApp number, else the phone number.
+    const whatsappNumber = (owner?.whatsappNumber || ownerPhone).replace(/\D/g, "");
 
 
     const availablePlaces =
@@ -411,6 +420,34 @@ export default function RoommateDetails({ listing, showContact = true }) {
                     }
                 />
 
+                {contactClosed && showContactProp && (
+                    <Alert severity="warning" sx={{ mt: 2 }}>
+                        {translate(
+                            "roommates.details.inactiveNoContact",
+                            "This announcement is inactive. The owner is not accepting contacts at the moment."
+                        )}
+                    </Alert>
+                )}
+
+                {/* Current numbers, "Verified" when the owner verified them */}
+                {showContact && ownerPhone && (
+                    <Stack spacing={1} sx={{ mt: 2 }}>
+                        <VerifiedContact
+                            icon={<PhoneRoundedIcon />}
+                            label={
+                                ownerWhatsapp === ownerPhone
+                                    ? translate("properties.contactOwner.phoneAndWhatsapp", "Phone & WhatsApp")
+                                    : translate("properties.contactOwner.phone", "Phone")
+                            }
+                            value={ownerPhone}
+                            verified={ownerWhatsapp === ownerPhone ? verified.phone || verified.whatsapp : verified.phone}
+                        />
+                        {ownerWhatsapp !== ownerPhone && (
+                            <VerifiedContact icon={<WhatsAppIcon />} label="WhatsApp" value={ownerWhatsapp} verified={verified.whatsapp} />
+                        )}
+                    </Stack>
+                )}
+
                 {!showContact ? null : ownerPhone ? (
                     <Stack spacing={1.25} sx={{ mt: 2.5 }}>
                         <Button variant="contained" size="large" startIcon={<PhoneRoundedIcon />} onClick={handleCall} fullWidth>
@@ -447,6 +484,9 @@ export default function RoommateDetails({ listing, showContact = true }) {
                     </Button>
                 )}
             </SidebarCard>
+
+            {/* Not on the owner's own view */}
+            {showContactProp && <ReportListingLink title={listing.title || ""} owner={ownerName} />}
         </>
     );
 
@@ -454,9 +494,14 @@ export default function RoommateDetails({ listing, showContact = true }) {
         <>
             <DetailsHeader
                 badges={
-                    purpose ? (
-                        <StatusBadge tone={purposeTones[purpose] || "default"} label={translateEnum("roommates.purpose", purpose)} />
-                    ) : null
+                    <>
+                        {purpose && (
+                            <StatusBadge tone={purposeTones[purpose] || "default"} label={translateEnum("roommates.purpose", purpose)} />
+                        )}
+                        {contactClosed && (
+                            <StatusBadge tone="default" label={translate("properties.card.inactive", "Inactive")} />
+                        )}
+                    </>
                 }
                 title={listing.title}
                 location={location}

@@ -3,6 +3,7 @@
 // (properties, furnished rentals, roommate announcements, establishments).
 // Mobile first: single column on phones, content + sticky sidebar on desktop.
 
+import { pagePaddingSx } from "./PageContainer";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -40,20 +41,14 @@ const isEmpty = (value) =>
 // Page container & back button
 // -----------------------------------------------------------------------------
 
-export function DetailsContainer({ children, maxWidth = 1240, withMobileBar = false }) {
+export function DetailsContainer({ children, withMobileBar = false }) {
     return (
         <Box
             component="main"
             sx={{
-                width: "100%",
-                maxWidth,
-                mx: "auto",
-                px: { xs: 1.5, sm: 3, md: 4 },
-                pt: { xs: 2, md: 3 },
+                ...pagePaddingSx,
                 // Leave room for the fixed mobile contact bar.
-                pb: withMobileBar ? { xs: 12, lg: 6 } : 6,
-                boxSizing: "border-box",
-                minWidth: 0,
+                pb: withMobileBar ? { xs: 12, lg: 4 } : pagePaddingSx.py,
             }}
         >
             {children}

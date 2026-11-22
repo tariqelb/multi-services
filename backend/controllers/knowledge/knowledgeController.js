@@ -229,10 +229,19 @@ const buildContentPayload = (body = {}, existing = {}) => {
             throw new Error("Source name must be a string of maximum 150 characters.");
         }
 
+        // Optional article image. Empty = the app shows its default image.
+        const articleImage = String(
+            body.thumbnailUrl ?? existing.thumbnailUrl ?? ""
+        ).trim();
+
+        if (articleImage && !validateHttpUrl(articleImage)) {
+            throw new Error("Image must be a valid HTTP or HTTPS URL.");
+        }
+
         payload.sourceUrl = sourceUrl.trim();
         payload.sourceName = sourceName.trim();
         payload.youtubeVideoId = "";
-        payload.thumbnailUrl = "";
+        payload.thumbnailUrl = articleImage;
     }
 
     if (type === "video") {
@@ -244,7 +253,7 @@ const buildContentPayload = (body = {}, existing = {}) => {
 
         const thumbnailUrl =
             body.thumbnailUrl !== undefined
-                ? body.thumbnailUrl.trim()
+                ? String(body.thumbnailUrl).trim()
                 : getYouTubeThumbnail(youtubeVideoId);
 
         if (thumbnailUrl && !validateHttpUrl(thumbnailUrl)) {

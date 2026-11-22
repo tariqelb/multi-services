@@ -2,17 +2,11 @@
 
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import { getAllowedOrigins } from "./allowedOrigins.js";
+import { getAccountStatus } from "../services/accountStatus.js";
 
 const initializeSocket = (server) => {
-    const allowedOrigins = [
-        ...(process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "")
-            .split(",")
-            .map((origin) => origin.trim())
-            .filter(Boolean),
-        ...(process.env.NODE_ENV !== "production"
-            ? ["http://localhost:5173"]
-            : []),
-    ];
+    const allowedOrigins = getAllowedOrigins();
 
     const io = new Server(server, {
         cors: {
@@ -22,7 +16,7 @@ const initializeSocket = (server) => {
     });
 
     // Authenticate each socket connection using the token cookie.
-    io.use((socket, next) => {
+    io.use(async (socket, next) => {
         try {
             const cookieHeader = socket.handshake.headers.cookie || "";
 
@@ -44,6 +38,12 @@ const initializeSocket = (server) => {
 
             if (!decoded.userId) {
                 return next(new Error("Invalid authentication token"));
+            }
+
+            const account = await getAccountStatus(decoded.userId);
+
+            if (!account.exists || account.status === "suspended") {
+                return next(new Error("Account unavailable"));
             }
 
             socket.data.userId = decoded.userId;

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -574,7 +575,7 @@ export default function PublicProfile() {
 
     if (profileError && !user) {
         return (
-            <Container maxWidth="lg" sx={{ py: 4 }}>
+            <Container maxWidth={false} disableGutters sx={pagePaddingSx}>
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {profileError}
                 </Alert>
@@ -596,7 +597,7 @@ export default function PublicProfile() {
         String(currentUserId) !== String(userId);
 
     return (
-        <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 } }}>
+        <Container maxWidth={false} disableGutters sx={pagePaddingSx}>
             <Stack spacing={3}>
                 <Box>
                     <Button

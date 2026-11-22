@@ -2,6 +2,8 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import ReportListingLink from "../listings/ReportListingLink";
+import { VerifiedBadge } from "../listings/VerifiedContact";
 
 import { Alert, Button, Snackbar } from "@mui/material";
 
@@ -22,6 +24,7 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import PlayCircleOutlineRoundedIcon from "@mui/icons-material/PlayCircleOutlineRounded";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
+import ChairOutlinedIcon from "@mui/icons-material/ChairOutlined";
 
 import {
     DescriptionText,
@@ -43,6 +46,7 @@ import SimilarProperties from "./SimilarProperties";
 import PropertyContactOwner from "./PropertyContactOwner";
 import axiosInstance from "../../../api/axiosInstance";
 import getImageUrl from "../../../utils/getImageUrl";
+import { getFurnishingStatus } from "../../../utils/furnishing";
 
 
 
@@ -142,6 +146,13 @@ function getStatusStyles(status, t) {
                 bgcolor: "#fee2e2",
                 color: "#b91c1c",
                 label: t("properties.details.status.unavailable"),
+            };
+
+        case "inactive":
+            return {
+                bgcolor: "#f1f5f9",
+                color: "#475569",
+                label: t("properties.card.inactive", "Inactive"),
             };
 
         default:
@@ -268,8 +279,12 @@ export default function PropertyDetails({
         ? getStatusStyles(property.status, t)
         : null;
 
+    // Inactive: the owner does not want to be contacted.
+    const contactClosed = property.status === "Inactive" || property.contactHidden === true;
+    const showOwnerContact = showContact && !contactClosed;
+
     const ownerEmail =
-        property.showEmail === true
+        property.showEmail === true && !contactClosed
             ? property.email || ""
             : "";
 
@@ -364,6 +379,11 @@ export default function PropertyDetails({
             value: getTranslatedPropertyValue(property.propertyType, t, "properties.categories"),
         },
         {
+            icon: <ChairOutlinedIcon />,
+            label: t("properties.details.furnishingStatus.label"),
+            value: getFurnishingStatus(property) ? getRentalValueLabel(getFurnishingStatus(property), t) : null,
+        },
+        {
             icon: <BadgeOutlinedIcon />,
             label: t("properties.details.listingBy"),
             value: getTranslatedPropertyValue(property.role, t, "properties.details.roles"),
@@ -380,10 +400,6 @@ export default function PropertyDetails({
             {
                 label: t("properties.details.rentalPeriod.label"),
                 value: property.rentalPeriod ? getRentalValueLabel(property.rentalPeriod, t) : null,
-            },
-            {
-                label: t("properties.details.furnishingStatus.label"),
-                value: property.furnishingStatus ? getRentalValueLabel(property.furnishingStatus, t) : null,
             },
             {
                 label: t("properties.details.rentalContract"),
@@ -464,7 +480,18 @@ export default function PropertyDetails({
 
     const sidebar = (
         <>
-            {showContact && <PropertyContactOwner property={property} withMobileBar />}
+            {showOwnerContact && <PropertyContactOwner property={property} withMobileBar />}
+
+            {showContact && contactClosed && (
+                <SidebarCard>
+                    <Alert severity="warning">
+                        {t(
+                            "properties.details.inactiveNoContact",
+                            "This listing is inactive. The owner is not accepting contacts at the moment."
+                        )}
+                    </Alert>
+                </SidebarCard>
+            )}
 
             {(googleMapLink || fullAddress || location) && (
                 <SidebarCard>
@@ -496,13 +523,22 @@ export default function PropertyDetails({
                     >
                         {ownerEmail}
                     </Button>
+                    <VerifiedBadge verified={property.contactVerified?.email} />
                 </SidebarCard>
+            )}
+
+            {/* Not on the owner's own view */}
+            {showContact && (
+                <ReportListingLink
+                    title={title}
+                    owner={[property.firstName, property.lastName].filter(Boolean).join(" ")}
+                />
             )}
         </>
     );
 
     return (
-        <DetailsContainer withMobileBar={showContact}>
+        <DetailsContainer withMobileBar={showOwnerContact}>
             <DetailsBackButton onClick={backAction || (() => navigate(-1))} label={backLabel || t("properties.details.back")} />
 
             <DetailsHeader

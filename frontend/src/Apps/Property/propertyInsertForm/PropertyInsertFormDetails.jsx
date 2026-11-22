@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 
 import cities from "../../../data/moroccanCities";
+import { isFurnishableType } from "../../../utils/furnishing";
 
 const moroccanCities = cities;
 
@@ -189,6 +190,28 @@ export default function PropertyInsertFormDetails({
                         }
                     )}
                 </Grid>
+
+                {/* Homes only (not land, stores, offices...) */}
+                {isFurnishableType(formData.propertyType) && (
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        {renderField(
+                            "furnishingStatus",
+                            t("properties.insert.details.rental.furnishing"),
+                            {
+                                select: true,
+                                required: true,
+                                children: [
+                                    <MenuItem key="Unfurnished" value="Unfurnished">
+                                        {t("properties.insert.details.rental.unfurnished")}
+                                    </MenuItem>,
+                                    <MenuItem key="Furnished" value="Furnished">
+                                        {t("properties.insert.details.rental.furnished")}
+                                    </MenuItem>,
+                                ],
+                            }
+                        )}
+                    </Grid>
+                )}
             </Grid>
 
             {/* Property location */}
@@ -486,38 +509,6 @@ export default function PropertyInsertFormDetails({
                                         <MenuItem key="Monthly" value="Monthly">
                                             {t(
                                                 "properties.insert.details.rental.monthly"
-                                            )}
-                                        </MenuItem>,
-                                    ],
-                                }
-                            )}
-                        </Grid>
-
-                        {/* Furnishing status */}
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            {renderField(
-                                "furnishingStatus",
-                                t(
-                                    "properties.insert.details.rental.furnishing"
-                                ),
-                                {
-                                    select: true,
-                                    required: true,
-                                    children: [
-                                        <MenuItem
-                                            key="Furnished"
-                                            value="Furnished"
-                                        >
-                                            {t(
-                                                "properties.insert.details.rental.furnished"
-                                            )}
-                                        </MenuItem>,
-                                        <MenuItem
-                                            key="Unfurnished"
-                                            value="Unfurnished"
-                                        >
-                                            {t(
-                                                "properties.insert.details.rental.unfurnished"
                                             )}
                                         </MenuItem>,
                                     ],

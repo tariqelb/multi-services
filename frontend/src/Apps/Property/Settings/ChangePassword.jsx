@@ -21,6 +21,7 @@ export default function ChangePassword({
     success,
     loading,
     onSubmit,
+    hasPassword = true,
 }) {
     const { t } = useTranslation();
 
@@ -37,7 +38,7 @@ export default function ChangePassword({
         event.preventDefault();
 
         if (
-            !passwords.currentPassword ||
+            (hasPassword && !passwords.currentPassword) ||
             !passwords.newPassword ||
             !passwords.confirmPassword
         ) {
@@ -52,7 +53,7 @@ export default function ChangePassword({
             return;
         }
 
-        if (passwords.currentPassword === passwords.newPassword) {
+        if (hasPassword && passwords.currentPassword === passwords.newPassword) {
             return;
         }
 
@@ -106,27 +107,36 @@ export default function ChangePassword({
                             variant="h6"
                             sx={{ fontWeight: 700, mb: 0.5 }}
                         >
-                            {t("settings.password.sectionTitle")}
+                            {hasPassword
+                                ? t("settings.password.sectionTitle")
+                                : t("settings.password.setTitle", "Create a password")}
                         </Typography>
 
                         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                            {t("settings.password.sectionSubtitle")}
+                            {hasPassword
+                                ? t("settings.password.sectionSubtitle")
+                                : t(
+                                    "settings.password.setSubtitle",
+                                    "You signed up with Google. Add a password to also log in with your email."
+                                )}
                         </Typography>
                     </Box>
                 </Stack>
 
                 <form onSubmit={handleSubmit}>
                     <Stack spacing={2.5}>
-                        <TextField
-                            label={t("settings.password.currentPassword")}
-                            name="currentPassword"
-                            type="password"
-                            value={passwords.currentPassword}
-                            onChange={handleChange}
-                            required
-                            fullWidth
-                            autoComplete="current-password"
-                        />
+                        {hasPassword && (
+                            <TextField
+                                label={t("settings.password.currentPassword")}
+                                name="currentPassword"
+                                type="password"
+                                value={passwords.currentPassword}
+                                onChange={handleChange}
+                                required
+                                fullWidth
+                                autoComplete="current-password"
+                            />
+                        )}
 
                         <TextField
                             label={t("settings.password.newPassword")}

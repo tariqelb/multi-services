@@ -1,5 +1,6 @@
 import express from "express";
 
+import { confirmStillAvailable } from "../../controllers/listingExpiryController.js";
 import {
     createRoommateListing,
     getRoommateListings,
@@ -12,6 +13,7 @@ import {
 } from "../../controllers/Roommate/roommateController.js";
 
 import authMiddleware from "../../middleware/authMiddleware.js";
+import optionalAuthMiddleware from "../../middleware/optionalAuthMiddleware.js";
 
 import {
     uploadRoommateImages,
@@ -27,6 +29,7 @@ router.get("/user/:userId", getUserRoommateListings);
 
 // Authenticated routes
 router.get("/my-listings", authMiddleware, getMyRoommateListings);
+router.post("/:id/still-available", authMiddleware, confirmStillAvailable("roommate"));
 
 // Create roommate listing with images
 router.post(
@@ -46,6 +49,7 @@ router.patch(
 router.put(
     "/:id",
     authMiddleware,
+    uploadRoommateImages,
     updateRoommateListing
 );
 
@@ -56,6 +60,6 @@ router.delete(
 );
 
 // Public details route — keep last
-router.get("/:id", getRoommateListingById);
+router.get("/:id", optionalAuthMiddleware, getRoommateListingById);
 
 export default router;

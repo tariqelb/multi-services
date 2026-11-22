@@ -17,21 +17,26 @@ import {
     confirmWhatsAppVerificationCode,
 } from "../../controllers/profile/verificationController.js";
 
+import {
+    verificationSendLimiter,
+    verificationCheckLimiter,
+} from "../../middleware/rateLimit.js";
+
 const router = Router();
 
 // Email verification
-router.post("/email/send", authMiddleware, sendEmailVerificationCode);
-router.post("/email/confirm", authMiddleware, confirmEmailVerificationCode);
+router.post("/email/send", authMiddleware, verificationSendLimiter, sendEmailVerificationCode);
+router.post("/email/confirm", authMiddleware, verificationCheckLimiter, confirmEmailVerificationCode);
 
 // Phone verification
-router.post("/phone/send", authMiddleware, sendPhoneVerificationCode);
-router.post("/phone/confirm", authMiddleware, confirmPhoneVerificationCode);
-router.post("/phone/resend", authMiddleware, resendPhoneVerificationCode);
+router.post("/phone/send", authMiddleware, verificationSendLimiter, sendPhoneVerificationCode);
+router.post("/phone/confirm", authMiddleware, verificationCheckLimiter, confirmPhoneVerificationCode);
+router.post("/phone/resend", authMiddleware, verificationSendLimiter, resendPhoneVerificationCode);
 
 router.get("/whatsapp", authMiddleware, getMyWhatsAppPreferences);
 router.put("/whatsapp", authMiddleware, updateMyWhatsAppPreferences);
 
-router.post("/whatsapp/send", authMiddleware, sendWhatsAppVerificationCode);
-router.post("/whatsapp/confirm", authMiddleware, confirmWhatsAppVerificationCode);
+router.post("/whatsapp/send", authMiddleware, verificationSendLimiter, sendWhatsAppVerificationCode);
+router.post("/whatsapp/confirm", authMiddleware, verificationCheckLimiter, confirmWhatsAppVerificationCode);
 
 export default router;

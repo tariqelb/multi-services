@@ -36,6 +36,22 @@ const userSchema = new mongoose.Schema(
             trim: true,
             index: true,
         },
+        // Filled when an administrator suspends the account.
+        suspendedAt: {
+            type: Date,
+            default: null,
+        },
+        suspendedReason: {
+            type: String,
+            trim: true,
+            default: "",
+            maxlength: 500,
+        },
+        suspendedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null,
+        },
         language: {
             type: String,
             enum: ["en", "fr", "ar"],
@@ -73,9 +89,40 @@ const userSchema = new mongoose.Schema(
             type: Date,
             select: false,
         },
+        // WhatsApp number used for publications and WhatsApp messages.
+        whatsappNumber: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+        whatsappVerified: {
+            type: Boolean,
+            default: false,
+        },
+        whatsappVerificationSessionId: {
+            type: String,
+            select: false,
+        },
+        whatsappVerificationExpires: {
+            type: Date,
+            select: false,
+        },
         password: {
             type: String,
             required: true,
+            select: false,
+        },
+        // false for accounts created with Google until the user sets a
+        // password (no current password to type in the settings).
+        passwordSet: {
+            type: Boolean,
+            default: true,
+        },
+        // Google account ID ("sub") when the user signs in with Google.
+        googleId: {
+            type: String,
+            trim: true,
+            default: undefined,
             select: false,
         },
         address: {
@@ -111,6 +158,7 @@ const userSchema = new mongoose.Schema(
                     default: true,
                 },
             },
+            // Switches only. The number is user.whatsappNumber.
             whatsapp: {
                 enabled: {
                     type: Boolean,
@@ -119,23 +167,6 @@ const userSchema = new mongoose.Schema(
                 propertyAlerts: {
                     type: Boolean,
                     default: false,
-                },
-                phoneNumber: {
-                    type: String,
-                    default: "",
-                    trim: true,
-                },
-                verified: {
-                    type: Boolean,
-                    default: false,
-                },
-                verificationSessionId: {
-                    type: String,
-                    select: false,
-                },
-                verificationExpires: {
-                    type: Date,
-                    select: false,
                 },
             },
         },
@@ -151,6 +182,12 @@ const userSchema = new mongoose.Schema(
     {
         timestamps: true,
     }
+);
+
+// One account per Google ID (accounts without Google are not indexed).
+userSchema.index(
+    { googleId: 1 },
+    { unique: true, partialFilterExpression: { googleId: { $type: "string" } } }
 );
 
 // Reuse the existing model during development.

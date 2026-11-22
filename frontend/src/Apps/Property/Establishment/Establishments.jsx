@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -32,6 +33,8 @@ import {
 
 import axiosInstance from "../../../api/axiosInstance";
 import PageHeader from "../../../Components/ui/PageHeader";
+import { FilterGrid, FilterPanel, FilterSearch, FilterSelect } from "../../../Components/ui/FilterKit";
+import moroccanCities from "../../../data/moroccanCities";
 import EstablishmentCard from "./EstablishmentCard";
 
 const ACCOMMODATION_TYPES = [
@@ -78,7 +81,7 @@ function getStartingPrice(rooms = []) {
 
 export default function Establishments() {
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [establishments, setEstablishments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -155,7 +158,7 @@ export default function Establishments() {
     };
 
     return (
-        <Container maxWidth="xl" sx={{ py: { xs: 2.5, md: 4 }, px: { xs: 2, sm: 3 } }}>
+        <Box sx={pagePaddingSx}>
             {/* Header */}
             <PageHeader
                 icon={<Hotel />}
@@ -173,78 +176,52 @@ export default function Establishments() {
             />
 
             {/* Filters */}
-            <Card
-                elevation={0}
-                sx={{
-                    border: "1px solid #E2E8F0",
-                    borderRadius: 3,
-                    mb: 4,
+            <FilterPanel
+                activeCount={(search.trim() ? 1 : 0) + (city ? 1 : 0) + (accommodationType !== "All" ? 1 : 0)}
+                onClear={() => {
+                    setSearch("");
+                    setCity("");
+                    setAccommodationType("All");
+                    setPage(1);
                 }}
+                clearLabel={t("establishments.empty.clearFilters")}
             >
-                <CardContent>
-                    <Grid container spacing={2}>
-                        <Grid size={{ xs: 12, md: 5 }}>
-                            <TextField
-                                fullWidth
-                                label={t("establishments.filters.search")}
-                                placeholder={t("establishments.filters.searchPlaceholder")}
-                                value={search}
-                                onChange={handleSearchChange}
-                                InputProps={{
-                                    startAdornment: (
-                                        <Search
-                                            sx={{
-                                                mr: 1,
-                                                color: "text.secondary",
-                                            }}
-                                        />
-                                    ),
-                                }}
-                            />
-                        </Grid>
+                <FilterSearch
+                    value={search}
+                    onChange={(value) => handleSearchChange({ target: { value } })}
+                    placeholder={t("establishments.filters.searchPlaceholder", {
+                        defaultValue: t("establishments.filters.search", "Search establishments"),
+                    })}
+                />
 
-                        <Grid size={{ xs: 12, md: 3 }}>
-                            <TextField
-                                fullWidth
-                                label={t("establishments.filters.city")}
-                                placeholder={t("establishments.filters.cityPlaceholder")}
-                                value={city}
-                                onChange={handleFilterChange(setCity)}
-                            />
-                        </Grid>
+                <FilterGrid>
+                    <FilterSelect
+                        label={t("establishments.filters.city")}
+                        value={city}
+                        onChange={(value) => handleFilterChange(setCity)({ target: { value } })}
+                        options={[
+                            { value: "", label: t("properties.filter.allCities", "All cities") },
+                            ...moroccanCities.map((item) => ({
+                                value: item.en,
+                                label: i18n.resolvedLanguage === "ar" ? item.ar : item.en,
+                            })),
+                        ]}
+                    />
 
-                        <Grid size={{ xs: 12, md: 4 }}>
-                            <FormControl fullWidth>
-                                <InputLabel>
-                                    {t("establishments.filters.accommodationType")}
-                                </InputLabel>
-
-                                <Select
-                                    value={accommodationType}
-                                    label={t("establishments.filters.accommodationType")}
-                                    onChange={handleFilterChange(
-                                        setAccommodationType
-                                    )}
-                                >
-                                    {ACCOMMODATION_TYPES.map((type) => (
-                                        <MenuItem
-                                            key={type}
-                                            value={type}
-                                        >
-                                            {type === "All"
-                                                ? t("establishments.filters.allTypes")
-                                                : t(
-                                                    `establishments.types.${type.toLowerCase()}`,
-                                                    { defaultValue: type }
-                                                )}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </Card>
+                    <FilterSelect
+                        label={t("establishments.filters.accommodationType")}
+                        value={accommodationType}
+                        onChange={(value) => handleFilterChange(setAccommodationType)({ target: { value } })}
+                        options={ACCOMMODATION_TYPES.map((type) => ({
+                            value: type,
+                            label:
+                                type === "All"
+                                    ? t("establishments.filters.allTypes")
+                                    : t(`establishments.types.${type.toLowerCase()}`, { defaultValue: type }),
+                        }))}
+                    />
+                </FilterGrid>
+            </FilterPanel>
 
             {/* Results */}
             {error && (
@@ -350,6 +327,6 @@ export default function Establishments() {
                     )}
                 </>
             )}
-        </Container>
+        </Box>
     );
 }

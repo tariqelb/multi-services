@@ -1,5 +1,6 @@
 //app/frontend/src/components/admin/components/feedback/FeedbackSection.jsx
 
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import PageHeader from "../../../Components/ui/PageHeader";
 import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
 import React, { useCallback, useEffect, useState } from "react";
@@ -158,7 +159,7 @@ export default function FeedbackSection() {
     };
 
     return (
-        <Box sx={{ width: "100%", minWidth: 0, boxSizing: "border-box", px: { xs: 2, sm: 3, md: 4 }, py: { xs: 3, md: 4 } }}>
+        <Box sx={pagePaddingSx}>
             <PageHeader
                 icon={<FeedbackOutlinedIcon />}
                 title={t("adminFeedback.title")}

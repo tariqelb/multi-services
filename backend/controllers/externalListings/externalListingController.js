@@ -23,6 +23,11 @@ import {
     removeListingSourceUrl,
 } from "../../services/externalListings/listingSourcesStore.js";
 
+import {
+    forgetRemoved,
+    wasRemoved,
+} from "../../services/externalListings/removedListings.js";
+
 
 
 function createContentHash(data) {
@@ -169,6 +174,9 @@ export async function createExternalListing(
                 setDefaultsOnInsert: true,
             }
         );
+
+        // Added again by hand: forget an earlier "no longer available" removal.
+        await forgetRemoved(data.sourceUrl).catch(() => {});
 
         return res.status(201).json({
             success: true,
@@ -353,6 +361,18 @@ export async function importNewExternalListings(req, res) {
                 const existing = await ExternalListing.findOne({
                     sourceUrl: data.sourceUrl,
                 });
+
+                if (!existing && (await wasRemoved(data.sourceUrl))) {
+                    summary.skipped++;
+
+                    results.push({
+                        sourceUrl,
+                        status: "skipped",
+                        message: "Removed earlier: no longer available.",
+                    });
+
+                    continue;
+                }
 
                 if (!existing) {
                     await ExternalListing.create({

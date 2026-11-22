@@ -9,6 +9,7 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 
 import { trackPropertyContact } from "../../../api/trackContact";
+import VerifiedContact from "../listings/VerifiedContact";
 import {
     MobileActionBar,
     OwnerSummary,
@@ -56,7 +57,12 @@ export default function PropertyContactOwner({ property, withMobileBar = false }
     const avatar = property.owner?.profileImage || property.userId?.profileImage || "";
 
     const normalizedPhone = String(phone).trim();
-    const whatsappNumber = normalizedPhone.replace(/\D/g, "");
+
+    // The owner's current WhatsApp number, else the phone number.
+    const whatsappDisplay = String(property.whatsappNumber || normalizedPhone).trim();
+    const whatsappNumber = whatsappDisplay.replace(/\D/g, "");
+
+    const verified = property.contactVerified || {};
 
     const handleVisitProfile = () => {
         if (!ownerId) {
@@ -90,11 +96,35 @@ export default function PropertyContactOwner({ property, withMobileBar = false }
                     {t("properties.contactOwner.subtitle", "Get in touch directly with the advertiser.")}
                 </Typography>
 
-                <OwnerSummary
-                    name={ownerName}
-                    avatar={avatar}
-                    subtitle={normalizedPhone || undefined}
-                />
+                <OwnerSummary name={ownerName} avatar={avatar} />
+
+                {/* Current numbers, "Verified" when the owner verified them */}
+                {(normalizedPhone || whatsappDisplay) && (
+                    <Stack spacing={1} sx={{ mt: 2 }}>
+                        <VerifiedContact
+                            icon={<PhoneRoundedIcon />}
+                            label={
+                                whatsappDisplay === normalizedPhone
+                                    ? t("properties.contactOwner.phoneAndWhatsapp", "Phone & WhatsApp")
+                                    : t("properties.contactOwner.phone", "Phone")
+                            }
+                            value={normalizedPhone}
+                            verified={
+                                whatsappDisplay === normalizedPhone
+                                    ? verified.phone || verified.whatsapp
+                                    : verified.phone
+                            }
+                        />
+                        {whatsappDisplay && whatsappDisplay !== normalizedPhone ? (
+                            <VerifiedContact
+                                icon={<WhatsAppIcon />}
+                                label="WhatsApp"
+                                value={whatsappDisplay}
+                                verified={verified.whatsapp}
+                            />
+                        ) : null}
+                    </Stack>
+                )}
 
                 {!normalizedPhone && (
                     <Alert severity="info" sx={{ mt: 2 }}>

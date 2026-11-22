@@ -1,5 +1,7 @@
+// WhatsApp notification switches.
+// The WhatsApp number is set in the profile and verified in
+// "Contact verification" (it is shown here read-only).
 
-import React from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -8,33 +10,29 @@ import {
     Button,
     Card,
     CardContent,
+    Chip,
     FormControlLabel,
-    InputAdornment,
     Stack,
     Switch,
-    TextField,
     Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 
 import {
     NotificationsActiveOutlined,
-    PhoneAndroidOutlined,
-    WhatsApp,
     VerifiedOutlined,
-    MarkEmailReadOutlined,
+    WhatsApp,
 } from "@mui/icons-material";
 
 export default function WhatsappNotifications({
     settings = {},
     setSettings,
+    whatsappNumber = "",
+    whatsappVerified = false,
     loading,
     saving,
     error,
     onSave,
-    onSendVerification,
-    onConfirmVerification,
-    sendingCode = false,
-    confirmingCode = false,
 }) {
     const { t } = useTranslation();
 
@@ -42,57 +40,90 @@ export default function WhatsappNotifications({
         setSettings((previous) => ({
             ...previous,
             [field]: value,
+            // Alerts need the channel switched on.
+            ...(field === "enabled" && !value ? { propertyAlerts: false } : {}),
         }));
     };
 
-    const verified = settings?.verified === true;
+    const ready = Boolean(whatsappNumber) && whatsappVerified;
 
     return (
-        <Card
-            variant="outlined"
-            sx={{
-                borderRadius: "16px",
-            }}
-        >
+        <Card variant="outlined" sx={{ borderRadius: "16px" }}>
             <CardContent sx={{ p: { xs: 3, md: 4.5 } }}>
-                <Stack
-                    direction="row"
-                    spacing={2.5}
-                    sx={{ alignItems: "center", mb: 4.5 }}
-                >
+                <Stack direction="row" spacing={2.5} sx={{ alignItems: "center", mb: 3.5 }}>
                     <Box
-                        sx={{
+                        sx={(theme) => ({
                             width: 52,
                             height: 52,
                             borderRadius: "10px",
-                            bgcolor: "#EFF6FF",
-                            color: "#1D4ED8",
+                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            color: "primary.main",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             flexShrink: 0,
-                        }}
+                        })}
                     >
                         <WhatsApp sx={{ fontSize: 26 }} />
                     </Box>
 
                     <Box>
-                        <Typography
-                            variant="h6"
-                            sx={{ fontWeight: 700, mb: 0.5 }}
-                        >
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
                             {t("settings.whatsappNotifications.title")}
                         </Typography>
-
                         <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             {t("settings.whatsappNotifications.subtitle")}
                         </Typography>
                     </Box>
                 </Stack>
 
-                <Alert severity="info" sx={{ mb: 3.5, py: 1.5 }}>
-                    {t("settings.whatsappNotifications.info")}
-                </Alert>
+                {/* The number, read-only */}
+                <Box
+                    sx={{
+                        p: 2,
+                        mb: 3,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        borderRadius: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 2,
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700 }}>
+                            {t("settings.whatsappNotifications.numberLabel", "Messages are sent to")}
+                        </Typography>
+                        <Typography sx={{ fontWeight: 700, overflowWrap: "anywhere" }}>
+                            {whatsappNumber || t("settings.whatsappNotifications.noNumber", "No WhatsApp number yet")}
+                        </Typography>
+                    </Box>
+
+                    {whatsappNumber && (
+                        <Chip
+                            size="small"
+                            icon={whatsappVerified ? <VerifiedOutlined /> : undefined}
+                            color={whatsappVerified ? "success" : "warning"}
+                            variant="outlined"
+                            label={
+                                whatsappVerified
+                                    ? t("settings.verification.verified")
+                                    : t("settings.verification.notVerified")
+                            }
+                        />
+                    )}
+                </Box>
+
+                {!ready && (
+                    <Alert severity="info" sx={{ mb: 3 }}>
+                        {t(
+                            "settings.whatsappNotifications.setupHint",
+                            "Add your WhatsApp number in your profile and verify it in “Contact verification” to turn these notifications on."
+                        )}
+                    </Alert>
+                )}
 
                 {loading && (
                     <Alert severity="info" sx={{ mb: 3 }}>
@@ -107,151 +138,23 @@ export default function WhatsappNotifications({
                 )}
 
                 <Stack spacing={3}>
-                    <TextField
-                        label={t("settings.whatsappNotifications.phoneNumber")}
-                        placeholder="+212 6XX XXX XXX"
-                        value={settings.phoneNumber || ""}
-                        onChange={(event) => {
-                            const phoneNumber = event.target.value;
-
-                            setSettings((previous) => ({
-                                ...previous,
-                                phoneNumber,
-                                verified: false,
-                                enabled: false,
-                                propertyAlerts: false,
-                                verificationCode: "",
-                            }));
-                        }}
-                        disabled={loading || saving || sendingCode}
-                        fullWidth
-                        helperText={t(
-                            "settings.whatsappNotifications.phoneHelper"
-                        )}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <PhoneAndroidOutlined />
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-
-                    {verified ? (
-                        <Alert
-                            severity="success"
-                            icon={<VerifiedOutlined />}
-                        >
-                            {t("settings.whatsappNotifications.verified")}
-                        </Alert>
-                    ) : (
-                        <Box>
-                            <Button
-                                variant="outlined"
-                                color="success"
-                                startIcon={<WhatsApp />}
-                                onClick={onSendVerification}
-                                disabled={
-                                    loading ||
-                                    saving ||
-                                    sendingCode ||
-                                    !settings.phoneNumber?.trim()
-                                }
-                                sx={{
-                                    textTransform: "none",
-                                    fontWeight: 700,
-                                    borderRadius: "10px",
-                                    py: 1.1,
-                                }}
-                            >
-                                {sendingCode
-                                    ? t("settings.whatsappNotifications.sendingCode")
-                                    : t("settings.whatsappNotifications.sendCode")}
-                            </Button>
-
-                            {settings.verificationCodeSent && (
-                                <Stack spacing={2} sx={{ mt: 2.5 }}>
-                                    <TextField
-                                        label={t(
-                                            "settings.whatsappNotifications.verificationCode"
-                                        )}
-                                        placeholder={t(
-                                            "settings.whatsappNotifications.codePlaceholder"
-                                        )}
-                                        value={settings.verificationCode || ""}
-                                        onChange={(event) =>
-                                            update(
-                                                "verificationCode",
-                                                event.target.value
-                                                    .replace(/\D/g, "")
-                                                    .slice(0, 6)
-                                            )
-                                        }
-                                        inputProps={{
-                                            inputMode: "numeric",
-                                            maxLength: 6,
-                                        }}
-                                        fullWidth
-                                        helperText={t(
-                                            "settings.whatsappNotifications.codeHelper"
-                                        )}
-                                    />
-
-                                    <Button
-                                        variant="contained"
-                                        color="success"
-                                        startIcon={<MarkEmailReadOutlined />}
-                                        onClick={onConfirmVerification}
-                                        disabled={
-                                            confirmingCode ||
-                                            loading ||
-                                            settings.verificationCode?.length !== 6
-                                        }
-                                        sx={{
-                                            alignSelf: "flex-start",
-                                            textTransform: "none",
-                                            fontWeight: 700,
-                                            borderRadius: "10px",
-                                            py: 1.1,
-                                        }}
-                                    >
-                                        {confirmingCode
-                                            ? t("settings.whatsappNotifications.verifying")
-                                            : t("settings.whatsappNotifications.verifyNumber")}
-                                    </Button>
-                                </Stack>
-                            )}
-                        </Box>
-                    )}
-
                     <FormControlLabel
                         sx={{ alignItems: "flex-start", ml: 0 }}
                         control={
                             <Switch
                                 checked={Boolean(settings.enabled)}
-                                disabled={loading || saving || !verified}
-                                onChange={(event) =>
-                                    update("enabled", event.target.checked)
-                                }
-                                color="primary"
+                                disabled={loading || saving || !ready}
+                                onChange={(event) => update("enabled", event.target.checked)}
                                 sx={{ mt: 0.5, mr: 2 }}
                             />
                         }
                         label={
                             <Box>
-                                <Typography
-                                    sx={{ fontWeight: 700, fontSize: "1.05rem" }}
-                                >
+                                <Typography sx={{ fontWeight: 700, fontSize: "1.05rem" }}>
                                     {t("settings.whatsappNotifications.enable")}
                                 </Typography>
-
-                                <Typography
-                                    variant="body2"
-                                    sx={{ color: "text.secondary", mt: 0.5 }}
-                                >
-                                    {t(
-                                        "settings.whatsappNotifications.enableDescription"
-                                    )}
+                                <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                                    {t("settings.whatsappNotifications.enableDescription")}
                                 </Typography>
                             </Box>
                         }
@@ -262,37 +165,18 @@ export default function WhatsappNotifications({
                         control={
                             <Switch
                                 checked={Boolean(settings.propertyAlerts)}
-                                disabled={
-                                    loading ||
-                                    saving ||
-                                    !verified ||
-                                    !settings.enabled
-                                }
-                                onChange={(event) =>
-                                    update(
-                                        "propertyAlerts",
-                                        event.target.checked
-                                    )
-                                }
-                                color="primary"
+                                disabled={loading || saving || !ready || !settings.enabled}
+                                onChange={(event) => update("propertyAlerts", event.target.checked)}
                                 sx={{ mt: 0.5, mr: 2 }}
                             />
                         }
                         label={
                             <Box>
-                                <Typography
-                                    sx={{ fontWeight: 700, fontSize: "1.05rem" }}
-                                >
+                                <Typography sx={{ fontWeight: 700, fontSize: "1.05rem" }}>
                                     {t("settings.whatsappNotifications.propertyAlerts")}
                                 </Typography>
-
-                                <Typography
-                                    variant="body2"
-                                    sx={{ color: "text.secondary", mt: 0.5 }}
-                                >
-                                    {t(
-                                        "settings.whatsappNotifications.propertyAlertsDescription"
-                                    )}
+                                <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                                    {t("settings.whatsappNotifications.propertyAlertsDescription")}
                                 </Typography>
                             </Box>
                         }
@@ -303,23 +187,10 @@ export default function WhatsappNotifications({
                     variant="contained"
                     startIcon={<NotificationsActiveOutlined />}
                     onClick={onSave}
-                    disabled={
-                        loading ||
-                        saving ||
-                        (settings.enabled && !verified)
-                    }
-                    sx={{
-                        mt: 4,
-                        textTransform: "none",
-                        fontWeight: 700,
-                        py: 1.25,
-                        px: 3,
-                        borderRadius: "10px",
-                    }}
+                    disabled={loading || saving || (settings.enabled && !ready)}
+                    sx={{ mt: 4, fontWeight: 700, py: 1.25, px: 3, borderRadius: "10px" }}
                 >
-                    {saving
-                        ? t("settings.whatsappNotifications.saving")
-                        : t("settings.whatsappNotifications.save")}
+                    {saving ? t("settings.whatsappNotifications.saving") : t("settings.whatsappNotifications.save")}
                 </Button>
             </CardContent>
         </Card>

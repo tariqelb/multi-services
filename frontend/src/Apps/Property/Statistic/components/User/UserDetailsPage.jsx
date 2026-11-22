@@ -1,4 +1,5 @@
 
+import { pagePaddingSx } from "../../../../../Components/ui/PageContainer";
 import { useEffect, useState } from "react";
 import {
     Navigate,
@@ -37,6 +38,7 @@ import {
 
 import { useTranslation } from "react-i18next";
 import axiosInstance from "../../../../../api/axiosInstance";
+import { UserSuspensionBanner, UserSuspensionButton } from "./UserSuspensionControl";
 
 const tabConfig = [
     { value: "overview", label: "overview", icon: <Person /> },
@@ -166,7 +168,7 @@ function StatCard({ label, value }) {
 }
 
 export default function UserDetailsPage() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { userId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -365,7 +367,7 @@ export default function UserDetailsPage() {
     };
 
     return (
-        <Box sx={{ p: { xs: 2, md: 3 }, minWidth: 0 }}>
+        <Box sx={pagePaddingSx}>
             <Button
                 startIcon={<ArrowBack />}
                 onClick={() => navigate("/dashboard")}
@@ -387,6 +389,8 @@ export default function UserDetailsPage() {
                             {overviewError}
                         </Alert>
                     )}
+
+                    <UserSuspensionBanner user={user} locale={i18n.language} />
 
                     {/* User header */}
                     <Card variant="outlined" sx={{ borderRadius: 3, mb: 3 }}>
@@ -422,7 +426,9 @@ export default function UserDetailsPage() {
 
                                         <Chip
                                             size="small"
-                                            label={user?.accountStatus || "active"}
+                                            label={t(`userCard.statuses.${user?.accountStatus || "active"}`, {
+                                                defaultValue: user?.accountStatus || "active",
+                                            })}
                                             color={
                                                 user?.accountStatus === "suspended"
                                                     ? "error"
@@ -442,6 +448,13 @@ export default function UserDetailsPage() {
                                         />
                                     </Stack>
                                 </Box>
+
+                                <UserSuspensionButton
+                                    user={user}
+                                    onChanged={(changes) =>
+                                        setUser((current) => ({ ...current, ...changes }))
+                                    }
+                                />
                             </Stack>
 
                             <Divider sx={{ my: 2 }} />
@@ -465,6 +478,15 @@ export default function UserDetailsPage() {
                                 <InfoItem
                                     label={t("userDetails.phone")}
                                     value={user?.phoneNumber}
+                                />
+
+                                <InfoItem
+                                    label={t("userDetails.whatsapp", "WhatsApp number")}
+                                    value={
+                                        user?.whatsappNumber
+                                            ? `${user.whatsappNumber}${user.whatsappVerified ? " ✓" : ""}`
+                                            : ""
+                                    }
                                 />
 
                                 <InfoItem

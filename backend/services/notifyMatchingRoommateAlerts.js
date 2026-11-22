@@ -13,6 +13,7 @@ import {
 import {
     sendRoommateAlertSMS,
 } from "./smsService.js";
+import { getWhatsAppPreferencesView } from "../utils/whatsapp.js";
 
 // Unique marker to verify that this exact file is loaded.
 console.log(
@@ -95,8 +96,8 @@ const sendEmailIfEnabled = async (user, roommateListing) => {
  * because it contains the verified phone number.
  */
 const sendSMSIfEnabled = async (user, roommateListing) => {
-    const preferences =
-        user?.notificationPreferences?.whatsapp;
+    // Switches + the user's WhatsApp number (user.whatsappNumber).
+    const preferences = getWhatsAppPreferencesView(user);
 
     console.log("\n[Roommate SMS] Checking recipient:", {
         userId: String(user._id),
@@ -262,7 +263,7 @@ const notifyMatchingRoommateAlerts = async (
     const users = await User.find({
         _id: { $in: userIds },
     })
-        .select("email language notificationPreferences")
+        .select("email language notificationPreferences phoneNumber phoneVerified whatsappNumber whatsappVerified accountStatus")
         .lean();
 
     const usersById = new Map(
@@ -367,8 +368,7 @@ const notifyMatchingRoommateAlerts = async (
     console.log("[Roommate SMS] Recipients diagnostic:");
 
     recipients.forEach((user) => {
-        const preferences =
-            user?.notificationPreferences?.whatsapp;
+        const preferences = getWhatsAppPreferencesView(user);
 
         console.log({
             userId: String(user._id),

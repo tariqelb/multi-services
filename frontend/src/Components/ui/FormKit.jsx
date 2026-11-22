@@ -2,6 +2,7 @@
 // One design for every insert / publish form in the application
 // (properties, roommate announcements, establishments...).
 
+import { pagePaddingSx } from "./PageContainer";
 import { Children, isValidElement } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,18 +25,9 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 // Page container
 // -----------------------------------------------------------------------------
 
-export function FormPage({ children, maxWidth = 1040 }) {
+export function FormPage({ children }) {
     return (
-        <Box
-            sx={{
-                width: "100%",
-                maxWidth,
-                mx: "auto",
-                px: { xs: 1.5, sm: 3 },
-                py: { xs: 2, md: 4 },
-                boxSizing: "border-box",
-            }}
-        >
+        <Box sx={pagePaddingSx}>
             {children}
         </Box>
     );

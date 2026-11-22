@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import getImageUrl from "../../../utils/getImageUrl";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -13,44 +14,8 @@ import {
 } from "@mui/material";
 
 import PropertyCard from "./PropertyCard";
-import PropertyCategoryBar from "./PropertyCategoryBar";
+import PropertyCategoryBar, { DEFAULT_FURNISHING, DEFAULT_STATUS } from "./PropertyCategoryBar";
 import axiosInstance from "../../../api/axiosInstance";
-
-const normalize = (value) =>
-    String(value ?? "")
-        .trim()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
-
-const normalizeCity = (value) => {
-    const city = normalize(value);
-
-    if (city === "tanger") return "tangier";
-    if (city === "marrakech") return "marrakesh";
-    if (city === "fes") return "fez";
-
-    return city;
-};
-
-// Identify furnished rental properties.
-// These belong exclusively to the Furnished Properties page.
-const isFurnishedRental = (property) => {
-    const isForRent =
-        normalize(property.listingType) === "for rent";
-
-    const furnishingStatus = normalize(
-        property.furnishingStatus
-    );
-
-    const isFurnished = [
-        "furnished",
-        "fully furnished",
-        "furnished property",
-    ].includes(furnishingStatus);
-
-    return isForRent && isFurnished;
-};
 
 // Keep internal category values unchanged.
 // Only their displayed labels are translated.
@@ -98,6 +63,13 @@ export default function PropertyList({
     const [selectedCity, setSelectedCity] =
         useState("All Cities");
 
+    // Unfurnished by default; furnished rentals have their own page.
+    const [selectedFurnishing, setSelectedFurnishing] =
+        useState(DEFAULT_FURNISHING);
+
+    // Available by default (sold / rented on demand, inactive never).
+    const [selectedStatus, setSelectedStatus] = useState(DEFAULT_STATUS);
+
     const [page, setPage] = useState(1);
 
     const itemsPerPage = 9;
@@ -141,8 +113,12 @@ export default function PropertyList({
         }
     }, [location, navigate]);
 
-    // Fetch all properties from the backend.
-    // Furnished rentals are filtered on the frontend.
+    const [total, setTotal] = useState(0);
+    const [serverTotalPages, setServerTotalPages] = useState(0);
+    const [typeCounts, setTypeCounts] = useState(null);
+
+    // One page at a time, filtered by the server.
+    // Furnished rentals are shown on their own page.
     useEffect(() => {
         let cancelled = false;
 
@@ -151,9 +127,18 @@ export default function PropertyList({
             setError(null);
 
             try {
-                const response = await axiosInstance.get(
-                    "/property/getlist"
-                );
+                const response = await axiosInstance.get("/property/getlist", {
+                    params: {
+                        page,
+                        limit: itemsPerPage,
+                        furnishing: selectedFurnishing,
+                        status: selectedStatus,
+                        propertyType: selectedCategory,
+                        listingType: selectedListingType,
+                        rentalPeriod: selectedListingType === "For Rent" ? selectedRentalPeriod : "All",
+                        city: selectedCity,
+                    },
+                });
 
                 const data = response.data;
 
@@ -165,7 +150,9 @@ export default function PropertyList({
 
                 if (!cancelled) {
                     setProperties(propertyList);
-                    setPage(1);
+                    setTotal(data?.pagination?.total ?? propertyList.length);
+                    setServerTotalPages(data?.pagination?.totalPages ?? 1);
+                    setTypeCounts(data?.typeCounts || null);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -187,47 +174,11 @@ export default function PropertyList({
         return () => {
             cancelled = true;
         };
-    }, [refreshTrigger]);
+    }, [refreshTrigger, page, selectedCategory, selectedListingType, selectedRentalPeriod, selectedCity, selectedFurnishing, selectedStatus]);
 
-    // GENERAL PROPERTIES:
-    // Exclude furnished properties for rent.
-    // These are displayed on the Furnished Properties page instead.
-    const generalProperties = properties.filter(
-        (property) => !isFurnishedRental(property)
-    );
-
-    // Apply category, transaction type, rental period, and city filters.
-    const filteredProperties = generalProperties.filter(
-        (property) => {
-            const matchesCategory =
-                selectedCategory === "All Properties" ||
-                normalize(property.propertyType) ===
-                    normalize(selectedCategory);
-
-            const matchesListingType =
-                selectedListingType === "All" ||
-                normalize(property.listingType) ===
-                    normalize(selectedListingType);
-
-            const matchesRentalPeriod =
-                selectedListingType !== "For Rent" ||
-                selectedRentalPeriod === "All" ||
-                normalize(property.rentalPeriod) ===
-                    normalize(selectedRentalPeriod);
-
-            const matchesCity =
-                selectedCity === "All Cities" ||
-                normalizeCity(property.city) ===
-                    normalizeCity(selectedCity);
-
-            return (
-                matchesCategory &&
-                matchesListingType &&
-                matchesRentalPeriod &&
-                matchesCity
-            );
-        }
-    );
+    // Already filtered and paged by the server.
+    const generalProperties = properties;
+    const filteredProperties = properties;
 
     const handleCategoryChange = (category) => {
         if (externalOnCategoryChange) {
@@ -257,6 +208,16 @@ export default function PropertyList({
 
     const handleCityChange = (city) => {
         setSelectedCity(city);
+        setPage(1);
+    };
+
+    const handleFurnishingChange = (furnishing) => {
+        setSelectedFurnishing(furnishing);
+        setPage(1);
+    };
+
+    const handleStatusChange = (status) => {
+        setSelectedStatus(status);
         setPage(1);
     };
 
@@ -295,30 +256,28 @@ export default function PropertyList({
         onSelectProperty?.(property);
     };
 
-    const totalPages = Math.ceil(
-        filteredProperties.length / itemsPerPage
-    );
-
-    const displayedProperties = filteredProperties.slice(
-        (page - 1) * itemsPerPage,
-        page * itemsPerPage
-    );
+    const totalPages = serverTotalPages;
+    const displayedProperties = filteredProperties;
 
     const hasActiveFilters =
         selectedCategory !== "All Properties" ||
         selectedListingType !== "All" ||
         selectedRentalPeriod !== "All" ||
-        selectedCity !== "All Cities";
+        selectedCity !== "All Cities" ||
+        selectedFurnishing !== DEFAULT_FURNISHING ||
+        selectedStatus !== DEFAULT_STATUS;
 
     const clearFilters = () => {
         handleCategoryChange("All Properties");
         handleListingTypeChange("All");
         handleRentalPeriodChange("All");
         handleCityChange("All Cities");
+        handleFurnishingChange(DEFAULT_FURNISHING);
+        handleStatusChange(DEFAULT_STATUS);
     };
 
-    // Loading state.
-    if (loading) {
+    // Loading state (first load only: later pages keep the filters visible).
+    if (loading && typeCounts === null) {
         return (
             <Box
                 sx={{
@@ -364,15 +323,7 @@ export default function PropertyList({
         <Box
             ref={listRef}
             sx={{
-                p: {
-                    xs: 1.5,
-                    sm: 2.5,
-                    md: 4,
-                },
-                width: "100%",
-                maxWidth: "100%",
-                minWidth: 0,
-                boxSizing: "border-box",
+                ...pagePaddingSx,
                 overflowX: "clip",
                 scrollMarginTop: "80px",
             }}
@@ -387,6 +338,7 @@ export default function PropertyList({
             >
                 <PropertyCategoryBar
                     properties={generalProperties}
+                    typeCounts={typeCounts}
                     selectedCategory={selectedCategory}
                     onCategoryChange={handleCategoryChange}
                     selectedListingType={selectedListingType}
@@ -395,6 +347,10 @@ export default function PropertyList({
                     onRentalPeriodChange={handleRentalPeriodChange}
                     selectedCity={selectedCity}
                     onCityChange={handleCityChange}
+                    selectedFurnishing={selectedFurnishing}
+                    onFurnishingChange={handleFurnishingChange}
+                    selectedStatus={selectedStatus}
+                    onStatusChange={handleStatusChange}
                 />
             </Box>
 
@@ -441,7 +397,7 @@ export default function PropertyList({
                     }}
                 >
                     {t("properties.list.propertyCount", {
-                        count: filteredProperties.length,
+                        count: total,
                     })}
                 </Typography>
             </Box>
@@ -518,6 +474,9 @@ export default function PropertyList({
                             minWidth: 0,
                             alignItems: "stretch",
                             boxSizing: "border-box",
+                            // Dim while the next page loads.
+                            opacity: loading ? 0.55 : 1,
+                            transition: "opacity 0.2s ease",
                         }}
                     >
                         {displayedProperties.map((property) => {

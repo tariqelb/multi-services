@@ -1,258 +1,192 @@
+// Admin: review everything users publish (properties, establishments and
+// roommate announcements), filter by type and period, open or delete.
 
-import PageHeader from "../../../Components/ui/PageHeader";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-    Alert,
-    Box,
-    CircularProgress,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    Stack,
-    Typography,
-} from "@mui/material";
-
-import {
-    Article,
-    CalendarMonth,
-} from "@mui/icons-material";
+import { Alert, Box, Button, CircularProgress, Snackbar, Stack, Typography } from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { Article, CalendarMonth } from "@mui/icons-material";
 
 import axiosInstance from "../../../api/axiosInstance";
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
+import PageHeader from "../../../Components/ui/PageHeader";
+import { FilterChips, FilterSelect } from "../../../Components/ui/FilterKit";
 import PublicationReviewCard from "./PublicationReviewCard";
+import { KIND_META } from "./publicationKinds";
 
-const DATE_FILTERS = [
-    { value: "today", label: "today" },
-    { value: "week", label: "week" },
-    { value: "month", label: "month" },
-    { value: "year", label: "year" },
-    { value: "all", label: "all" },
-];
+const PERIODS = ["today", "week", "month", "year", "all"];
+const KINDS = ["all", "property", "establishment", "roommate"];
 
 export default function PublicationsReviewSection() {
     const { t } = useTranslation();
 
     const [period, setPeriod] = useState("today");
-    const [properties, setProperties] = useState([]);
+    const [kind, setKind] = useState("all");
+    const [publications, setPublications] = useState([]);
+    const [counts, setCounts] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [notice, setNotice] = useState("");
 
     const fetchPublications = useCallback(async () => {
         try {
             setLoading(true);
             setError("");
 
-            const response = await axiosInstance.get(
-                "/property/admin-listings",
-                {
-                    params: { period },
-                }
-            );
+            const response = await axiosInstance.get("/dashboard/publications", {
+                params: { period, type: kind },
+            });
 
-            const data = response.data;
-
-            const propertyList = Array.isArray(data)
-                ? data
-                : Array.isArray(data?.properties)
-                  ? data.properties
-                  : [];
-
-            setProperties(propertyList);
+            setPublications(Array.isArray(response.data?.publications) ? response.data.publications : []);
+            setCounts(response.data?.counts || {});
         } catch (err) {
-            console.error(
-                "Failed to fetch publications:",
-                err.response?.data || err.message
-            );
-
-            setError(
-                err.response?.data?.message ||
-                    t("adminPublications.errors.load")
-            );
+            console.error("Failed to fetch publications:", err.response?.data || err.message);
+            setError(err.response?.data?.message || t("adminPublications.errors.load"));
         } finally {
             setLoading(false);
         }
-    }, [period, t]);
+    }, [period, kind, t]);
 
     useEffect(() => {
         fetchPublications();
     }, [fetchPublications]);
 
-    const handlePeriodChange = (event) => {
-        setPeriod(event.target.value);
+    const handleDeleted = (id, deletedKind) => {
+        setPublications((current) => current.filter((item) => (item._id || item.id) !== id));
+        setCounts((current) => ({
+            ...current,
+            [deletedKind]: Math.max(0, (current[deletedKind] || 0) - 1),
+            all: Math.max(0, (current.all || 0) - 1),
+        }));
+        setNotice(t("adminPublications.notifications.deleteSuccess"));
     };
 
+    const total = counts[kind] ?? publications.length;
+
     return (
-        <Box sx={{ width: "100%", minWidth: 0, boxSizing: "border-box", px: { xs: 2, sm: 3, md: 4 }, py: { xs: 3, md: 4 } }}>
-            {/* Heading and date filter */}
+        <Box sx={pagePaddingSx}>
             <PageHeader
                 icon={<Article />}
                 title={t("adminPublications.title")}
                 subtitle={t("adminPublications.subtitle")}
                 action={
-                <FormControl
-                    size="small"
-                    sx={{
-                        minWidth: {
-                            xs: "100%",
-                            sm: 190,
-                        },
-                        bgcolor: "#fff",
-                    }}
-                >
-                    <InputLabel id="publication-period-label">
-                        {t("adminPublications.dateRange")}
-                    </InputLabel>
-
-                    <Select
-                        labelId="publication-period-label"
-                        value={period}
-                        label={t("adminPublications.dateRange")}
-                        onChange={handlePeriodChange}
-                        startAdornment={
-                            <CalendarMonth
-                                sx={{
-                                    mr: 1,
-                                    color: "#64748b",
-                                    fontSize: 20,
-                                }}
-                            />
-                        }
-                    >
-                        {DATE_FILTERS.map((filter) => (
-                            <MenuItem
-                                key={filter.value}
-                                value={filter.value}
-                            >
-                                {t(
-                                    `adminPublications.periods.${filter.label}`
-                                )}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                    <Box sx={{ minWidth: { xs: "100%", sm: 200 } }}>
+                        <FilterSelect
+                            label={t("adminPublications.dateRange")}
+                            value={period}
+                            onChange={setPeriod}
+                            startIcon={<CalendarMonth fontSize="small" />}
+                            options={PERIODS.map((value) => ({
+                                value,
+                                label: t(`adminPublications.periods.${value}`),
+                            }))}
+                        />
+                    </Box>
                 }
             />
 
-            {/* Publication count */}
+            {/* Type filter + count */}
             <Box
-                sx={{
-                    p: 2.5,
+                sx={(theme) => ({
+                    p: { xs: 1.5, sm: 2 },
                     mb: 3,
-                    border: "1px solid #DBEAFE",
+                    border: "1px solid",
+                    borderColor: alpha(theme.palette.primary.main, 0.2),
                     borderRadius: "14px",
-                    bgcolor: "#EFF6FF",
+                    bgcolor: alpha(theme.palette.primary.main, 0.04),
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: { xs: "stretch", md: "center" },
+                    flexDirection: { xs: "column", md: "row" },
                     justifyContent: "space-between",
                     gap: 2,
-                }}
+                })}
             >
-                <Box>
-                    <Typography
-                        variant="body2" sx={{ color: "#475569", fontWeight: 600 }}
-                    >
-                        {t("adminPublications.count")}
-                    </Typography>
+                <FilterChips
+                    label={t("adminPublications.typeLabel")}
+                    value={kind}
+                    onChange={setKind}
+                    options={KINDS.map((value) => ({
+                        value,
+                        label: t(`adminPublications.kinds.${value}`),
+                        count: loading && counts[value] === undefined ? undefined : counts[value] ?? 0,
+                        icon: KIND_META[value]?.icon,
+                    }))}
+                />
 
-                    <Typography
-                        variant="body2"
-                        sx={{ color: "#64748b", mt: 0.5 }}
-                    >
-                        {t(`adminPublications.periods.${period}`)}
+                <Stack sx={{ alignItems: { xs: "flex-start", md: "flex-end" }, flexShrink: 0 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: "primary.main", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
+                        {loading ? "—" : total}
                     </Typography>
-                </Box>
-
-                <Typography
-                    variant="h4"
-                    sx={{ fontWeight: 800, color: "#2563EB",
-                        fontVariantNumeric: "tabular-nums",
-                    }}
-                >
-                    {loading ? "—" : properties.length}
-                </Typography>
+                    <Typography variant="caption" sx={{ color: "text.secondary", mt: 0.5 }}>
+                        {t("adminPublications.count")} · {t(`adminPublications.periods.${period}`)}
+                    </Typography>
+                </Stack>
             </Box>
 
-            {/* Loading */}
             {loading && (
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        py: 8,
-                    }}
-                >
+                <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
                     <CircularProgress />
                 </Box>
             )}
 
-            {/* Error */}
             {!loading && error && (
                 <Alert
                     severity="error"
                     action={
-                        <button
-                            type="button"
-                            onClick={fetchPublications}
-                        >
-                            {t("adminPublications.retry", {
-                                defaultValue: "Retry",
-                            })}
-                        </button>
+                        <Button color="inherit" size="small" onClick={fetchPublications}>
+                            {t("adminPublications.retry", { defaultValue: "Retry" })}
+                        </Button>
                     }
                 >
                     {error}
                 </Alert>
             )}
 
-            {/* Empty state */}
-            {!loading && !error && properties.length === 0 && (
+            {!loading && !error && publications.length === 0 && (
                 <Box
                     sx={{
                         py: 7,
                         px: 2,
                         textAlign: "center",
-                        border: "1px dashed #cbd5e1",
+                        border: "1px dashed",
+                        borderColor: "divider",
                         borderRadius: "16px",
-                        bgcolor: "#F8FAFC",
+                        bgcolor: "background.muted",
                     }}
                 >
-                    <Article
-                        sx={{
-                            fontSize: 42,
-                            color: "#94a3b8",
-                            mb: 1,
-                        }}
-                    />
-
-                    <Typography
-                        variant="h6" sx={{ fontWeight: 700, color: "#334155" }}
-                    >
+                    <Article sx={{ fontSize: 42, color: "text.disabled", mb: 1 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         {t("adminPublications.empty.title")}
                     </Typography>
-
-                    <Typography
-                        variant="body2"
-                        sx={{ color: "#64748b", mt: 0.5 }}
-                    >
+                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
                         {t("adminPublications.empty.description")}
                     </Typography>
                 </Box>
             )}
 
-            {/* Publications list */}
-            {!loading && !error && properties.length > 0 && (
+            {!loading && !error && publications.length > 0 && (
                 <Stack spacing={2.5}>
-                    {properties.map((property) => (
+                    {publications.map((publication) => (
                         <PublicationReviewCard
-                            key={property._id || property.id}
-                            property={property}
-                            onDeleted={fetchPublications}
+                            key={`${publication.kind}-${publication._id || publication.id}`}
+                            publication={publication}
+                            onDeleted={handleDeleted}
                         />
                     ))}
                 </Stack>
             )}
+
+            <Snackbar
+                open={Boolean(notice)}
+                autoHideDuration={4000}
+                onClose={() => setNotice("")}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+                <Alert severity="success" variant="filled" onClose={() => setNotice("")}>
+                    {notice}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

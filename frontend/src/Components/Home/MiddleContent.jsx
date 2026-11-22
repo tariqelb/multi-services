@@ -94,7 +94,6 @@ export default function MiddleContent({ activeNav }) {
                     section: activeNav,
                 })}
                 subtitle={t("middleContent.subtitle")}
-                maxWidth={1280}
             >
                 <Grid
                     container

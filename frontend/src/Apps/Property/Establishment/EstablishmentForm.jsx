@@ -406,6 +406,7 @@ export default function EstablishmentForm({
     handleSubmit,
     resetForm,
     closeNotification,
+    isEdit = false,
 }) {
     const { t } = useTranslation();
     const coverInputRef = useRef(null);
@@ -485,11 +486,15 @@ export default function EstablishmentForm({
             <FormPageHeader
                 icon={<AddBusinessOutlinedIcon />}
                 badge={tr("badge", "ACCOMMODATION")}
-                title={tr("title", "Add your establishment")}
-                subtitle={tr(
-                    "description",
-                    "Create a detailed profile for your hotel, riad, guesthouse or other accommodation."
-                )}
+                title={isEdit ? tr("editTitle", "Edit your establishment") : tr("title", "Add your establishment")}
+                subtitle={
+                    isEdit
+                        ? tr("editDescription", "Update the information, rooms and photos of your establishment.")
+                        : tr(
+                            "description",
+                            "Create a detailed profile for your hotel, riad, guesthouse or other accommodation."
+                        )
+                }
                 showRequiredNote
             />
 
@@ -1441,11 +1446,11 @@ export default function EstablishmentForm({
 
                 {/* SUBMIT */}
                 <FormSubmitBar
-                    title={tr("submit.title", "Ready to create your establishment?")}
+                    title={isEdit ? tr("submit.editTitle", "Save your changes") : tr("submit.title", "Ready to create your establishment?")}
                     subtitle={tr("submit.description", "Check your information before submitting.")}
                     loading={loading}
-                    submitLabel={tr("actions.create", "Create establishment")}
-                    loadingLabel={tr("actions.publishing", "Publishing...")}
+                    submitLabel={isEdit ? tr("actions.save", "Save changes") : tr("actions.create", "Create establishment")}
+                    loadingLabel={isEdit ? tr("actions.saving", "Saving...") : tr("actions.publishing", "Publishing...")}
                     resetLabel={tr("actions.reset", "Reset")}
                     onReset={resetForm}
                 />

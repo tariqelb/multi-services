@@ -62,7 +62,10 @@ export default function LoginLanguageSwitcher({
     }, []);
 
     return (
-        <div ref={dropdownRef} className="relative">
+        // The switcher always sits in the top-right corner of the auth pages,
+        // so it keeps the English (LTR) layout in every language: the menu
+        // opens toward the left and always stays inside the page.
+        <div ref={dropdownRef} className="relative" dir="ltr">
             {/* Dropdown trigger */}
             <button
                 type="button"
@@ -81,7 +84,7 @@ export default function LoginLanguageSwitcher({
                     className={isLogin ? "text-blue-600" : ""}
                 />
 
-                <span className={`flex-1 text-start ${
+                <span className={`flex-1 text-left ${
                     isLogin
                         ? "text-sm font-semibold text-slate-800"
                         : "text-sm font-medium uppercase"
@@ -104,7 +107,7 @@ export default function LoginLanguageSwitcher({
                 <div
                     role="listbox"
                     aria-label={t("language.available", "Available languages")}
-                    className={`absolute end-0 z-[100] mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white py-1.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 ${
+                    className={`absolute right-0 left-auto z-[100] mt-2 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-200 bg-white py-1.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 ${
                         isLogin ? "w-48" : "w-40"
                     }`}
                 >

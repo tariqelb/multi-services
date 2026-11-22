@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import axiosInstance from "../../../api/axiosInstance";
 import PageLayout from "../Statistic/PageLayout";
+import { DEFAULT_ARTICLE_IMAGE, getKnowledgeImage } from "./knowledgeImages";
 
 import {
     Alert,
@@ -70,12 +71,29 @@ const formatDate = (date, locale = "en-GB") => {
     }).format(parsedDate);
 };
 
+/** Image that falls back to the default article image when it fails. */
+function KnowledgeImage({ item, sx }) {
+    const [failed, setFailed] = useState(false);
+    const src = failed && item.type === "article" ? DEFAULT_ARTICLE_IMAGE : getKnowledgeImage(item);
+
+    if (!src || (failed && item.type !== "article")) return null;
+
+    return (
+        <Box
+            component="img"
+            src={src}
+            alt={item.title}
+            loading="lazy"
+            onError={() => {
+                if (src !== DEFAULT_ARTICLE_IMAGE) setFailed(true);
+            }}
+            sx={{ display: "block", width: "100%", aspectRatio: "16 / 9", objectFit: "cover", bgcolor: "action.hover", ...sx }}
+        />
+    );
+}
+
 function RelatedContentCard({ item, onClick, t }) {
-    const thumbnail =
-        item.thumbnailUrl ||
-        (item.type === "video" && item.youtubeVideoId
-            ? `https://img.youtube.com/vi/${item.youtubeVideoId}/hqdefault.jpg`
-            : "");
+    const thumbnail = getKnowledgeImage(item);
 
     const categoryKey = categories.find(
         (category) => category.value === item.category
@@ -99,18 +117,7 @@ function RelatedContentCard({ item, onClick, t }) {
                 sx={{ height: "100%" }}
             >
                 {thumbnail ? (
-                    <Box
-                        component="img"
-                        src={thumbnail}
-                        alt={item.title}
-                        sx={{
-                            display: "block",
-                            width: "100%",
-                            aspectRatio: "16 / 9",
-                            objectFit: "cover",
-                            bgcolor: "action.hover",
-                        }}
-                    />
+                    <KnowledgeImage item={item} />
                 ) : (
                     <Box
                         sx={{
@@ -417,6 +424,12 @@ export default function KnowledgeDetails() {
                                 </Alert>
                             )
                         ) : (
+                            <>
+                            <KnowledgeImage
+                                item={item}
+                                sx={{ maxWidth: 1000, mx: "auto", borderRadius: 3 }}
+                            />
+
                             <Box
                                 sx={{
                                     p: { xs: 2, sm: 3 },
@@ -458,6 +471,7 @@ export default function KnowledgeDetails() {
                                     )}
                                 </Stack>
                             </Box>
+                            </>
                         )}
 
                         {item.description && (

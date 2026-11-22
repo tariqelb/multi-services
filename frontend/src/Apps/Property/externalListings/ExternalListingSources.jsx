@@ -1,371 +1,868 @@
-import { useEffect, useState } from "react";
+// Admin page: collect new external listings from a whole website.
+//
+// Type a website (or pick one), choose how many NEW listings you want,
+// click Collect. The backend visits the website, skips listings already in
+// the application and saves the new ones. Progress is polled live.
+//
+// "Check listings availability" removes listings that no longer exist on
+// their website (AvailabilityCheck.jsx).
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import {
+    Alert,
+    Autocomplete,
+    Avatar,
+    Box,
+    Button,
+    Chip,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Divider,
+    IconButton,
+    InputAdornment,
+    LinearProgress,
+    Link,
+    Stack,
+    TextField,
+    Tooltip,
+    Typography,
+} from "@mui/material";
+import { alpha } from "@mui/material/styles";
+
+import TravelExploreOutlinedIcon from "@mui/icons-material/TravelExploreOutlined";
+import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
+import CloudDownloadOutlinedIcon from "@mui/icons-material/CloudDownloadOutlined";
+import StopCircleOutlinedIcon from "@mui/icons-material/StopCircleOutlined";
+import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
+import HideImageOutlinedIcon from "@mui/icons-material/HideImageOutlined";
+import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
+import TravelExploreRoundedIcon from "@mui/icons-material/TravelExploreRounded";
+import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
+import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
+
 import axiosInstance from "../../../api/axiosInstance";
+import PageHeader from "../../../Components/ui/PageHeader";
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
+import { filterFieldSx } from "../../../Components/ui/FilterKit";
+import { SectionCard, StatTile } from "./sourcesUi";
+import { formatDate, getLocale } from "./sourcesFormat";
+import AvailabilityCheck from "./AvailabilityCheck";
+
+const API = "/external-listings";
+const POLL_INTERVAL = 2000;
+const DEFAULT_COUNT = 10;
+
+/* --------------------------------------------------
+   Page
+-------------------------------------------------- */
 
 export default function ExternalListingSources() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = getLocale(i18n.resolvedLanguage || i18n.language);
+    const tr = useCallback((key, fallback, options) => t(`externalSources.${key}`, { defaultValue: fallback, ...options }), [t]);
 
-    const [urls, setUrls] = useState([]);
-    const [url, setUrl] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [websites, setWebsites] = useState([]);
+    const [maxPerRun, setMaxPerRun] = useState(50);
+    const [loadingWebsites, setLoadingWebsites] = useState(true);
+
+    const [website, setWebsite] = useState("");
+    const [count, setCount] = useState(DEFAULT_COUNT);
+
+    const [job, setJob] = useState(null);
+    const [history, setHistory] = useState([]);
+    const [running, setRunning] = useState(false);
+    const [starting, setStarting] = useState(false);
+
+    const [exampleUrl, setExampleUrl] = useState("");
+    const [teaching, setTeaching] = useState(false);
+
     const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
-    const [removingUrl, setRemovingUrl] = useState("");
+    const [notice, setNotice] = useState("");
     const [refreshing, setRefreshing] = useState(false);
-    const [importing, setImporting] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
 
-    async function loadSources() {
+    // Availability check (see AvailabilityCheck.jsx)
+    const [checkRunning, setCheckRunning] = useState(false);
+    const [checkWebsite, setCheckWebsite] = useState("");
+
+    const pollRef = useRef(null);
+
+    /* ---------- data ---------- */
+
+    const loadWebsites = useCallback(async () => {
         try {
-            setLoading(true);
-            setError("");
-
-            const response = await axiosInstance.get(
-                "/external-listings/sources"
-            );
-
-            const sources = response.data.urls || [];
-
-            setUrls(
-                sources
-                    .map((source) =>
-                        typeof source === "string" ? source : source.url
-                    )
-                    .filter(Boolean)
-                    .reverse()
-            );
+            setLoadingWebsites(true);
+            const response = await axiosInstance.get(`${API}/websites`);
+            setWebsites(response.data.websites || []);
+            setMaxPerRun(response.data.maxPerRun || 50);
         } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                    t("externalSources.errors.load")
-            );
+            setError(err.response?.data?.message || tr("errors.load", "Failed to load listing sources."));
         } finally {
-            setLoading(false);
+            setLoadingWebsites(false);
         }
-    }
+    }, [tr]);
 
-    useEffect(() => {
-        loadSources();
+    const loadStatus = useCallback(async () => {
+        try {
+            const response = await axiosInstance.get(`${API}/collect-site/status`);
+            const { current, running: isRunning, history: runs } = response.data;
+
+            setJob(current || null);
+            setRunning(Boolean(isRunning));
+            setHistory(runs || []);
+
+            return Boolean(isRunning);
+        } catch {
+            return false;
+        }
     }, []);
 
-    async function handleRefresh() {
+    const stopPolling = () => {
+        if (pollRef.current) {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+        }
+    };
+
+    const startPolling = useCallback(() => {
+        stopPolling();
+
+        pollRef.current = setInterval(async () => {
+            const stillRunning = await loadStatus();
+
+            if (!stillRunning) {
+                stopPolling();
+                loadWebsites();
+            }
+        }, POLL_INTERVAL);
+    }, [loadStatus, loadWebsites]);
+
+    useEffect(() => {
+        loadWebsites();
+
+        loadStatus().then((isRunning) => {
+            if (isRunning) startPolling();
+        });
+
+        return stopPolling;
+    }, [loadWebsites, loadStatus, startPolling]);
+
+    /* ---------- actions ---------- */
+
+    const handleCollect = async (event) => {
+        event?.preventDefault();
         setError("");
-        setMessage("");
-        setRefreshing(true);
+        setNotice("");
+
+        const target = String(website || "").trim();
+
+        if (!target) {
+            setError(tr("collect.websiteRequired", "Type or choose a website."));
+            return;
+        }
 
         try {
-            const response = await axiosInstance.post(
-                "/external-listings/refresh"
-            );
+            setStarting(true);
 
-            setMessage(
-                response.data.message ||
-                    t("externalSources.messages.refreshSuccess")
-            );
+            const response = await axiosInstance.post(`${API}/collect-site`, {
+                website: target,
+                count,
+            });
+
+            setJob(response.data.job);
+            setRunning(true);
+            startPolling();
         } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                    t("externalSources.errors.refresh")
-            );
+            setError(err.response?.data?.message || tr("collect.startError", "Could not start the collection."));
+        } finally {
+            setStarting(false);
+        }
+    };
+
+    const handleCancel = async () => {
+        try {
+            await axiosInstance.post(`${API}/collect-site/cancel`);
+            setNotice(tr("collect.stopping", "Stopping after the current listing..."));
+        } catch (err) {
+            setError(err.response?.data?.message || tr("collect.cancelError", "Could not stop the collection."));
+        }
+    };
+
+    const handleTeach = async () => {
+        setError("");
+        setNotice("");
+
+        try {
+            setTeaching(true);
+            const response = await axiosInstance.post(`${API}/websites`, { website: exampleUrl.trim() });
+            setNotice(response.data.message);
+            setExampleUrl("");
+            await loadWebsites();
+        } catch (err) {
+            setError(err.response?.data?.message || tr("collect.teachError", "Could not use this listing URL."));
+        } finally {
+            setTeaching(false);
+        }
+    };
+
+    const handleRefreshExisting = async () => {
+        setError("");
+        setNotice("");
+
+        try {
+            setRefreshing(true);
+            const response = await axiosInstance.post(`${API}/refresh`);
+            setNotice(response.data.message || tr("messages.refreshSuccess", "External listings refreshed successfully."));
+        } catch (err) {
+            setError(err.response?.data?.message || tr("errors.refresh", "Failed to refresh external listings."));
         } finally {
             setRefreshing(false);
         }
-    }
+    };
 
-    async function handleImport() {
-        setError("");
-        setMessage("");
-        setImporting(true);
+    const handleDelete = async () => {
+        if (!deleteTarget) return;
 
         try {
-            const response = await axiosInstance.post(
-                "/external-listings/import"
+            const response = await axiosInstance.delete(
+                `${API}/websites/${encodeURIComponent(deleteTarget.hostname)}`
             );
-
-            setMessage(
-                response.data.message ||
-                    t("externalSources.messages.importSuccess")
-            );
+            setNotice(response.data.message);
+            setDeleteTarget(null);
+            await loadWebsites();
         } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                    t("externalSources.errors.import")
-            );
-        } finally {
-            setImporting(false);
+            setError(err.response?.data?.message || tr("errors.delete", "Failed to delete listing source."));
+            setDeleteTarget(null);
         }
-    }
+    };
 
-    async function handleAdd(event) {
-        event.preventDefault();
-        setError("");
-        setMessage("");
+    /* ---------- derived ---------- */
 
-        const trimmedUrl = url.trim();
+    const websiteOptions = useMemo(
+        () => websites.map((item) => item.hostname).filter(Boolean),
+        [websites]
+    );
 
-        try {
-            const response = await axiosInstance.post(
-                "/external-listings/sources",
-                { url: trimmedUrl }
-            );
+    const websiteByHost = useMemo(
+        () => new Map(websites.map((item) => [item.hostname, item])),
+        [websites]
+    );
 
-            setMessage(
-                response.data.message ||
-                    t("externalSources.messages.addSuccess")
-            );
+    const progress = job?.requested ? Math.min(100, Math.round((job.saved / job.requested) * 100)) : 0;
 
-            setUrl("");
+    const finishedJob = job && !running ? job : null;
+    const showTeach = finishedJob && finishedJob.discovered === 0 && finishedJob.status !== "failed";
 
-            await loadSources();
+    const phaseLabel = (phase) =>
+        ({
+            starting: tr("collect.phase.starting", "Starting..."),
+            discovering: tr("collect.phase.discovering", "Looking for listings on the website..."),
+            extracting: tr("collect.phase.extracting", "Reading a new listing..."),
+        })[phase] || tr("collect.phase.working", "Working...");
 
-            if (response.data.added) {
-                await handleRefresh();
-            }
-        } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                    t("externalSources.errors.add")
-            );
-        }
-    }
+    const statusChip = (status) => {
+        const map = {
+            completed: { color: "success", label: tr("collect.status.completed", "Completed") },
+            running: { color: "info", label: tr("collect.status.running", "Running") },
+            cancelled: { color: "warning", label: tr("collect.status.cancelled", "Stopped") },
+            failed: { color: "error", label: tr("collect.status.failed", "Failed") },
+        };
+        const item = map[status] || { color: "default", label: status };
 
-    async function handleRemove(sourceUrl) {
-        setError("");
-        setMessage("");
-        setRemovingUrl(sourceUrl);
+        return <Chip size="small" color={item.color} label={item.label} sx={{ fontWeight: 700 }} />;
+    };
 
-        try {
-            await axiosInstance.delete(
-                "/external-listings/sources",
-                { data: { url: sourceUrl } }
-            );
-
-            setUrls((current) =>
-                current.filter((item) => item !== sourceUrl)
-            );
-
-            setMessage(t("externalSources.messages.deleteSuccess"));
-        } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                    t("externalSources.errors.delete")
-            );
-        } finally {
-            setRemovingUrl("");
-        }
-    }
+    /* ---------- render ---------- */
 
     return (
-        <section className="mx-auto box-border w-full min-w-0 max-w-[1120px] overflow-x-clip px-4 py-6 sm:px-6 md:px-8 md:py-8">
-            <div className="mb-6">
-                <h1 className="text-[1.875rem] font-bold leading-tight text-slate-900">
-                    {t("externalSources.title")}
-                </h1>
+        <Box sx={pagePaddingSx}>
+            <PageHeader
+                icon={<TravelExploreOutlinedIcon />}
+                title={tr("title", "External Listing Sources")}
+                subtitle={tr(
+                    "collect.pageSubtitle",
+                    "Collect new property listings from external websites. Listings already in your application are skipped automatically."
+                )}
+                action={
+                    <Button
+                        variant="outlined"
+                        startIcon={refreshing ? <CircularProgress size={16} /> : <RefreshRoundedIcon />}
+                        onClick={handleRefreshExisting}
+                        disabled={refreshing || running || checkRunning}
+                    >
+                        {refreshing
+                            ? tr("actions.refreshing", "Refreshing...")
+                            : tr("collect.refreshExisting", "Refresh existing listings")}
+                    </Button>
+                }
+            />
 
-                <p className="mt-1.5 max-w-3xl text-base text-[#64748B]">
-                    {t("externalSources.subtitle")}
-                </p>
-            </div>
+            <Stack spacing={3}>
+                {error && (
+                    <Alert severity="error" onClose={() => setError("")}>
+                        {error}
+                    </Alert>
+                )}
+                {notice && (
+                    <Alert severity="success" onClose={() => setNotice("")}>
+                        {notice}
+                    </Alert>
+                )}
 
-            <form
-                onSubmit={handleAdd}
-                className="mb-6 flex w-full min-w-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:p-4"
-            >
-                <input
-                    type="url"
-                    value={url}
-                    onChange={(event) => setUrl(event.target.value)}
-                    placeholder={t("externalSources.form.placeholder")}
-                    required
-                    aria-label={t("externalSources.form.ariaLabel")}
-                    className="box-border h-12 w-full min-w-0 flex-1 rounded-[10px] border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-base"
+                {/* ---------- Collect form ---------- */}
+                <SectionCard
+                    title={tr("collect.title", "Collect new listings")}
+                    subtitle={tr(
+                        "collect.subtitle",
+                        "Type the website name and how many new listings you want."
+                    )}
+                >
+                    <Box
+                        component="form"
+                        onSubmit={handleCollect}
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: { xs: "1fr", sm: "minmax(0, 1fr) 160px auto" },
+                            gap: 1.5,
+                            alignItems: "start",
+                        }}
+                    >
+                        <Autocomplete
+                            freeSolo
+                            options={websiteOptions}
+                            inputValue={website}
+                            onInputChange={(_event, value) => setWebsite(value)}
+                            disabled={running || checkRunning}
+                            renderOption={(props, option) => {
+                                const { key, ...rest } = props;
+                                const item = websiteByHost.get(option);
+
+                                return (
+                                    <Box component="li" key={key} {...rest}>
+                                        <Stack direction="row" spacing={1.25} sx={{ alignItems: "center", width: "100%" }}>
+                                            <LanguageRoundedIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                                            <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                                                    {item?.sourceName || option}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: "text.secondary" }} noWrap>
+                                                    {option}
+                                                </Typography>
+                                            </Box>
+                                            <Chip
+                                                size="small"
+                                                variant="outlined"
+                                                label={tr("collect.listingCount", "{{count}} listings", {
+                                                    count: item?.activeListingCount || 0,
+                                                })}
+                                            />
+                                        </Stack>
+                                    </Box>
+                                );
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    size="small"
+                                    label={tr("collect.websiteLabel", "Website")}
+                                    placeholder={tr("collect.websitePlaceholder", "e.g. mrsemsar.ma")}
+                                    helperText={tr(
+                                        "collect.websiteHelp",
+                                        "Choose a website or type a new domain."
+                                    )}
+                                    sx={filterFieldSx}
+                                    slotProps={{
+                                        ...params.slotProps,
+                                        input: {
+                                            ...params.slotProps?.input,
+                                            ...params.InputProps,
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <LanguageRoundedIcon fontSize="small" />
+                                                </InputAdornment>
+                                            ),
+                                        },
+                                    }}
+                                />
+                            )}
+                        />
+
+                        <TextField
+                            size="small"
+                            type="number"
+                            label={tr("collect.countLabel", "New listings")}
+                            value={count}
+                            disabled={running || checkRunning}
+                            onChange={(event) => {
+                                const value = Number(event.target.value);
+                                setCount(Number.isFinite(value) ? Math.min(maxPerRun, Math.max(1, Math.round(value))) : 1);
+                            }}
+                            helperText={tr("collect.countHelp", "1 to {{max}}", { max: maxPerRun })}
+                            sx={filterFieldSx}
+                            slotProps={{ htmlInput: { min: 1, max: maxPerRun } }}
+                        />
+
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            startIcon={starting ? <CircularProgress size={16} color="inherit" /> : <CloudDownloadOutlinedIcon />}
+                            disabled={running || starting || checkRunning}
+                            sx={{ height: 40, whiteSpace: "nowrap" }}
+                        >
+                            {tr("collect.button", "Collect")}
+                        </Button>
+                    </Box>
+                </SectionCard>
+
+                {/* ---------- Live progress / result ---------- */}
+                {job && (
+                    <SectionCard
+                        title={
+                            running
+                                ? tr("collect.runningTitle", "Collecting from {{site}}", {
+                                      site: job.sourceName || job.website,
+                                  })
+                                : tr("collect.resultTitle", "Last collection: {{site}}", {
+                                      site: job.sourceName || job.website,
+                                  })
+                        }
+                        subtitle={running ? phaseLabel(job.phase) : formatDate(job.finishedAt, locale)}
+                        action={
+                            running ? (
+                                <Button
+                                    color="warning"
+                                    variant="outlined"
+                                    startIcon={<StopCircleOutlinedIcon />}
+                                    onClick={handleCancel}
+                                    disabled={job.cancelRequested}
+                                >
+                                    {tr("collect.stop", "Stop")}
+                                </Button>
+                            ) : (
+                                statusChip(job.status)
+                            )
+                        }
+                    >
+                        <Stack spacing={2}>
+                            <Box>
+                                <Stack direction="row" sx={{ justifyContent: "space-between", mb: 0.75 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                        {tr("collect.savedOf", "{{saved}} of {{requested}} new listings saved", {
+                                            saved: job.saved,
+                                            requested: job.requested,
+                                        })}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                                        {progress}%
+                                    </Typography>
+                                </Stack>
+                                <LinearProgress
+                                    variant={running && job.saved === 0 ? "indeterminate" : "determinate"}
+                                    value={progress}
+                                    sx={{ height: 8, borderRadius: 4 }}
+                                />
+                                {running && job.currentUrl && (
+                                    <Typography
+                                        variant="caption"
+                                        sx={{ color: "text.secondary", display: "block", mt: 0.75, overflowWrap: "anywhere" }}
+                                    >
+                                        {job.currentUrl}
+                                    </Typography>
+                                )}
+                            </Box>
+
+                            <Box
+                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", md: "repeat(5, minmax(0, 1fr))" },
+                                    gap: 1.25,
+                                }}
+                            >
+                                <StatTile
+                                    icon={<CheckCircleRoundedIcon fontSize="small" />}
+                                    label={tr("collect.stats.saved", "New listings saved")}
+                                    value={job.saved}
+                                    color="success"
+                                />
+                                <StatTile
+                                    icon={<ContentCopyRoundedIcon fontSize="small" />}
+                                    label={tr("collect.stats.alreadyInDb", "Already in your app")}
+                                    value={job.alreadyInDb}
+                                    color="info"
+                                />
+                                <StatTile
+                                    icon={<HideImageOutlinedIcon fontSize="small" />}
+                                    label={tr("collect.stats.noImage", "Skipped (no photo)")}
+                                    value={job.skippedNoImage}
+                                    color="warning"
+                                />
+                                <StatTile
+                                    icon={<ErrorOutlineRoundedIcon fontSize="small" />}
+                                    label={tr("collect.stats.failed", "Failed")}
+                                    value={job.failed}
+                                    color="error"
+                                />
+                                <StatTile
+                                    icon={<TravelExploreRoundedIcon fontSize="small" />}
+                                    label={tr("collect.stats.pages", "Pages scanned")}
+                                    value={job.pagesScanned + (job.sitemapFiles || 0)}
+                                />
+                            </Box>
+
+                            {!running && job.message && (
+                                <Alert
+                                    severity={
+                                        job.status === "failed"
+                                            ? "error"
+                                            : job.saved >= job.requested
+                                              ? "success"
+                                              : job.saved > 0
+                                                ? "info"
+                                                : "warning"
+                                    }
+                                >
+                                    {job.message}
+                                </Alert>
+                            )}
+
+                            {/* Teach the listing path when nothing was found */}
+                            {showTeach && (
+                                <Box
+                                    sx={(theme) => ({
+                                        p: 2,
+                                        borderRadius: "12px",
+                                        border: "1px dashed",
+                                        borderColor: "divider",
+                                        bgcolor: alpha(theme.palette.primary.main, 0.03),
+                                    })}
+                                >
+                                    <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
+                                        <SchoolOutlinedIcon color="primary" fontSize="small" />
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                            {tr("collect.teachTitle", "Help the collector find the listings")}
+                                        </Typography>
+                                    </Stack>
+                                    <Typography variant="body2" sx={{ color: "text.secondary", mb: 1.5 }}>
+                                        {tr(
+                                            "collect.teachText",
+                                            "Paste the link of one listing from this website, then collect again."
+                                        )}
+                                    </Typography>
+                                    <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                                        <TextField
+                                            size="small"
+                                            fullWidth
+                                            type="url"
+                                            value={exampleUrl}
+                                            onChange={(event) => setExampleUrl(event.target.value)}
+                                            placeholder={`https://${job.hostname || "website.ma"}/...`}
+                                            sx={filterFieldSx}
+                                        />
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleTeach}
+                                            disabled={!exampleUrl.trim() || teaching}
+                                            sx={{ whiteSpace: "nowrap" }}
+                                        >
+                                            {tr("collect.teachButton", "Use this link")}
+                                        </Button>
+                                    </Stack>
+                                </Box>
+                            )}
+
+                            {job.savedListings?.length > 0 && (
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                                        {tr("collect.savedListTitle", "Listings added")}
+                                    </Typography>
+                                    <Stack divider={<Divider flexItem />} sx={{ border: "1px solid", borderColor: "divider", borderRadius: "12px" }}>
+                                        {job.savedListings.slice(-10).reverse().map((listing) => (
+                                            <Stack
+                                                key={listing.sourceUrl}
+                                                direction="row"
+                                                spacing={1.5}
+                                                sx={{ alignItems: "center", p: 1.25, minWidth: 0 }}
+                                            >
+                                                <Avatar
+                                                    variant="rounded"
+                                                    src={listing.imageUrl}
+                                                    sx={{ width: 48, height: 40, flexShrink: 0 }}
+                                                />
+                                                <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                                                        {listing.title}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: "text.secondary" }} noWrap component="div">
+                                                        {[listing.city, listing.price != null ? `${Number(listing.price).toLocaleString(locale)} ${listing.currency || "MAD"}` : ""]
+                                                            .filter(Boolean)
+                                                            .join(" · ")}
+                                                    </Typography>
+                                                </Box>
+                                                <Tooltip title={tr("actions.openLink", "Open link")}>
+                                                    <IconButton
+                                                        size="small"
+                                                        component="a"
+                                                        href={listing.sourceUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <OpenInNewRoundedIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Stack>
+                                        ))}
+                                    </Stack>
+                                </Box>
+                            )}
+
+                            {!running && job.errors?.length > 0 && (
+                                <Typography variant="caption" sx={{ color: "text.secondary", overflowWrap: "anywhere" }}>
+                                    {tr("collect.lastError", "Last error:")} {job.errors[job.errors.length - 1]}
+                                </Typography>
+                            )}
+                        </Stack>
+                    </SectionCard>
+                )}
+
+                {/* ---------- Availability check ---------- */}
+                <AvailabilityCheck
+                    tr={tr}
+                    locale={locale}
+                    websites={websites}
+                    website={checkWebsite}
+                    onWebsiteChange={setCheckWebsite}
+                    collectRunning={running}
+                    onRunningChange={setCheckRunning}
+                    onFinished={loadWebsites}
                 />
 
-                <button
-                    type="submit"
-                    disabled={refreshing || importing}
-                    className="h-12 w-full shrink-0 rounded-[10px] bg-blue-600 px-5 font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                {/* ---------- Registered websites ---------- */}
+                <SectionCard
+                    title={tr("collect.websitesTitle", "Websites")}
+                    subtitle={tr(
+                        "collect.websitesSubtitle",
+                        "Websites you collect listings from. Removing a website keeps its listings."
+                    )}
+                    action={
+                        <Chip
+                            color="primary"
+                            variant="outlined"
+                            label={tr("sourceCount", "{{count}} sources", { count: websites.length })}
+                            sx={{ fontWeight: 700 }}
+                        />
+                    }
                 >
-                    {t("externalSources.form.addUrl")}
-                </button>
-            </form>
+                    {loadingWebsites ? (
+                        <Stack sx={{ alignItems: "center", py: 4 }}>
+                            <CircularProgress size={28} />
+                        </Stack>
+                    ) : websites.length === 0 ? (
+                        <Box sx={{ textAlign: "center", py: 4, color: "text.secondary" }}>
+                            <Typography sx={{ fontWeight: 600, color: "text.primary" }}>
+                                {tr("empty.title", "No external listing sources added yet.")}
+                            </Typography>
+                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                {tr("collect.emptyText", "Type a website above to collect its listings.")}
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))", xl: "repeat(3, minmax(0, 1fr))" },
+                                gap: 1.5,
+                            }}
+                        >
+                            {websites.map((item) => (
+                                <Box
+                                    key={item.hostname}
+                                    sx={{
+                                        p: 2,
+                                        borderRadius: "14px",
+                                        border: "1px solid",
+                                        borderColor: "divider",
+                                        transition: "border-color .2s",
+                                        "&:hover": { borderColor: "primary.light" },
+                                        minWidth: 0,
+                                    }}
+                                >
+                                    <Stack direction="row" spacing={1.5} sx={{ alignItems: "flex-start" }}>
+                                        <Avatar
+                                            variant="rounded"
+                                            sx={(theme) => ({
+                                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                                color: "primary.main",
+                                                width: 40,
+                                                height: 40,
+                                            })}
+                                        >
+                                            <LanguageRoundedIcon />
+                                        </Avatar>
 
-            <p className="mb-5 text-sm text-slate-500">
-                {t("externalSources.supportedWebsites")}
-            </p>
+                                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                                            <Typography sx={{ fontWeight: 700 }} noWrap>
+                                                {item.sourceName}
+                                            </Typography>
+                                            <Link
+                                                href={`https://${item.hostname}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                variant="caption"
+                                                underline="hover"
+                                                sx={{ display: "block" }}
+                                                noWrap
+                                            >
+                                                {item.hostname}
+                                            </Link>
+                                        </Box>
 
-            {error && (
-                <div
-                    role="alert"
-                    className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-                >
-                    <span className="min-w-0 break-words">{error}</span>
+                                        <Tooltip title={tr("actions.delete", "Delete")}>
+                                            <span>
+                                                <IconButton
+                                                    size="small"
+                                                    color="error"
+                                                    onClick={() => setDeleteTarget(item)}
+                                                    disabled={running || checkRunning}
+                                                >
+                                                    <DeleteOutlineRoundedIcon fontSize="small" />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    </Stack>
 
-                    <button
-                        type="button"
-                        onClick={loadSources}
-                        className="shrink-0 font-semibold underline underline-offset-2 hover:text-red-900"
+                                    <Stack direction="row" sx={{ flexWrap: "wrap", gap: 0.75, mt: 1.5 }}>
+                                        <Chip
+                                            size="small"
+                                            label={tr("collect.listingCount", "{{count}} listings", {
+                                                count: item.activeListingCount,
+                                            })}
+                                        />
+                                        <Chip
+                                            size="small"
+                                            variant="outlined"
+                                            color={item.pathPrefix === "/" ? "warning" : "default"}
+                                            label={
+                                                item.pathPrefix === "/"
+                                                    ? tr("collect.pathUnknown", "Listing path not detected yet")
+                                                    : tr("collect.pathKnown", "Listings: {{path}}", { path: item.pathPrefix })
+                                            }
+                                        />
+                                    </Stack>
+
+                                    <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mt: 1.25 }}>
+                                        {item.lastCollectedAt
+                                            ? tr("collect.lastCollected", "Last collection: {{date}} · {{saved}} added", {
+                                                  date: formatDate(item.lastCollectedAt, locale),
+                                                  saved: item.lastCollectSummary?.saved ?? 0,
+                                              })
+                                            : tr("collect.neverCollected", "Never collected")}
+                                    </Typography>
+
+                                    <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            startIcon={<CloudDownloadOutlinedIcon />}
+                                            disabled={running || checkRunning}
+                                            onClick={() => {
+                                                setWebsite(item.hostname);
+                                                window.scrollTo({ top: 0, behavior: "smooth" });
+                                            }}
+                                            sx={{ flex: 1, minWidth: 0 }}
+                                        >
+                                            {tr("collect.button", "Collect")}
+                                        </Button>
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            color="secondary"
+                                            startIcon={<FactCheckOutlinedIcon />}
+                                            disabled={running || checkRunning}
+                                            onClick={() => {
+                                                setCheckWebsite(item.hostname);
+                                                document
+                                                    .getElementById("availability-check")
+                                                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                                            }}
+                                            sx={{ flex: 1, minWidth: 0 }}
+                                        >
+                                            {tr("availability.checkShort", "Check")}
+                                        </Button>
+                                    </Stack>
+                                </Box>
+                            ))}
+                        </Box>
+                    )}
+                </SectionCard>
+
+                {/* ---------- Recent collections ---------- */}
+                {history.length > 0 && (
+                    <SectionCard
+                        title={tr("collect.historyTitle", "Recent collections")}
+                        subtitle={tr("collect.historySubtitle", "Since the server last started.")}
                     >
-                        {t("common.retry")}
-                    </button>
-                </div>
-            )}
-
-            {message && (
-                <p
-                    role="status"
-                    className="mb-5 rounded-[10px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
-                >
-                    {message}
-                </p>
-            )}
-
-            <div className="w-full min-w-0">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
-                        {t("externalSources.registeredSources")}
-                    </h2>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
-                            {t("externalSources.sourceCount", {
-                                count: urls.length,
-                            })}
-                        </span>
-
-                        <button
-                            type="button"
-                            onClick={handleImport}
-                            disabled={
-                                importing ||
-                                refreshing ||
-                                loading ||
-                                urls.length === 0
-                            }
-                            className="flex h-9 items-center justify-center gap-2 rounded-[10px] border border-blue-200 px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <svg
-                                className={`h-4 w-4 ${importing ? "animate-spin" : ""}`}
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 4v12m0 0 4-4m-4 4-4-4M5 20h14"
-                                />
-                            </svg>
-
-                            {importing
-                                ? t("externalSources.actions.importing")
-                                : t("externalSources.actions.import")}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={handleRefresh}
-                            disabled={
-                                refreshing ||
-                                importing ||
-                                loading ||
-                                urls.length === 0
-                            }
-                            className="flex h-9 items-center justify-center gap-2 rounded-[10px] border border-blue-200 px-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <svg
-                                className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0 1 18 6l2 3M18.5 15A7 7 0 0 1 6 18l-2-3"
-                                />
-                            </svg>
-
-                            {refreshing
-                                ? t("externalSources.actions.refreshing")
-                                : t("externalSources.actions.refresh")}
-                        </button>
-                    </div>
-                </div>
-
-                {loading ? (
-                    <div className="flex min-h-40 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white p-6">
-                        <p className="text-sm text-slate-500">
-                            {t("externalSources.loading")}
-                        </p>
-                    </div>
-                ) : urls.length === 0 ? (
-                    <div className="flex min-h-40 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center sm:py-12">
-                        <p className="font-semibold text-slate-700">
-                            {t("externalSources.empty.title")}
-                        </p>
-
-                        <p className="mt-2 text-sm text-slate-500">
-                            {t("externalSources.empty.description")}
-                        </p>
-                    </div>
-                ) : (
-                    <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:gap-4">
-                        {urls.map((sourceUrl, index) => (
-                            <article
-                                key={sourceUrl}
-                                className="flex w-full min-w-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-blue-300 sm:flex-row sm:items-center sm:gap-4 sm:p-4 lg:p-5"
-                            >
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-blue-50 text-sm font-bold text-blue-700">
-                                    {String(index + 1).padStart(2, "0")}
-                                </div>
-
-                                <div className="min-w-0 flex-1">
-                                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                        {t("externalSources.listingSource")}
-                                    </p>
-
-                                    <a
-                                        href={sourceUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        title={sourceUrl}
-                                        className="block min-w-0 break-all text-sm font-medium leading-6 text-blue-600 hover:text-blue-800 hover:underline sm:text-base"
-                                    >
-                                        {sourceUrl}
-                                    </a>
-                                </div>
-
-                                <div className="flex w-full shrink-0 items-center sm:w-auto">
-                                    <a
-                                        href={sourceUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="me-2 flex h-10 min-w-0 flex-1 items-center justify-center rounded-[10px] border border-slate-300 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none"
-                                    >
-                                        {t("externalSources.actions.openLink")}
-                                    </a>
-
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemove(sourceUrl)}
-                                        disabled={removingUrl === sourceUrl}
-                                        className="h-10 shrink-0 rounded-[10px] border border-red-200 px-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
-                                    >
-                                        {removingUrl === sourceUrl
-                                            ? t("externalSources.actions.deleting")
-                                            : t("externalSources.actions.delete")}
-                                    </button>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
+                        <Stack divider={<Divider flexItem />}>
+                            {history.map((run) => (
+                                <Stack
+                                    key={run.id}
+                                    direction={{ xs: "column", sm: "row" }}
+                                    spacing={{ xs: 0.5, sm: 2 }}
+                                    sx={{ py: 1.25, alignItems: { sm: "center" }, justifyContent: "space-between" }}
+                                >
+                                    <Box sx={{ minWidth: 0 }}>
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                                            {run.sourceName || run.website}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                                            {formatDate(run.finishedAt || run.startedAt, locale)}
+                                        </Typography>
+                                    </Box>
+                                    <Stack direction="row" spacing={1} sx={{ alignItems: "center", flexShrink: 0 }}>
+                                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                                            {tr("collect.historyLine", "{{saved}}/{{requested}} added · {{already}} already in app", {
+                                                saved: run.saved,
+                                                requested: run.requested,
+                                                already: run.alreadyInDb,
+                                            })}
+                                        </Typography>
+                                        {statusChip(run.status)}
+                                    </Stack>
+                                </Stack>
+                            ))}
+                        </Stack>
+                    </SectionCard>
                 )}
-            </div>
-        </section>
+            </Stack>
+
+            {/* Delete confirmation */}
+            <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} maxWidth="xs" fullWidth>
+                <DialogTitle>{tr("collect.deleteTitle", "Remove this website?")}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {tr(
+                            "collect.deleteText",
+                            "{{site}} will no longer be collected. The listings already added stay in your application.",
+                            { site: deleteTarget?.sourceName || "" }
+                        )}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteTarget(null)}>{t("common.cancel", "Cancel")}</Button>
+                    <Button color="error" variant="contained" onClick={handleDelete}>
+                        {tr("actions.delete", "Delete")}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
     );
 }

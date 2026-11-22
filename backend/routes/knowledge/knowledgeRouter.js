@@ -17,16 +17,18 @@ import {
 
 const router = express.Router();
 
-router.use(authMiddleware);
+// Published articles and videos can be read without logging in.
+// Managing content is for administrators only.
+const adminOnly = [authMiddleware, adminMiddleware];
 
 // --------------------------------------------------
 // ADMIN ROUTES
 // Keep these before /:id.
 // --------------------------------------------------
 
-router.get("/admin", adminMiddleware, getAdminKnowledge);
+router.get("/admin", adminOnly, getAdminKnowledge);
 
-router.get("/admin/:id", adminMiddleware, getAdminKnowledgeById);
+router.get("/admin/:id", adminOnly, getAdminKnowledgeById);
 
 // --------------------------------------------------
 // PUBLIC ROUTES
@@ -42,12 +44,12 @@ router.get("/:id", getPublishedKnowledgeById);
 // ADMIN MUTATIONS
 // --------------------------------------------------
 
-router.post("/", adminMiddleware, createKnowledgeContent);
+router.post("/", adminOnly, createKnowledgeContent);
 
-router.put("/:id", adminMiddleware, updateKnowledgeContent);
+router.put("/:id", adminOnly, updateKnowledgeContent);
 
-router.patch("/:id/status", adminMiddleware, updateKnowledgeStatus);
+router.patch("/:id/status", adminOnly, updateKnowledgeStatus);
 
-router.delete("/:id", adminMiddleware, deleteKnowledgeContent);
+router.delete("/:id", adminOnly, deleteKnowledgeContent);
 
 export default router;

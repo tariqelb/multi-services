@@ -67,6 +67,39 @@ const tooltipStyle = {
 };
 
 // -----------------------------------------------------------------------------
+// Charts in Arabic (RTL)
+//
+// Recharts draws SVG text with text-anchor start/end. Inside an RTL page
+// those anchors flip, so axis labels were drawn over the bars. Charts are
+// drawn in an LTR box (Arabic text still renders correctly) and mirrored
+// on purpose where it helps reading (horizontal bars grow from the right).
+// Tooltips and legends keep the page direction.
+// -----------------------------------------------------------------------------
+
+const useIsRtl = () => {
+    const { i18n } = useTranslation();
+    return i18n.dir(i18n.resolvedLanguage || i18n.language) === "rtl";
+};
+
+function ChartFrame({ children }) {
+    return (
+        // dir attribute, not sx: the RTL style plugin would flip "direction".
+        <Box dir="ltr" sx={{ width: "100%", height: "100%" }}>
+            {children}
+        </Box>
+    );
+}
+
+const tooltipProps = (isRtl) => ({
+    contentStyle: { ...tooltipStyle, direction: isRtl ? "rtl" : "ltr", textAlign: isRtl ? "right" : "left" },
+});
+
+const legendProps = (isRtl) => ({
+    iconType: "circle",
+    wrapperStyle: { direction: isRtl ? "rtl" : "ltr" },
+});
+
+// -----------------------------------------------------------------------------
 // Data hook
 // -----------------------------------------------------------------------------
 
@@ -514,6 +547,7 @@ const hasValues = (data = [], keys = []) =>
  * series: [{ key, name, color }]
  */
 export function TrendChart({ data = [], series = [], locale, stacked = false }) {
+    const isRtl = useIsRtl();
     const rawId = useId();
     const id = rawId.replace(/[^a-zA-Z0-9]/g, "");
 
@@ -531,6 +565,7 @@ export function TrendChart({ data = [], series = [], locale, stacked = false }) 
     }
 
     return (
+        <ChartFrame>
         <ResponsiveContainer width="100%" height="100%">
             <AreaChart
                 data={chartData}
@@ -571,11 +606,11 @@ export function TrendChart({ data = [], series = [], locale, stacked = false }) 
                 />
 
                 <Tooltip
-                    contentStyle={tooltipStyle}
+                    {...tooltipProps(isRtl)}
                     formatter={(value, name) => [formatNumber(value, locale), name]}
                 />
 
-                {series.length > 1 && <Legend iconType="circle" />}
+                {series.length > 1 && <Legend {...legendProps(isRtl)} />}
 
                 {series.map((item) => (
                     <Area
@@ -592,6 +627,7 @@ export function TrendChart({ data = [], series = [], locale, stacked = false }) 
                 ))}
             </AreaChart>
         </ResponsiveContainer>
+        </ChartFrame>
     );
 }
 
@@ -607,21 +643,27 @@ export function BarChartView({
     locale,
     labelWidth = 120,
 }) {
+    const isRtl = useIsRtl();
+
     if (!hasValues(data, bars.map((item) => item.key))) {
         return <EmptyState height="100%" />;
     }
 
     const isVertical = layout === "vertical";
 
+    // Arabic: labels on the right, bars growing to the left.
+    const mirror = isRtl && isVertical;
+
     return (
+        <ChartFrame>
         <ResponsiveContainer width="100%" height="100%">
             <BarChart
                 data={data}
                 layout={layout}
                 margin={{
                     top: 8,
-                    right: 16,
-                    left: isVertical ? 8 : 0,
+                    right: mirror ? 8 : 16,
+                    left: mirror ? 16 : isVertical ? 8 : 0,
                     bottom: isVertical ? 0 : 30,
                 }}
             >
@@ -634,13 +676,14 @@ export function BarChartView({
 
                 {isVertical ? (
                     <>
-                        <XAxis type="number" allowDecimals={false} tick={AXIS_TICK} />
+                        <XAxis type="number" allowDecimals={false} tick={AXIS_TICK} reversed={mirror} />
                         <YAxis
                             type="category"
                             dataKey={nameKey}
                             width={labelWidth}
                             tick={AXIS_TICK}
                             tickLine={false}
+                            orientation={mirror ? "right" : "left"}
                         />
                     </>
                 ) : (
@@ -648,8 +691,9 @@ export function BarChartView({
                         <XAxis
                             dataKey={nameKey}
                             interval={0}
-                            angle={-20}
-                            textAnchor="end"
+                            angle={isRtl ? 20 : -20}
+                            textAnchor={isRtl ? "start" : "end"}
+                            reversed={isRtl}
                             height={50}
                             tick={AXIS_TICK}
                             tickLine={false}
@@ -666,11 +710,11 @@ export function BarChartView({
 
                 <Tooltip
                     cursor={{ fill: "rgba(37, 99, 235, 0.05)" }}
-                    contentStyle={tooltipStyle}
+                    {...tooltipProps(isRtl)}
                     formatter={(value, name) => [formatNumber(value, locale), name]}
                 />
 
-                {bars.length > 1 && <Legend iconType="circle" />}
+                {bars.length > 1 && <Legend {...legendProps(isRtl)} />}
 
                 {bars.map((item, index) => (
                     <Bar
@@ -680,15 +724,18 @@ export function BarChartView({
                         fill={item.color || CHART_COLORS[index % CHART_COLORS.length]}
                         stackId={item.stackId}
                         maxBarSize={isVertical ? 26 : 46}
-                        radius={isVertical ? [0, 6, 6, 0] : [6, 6, 0, 0]}
+                        radius={isVertical ? (mirror ? [6, 0, 0, 6] : [0, 6, 6, 0]) : [6, 6, 0, 0]}
                     />
                 ))}
             </BarChart>
         </ResponsiveContainer>
+        </ChartFrame>
     );
 }
 
 export function DonutChart({ data = [], nameKey = "name", valueKey = "value", locale }) {
+    const isRtl = useIsRtl();
+
     if (!hasValues(data, [valueKey])) {
         return <EmptyState height="100%" />;
     }
@@ -696,6 +743,7 @@ export function DonutChart({ data = [], nameKey = "name", valueKey = "value", lo
     const total = data.reduce((sum, item) => sum + (Number(item[valueKey]) || 0), 0);
 
     return (
+        <ChartFrame>
         <ResponsiveContainer width="100%" height="100%">
             <PieChart>
                 <Pie
@@ -717,7 +765,7 @@ export function DonutChart({ data = [], nameKey = "name", valueKey = "value", lo
                 </Pie>
 
                 <Tooltip
-                    contentStyle={tooltipStyle}
+                    {...tooltipProps(isRtl)}
                     formatter={(value, name) => [
                         `${formatNumber(value, locale)} (${formatPercent(
                             total ? (value / total) * 100 : 0,
@@ -727,13 +775,15 @@ export function DonutChart({ data = [], nameKey = "name", valueKey = "value", lo
                     ]}
                 />
 
-                <Legend verticalAlign="bottom" iconType="circle" />
+                <Legend verticalAlign="bottom" {...legendProps(isRtl)} />
             </PieChart>
         </ResponsiveContainer>
+        </ChartFrame>
     );
 }
 
 export function HourlyChart({ data = [], valueKey = "count", name, color = "#9333EA", locale }) {
+    const isRtl = useIsRtl();
     const chartData = useMemo(
         () => data.map((row) => ({ ...row, label: formatHour(row.hour) })),
         [data]
@@ -744,6 +794,7 @@ export function HourlyChart({ data = [], valueKey = "count", name, color = "#933
     if (!peak) return <EmptyState height="100%" />;
 
     return (
+        <ChartFrame>
         <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={GRID_STROKE} />
@@ -751,7 +802,7 @@ export function HourlyChart({ data = [], valueKey = "count", name, color = "#933
                 <YAxis allowDecimals={false} tick={AXIS_TICK} tickLine={false} axisLine={false} width={36} />
                 <Tooltip
                     cursor={{ fill: "rgba(147, 51, 234, 0.06)" }}
-                    contentStyle={tooltipStyle}
+                    {...tooltipProps(isRtl)}
                     formatter={(value) => [formatNumber(value, locale), name]}
                 />
                 <Bar dataKey={valueKey} name={name} radius={[4, 4, 0, 0]}>
@@ -765,6 +816,7 @@ export function HourlyChart({ data = [], valueKey = "count", name, color = "#933
                 </Bar>
             </BarChart>
         </ResponsiveContainer>
+        </ChartFrame>
     );
 }
 

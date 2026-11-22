@@ -148,8 +148,10 @@ export default function OverviewSection() {
     const contactsBreakdown = (data?.contactsByType || [])
         .filter((item) => item.value > 0)
         .map((item) =>
-            t(`overview.contactsByType.${item.name}`, `{{count}} ${item.name}`, {
-                count: formatNumber(item.value, locale),
+            t(`overview.contactsByType.${item.name}`, {
+                count: Number(item.value) || 0,
+                value: formatNumber(item.value, locale),
+                defaultValue: `${formatNumber(item.value, locale)} ${item.name}`,
             })
         )
         .join(" · ");

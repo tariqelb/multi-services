@@ -1,10 +1,12 @@
 
+import { FilterGrid, FilterPanel, FilterSelect, filterFieldSx } from "../../../Components/ui/FilterKit";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import axiosInstance from "../../../api/axiosInstance";
 import PageLayout from "../Statistic/PageLayout";
+import { DEFAULT_ARTICLE_IMAGE, getKnowledgeImage } from "./knowledgeImages";
 
 import {
     Alert,
@@ -22,7 +24,6 @@ import {
     List,
     ListItemButton,
     ListItemText,
-    MenuItem,
     Pagination,
     Paper,
     Stack,
@@ -58,16 +59,6 @@ const localeMap = {
     ar: "ar-MA",
 };
 
-const getThumbnail = (item) => {
-    if (item.thumbnailUrl) return item.thumbnailUrl;
-
-    if (item.type === "video" && item.youtubeVideoId) {
-        return `https://img.youtube.com/vi/${item.youtubeVideoId}/hqdefault.jpg`;
-    }
-
-    return "";
-};
-
 const formatDate = (date, locale = "en-GB") => {
     if (!date) return "";
 
@@ -85,7 +76,12 @@ const formatDate = (date, locale = "en-GB") => {
 function KnowledgeCard({ item, onClick, t, locale }) {
     const [imageFailed, setImageFailed] = useState(false);
 
-    const thumbnail = getThumbnail(item);
+    // Articles without an image (or with a broken one) get the default image.
+    const thumbnail = imageFailed
+        ? item.type === "article"
+            ? DEFAULT_ARTICLE_IMAGE
+            : ""
+        : getKnowledgeImage(item);
 
     const categoryKey = categories.find(
         (category) => category.value === item.category
@@ -114,12 +110,15 @@ function KnowledgeCard({ item, onClick, t, locale }) {
                     alignItems: "stretch",
                 }}
             >
-                {thumbnail && !imageFailed ? (
+                {thumbnail ? (
                     <CardMedia
                         component="img"
                         image={thumbnail}
                         alt={item.title}
-                        onError={() => setImageFailed(true)}
+                        loading="lazy"
+                        onError={() => {
+                            if (thumbnail !== DEFAULT_ARTICLE_IMAGE) setImageFailed(true);
+                        }}
                         sx={{
                             width: "100%",
                             aspectRatio: "16 / 9",
@@ -266,7 +265,7 @@ export default function KnowledgeCenter() {
 
     const locale = localeMap[currentLanguage] || "en-GB";
 
-    const [activeTab, setActiveTab] = useState("article");
+    const [activeTab, setActiveTab] = useState("video");
 
     const [items, setItems] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
@@ -437,18 +436,13 @@ export default function KnowledgeCenter() {
             icon={<MenuBookOutlinedIcon color="primary" />}
         >
             <Stack spacing={3}>
-                <Paper
-                    variant="outlined"
-                    sx={{
-                        p: { xs: 2, sm: 3 },
-                        borderRadius: 3,
-                    }}
+                <FilterPanel
+                    title={t("searchHeading")}
+                    activeCount={(category ? 1 : 0) + (language ? 1 : 0) + (submittedSearch ? 1 : 0)}
+                    onClear={clearFilters}
+                    clearLabel={t("clearFilters")}
+                    sx={{ mb: 0 }}
                 >
-                    <Stack spacing={2}>
-                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                            {t("searchHeading")}
-                        </Typography>
-
                         {/* Search */}
                         <Stack
                             direction={{ xs: "column", sm: "row" }}
@@ -464,6 +458,8 @@ export default function KnowledgeCenter() {
                             >
                                 <TextField
                                     fullWidth
+                                    size="small"
+                                    sx={filterFieldSx}
                                     value={searchInput}
                                     placeholder={t("searchPlaceholder")}
                                     onChange={(event) => {
@@ -479,17 +475,19 @@ export default function KnowledgeCenter() {
                                             setSuggestions([]);
                                         }
                                     }}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SearchOutlinedIcon color="action" />
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: suggestionsLoading ? (
-                                            <InputAdornment position="end">
-                                                <CircularProgress size={18} />
-                                            </InputAdornment>
-                                        ) : null,
+                                    slotProps={{
+                                        input: {
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <SearchOutlinedIcon color="action" />
+                                                </InputAdornment>
+                                            ),
+                                            endAdornment: suggestionsLoading ? (
+                                                <InputAdornment position="end">
+                                                    <CircularProgress size={18} />
+                                                </InputAdornment>
+                                            ) : null,
+                                        },
                                     }}
                                 />
 
@@ -500,8 +498,8 @@ export default function KnowledgeCenter() {
                                         sx={{
                                             position: "absolute",
                                             top: "calc(100% + 5px)",
-                                            left: 0,
-                                            right: 0,
+                                            insetInlineStart: 0,
+                                            insetInlineEnd: 0,
                                             zIndex: 1300,
                                             maxHeight: 320,
                                             overflowY: "auto",
@@ -536,14 +534,12 @@ export default function KnowledgeCenter() {
                                                             primary={item.title}
                                                             secondary={`${item.category || ""} · ${
                                                                 item.language?.toUpperCase() || ""
-                                                            }`}
-                                                            primaryTypographyProps={{
-                                                                fontWeight: 600,
+                                                            }`} slotProps={{ primary: {
                                                                 noWrap: true,
-                                                            }}
-                                                            secondaryTypographyProps={{
+                                                                sx: { fontWeight: 600 },
+                                                            }, secondary: {
                                                                 variant: "caption",
-                                                            }}
+                                                            } }}
                                                         />
                                                     </ListItemButton>
 
@@ -585,7 +581,7 @@ export default function KnowledgeCenter() {
                                 onClick={handleSearchSubmit}
                                 sx={{
                                     minWidth: { xs: "100%", sm: 120 },
-                                    minHeight: 56,
+                                    height: 40,
                                 }}
                             >
                                 {t("search")}
@@ -593,70 +589,35 @@ export default function KnowledgeCenter() {
                         </Stack>
 
                         {/* Filters */}
-                        <Stack
-                            direction={{ xs: "column", sm: "row" }}
-                            spacing={2}
-                        >
-                            <TextField
-                                select
-                                fullWidth
-                                size="small"
+                        <FilterGrid>
+                            <FilterSelect
                                 label={t("category")}
                                 value={category}
-                                onChange={(event) => {
-                                    setCategory(event.target.value);
+                                onChange={(value) => {
+                                    setCategory(value);
                                     setPage(1);
                                 }}
-                            >
-                                <MenuItem value="">
-                                    {t("allCategories")}
-                                </MenuItem>
-
-                                {categories.map((item) => (
-                                    <MenuItem
-                                        key={item.value}
-                                        value={item.value}
-                                    >
-                                        {t(`categories.${item.key}`)}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-
-                            <TextField
-                                select
-                                fullWidth
-                                size="small"
+                                options={[
+                                    { value: "", label: t("allCategories") },
+                                    ...categories.map((item) => ({ value: item.value, label: t(`categories.${item.key}`) })),
+                                ]}
+                            />
+                            <FilterSelect
                                 label={t("language")}
                                 value={language}
-                                onChange={(event) => {
-                                    setLanguage(event.target.value);
+                                onChange={(value) => {
+                                    setLanguage(value);
                                     setPage(1);
                                 }}
-                            >
-                                <MenuItem value="">
-                                    {t("allLanguages")}
-                                </MenuItem>
-                                <MenuItem value="en">
-                                    {t("english")}
-                                </MenuItem>
-                                <MenuItem value="fr">
-                                    {t("french")}
-                                </MenuItem>
-                                <MenuItem value="ar">
-                                    {t("arabic")}
-                                </MenuItem>
-                            </TextField>
-
-                            <Button
-                                color="inherit"
-                                onClick={clearFilters}
-                                sx={{ minWidth: 120 }}
-                            >
-                                {t("clearFilters")}
-                            </Button>
-                        </Stack>
-                    </Stack>
-                </Paper>
+                                options={[
+                                    { value: "", label: t("allLanguages") },
+                                    { value: "en", label: t("english") },
+                                    { value: "fr", label: t("french") },
+                                    { value: "ar", label: t("arabic") },
+                                ]}
+                            />
+                        </FilterGrid>
+                </FilterPanel>
 
                 {/* Content tabs */}
                 <Box>
@@ -670,17 +631,17 @@ export default function KnowledgeCenter() {
                         }}
                     >
                         <Tab
-                            value="article"
-                            icon={<MenuBookOutlinedIcon />}
-                            iconPosition="start"
-                            label={t("articles")}
-                        />
-
-                        <Tab
                             value="video"
                             icon={<VideoLibraryOutlinedIcon />}
                             iconPosition="start"
                             label={t("videos")}
+                        />
+
+                        <Tab
+                            value="article"
+                            icon={<MenuBookOutlinedIcon />}
+                            iconPosition="start"
+                            label={t("articles")}
                         />
                     </Tabs>
                 </Box>

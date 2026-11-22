@@ -87,6 +87,25 @@ axiosInstance.interceptors.response.use(
         const status = error.response?.status;
         const requestUrl = error.config?.url || "";
 
+        // Suspended by an administrator during the session.
+        if (
+            status === 403 &&
+            error.response?.data?.code === "ACCOUNT_SUSPENDED" &&
+            window.location.pathname !== "/login"
+        ) {
+            try {
+                sessionStorage.setItem(
+                    "accountSuspended",
+                    error.response.data.reason || ""
+                );
+            } catch {
+                // ignore: the login page then shows the generic message
+            }
+
+            window.location.replace("/login");
+            return Promise.reject(error);
+        }
+
         if (
             status === 401 &&
             !matchesAny(requestUrl, AUTH_REQUESTS) &&

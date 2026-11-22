@@ -325,11 +325,10 @@ export default function Sidebar({
                             <ListItemText
                                 primary={t("sidebar.backToMainMenu", {
                                     defaultValue: "Back to main menu",
-                                })}
-                                primaryTypographyProps={{
+                                })} slotProps={{ primary: { sx: {
                                     fontSize: "0.875rem",
                                     fontWeight: 500,
-                                }}
+                                } } }}
                             />
                         </ListItemButton>
 
@@ -395,15 +394,11 @@ export default function Sidebar({
                                     </ListItemIcon>
 
                                     <ListItemText
-                                        primary={item.name}
-                                        primaryTypographyProps={{
-                                            fontSize: "0.60rem",
+                                        primary={item.name} slotProps={{ primary: { sx: {
                                             fontWeight: isActive ? 600 : 400,
-                                            sx: {
-                                                overflowWrap: "anywhere",
-                                                textAlign: "start",
-                                            },
-                                        }}
+                                            overflowWrap: "anywhere",
+                                            textAlign: "start",
+                                        } } }}
                                     />
                                 </ListItemButton>
                             </ListItem>
@@ -452,11 +447,10 @@ export default function Sidebar({
                         <ListItemText
                             primary={t("sidebar.adminPanel", {
                                 defaultValue: "Admin Panel",
-                            })}
-                            primaryTypographyProps={{
+                            })} slotProps={{ primary: { sx: {
                                 fontSize: "0.875rem",
                                 fontWeight: 600,
-                            }}
+                            } } }}
                         />
 
                         <Typography

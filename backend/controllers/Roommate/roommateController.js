@@ -1,14 +1,18 @@
 
+import { confirmedNow, getExpiryInfo } from "../../services/listingExpiry.js";
 import mongoose from "mongoose";
 import { extractGoogleMapsLocation } from "../../utils/googleMapsLocation.js";
 import RoommateListing from "../../DatabaseModels/Schema/RoommateListing.js";
 import User from "../../DatabaseModels/Schema/User.js";
 import notifyMatchingRoommateAlerts from "../../services/notifyMatchingRoommateAlerts.js";
+import { hideSuspended, isHiddenForRequester, isPublisherSuspended, isRequesterAdmin } from "../../services/accountStatus.js";
+import { contactFromOwner, roommateForViewer } from "../../utils/listingStatus.js";
 
 import {
     uploadPropertyImages,
     deletePropertyImages,
 } from "../../middleware/propertyUpload.js";
+import { getUserWhatsApp } from "../../utils/whatsapp.js";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -267,7 +271,7 @@ export const createRoommateListing = async (req, res) => {
             });
         }
 
-        if (!user.notificationPreferences?.whatsapp?.verified) {
+        if (!getUserWhatsApp(user).verified) {
             return res.status(403).json({
                 message: "Please verify your WhatsApp number before publishing.",
                 field: "whatsapp",
@@ -932,8 +936,11 @@ export const getRoommateListings = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
+        // Hide announcements of suspended users.
+        const visibleFilter = await hideSuspended(filter);
+
         const [listings, total] = await Promise.all([
-            RoommateListing.find(filter)
+            RoommateListing.find(visibleFilter)
                 .select("-fullAddress")
                 .populate({
                     path: "userId",
@@ -941,7 +948,7 @@ export const getRoommateListings = async (req, res) => {
                         "firstName",
                         "lastName",
                         "phoneNumber",
-                        "notificationPreferences.whatsapp.phoneNumber",
+                        "whatsappNumber",
                     ].join(" "),
                 })
                 .sort({ createdAt: -1 })
@@ -949,7 +956,7 @@ export const getRoommateListings = async (req, res) => {
                 .limit(limit)
                 .lean(),
 
-            RoommateListing.countDocuments(filter),
+            RoommateListing.countDocuments(visibleFilter),
         ]);
 
         return res.status(200).json({
@@ -983,10 +990,7 @@ export const getRoommateListingById = async (req, res) => {
             });
         }
 
-        const listing = await RoommateListing.findOne({
-            _id: id,
-            status: { $in: ["Open", "Full"] },
-        })
+        const found = await RoommateListing.findById(id)
             .select("-fullAddress")
             .populate({
                 path: "userId",
@@ -994,19 +998,45 @@ export const getRoommateListingById = async (req, res) => {
                     "firstName",
                     "lastName",
                     "phoneNumber",
-                    "notificationPreferences.whatsapp.phoneNumber",
+                    "whatsappNumber",
+                    "phoneVerified",
+                    "whatsappVerified",
                 ].join(" "),
             })
             .lean();
 
-        if (!listing) {
+        const viewerId = req.user?.userId || req.user?.id || null;
+        const isOwner = Boolean(found && viewerId && String(found.userId?._id || found.userId) === String(viewerId));
+        const isAdmin = found && !isOwner ? await isRequesterAdmin(req) : false;
+
+        // Visitors: open, full and inactive (inactive without contact).
+        // Owner and administrators: any status (needed to edit it).
+        const visibleToVisitors = ["Open", "Full", "Inactive"];
+        const listing =
+            found && (isOwner || isAdmin || visibleToVisitors.includes(found.status)) ? found : null;
+
+        // Publisher suspended: hidden (administrators still see it).
+        if (!listing || (await isHiddenForRequester(listing.userId, req))) {
             return res.status(404).json({
                 message: "Roommate listing not found.",
             });
         }
 
+        // "Verified" badges: the owner's current numbers, if verified.
+        const owner = listing.userId && typeof listing.userId === "object" ? listing.userId : null;
+        const { contactVerified } = contactFromOwner(owner);
+
+        const { phoneVerified, whatsappVerified, ...publicOwner } = owner || {};
+
         return res.status(200).json({
-            listing: formatRoommateListing(listing),
+            listing: roommateForViewer(
+                {
+                    ...formatRoommateListing(listing),
+                    userId: owner ? publicOwner : listing.userId,
+                    contactVerified: { phone: contactVerified.phone, whatsapp: contactVerified.whatsapp },
+                },
+                { viewerId, isAdmin }
+            ),
         });
     } catch (error) {
         console.error("[GetRoommateListingById] Error:", error);
@@ -1046,7 +1076,7 @@ export const getMyRoommateListings = async (req, res) => {
                         "firstName",
                         "lastName",
                         "phoneNumber",
-                        "notificationPreferences.whatsapp.phoneNumber",
+                        "whatsappNumber",
                     ].join(" "),
                 })
                 .sort({ createdAt: -1 })
@@ -1058,7 +1088,10 @@ export const getMyRoommateListings = async (req, res) => {
         ]);
 
         return res.status(200).json({
-            listings: listings.map(formatRoommateListing),
+            listings: listings.map((listing) => ({
+                ...formatRoommateListing(listing),
+                expiry: getExpiryInfo("roommate", listing),
+            })),
             pagination: {
                 currentPage: page,
                 totalPages: Math.ceil(total / limit),
@@ -1099,6 +1132,10 @@ export const getUserRoommateListings = async (req, res) => {
             userId,
             status: { $in: ["Open", "Full"] },
         };
+
+        if (await isPublisherSuspended(userId)) {
+            filter._id = { $in: [] }; // suspended publisher: nothing public
+        }
 
         const skip = (page - 1) * limit;
 
@@ -1161,6 +1198,9 @@ const editableRoommateFields = [
     "availableFrom",
     "youtubeVideoUrl",
     "preferences",
+    "hasBalcony",
+    "hasKitchen",
+    "hasParking",
 ];
 
 const roommateNumberFields = [
@@ -1372,13 +1412,34 @@ export const updateRoommateListing = async (req, res) => {
             });
         }
 
-        if (listing.userId.toString() !== userId.toString()) {
+        // Owner or administrator.
+        if (
+            listing.userId.toString() !== userId.toString() &&
+            !(await isRequesterAdmin(req))
+        ) {
             return res.status(403).json({
                 message: "You are not allowed to update this announcement.",
             });
         }
 
-        const updates = parseRoommateUpdateBody(req.body);
+        const updates = parseRoommateUpdateBody(req.body || {});
+
+        // Map link changed: read the coordinates again.
+        if (updates.mapLink !== undefined && updates.mapLink !== listing.mapLink) {
+            if (!updates.mapLink) {
+                updates.location = { lat: null, lng: null };
+            } else {
+                const location = await extractGoogleMapsLocation(updates.mapLink).catch(() => null);
+
+                if (!location || !Number.isFinite(location.lat) || !Number.isFinite(location.lng)) {
+                    throw createValidationError(
+                        "Could not extract valid coordinates from the Google Maps link."
+                    );
+                }
+
+                updates.location = { lat: location.lat, lng: location.lng };
+            }
+        }
 
         if (updates.totalPeople !== undefined || updates.currentPeople !== undefined) {
             const totalPeople = updates.totalPeople ?? listing.totalPeople;
@@ -1427,13 +1488,18 @@ export const updateRoommateListing = async (req, res) => {
             }
         }
 
-        const removedImages = listing.images.filter((image) =>
-            imagesToRemove.includes(image.filename)
-        );
+        // Accept filenames or full paths/URLs.
+        const isRemoved = (image) =>
+            imagesToRemove.some(
+                (value) =>
+                    value &&
+                    (value === image.filename ||
+                        value === image.path ||
+                        value === image.url)
+            );
 
-        const remainingImages = listing.images.filter(
-            (image) => !imagesToRemove.includes(image.filename)
-        );
+        const removedImages = listing.images.filter(isRemoved);
+        const remainingImages = listing.images.filter((image) => !isRemoved(image));
 
         const nextImages = [
             ...remainingImages,
@@ -1444,7 +1510,8 @@ export const updateRoommateListing = async (req, res) => {
             throw createValidationError("A maximum of 15 images is allowed.");
         }
 
-        Object.assign(listing, updates);
+        // Editing confirms the announcement (60-day expiry starts again).
+        Object.assign(listing, updates, confirmedNow());
         listing.images = nextImages;
 
         const totalPeople = Number(listing.totalPeople) || 0;
@@ -1609,6 +1676,7 @@ export const updateRoommateListingStatus = async (req, res) => {
         }
 
         listing.status = status;
+        Object.assign(listing, confirmedNow());
         await listing.save();
 
         return res.status(200).json({

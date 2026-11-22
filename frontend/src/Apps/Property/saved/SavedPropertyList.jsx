@@ -1,4 +1,5 @@
 
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import PageHeader from "../../../Components/ui/PageHeader";
 import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded";
 import React, { useCallback, useEffect, useState } from "react";
@@ -270,10 +271,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
     return (
         <Box
             sx={{
-                width: "100%",
-                maxWidth: "100%",
-                mx: "auto",
-                p: { xs: 2, md: 4 },
+                ...pagePaddingSx,
             }}
         >
             <PageHeader

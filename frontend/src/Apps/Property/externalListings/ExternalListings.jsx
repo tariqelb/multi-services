@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+import { FilterField, FilterGrid, FilterPanel, FilterSearch, FilterSelect } from "../../../Components/ui/FilterKit";
 import TravelExploreOutlinedIcon from "@mui/icons-material/TravelExploreOutlined";
 import {
     Alert,
@@ -14,14 +15,8 @@ import {
     Pagination,
     Stack,
     Typography,
-    TextField,
-    MenuItem,
-    InputAdornment,
 } from "@mui/material";
 
-import SearchIcon from "@mui/icons-material/Search";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import ClearIcon from "@mui/icons-material/Clear";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import BedOutlinedIcon from "@mui/icons-material/BedOutlined";
@@ -503,6 +498,7 @@ function ExternalListingFilters({
     onFilterChange,
     onClear,
     activeFilterCount,
+    isArabic = false,
     t,
 }) {
     const propertyTypes = [
@@ -527,10 +523,6 @@ function ExternalListingFilters({
         "Unknown",
     ];
 
-    const handleChange = (field) => (event) => {
-        onFilterChange(field, event.target.value);
-    };
-
     const getListingTypeLabel = (type) => {
         if (type === "For Sale") {
             return t("externalListings.listingTypes.forSale");
@@ -544,205 +536,72 @@ function ExternalListingFilters({
     };
 
     return (
-        <Box
-            sx={{
-                mb: 3,
-                p: { xs: 2, sm: 2.5 },
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: "16px",
-                bgcolor: "background.paper",
-                boxShadow: 1,
-            }}
+        <FilterPanel
+            title={t("externalListings.filters.title")}
+            activeCount={activeFilterCount}
+            onClear={onClear}
+            clearLabel={t("externalListings.filters.clear")}
         >
-            {/* Filter heading */}
-            <Stack
-                direction="row"
-                sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1, mb: 2.5 }}
-            >
-                <Stack
-                    direction="row"
-                    spacing={1} sx={{ alignItems: "center" }}
-                >
-                    <FilterAltOutlinedIcon color="action" />
-
-                    <Typography sx={{ fontWeight: 750 }}>
-                        {t("externalListings.filters.title")}
-                    </Typography>
-
-                    {activeFilterCount > 0 && (
-                        <Chip
-                            label={t("externalListings.filters.active", {
-                                count: activeFilterCount,
-                            })}
-                            color="primary"
-                            size="small"
-                        />
-                    )}
-                </Stack>
-
-                {activeFilterCount > 0 && (
-                    <Button
-                        size="small"
-                        color="inherit"
-                        startIcon={<ClearIcon />}
-                        onClick={onClear}
-                        sx={{ textTransform: "none" }}
-                    >
-                        {t("externalListings.filters.clear")}
-                    </Button>
-                )}
-            </Stack>
-
-            {/* Search */}
-            <TextField
-                fullWidth
-                size="small"
-                placeholder={t("externalListings.filters.searchPlaceholder")}
+            <FilterSearch
                 value={filters.search}
-                onChange={handleChange("search")}
-                sx={{ mb: 2 }}
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon color="action" />
-                        </InputAdornment>
-                    ),
-                }}
+                onChange={(value) => onFilterChange("search", value)}
+                placeholder={t("externalListings.filters.searchPlaceholder")}
             />
 
-            {/* Select filters */}
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <TextField
-                        select
-                        fullWidth
-                        size="small"
-                        label={t("externalListings.filters.listingType")}
-                        value={filters.listingType}
-                        onChange={handleChange("listingType")}
-                    >
-                        <MenuItem value="All">
-                            {t("externalListings.filters.allListingTypes")}
-                        </MenuItem>
-
-                        {listingTypes.map((type) => (
-                            <MenuItem key={type} value={type}>
-                                {getListingTypeLabel(type)}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <TextField
-                        select
-                        fullWidth
-                        size="small"
-                        label={t("externalListings.filters.propertyType")}
-                        value={filters.propertyType}
-                        onChange={handleChange("propertyType")}
-                    >
-                        <MenuItem value="All">
-                            {t("externalListings.filters.allPropertyTypes")}
-                        </MenuItem>
-
-                        {propertyTypes.map((type) => (
-                            <MenuItem key={type} value={type}>
-                                {getPropertyTypeLabel(type, t)}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <TextField
-                        select
-                        fullWidth
-                        size="small"
-                        label={t("externalListings.filters.city")}
-                        value={filters.city}
-                        onChange={handleChange("city")}
-                    >
-                        <MenuItem value="All">
-                            {t("externalListings.filters.allCities")}
-                        </MenuItem>
-
-                        {cities.map((city) => (
-                            <MenuItem key={city.en} value={city.en}>
-                                <Stack
-                                    direction="row"
-                                    sx={{ justifyContent: "space-between", alignItems: "center",
-                                        width: "100%",
-                                        columnGap: 2,
-                                    }}
-                                >
-                                    <span>{city.en}</span>
-
-                                    <Typography
-                                        component="span"
-                                        variant="body2"
-                                        dir="rtl" sx={{ color: "text.secondary" }}
-                                    >
-                                        {city.ar}
-                                    </Typography>
-                                </Stack>
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <TextField
-                        select
-                        fullWidth
-                        size="small"
-                        label={t("externalListings.filters.source")}
-                        value={filters.source}
-                        onChange={handleChange("source")}
-                    >
-                        <MenuItem value="All">
-                            {t("externalListings.filters.allSources")}
-                        </MenuItem>
-
-                        {sources.map((source) => (
-                            <MenuItem key={source} value={source}>
-                                {source}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-
-                {/* Price range */}
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <TextField
-                        fullWidth
-                        size="small"
-                        type="number"
-                        label={t("externalListings.filters.minimumPrice")}
-                        value={filters.minPrice}
-                        onChange={handleChange("minPrice")}
-                        slotProps={{
-                            htmlInput: { min: 0 },
-                        }}
-                    />
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <TextField
-                        fullWidth
-                        size="small"
-                        type="number"
-                        label={t("externalListings.filters.maximumPrice")}
-                        value={filters.maxPrice}
-                        onChange={handleChange("maxPrice")}
-                        slotProps={{
-                            htmlInput: { min: 0 },
-                        }}
-                    />
-                </Grid>
-            </Grid>
-        </Box>
+            <FilterGrid min={200}>
+                <FilterSelect
+                    label={t("externalListings.filters.listingType")}
+                    value={filters.listingType}
+                    onChange={(value) => onFilterChange("listingType", value)}
+                    options={[
+                        { value: "All", label: t("externalListings.filters.allListingTypes") },
+                        ...listingTypes.map((type) => ({ value: type, label: getListingTypeLabel(type) })),
+                    ]}
+                />
+                <FilterSelect
+                    label={t("externalListings.filters.propertyType")}
+                    value={filters.propertyType}
+                    onChange={(value) => onFilterChange("propertyType", value)}
+                    options={[
+                        { value: "All", label: t("externalListings.filters.allPropertyTypes") },
+                        ...propertyTypes.map((type) => ({ value: type, label: getPropertyTypeLabel(type, t) })),
+                    ]}
+                />
+                <FilterSelect
+                    label={t("externalListings.filters.city")}
+                    value={filters.city}
+                    onChange={(value) => onFilterChange("city", value)}
+                    options={[
+                        { value: "All", label: t("externalListings.filters.allCities") },
+                        ...cities.map((city) => ({
+                            value: city.en,
+                            label: isArabic ? city.ar : city.en,
+                        })),
+                    ]}
+                />
+                <FilterSelect
+                    label={t("externalListings.filters.source")}
+                    value={filters.source}
+                    onChange={(value) => onFilterChange("source", value)}
+                    options={[
+                        { value: "All", label: t("externalListings.filters.allSources") },
+                        ...sources.map((source) => ({ value: source, label: source })),
+                    ]}
+                />
+                <FilterField
+                    type="number"
+                    label={t("externalListings.filters.minimumPrice")}
+                    value={filters.minPrice}
+                    onChange={(value) => onFilterChange("minPrice", value)}
+                />
+                <FilterField
+                    type="number"
+                    label={t("externalListings.filters.maximumPrice")}
+                    value={filters.maxPrice}
+                    onChange={(value) => onFilterChange("maxPrice", value)}
+                />
+            </FilterGrid>
+        </FilterPanel>
     );
 }
 
@@ -803,7 +662,8 @@ export default function ExternalListings() {
                 firstResponse.data?.pagination ||
                 firstResponse.data?.data?.pagination;
 
-            const totalPages = pagination?.totalPages || 1;
+            // The backend sends "pages"; keep "totalPages" for compatibility.
+            const totalPages = pagination?.totalPages || pagination?.pages || 1;
 
             let allListings = [...firstListings];
 
@@ -865,13 +725,8 @@ export default function ExternalListings() {
         setPage(1);
     };
 
-    const activeFilterCount = Object.entries(filters).filter(
-        ([key, value]) => {
-            return (
-                value !== "" &&
-                value !== "All"
-            );
-        }
+    const activeFilterCount = Object.values(filters).filter(
+        (value) => value !== "" && value !== "All"
     ).length;
 
     // Apply all filters together.
@@ -974,7 +829,6 @@ export default function ExternalListings() {
             icon={<TravelExploreOutlinedIcon />}
                 title={t("externalListings.title")}
                 subtitle={t("externalListings.subtitle")}
-                maxWidth={1280}
             >
                 {error && (
                     <Alert
@@ -1014,6 +868,7 @@ export default function ExternalListings() {
                             onFilterChange={handleFilterChange}
                             onClear={clearFilters}
                             activeFilterCount={activeFilterCount}
+                            isArabic={isRTL}
                             t={t}
                         />
 

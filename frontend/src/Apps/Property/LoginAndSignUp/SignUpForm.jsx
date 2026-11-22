@@ -2,9 +2,12 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { getInfoContent } from "../Info/infoContent";
 
 import axiosInstance from "../../../api/axiosInstance";
 import { activeFormAction } from "../../../redux/actions/activeFormAction";
+import GoogleSignInButton from "./GoogleSignInButton";
 
 import {
     setSignupFirstName,
@@ -18,7 +21,8 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function SignUpForm() {
     const dispatch = useDispatch();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const legal = getInfoContent(i18n.resolvedLanguage || i18n.language).signupNotice;
 
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -339,7 +343,23 @@ function SignUpForm() {
                         ? t("auth.sendingVerification")
                         : t("auth.continue")}
                 </button>
+
+                {/* Terms and privacy */}
+                <p className="text-center text-xs leading-5 text-slate-500">
+                    {legal.before}{" "}
+                    <Link to="/terms" target="_blank" className="font-semibold text-blue-600 hover:underline">
+                        {legal.terms}
+                    </Link>{" "}
+                    {legal.and}{" "}
+                    <Link to="/privacy" target="_blank" className="font-semibold text-blue-600 hover:underline">
+                        {legal.privacy}
+                    </Link>
+                    .
+                </p>
             </form>
+
+            {/* Google: creates the account with a verified email */}
+            <GoogleSignInButton text="signup_with" />
 
             {/* Login link */}
             <p className="mt-4 text-center text-base text-black">

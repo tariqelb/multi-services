@@ -8,6 +8,9 @@ import SavedProperty from "../../DatabaseModels/Schema/SavedProperty.js";
 import Feedback from "../../DatabaseModels/Schema/Feedback.js";
 import PropertyAlert from "../../DatabaseModels/Schema/PropertyAlert.js";
 
+import { forgetAccountStatus } from "../../services/accountStatus.js";
+import { sendAccountStatusEmail } from "../../services/emailService.js";
+
 import {
     DAY_MS,
     bucketExpression,
@@ -21,6 +24,7 @@ import {
     rate,
     round,
 } from "../../utils/analytics.js";
+import { getUserWhatsApp } from "../../utils/whatsapp.js";
 
 const getValidUserId = (userId) => mongoose.Types.ObjectId.isValid(userId);
 
@@ -41,10 +45,14 @@ const getAdminUserOrRespond = async (userId, res) => {
                 "email",
                 "role",
                 "accountStatus",
+                "suspendedAt",
+                "suspendedReason",
                 "language",
                 "emailVerified",
                 "phoneNumber",
                 "phoneVerified",
+                "whatsappNumber",
+                "whatsappVerified",
                 "address",
                 "bio",
                 "profileImage",
@@ -293,7 +301,7 @@ const buildUsersSummary = (users) => {
         if (status === "suspended") summary.suspendedUsers += 1;
         if (user.emailVerified) summary.emailVerified += 1;
         if (user.phoneVerified) summary.phoneVerified += 1;
-        if (user.notificationPreferences?.whatsapp?.verified) {
+        if (getUserWhatsApp(user).verified) {
             summary.whatsappVerified += 1;
         }
         if (user.deletionRequestedAt) summary.pendingDeletion += 1;
@@ -430,8 +438,8 @@ export const getAdminUsers = async (req, res) => {
                     emailVerificationExpires: 0,
                     phoneVerificationSessionId: 0,
                     phoneVerificationExpires: 0,
-                    "notificationPreferences.whatsapp.verificationSessionId": 0,
-                    "notificationPreferences.whatsapp.verificationExpires": 0,
+                    whatsappVerificationSessionId: 0,
+                    whatsappVerificationExpires: 0,
                     propertyStats: 0,
                     savedStats: 0,
                     feedbackStats: 0,
@@ -736,6 +744,121 @@ export const getPropertyDemandAnalytics = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to retrieve property demand analytics.",
+        });
+    }
+};
+
+// -----------------------------------------------------------------------------
+// Suspend / reactivate a user
+// -----------------------------------------------------------------------------
+
+// PATCH /api/dashboard/users/:userId/status   { status: "suspended" | "active", reason? }
+export const updateAdminUserStatus = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const status = String(req.body?.status || "").toLowerCase();
+        const reason = String(req.body?.reason || "").trim().slice(0, 500);
+        const notify = req.body?.notify !== false;
+
+        if (!getValidUserId(userId)) {
+            return res.status(400).json({ success: false, message: "Invalid user ID." });
+        }
+
+        if (!["active", "suspended"].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: "Status must be active or suspended.",
+            });
+        }
+
+        if (String(userId) === String(req.user?.userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "You cannot change the status of your own account.",
+            });
+        }
+
+        const user = await User.findById(userId).select(
+            "firstName lastName email role language accountStatus suspendedAt suspendedReason suspendedBy"
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
+
+        if (user.role === "admin" && status === "suspended") {
+            return res.status(403).json({
+                success: false,
+                message: "Administrators cannot be suspended. Change their role first.",
+            });
+        }
+
+        if (status === "suspended" && !reason) {
+            return res.status(400).json({
+                success: false,
+                message: "Please give a reason for the suspension.",
+            });
+        }
+
+        const changed = user.accountStatus !== status;
+
+        user.accountStatus = status;
+
+        if (status === "suspended") {
+            user.suspendedAt = user.suspendedAt && !changed ? user.suspendedAt : new Date();
+            user.suspendedReason = reason;
+            user.suspendedBy = req.user.userId;
+        } else {
+            user.suspendedAt = null;
+            user.suspendedReason = "";
+            user.suspendedBy = null;
+        }
+
+        await user.save();
+
+        // Takes effect immediately everywhere.
+        forgetAccountStatus(user._id);
+
+        if (status === "suspended") {
+            req.app?.get?.("io")?.in(`user:${user._id}`).disconnectSockets(true);
+        }
+
+        let emailSent = false;
+
+        if (changed && notify && user.email) {
+            try {
+                await sendAccountStatusEmail({
+                    to: user.email,
+                    status,
+                    reason,
+                    language: user.language,
+                });
+                emailSent = true;
+            } catch (emailError) {
+                console.error("[Admin] Account status email failed:", emailError.message);
+            }
+        }
+
+        console.log(`[Admin] ${req.user.userId} set user ${user._id} to ${status}`);
+
+        return res.status(200).json({
+            success: true,
+            message: status === "suspended" ? "User suspended." : "User reactivated.",
+            emailSent,
+            user: {
+                _id: user._id,
+                accountStatus: user.accountStatus,
+                suspendedAt: user.suspendedAt,
+                suspendedReason: user.suspendedReason,
+                suspendedBy: user.suspendedBy,
+            },
+        });
+    } catch (error) {
+        console.error("Update user status error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update the user status.",
         });
     }
 };

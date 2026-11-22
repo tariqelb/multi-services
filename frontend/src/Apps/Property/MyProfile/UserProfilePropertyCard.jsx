@@ -25,11 +25,14 @@ import {
     Visibility,
     Delete,
     Edit,
+    EditNote,
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../api/axiosInstance";
 import getImageUrl from "../../../utils/getImageUrl";
+import { getFurnishingStatus } from "../../../utils/furnishing";
+import ListingExpiryNotice from "../listings/ListingExpiryNotice";
 
 export const updatePropertyStatus = async (id, status) => {
     const response = await axiosInstance.patch(
@@ -40,12 +43,14 @@ export const updatePropertyStatus = async (id, status) => {
     return response.data;
 };
 
-const STATUS_OPTIONS = [
-    "Available",
-    "Rented",
-    "Sold",
-    "Inactive",
-];
+// Sold only for sale, Rented only for rent.
+const STATUS_OPTIONS_BY_LISTING_TYPE = {
+    "For Sale": ["Available", "Sold", "Inactive"],
+    "For Rent": ["Available", "Rented", "Inactive"],
+};
+
+const getStatusOptions = (listingType) =>
+    STATUS_OPTIONS_BY_LISTING_TYPE[listingType] || ["Available", "Inactive"];
 
 function getStatusStyles(status) {
     const normalizedStatus = String(status || "Available").toLowerCase();
@@ -365,6 +370,27 @@ export default function UserProfileCard({
                                     boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
                                 }}
                             />
+
+                            {/* Homes only: furnished / unfurnished */}
+                            {getFurnishingStatus(property) && (
+                                <Chip
+                                    label={
+                                        getFurnishingStatus(property) === "Furnished"
+                                            ? t("properties.card.furnished", "Furnished")
+                                            : t("properties.card.unfurnished", "Unfurnished")
+                                    }
+                                    size="small"
+                                    sx={{
+                                        height: 28,
+                                        px: 0.5,
+                                        bgcolor: "#F1F5F9",
+                                        color: "#334155",
+                                        fontWeight: 700,
+                                        fontSize: "0.78rem",
+                                        borderRadius: "16px",
+                                    }}
+                                />
+                            )}
                             </Stack>
                         </Stack>
 
@@ -428,6 +454,20 @@ export default function UserProfileCard({
                                 </Box>
                             )}
                         </Stack>
+
+                        {/* 60-day expiry: reminder / reactivate */}
+                        <ListingExpiryNotice
+                            kind="property"
+                            id={property._id || property.id}
+                            expiry={property.expiry}
+                            hidden={currentStatus !== initialStatus}
+                            onConfirmed={(status) => {
+                                if (status && status !== currentStatus) {
+                                    setCurrentStatus(status);
+                                    onStatusChange?.(property._id || property.id, status);
+                                }
+                            }}
+                        />
                     </Box>
 
                     {/* Actions Toolbar */}
@@ -452,6 +492,31 @@ export default function UserProfileCard({
                                 minWidth: 0,
                             }}
                         >
+                            {/* Edit the publication */}
+                            <Button
+                                variant="contained"
+                                size="small"
+                                startIcon={<EditNote />}
+                                onClick={() => navigate(`/properties/${property._id || property.id}/edit`)}
+                                sx={{
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                    whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                    px: { xs: 0.8, sm: 1.5 },
+                                    fontSize: { xs: "0.68rem", sm: "0.875rem" },
+                                    "& .MuiButton-startIcon": {
+                                        mr: { xs: 0.5, sm: 1 },
+                                        ml: 0,
+                                        "& > *:nth-of-type(1)": {
+                                            fontSize: { xs: 15, sm: 20 },
+                                        },
+                                    },
+                                }}
+                            >
+                                {t("properties.profileCard.edit", "Edit")}
+                            </Button>
+
                             {/* Edit Status */}
                             <Button
                                 variant="outlined"
@@ -502,7 +567,7 @@ export default function UserProfileCard({
                                     horizontal: "left",
                                 }}
                             >
-                                {STATUS_OPTIONS.map((opt) => (
+                                {getStatusOptions(property.listingType).map((opt) => (
                                     <MenuItem
                                         key={opt}
                                         selected={opt === currentStatus}

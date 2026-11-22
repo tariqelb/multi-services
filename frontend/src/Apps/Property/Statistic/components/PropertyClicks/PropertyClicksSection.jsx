@@ -52,6 +52,8 @@ import {
     formatPercent,
     getLocale,
     translateValue,
+    translateCity,
+    translateCityRows,
 } from "../shared/analyticsUtils";
 
 const API_URL = "/property/clicks";
@@ -232,7 +234,7 @@ export default function PropertyClicksSection() {
                 <ChartCard title={t("adminPropertyClicks.charts.cities", "By city")} height={300}>
                     <BarChartView
                         layout="vertical"
-                        data={charts.cities || []}
+                        data={translateCityRows(t, i18n.language, charts.cities || [])}
                         bars={[{ key: "clicks", name: t("adminPropertyClicks.charts.clicks", "Views"), color: "#16A34A" }]}
                         locale={locale}
                         labelWidth={95}
@@ -253,7 +255,7 @@ export default function PropertyClicksSection() {
                         key: item.propertyId,
                         primary: item.title || t("adminPropertyClicks.properties.untitled", "Untitled property"),
                         secondary: [
-                            item.city,
+                            item.city && translateCity(t, i18n.language, item.city),
                             translateValue(t, "adminPropertyClicks.propertyTypes", item.propertyType),
                             translateValue(t, "adminPropertyClicks.listingTypes", item.listingType),
                         ]

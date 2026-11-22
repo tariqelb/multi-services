@@ -51,6 +51,11 @@ const externalListingSchema = new mongoose.Schema(
             type: String,
             default: "MAD",
         },
+        // "monthly", "per_m2"... (shown next to the price).
+        priceUnit: {
+            type: String,
+            default: "",
+        },
 
         listingType: {
             type: String,
@@ -116,7 +121,7 @@ const externalListingSchema = new mongoose.Schema(
 
         extractionMethod: {
             type: String,
-            enum: ["metadata", "structured_data", "source_parser"],
+            enum: ["metadata", "structured_data", "source_parser", "manual"],
             default: "metadata",
         },
 

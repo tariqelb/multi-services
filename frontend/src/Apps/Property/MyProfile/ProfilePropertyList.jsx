@@ -1,5 +1,6 @@
 // /home/tariq/multi-services/app/frontend/src/components/MyProfile/ProfilePropertyList.jsx
 
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import PageHeader from "../../../Components/ui/PageHeader";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
 import React, { useState, useEffect } from "react";
@@ -492,12 +493,7 @@ export default function ProfilePropertyList({
             ref={listRef}
             sx={{
                 scrollMarginTop: "0px",
-                width: "100%",
-                maxWidth: "100%",
-                mx: "auto",
-                p: showTabs
-                    ? { xs: 2, md: 4 }
-                    : { xs: 0, md: 0 },
+                ...(showTabs ? pagePaddingSx : { width: "100%", minWidth: 0, p: 0 }),
             }}
         >
             {showTabs && (

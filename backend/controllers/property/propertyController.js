@@ -10,6 +10,8 @@ import {
 } from "../../middleware/propertyUpload.js";
 
 import notifyMatchingPropertyAlerts from "./propertyAlertNotificationService.js";
+import { getUserWhatsApp } from "../../utils/whatsapp.js";
+import { resolveFurnishingStatus } from "../../utils/furnishing.js";
 
 // Google Maps domains accepted by the backend.
 const isAllowedGoogleMapsHost = (hostname) => {
@@ -79,7 +81,7 @@ const parseGoogleMapsCoordinates = (url) => {
 };
 
 // Resolve a shortened Google Maps URL and extract its coordinates.
-const extractGoogleMapsLocation = async (mapLink) => {
+export const extractGoogleMapsLocation = async (mapLink) => {
     let currentUrl;
 
     try {
@@ -180,7 +182,7 @@ const removeUploadedFiles = async (images = []) => {
 };
 
 // Convert multipart form values into Booleans.
-const parseBoolean = (value, field) => {
+export const parseBoolean = (value, field) => {
     if (
         value === undefined ||
         value === null ||
@@ -219,17 +221,13 @@ export const createProperty = async (req, res) => {
             database: mongoose.connection.name,
             collection: User.collection.name,
             emailVerified: User.schema.path("emailVerified")?.instance,
-            whatsappPhoneNumber: User.schema.path(
-                "notificationPreferences.whatsapp.phoneNumber"
-            )?.instance,
-            whatsappVerified: User.schema.path(
-                "notificationPreferences.whatsapp.verified"
-            )?.instance,
+            whatsappNumber: User.schema.path("whatsappNumber")?.instance,
+            whatsappVerified: User.schema.path("whatsappVerified")?.instance,
         });
 
         // 3. Retrieve authenticated user's profile.
         const user = await User.findById(userId).select(
-            "firstName lastName email emailVerified notificationPreferences.whatsapp"
+            "firstName lastName email emailVerified phoneNumber phoneVerified whatsappNumber whatsappVerified"
         );
 
         if (!user) {
@@ -240,14 +238,13 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        const whatsapp = user.notificationPreferences?.whatsapp;
-
-        const whatsappPhoneNumber =
-            whatsapp?.phoneNumber?.trim() || "";
+        // WhatsApp number shown on the listing (user.whatsappNumber).
+        const whatsapp = getUserWhatsApp(user);
+        const whatsappPhoneNumber = whatsapp.number;
 
         // 4. Check verification.
         const emailVerified = user.emailVerified === true;
-        const phoneVerified = whatsapp?.verified === true;
+        const phoneVerified = whatsapp.verified;
 
         console.log("[CreateProperty] Retrieved user:", {
             userId: user._id.toString(),
@@ -363,11 +360,6 @@ export const createProperty = async (req, res) => {
                     ? rentalPeriod.trim()
                     : "";
 
-            normalizedFurnishingStatus =
-                typeof furnishingStatus === "string"
-                    ? furnishingStatus.trim()
-                    : "";
-
             if (
                 !["Daily", "Monthly"].includes(normalizedRentalPeriod)
             ) {
@@ -376,18 +368,19 @@ export const createProperty = async (req, res) => {
                     field: "rentalPeriod",
                 });
             }
-
-            if (
-                !["Furnished", "Unfurnished"].includes(
-                    normalizedFurnishingStatus
-                )
-            ) {
-                return res.status(400).json({
-                    message: "Please select a valid furnishing status.",
-                    field: "furnishingStatus",
-                });
-            }
         }
+
+        // Furnishing status: homes only (sale or rent).
+        const furnishing = resolveFurnishingStatus(propertyType, furnishingStatus);
+
+        if (furnishing.error) {
+            return res.status(400).json({
+                message: furnishing.error,
+                field: "furnishingStatus",
+            });
+        }
+
+        normalizedFurnishingStatus = furnishing.value;
 
         // For sale listings, rental-specific fields remain null.
         // 9. Validate description.

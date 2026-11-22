@@ -31,6 +31,8 @@ async function migrateMissingUserFields() {
             emailVerified: false,
             phoneVerified: false,
             phoneNumber: "",
+            whatsappNumber: "",
+            whatsappVerified: false,
             address: "",
             bio: "",
             profileImage: "",
@@ -43,11 +45,10 @@ async function migrateMissingUserFields() {
                 enabled: true,
                 propertyAlerts: true,
             },
+            // Switches only: the number is user.whatsappNumber.
             whatsapp: {
                 enabled: false,
-                phoneNumber: "",
                 propertyAlerts: false,
-                verified: false,
             },
         };
 

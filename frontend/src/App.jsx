@@ -83,6 +83,11 @@ import ForgotPassword from "./Apps/Property/LoginAndSignUp/ForgotPassword";
 import ResetPassword from "./Apps/Property/LoginAndSignUp/ResetPassword";
 
 import ScrollToTop from "./Components/Home/ScrollToTop";
+import EditPropertyPage from "./Apps/Property/propertyInsertForm/EditPropertyPage";
+import RoommateEditPage from "./Apps/Property/roommate/RoommateEditPage";
+import EstablishmentEditPage from "./Apps/Property/Establishment/EstablishmentEditPage";
+import PublicLayout from "./Apps/Property/Info/PublicLayout";
+import { AboutPage, ContactPage, PrivacyPage, TermsPage } from "./Apps/Property/Info/InfoPages";
 
 
 import PublicationsReviewSection from "./Apps/Property/PublicationReviews/PublicationsReviewSection";
@@ -349,6 +354,17 @@ const router = createBrowserRouter([
         element: <Navigate to="/login" replace />,
     },
 
+    // Public pages (no login needed)
+    {
+        element: <PublicLayout />,
+        children: [
+            { path: "/about", element: <AboutPage /> },
+            { path: "/contact", element: <ContactPage /> },
+            { path: "/privacy", element: <PrivacyPage /> },
+            { path: "/terms", element: <TermsPage /> },
+        ],
+    },
+
     // Authenticated application layout
     {
         id: "dashboard-layout",
@@ -370,6 +386,10 @@ const router = createBrowserRouter([
             {
                 path: "/properties",
                 element: <Properties />,
+            },
+            {
+                path: "/properties/:id/edit",
+                element: <EditPropertyPage />,
             },
             {
                 path: "/properties/publish",
@@ -412,6 +432,10 @@ const router = createBrowserRouter([
                 element: <EstablishmentInsertForm />,
             },
             {
+                path: "/establishments/:id/edit",
+                element: <EstablishmentEditPage />,
+            },
+            {
                 path: "/establishments/:id",
                 element: <EstablishmentDetailsPage />,
             },
@@ -427,6 +451,10 @@ const router = createBrowserRouter([
             {
                 path: "/roommates/:id",
                 element: <RoommateDetailsPage />,
+            },
+            {
+                path: "/roommates/:id/edit",
+                element: <RoommateEditPage />,
             },
             {
                 path: "/roommates/profile/:id",
@@ -487,7 +515,11 @@ const router = createBrowserRouter([
 
             {
                 path: "/dashboard",
-                element: <Dashboard />,
+                element: (
+                    <AdminOnly>
+                        <Dashboard />
+                    </AdminOnly>
+                ),
             },
             {
                 path: "/setting",
@@ -508,7 +540,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "/addexternalListings",
-                element: <ExternalListingSources />,
+                element: (
+                    <AdminOnly>
+                        <ExternalListingSources />
+                    </AdminOnly>
+                ),
             },
 
             // -----------------------------------------------------------------
@@ -517,11 +553,19 @@ const router = createBrowserRouter([
 
             {
                 path: "/admin/users/:userId",
-                element: <UserDetailsPage />,
+                element: (
+                    <AdminOnly>
+                        <UserDetailsPage />
+                    </AdminOnly>
+                ),
             },
             {
                 path: "/admin/knowledge",
-                element: <KnowledgeManagement />,
+                element: (
+                    <AdminOnly>
+                        <KnowledgeManagement />
+                    </AdminOnly>
+                ),
             },
             // -----------------------------------------------------------------
             // Admin moderation

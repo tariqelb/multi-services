@@ -2,16 +2,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../api/axiosInstance";
+import getImageUrl from "../../../utils/getImageUrl";
 
 import {
     updateField,
     setImages,
     setErrors,
+    resetPropertyForm as resetPropertyFormState,
 } from "../../../redux/reducers/insertProperty/propertyFormSlice";
 
-import { Box, Snackbar, Alert } from "@mui/material";
+import { Box, Snackbar, Alert, CircularProgress, Stack, Typography } from "@mui/material";
 import AddHomeWorkRoundedIcon from "@mui/icons-material/AddHomeWorkRounded";
+import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
 
 import {
     FormPage,
@@ -24,11 +28,50 @@ import PropertyInsertFormOwnerInfo from "./PropertyInsertFormOwnerInfo";
 import PropertyInsertFormDetails from "./PropertyInsertFormDetails";
 import PropertyInsertFormImages from "./PropertyInsertFormImages";
 import PropertyInsertFormPublish from "./PropertyInsertFormPublish";
+import { isFurnishableType } from "../../../utils/furnishing";
 import PropertyInsertFormDescription from "./PropertyInsertFormDescription";
 
-export default function PropertyInsertForm({ onAddProperty }) {
+// Fields copied from a saved property into the form (edit mode).
+const EDITABLE_FIELDS = [
+    "role",
+    "title",
+    "description",
+    "listingType",
+    "propertyType",
+    "rentalPeriod",
+    "furnishingStatus",
+    "city",
+    "neighborhood",
+    "fullAddress",
+    "mapLink",
+    "youtubeVideoUrl",
+    "price",
+    "surface",
+    "rooms",
+    "salons",
+    "bathrooms",
+    "floor",
+    "syndicateFees",
+    "deposit",
+    "mediatorFee",
+    "rentWithContract",
+    "mortgageAgreement",
+    "showEmail",
+];
+
+/**
+ * Publish a property, or edit one when propertyId is given.
+ */
+export default function PropertyInsertForm({ onAddProperty, propertyId = null }) {
     const { t } = useTranslation();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const isEdit = Boolean(propertyId);
+    const [editLoading, setEditLoading] = useState(isEdit);
+    const [editError, setEditError] = useState("");
+    // Saved photos the user removed (sent as removeImages).
+    const [removedImages, setRemovedImages] = useState([]);
 
     const formData = useSelector(
         (state) => state.propertyForm.formData
@@ -65,19 +108,20 @@ export default function PropertyInsertForm({ onAddProperty }) {
                     throw new Error("User profile not found");
                 }
 
+                // WhatsApp number lives next to the phone number.
                 const whatsapp = user.notificationPreferences?.whatsapp;
 
-                const whatsappPhoneNumber =
-                    typeof whatsapp?.phoneNumber === "string"
-                        ? whatsapp.phoneNumber.trim()
-                        : "";
+                const whatsappPhoneNumber = String(
+                    user.whatsappNumber ?? whatsapp?.phoneNumber ?? ""
+                ).trim();
 
                 const userProfile = {
                     firstName: user.firstName || "",
                     lastName: user.lastName || "",
                     email: user.email || "",
                     whatsappPhoneNumber,
-                    whatsappVerified: whatsapp?.verified === true,
+                    whatsappVerified:
+                        (user.whatsappVerified ?? whatsapp?.verified) === true,
                     emailVerified: user.emailVerified === true,
                 };
 
@@ -148,6 +192,71 @@ export default function PropertyInsertForm({ onAddProperty }) {
             cancelled = true;
         };
     }, [dispatch, t]);
+
+    // Edit mode: load the property into the form; clear it when leaving.
+    useEffect(() => {
+        if (!isEdit) return undefined;
+
+        let cancelled = false;
+
+        const loadProperty = async () => {
+            setEditLoading(true);
+            setEditError("");
+            setRemovedImages([]);
+            dispatch(setErrors({}));
+
+            try {
+                const response = await axiosInstance.get(`/property/${propertyId}`);
+                const property = response.data?.property || response.data;
+
+                if (cancelled) return;
+
+                EDITABLE_FIELDS.forEach((name) => {
+                    const value = property?.[name];
+                    const isBoolean = ["rentWithContract", "mortgageAgreement", "showEmail"].includes(name);
+
+                    dispatch(
+                        updateField({
+                            name,
+                            value: isBoolean
+                                ? value === true
+                                : value === null || value === undefined
+                                  ? ""
+                                  : String(value),
+                        })
+                    );
+                });
+
+                dispatch(
+                    setImages(
+                        (property?.images || []).map((image) => ({
+                            existing: true,
+                            filename: image.filename,
+                            path: image.path,
+                            url: getImageUrl(image),
+                        }))
+                    )
+                );
+            } catch (error) {
+                if (!cancelled) {
+                    setEditError(
+                        error.response?.data?.message ||
+                            t("properties.edit.loadError", "This property could not be loaded.")
+                    );
+                }
+            } finally {
+                if (!cancelled) setEditLoading(false);
+            }
+        };
+
+        loadProperty();
+
+        return () => {
+            cancelled = true;
+            // Leave an empty form for the next "publish".
+            dispatch(resetPropertyFormState());
+        };
+    }, [dispatch, isEdit, propertyId, t]);
 
     // Set the email visibility default without overriding an existing choice.
     useEffect(() => {
@@ -332,7 +441,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
     const handleRemoveImage = (index) => {
         const image = (formData.images || [])[index];
 
-        if (image?.url) {
+        if (image?.existing) {
+            setRemovedImages((current) => [...current, image.filename || image.path]);
+        } else if (image?.url) {
             URL.revokeObjectURL(image.url);
         }
 
@@ -361,11 +472,12 @@ export default function PropertyInsertForm({ onAddProperty }) {
             return;
         }
 
-        // Check email and WhatsApp verification.
+        // Check email and WhatsApp verification (publishing only).
         if (
-            !profile.emailVerified ||
+            !isEdit &&
+            (!profile.emailVerified ||
             !profile.whatsappVerified ||
-            !profile.whatsappPhoneNumber
+            !profile.whatsappPhoneNumber)
         ) {
             const missingVerification = [];
 
@@ -409,6 +521,11 @@ export default function PropertyInsertForm({ onAddProperty }) {
             "price",
             "surface",
         ];
+
+        // Homes need a furnishing status.
+        if (isFurnishableType(formData.propertyType)) {
+            requiredFields.push("furnishingStatus");
+        }
 
         requiredFields.forEach((key) => {
             if (!String(formData[key] ?? "").trim()) {
@@ -566,6 +683,9 @@ export default function PropertyInsertForm({ onAddProperty }) {
 
         const submissionData = {
             ...propertyFields,
+            furnishingStatus: isFurnishableType(propertyFields.propertyType)
+                ? propertyFields.furnishingStatus
+                : "",
             showEmail: formData.showEmail ?? false,
             rentWithContract: formData.rentWithContract ?? false,
             mortgageAgreement: formData.mortgageAgreement ?? false,
@@ -587,6 +707,38 @@ export default function PropertyInsertForm({ onAddProperty }) {
                 payload.append(key, String(value));
             }
         });
+
+        if (isEdit) {
+            payload.append("removeImages", JSON.stringify(removedImages));
+
+            try {
+                setLoading(true);
+
+                const response = await axiosInstance.put(`/property/${propertyId}`, payload);
+
+                setNotification({
+                    open: true,
+                    message:
+                        response.data?.message ||
+                        t("properties.edit.saved", "Your changes were saved."),
+                    severity: "success",
+                });
+
+                setTimeout(() => navigate(`/property/${propertyId}`), 900);
+            } catch (error) {
+                setNotification({
+                    open: true,
+                    message:
+                        error.response?.data?.message ||
+                        t("properties.edit.saveError", "Your changes could not be saved."),
+                    severity: "error",
+                });
+            } finally {
+                setLoading(false);
+            }
+
+            return;
+        }
 
         try {
             setLoading(true);
@@ -636,14 +788,34 @@ export default function PropertyInsertForm({ onAddProperty }) {
         <Box>
             <FormPage>
                 <FormPageHeader
-                    icon={<AddHomeWorkRoundedIcon />}
-                    badge={t("properties.insert.badge")}
-                    title={t("properties.insert.title")}
-                    subtitle={t("properties.insert.subtitle")}
+                    icon={isEdit ? <EditNoteRoundedIcon /> : <AddHomeWorkRoundedIcon />}
+                    badge={isEdit ? t("properties.edit.badge", "Edit") : t("properties.insert.badge")}
+                    title={isEdit ? t("properties.edit.title", "Edit your property") : t("properties.insert.title")}
+                    subtitle={
+                        isEdit
+                            ? t("properties.edit.subtitle", "Update the details and photos of your publication.")
+                            : t("properties.insert.subtitle")
+                    }
                     requiredNote={t("properties.insert.requiredFields")}
                 />
 
+                {isEdit && editLoading && (
+                    <Stack spacing={1.5} sx={{ alignItems: "center", py: 8 }}>
+                        <CircularProgress />
+                        <Typography sx={{ color: "text.secondary" }}>
+                            {t("properties.edit.loading", "Loading your property...")}
+                        </Typography>
+                    </Stack>
+                )}
+
+                {isEdit && !editLoading && editError && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                        {editError}
+                    </Alert>
+                )}
+
                 {/* Property form */}
+                {!(isEdit && (editLoading || editError)) && (
                 <Box component="form" onSubmit={handleSubmit}>
                     <PropertyInsertFormOwnerInfo
                         formData={formData}
@@ -686,8 +858,10 @@ export default function PropertyInsertForm({ onAddProperty }) {
 
                     <PropertyInsertFormPublish
                         loading={loading || profileLoading}
+                        isEdit={isEdit}
                     />
                 </Box>
+                )}
             </FormPage>
 
             {/* Success and error notifications */}

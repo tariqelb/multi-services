@@ -1,4 +1,5 @@
 
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import PageHeader from "../../../Components/ui/PageHeader";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -28,13 +29,7 @@ export default function RoommatePage() {
     };
 
     return (
-        <Container
-            maxWidth="xl"
-            sx={{
-                py: { xs: 2, md: 4 },
-                px: { xs: 1.5, sm: 2, md: 3 },
-            }}
-        >
+        <Box sx={pagePaddingSx}>
             {/* Page header */}
             <PageHeader
                 icon={<PeopleAltIcon />}
@@ -100,6 +95,6 @@ export default function RoommatePage() {
                     onAddListing={handleListingAdded}
                 />
             )}
-        </Container>
+        </Box>
     );
 }

@@ -126,7 +126,7 @@ export default function RoommateRentSection({
                         onChange={onChange}
                         error={Boolean(errors[field.name])}
                         helperText={errors[field.name]}
-                        inputProps={{ min: 0 }}
+                        slotProps={{ htmlInput: { min: 0 } }}
                     />
                 ))}
 
@@ -161,7 +161,7 @@ export default function RoommateRentSection({
                     name="availableFrom"
                     value={formData.availableFrom}
                     onChange={onChange}
-                    InputLabelProps={{ shrink: true }}
+                    slotProps={{ inputLabel: { shrink: true } }}
                 />
             </Stack>
         </SectionPaper>

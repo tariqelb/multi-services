@@ -20,7 +20,7 @@ export default function RealEstateBanner() {
                 backgroundPosition: "center",
                 display: "flex",
                 alignItems: "flex-end",
-                px: { xs: 2, sm: 3, md: 5 },
+                px: { xs: 2, sm: 3, md: 4 },
                 py: { xs: 3, md: 5 },
                 overflow: "hidden",
                 boxSizing: "border-box",

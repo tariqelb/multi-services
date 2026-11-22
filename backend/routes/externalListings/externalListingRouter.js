@@ -19,12 +19,101 @@ import {
     importNewExternalListings,
 } from "../../controllers/externalListings/externalListingController.js";
 
+import {
+    getCollectableWebsites,
+    addCollectableWebsite,
+    deleteCollectableWebsite,
+    startWebsiteCollection,
+    getWebsiteCollectionStatus,
+    cancelWebsiteCollection,
+} from "../../controllers/externalListings/externalListingCollectionController.js";
+
+import {
+    startAvailabilityCheckController,
+    getAvailabilityStatusController,
+    cancelAvailabilityCheckController,
+    removeReviewedListingsController,
+} from "../../controllers/externalListings/externalListingAvailabilityController.js";
+
 const router = express.Router();
 
 // Public reading endpoint.
 router.get("/", getExternalListings);
 
-// Administrator-only source management endpoints.
+// Administrator-only: collect new listings from a whole website.
+router.get(
+    "/websites",
+    authMiddleware,
+    adminMiddleware,
+    getCollectableWebsites
+);
+
+router.post(
+    "/websites",
+    authMiddleware,
+    adminMiddleware,
+    addCollectableWebsite
+);
+
+router.delete(
+    "/websites/:hostname",
+    authMiddleware,
+    adminMiddleware,
+    deleteCollectableWebsite
+);
+
+router.post(
+    "/collect-site",
+    authMiddleware,
+    adminMiddleware,
+    startWebsiteCollection
+);
+
+router.get(
+    "/collect-site/status",
+    authMiddleware,
+    adminMiddleware,
+    getWebsiteCollectionStatus
+);
+
+router.post(
+    "/collect-site/cancel",
+    authMiddleware,
+    adminMiddleware,
+    cancelWebsiteCollection
+);
+
+// Administrator-only: check that listings are still available on their
+// websites and remove the ones that are not.
+router.post(
+    "/availability/check",
+    authMiddleware,
+    adminMiddleware,
+    startAvailabilityCheckController
+);
+
+router.get(
+    "/availability/status",
+    authMiddleware,
+    adminMiddleware,
+    getAvailabilityStatusController
+);
+
+router.post(
+    "/availability/cancel",
+    authMiddleware,
+    adminMiddleware,
+    cancelAvailabilityCheckController
+);
+
+router.post(
+    "/availability/remove",
+    authMiddleware,
+    adminMiddleware,
+    removeReviewedListingsController
+);
+
+// Administrator-only source management endpoints (single listing URLs).
 router.get(
     "/sources",
     authMiddleware,

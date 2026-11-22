@@ -39,7 +39,16 @@ export default function PropertyDetailsPage() {
                 setProperty(propertyData);
 
                 // 2. Fetch list to extract similar properties
-                const listRes = await axiosInstance.get('/property/getlist');
+                const listRes = await axiosInstance.get("/property/getlist", {
+                    params: {
+                        page: 1,
+                        limit: 12,
+                        propertyType: propertyData.propertyType,
+                        // Furnished ones have their own page and suggestions.
+                        furnishing: "unfurnished",
+                        excludeId: propertyData._id || propertyData.id,
+                    },
+                });
                 const allProps = Array.isArray(listRes.data)
                     ? listRes.data
                     : Array.isArray(listRes.data?.properties)

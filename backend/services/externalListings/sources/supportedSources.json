@@ -22,5 +22,39 @@
             "www.3a9arai.ma"
         ],
         "pathPrefix": "/annonce/"
+    },
+    {
+        "sourceName": "immo.hespress",
+        "hostnames": [
+            "immo.hespress.com",
+            "www.immo.hespress.com"
+        ],
+        "pathPrefix": "/fr/biens/",
+        "lastCollectedAt": "2026-11-21T00:42:44.818Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 10,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "immofind",
+        "hostnames": [
+            "immofind.ma",
+            "www.immofind.ma"
+        ],
+        "pathPrefix": "/annonce/",
+        "lastCollectedAt": "2026-11-21T01:27:06.433Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 10,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
     }
 ]

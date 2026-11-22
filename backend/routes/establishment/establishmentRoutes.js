@@ -12,6 +12,7 @@ import {
 } from "../../controllers/Establishment/establishmentController.js";
 
 import authMiddleware from "../../middleware/authMiddleware.js";
+import optionalAuthMiddleware from "../../middleware/optionalAuthMiddleware.js";
 import {
     uploadEstablishmentFiles,
 } from "../../middleware/establishmentUpload.js";
@@ -47,6 +48,6 @@ router.delete(
     deleteEstablishment
 );
 router.get("/user/:userId", getEstablishmentsByUser);
-router.get("/:id", getEstablishmentById);
+router.get("/:id", optionalAuthMiddleware, getEstablishmentById);
 
 export default router;

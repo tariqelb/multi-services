@@ -4,6 +4,7 @@ import {
     discoverAqariListings,
     extractAqariListing,
 } from "./sources/aqariSource.js";
+import { wasRemoved } from "./removedListings.js";
 
 export async function collectAqariListings() {
     const urls = await discoverAqariListings();
@@ -57,6 +58,12 @@ export async function collectAqariListings() {
             const existing = await ExternalListing.findOne({
                 sourceUrl,
             }).select("_id");
+
+            // Removed earlier because it was no longer available.
+            if (!existing && (await wasRemoved(sourceUrl))) {
+                result.skipped += 1;
+                continue;
+            }
 
             const update = {
                 ...listing,

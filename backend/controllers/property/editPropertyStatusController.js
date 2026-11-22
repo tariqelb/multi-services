@@ -1,3 +1,5 @@
+import { getAllowedPropertyStatuses, isPropertyStatusAllowed } from "../../utils/listingStatus.js";
+import { confirmedNow } from "../../services/listingExpiry.js";
 import Property from "../../DatabaseModels/Schema/Property.js";
 
 export const editPropertyStatus = async (req, res) => {
@@ -24,8 +26,22 @@ export const editPropertyStatus = async (req, res) => {
             return res.status(403).json({ message: "Unauthorized to update this property status" });
         }
 
-        // 3. Update status and save
+        // 3. Sold only for sale, Rented only for rent.
+        if (!isPropertyStatusAllowed(property.listingType, status)) {
+            return res.status(400).json({
+                code: "STATUS_NOT_ALLOWED",
+                message:
+                    property.listingType === "For Sale"
+                        ? "A property for sale can be Available, Sold or Inactive."
+                        : "A property for rent can be Available, Rented or Inactive.",
+                allowedStatuses: getAllowedPropertyStatuses(property.listingType),
+            });
+        }
+
+        // 4. Update status and save
         property.status = status;
+        // Changing the status confirms the listing (60-day expiry).
+        Object.assign(property, confirmedNow());
         await property.save();
 
         return res.status(200).json({

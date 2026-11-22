@@ -1,8 +1,9 @@
 import { Box } from "@mui/material";
+import { pagePaddingSx } from "../ui/PageContainer";
 import PageHeader from "../ui/PageHeader";
 
 /**
- * Shared page shell: centered container + title / subtitle / main action.
+ * Shared page shell: full width with the common padding + title / subtitle / main action.
  * Use it as the root of every page.
  */
 export default function PageLayout({
@@ -10,21 +11,10 @@ export default function PageLayout({
     subtitle,
     action,
     icon,
-    maxWidth = 1120,
     children,
 }) {
     return (
-        <Box
-            sx={{
-                width: "100%",
-                minWidth: 0,
-                maxWidth,
-                mx: "auto",
-                px: { xs: 2, sm: 3, md: 4 },
-                py: { xs: 3, md: 4 },
-                boxSizing: "border-box",
-            }}
-        >
+        <Box sx={pagePaddingSx}>
             <PageHeader icon={icon} title={title} subtitle={subtitle} action={action} />
 
             {children}

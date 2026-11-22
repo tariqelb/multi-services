@@ -1,0 +1,47 @@
+Unused files in /home/tariq/multi-services/app/frontend
+Scanned 246 files, 4 starting files, 207 used.
+
+UNUSED (38) — nothing imports them:
+  src/App.css
+  src/Apps/cars/Components/Sidebar/Sidebar.jsx   (copy? the app uses src/Apps/Property/Sidebar/Sidebar.jsx)
+  src/Apps/DailyWorker/Components/Sidebar/Sidebar.jsx   (copy? the app uses src/Apps/Property/Sidebar/Sidebar.jsx)
+  src/Apps/DelivryMan/Components/Sidebar/Sidebar.jsx   (copy? the app uses src/Apps/Property/Sidebar/Sidebar.jsx)
+  src/Apps/Driver/Components/Sidebar/Sidebar.jsx   (copy? the app uses src/Apps/Property/Sidebar/Sidebar.jsx)
+  src/Apps/Property/externalListings/ExternalListingClickCard.jsx   (copy? the app uses src/Apps/Property/Statistic/components/ExternalListingsClicks/ExternalListingClickCard.jsx)
+  src/Apps/Property/externalListings/SummaryCard.jsx
+  src/Apps/Property/language/LanguageSwitcher.jsx
+  src/Apps/Property/main-snippet.jsx
+  src/Apps/Property/properties/CategoryCard.jsx
+  src/Apps/Property/roommate/roommateFormConstants.js
+  src/Apps/Property/roommate/roommateFormUtils.js
+  src/Apps/Property/Settings/EditProfile.jsx
+  src/Apps/Property/Settings/Password.jsx
+  src/Apps/Property/Statistic/components/ClientContactActions/ContactActionBreakdown.jsx
+  src/Apps/Property/Statistic/components/ClientContactActions/ContactActivityChart.jsx
+  src/Apps/Property/Statistic/components/ClientContactActions/ContactStatCard.jsx
+  src/Apps/Property/Statistic/components/ClientContactActions/RecentContactActivity.jsx
+  src/Apps/Property/Statistic/components/ClientContactActions/TopContactedProperties.jsx
+  src/Apps/Property/Statistic/components/ExternalListingsClicks/AnalyticsChart.jsx
+  src/Apps/Property/Statistic/components/PropertyClicks/AnalyticsChart.jsx
+  src/Apps/Property/Statistic/components/PropertyClicks/SummaryCard.jsx
+  src/Apps/Property/Statistic/components/User/UserCard_.jsx
+  src/Apps/Property/theme.js   (copy? the app uses src/theme/theme.js)
+  src/Apps/Services&Companies/Components/Sidebar/Sidebar.jsx   (copy? the app uses src/Apps/Property/Sidebar/Sidebar.jsx)
+  src/assets/appa01.jpeg
+  src/assets/appa02.jpeg
+  src/assets/appa03.jpeg
+  src/assets/Common layout (applies to every page)@1x.png
+  src/assets/villa01.jpeg
+  src/assets/villa02.jpeg
+  src/Components/Home/Home.jsx
+  src/Components/Home/MiddleContent_.jsx
+  src/Components/Home/PageLayout_.jsx
+  src/Components/ui/DetailsKit_.jsx
+  src/Components/ui/FormKit_.jsx
+  src/pages/Home.jsx
+  src/redux/actions/loginAction.js
+
+MAYBE USED (1) — not imported, but their name appears in the code. Check by hand:
+  src/redux/reducers/profile/updateProfile.js   <- named in src/redux/actions/profile/profileAction.js
+
+MANUAL SCRIPTS (0) — run by hand, kept:

@@ -5,28 +5,58 @@ import {
     supportsExternalListingUrl,
 } from "../services/externalListings/sources/externalListingSource.js";
 
+// Fields refreshed from the source website. Listings edited manually by an
+// administrator (extractionMethod "manual") keep their values.
+const REFRESHED_FIELDS = [
+    "title",
+    "description",
+    "imageUrl",
+    "imageUrls",
+    "price",
+    "currency",
+    "priceUnit",
+    "listingType",
+    "propertyType",
+    "city",
+    "neighborhood",
+    "surface",
+    "rooms",
+    "bathrooms",
+];
+
+const isEmpty = (value) =>
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0);
+
 async function refreshListing(listing) {
     if (!supportsExternalListingUrl(listing.sourceUrl)) {
-        throw new Error(
-            "Unsupported listing source URL."
-        );
+        throw new Error("Unsupported listing source URL.");
     }
 
-    const extracted = await extractExternalListing(
-        listing.sourceUrl
-    );
+    const extracted = await extractExternalListing(listing.sourceUrl);
 
     if (!extracted) {
-        throw new Error(
-            "Could not extract usable listing information."
-        );
+        throw new Error("Could not extract usable listing information.");
+    }
+
+    if (listing.extractionMethod !== "manual") {
+        for (const field of REFRESHED_FIELDS) {
+            // Never erase a stored value with an empty one.
+            if (!isEmpty(extracted[field])) {
+                listing[field] = extracted[field];
+            }
+        }
+
+        listing.extractionMethod = extracted.extractionMethod || listing.extractionMethod;
     }
 
     listing.lastCheckedAt = new Date();
     listing.lastSeenAt = new Date();
     listing.lastError = "";
     listing.status = "active";
-    listing.contentHash = extracted.contentHash || "";
+    listing.contentHash = extracted.contentHash || listing.contentHash || "";
 
     await listing.save();
 }
@@ -52,9 +82,7 @@ export async function runExternalListingsJob() {
 
             listing.lastCheckedAt = new Date();
             listing.lastError =
-                error instanceof Error
-                    ? error.message
-                    : "Refresh failed.";
+                error instanceof Error ? error.message : "Refresh failed.";
 
             try {
                 await listing.save();
@@ -73,9 +101,7 @@ export async function runExternalListingsJob() {
         }
 
         // Avoid sending requests too quickly.
-        await new Promise((resolve) =>
-            setTimeout(resolve, 2000)
-        );
+        await new Promise((resolve) => setTimeout(resolve, 2000));
     }
 
     const summary = {
@@ -84,10 +110,7 @@ export async function runExternalListingsJob() {
         failed,
     };
 
-    console.info(
-        "[ExternalListings] Finished:",
-        summary
-    );
+    console.info("[ExternalListings] Finished:", summary);
 
     return summary;
 }

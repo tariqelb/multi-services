@@ -11,13 +11,15 @@ export default function RoommatePublishSection({
     profile,
     onSubmit,
     onReset,
+    isEdit = false,
     t,
 }) {
     const translate = (key, fallback) => t(key, { defaultValue: fallback });
 
     const emailVerified = Boolean(profile?.emailVerified || profile?.isEmailVerified);
     const whatsappVerified = Boolean(profile?.whatsappVerified || profile?.whatsapp?.verified);
-    const canPublish = emailVerified && whatsappVerified;
+    // Editing an existing announcement needs no new verification.
+    const canPublish = isEdit || (emailVerified && whatsappVerified);
 
     return (
         <Stack spacing={2}>
@@ -31,15 +33,31 @@ export default function RoommatePublishSection({
             )}
 
             <FormSubmitBar
-                title={translate("roommates.form.publishTitle", "Publish your announcement")}
-                subtitle={translate(
-                    "roommates.form.publishDescription",
-                    "Review your information before publishing your roommate announcement."
-                )}
+                title={
+                    isEdit
+                        ? translate("roommates.edit.saveTitle", "Save your changes")
+                        : translate("roommates.form.publishTitle", "Publish your announcement")
+                }
+                subtitle={
+                    isEdit
+                        ? translate("roommates.edit.saveDescription", "Your announcement is updated right away.")
+                        : translate(
+                            "roommates.form.publishDescription",
+                            "Review your information before publishing your roommate announcement."
+                        )
+                }
                 loading={loading}
-                disabled={profileLoading || !canPublish}
-                submitLabel={translate("roommates.form.publish", "Publish announcement")}
-                loadingLabel={translate("roommates.form.publishing", "Publishing...")}
+                disabled={(!isEdit && profileLoading) || !canPublish}
+                submitLabel={
+                    isEdit
+                        ? translate("roommates.edit.save", "Save changes")
+                        : translate("roommates.form.publish", "Publish announcement")
+                }
+                loadingLabel={
+                    isEdit
+                        ? translate("roommates.edit.saving", "Saving...")
+                        : translate("roommates.form.publishing", "Publishing...")
+                }
                 submitIcon={<RocketLaunchOutlinedIcon />}
                 onSubmit={onSubmit}
                 onReset={onReset}

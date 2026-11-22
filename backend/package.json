@@ -7,7 +7,9 @@
     "dev": "node --watch server.js",
     "start": "node server.js",
     "job:account-deletion": "node scripts/runAccountDeletion.js",
-    "job:external-listings": "node scripts/runExternalListings.js"
+    "job:external-listings": "node scripts/runExternalListings.js",
+    "migrate:whatsapp": "node scripts/migrateWhatsappNumber.js",
+    "fix:property-status": "node scripts/fixPropertyStatuses.js"
   },
   "keywords": [],
   "author": "",

@@ -1,6 +1,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
+import { Alert, Box, CircularProgress } from "@mui/material";
 import axiosInstance from "../../../api/axiosInstance";
+import getImageUrl from "../../../utils/getImageUrl";
 import EstablishmentForm from "./EstablishmentForm";
 
 const initialRoom = () => ({
@@ -70,7 +72,77 @@ const createPreview = (file) => ({
     preview: URL.createObjectURL(file),
 });
 
-export default function EstablishmentInsertForm({ onAddEstablishment }) {
+// A saved photo shown in the form (edit mode).
+const savedPreview = (value) => {
+    const image = typeof value === "string" ? { filename: value, path: value } : value;
+
+    return image?.path ? { existing: true, image, preview: getImageUrl(image) } : null;
+};
+
+const revoke = (item) => {
+    if (item?.file && item?.preview) URL.revokeObjectURL(item.preview);
+};
+
+const asText = (value) => (value === null || value === undefined ? "" : value);
+
+// Saved establishment -> form values + photo previews.
+function establishmentToForm(establishment) {
+    const form = {
+        ...initialForm,
+        name: asText(establishment.name),
+        accommodationType: asText(establishment.accommodationType),
+        shortDescription: asText(establishment.shortDescription),
+        fullDescription: asText(establishment.fullDescription),
+        yearEstablished: asText(establishment.yearEstablished),
+        numberOfRooms: asText(establishment.numberOfRooms),
+        numberOfFloors: asText(establishment.numberOfFloors),
+        officialClassification: asText(establishment.officialClassification),
+        location: {
+            ...initialForm.location,
+            city: asText(establishment.location?.city),
+            neighborhood: asText(establishment.location?.neighborhood),
+            fullAddress: asText(establishment.location?.fullAddress),
+            googleMapsLink: asText(establishment.location?.googleMapsLink),
+        },
+        facilities: {
+            ...initialForm.facilities,
+            ...(establishment.facilities || {}),
+            otherServices: [...(establishment.facilities?.otherServices || [])],
+        },
+        contact: {
+            ...initialForm.contact,
+            ...Object.fromEntries(
+                Object.entries(establishment.contact || {}).map(([key, value]) => [key, value ?? ""])
+            ),
+            socialMedia: (establishment.contact?.socialMedia || []).map(({ platform, url }) => ({ platform, url })),
+        },
+        media: {
+            ...initialForm.media,
+            videoUrl: asText(establishment.media?.videoUrl),
+        },
+        rooms: (establishment.rooms?.length ? establishment.rooms : [initialRoom()]).map((room) => ({
+            ...initialRoom(),
+            ...room,
+            bedConfiguration: [...(room.bedConfiguration || [])],
+            description: asText(room.description),
+            pricePerNight: asText(room.pricePerNight),
+            photos: (room.photos || []).map(savedPreview).filter(Boolean),
+        })),
+    };
+
+    return {
+        form,
+        cover: savedPreview(establishment.media?.coverPhoto),
+        gallery: (establishment.media?.gallery || []).map(savedPreview).filter(Boolean),
+    };
+}
+
+// establishmentId: edit an existing establishment (PUT) instead of creating one.
+export default function EstablishmentInsertForm({ onAddEstablishment, establishmentId = null, onSaved }) {
+    const isEdit = Boolean(establishmentId);
+    const [pageLoading, setPageLoading] = useState(isEdit);
+    const [loadError, setLoadError] = useState("");
+    const originalRef = useRef(null);
     const [formData, setFormData] = useState(initialForm);
     const [coverFile, setCoverFile] = useState(null);
     const [galleryFiles, setGalleryFiles] = useState([]);
@@ -103,21 +175,48 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
         return () => {
             const current = latestFilesRef.current;
 
-            if (current.coverFile?.preview) {
-                URL.revokeObjectURL(current.coverFile.preview);
-            }
-
-            current.galleryFiles.forEach((image) => {
-                URL.revokeObjectURL(image.preview);
-            });
-
-            current.rooms.forEach((room) => {
-                room.photos.forEach((photo) => {
-                    if (photo.preview) URL.revokeObjectURL(photo.preview);
-                });
-            });
+            revoke(current.coverFile);
+            current.galleryFiles.forEach(revoke);
+            current.rooms.forEach((room) => room.photos.forEach(revoke));
         };
     }, []);
+
+    // Edit mode: load the establishment.
+    useEffect(() => {
+        if (!establishmentId) return undefined;
+
+        let cancelled = false;
+
+        (async () => {
+            try {
+                setPageLoading(true);
+                setLoadError("");
+
+                const response = await axiosInstance.get(`/establishments/${establishmentId}`);
+                const establishment = response.data?.establishment;
+
+                if (!establishment?._id) throw new Error("Establishment not found");
+
+                if (!cancelled) {
+                    const loaded = establishmentToForm(establishment);
+                    originalRef.current = loaded;
+                    setFormData(loaded.form);
+                    setCoverFile(loaded.cover);
+                    setGalleryFiles(loaded.gallery);
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    setLoadError(error.response?.data?.message || "Unable to load this establishment.");
+                }
+            } finally {
+                if (!cancelled) setPageLoading(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [establishmentId]);
 
     const notify = (message, severity = "success") => {
         setNotification({ open: true, message, severity });
@@ -128,21 +227,16 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
     };
 
     const resetForm = () => {
-        if (coverFile?.preview) URL.revokeObjectURL(coverFile.preview);
+        revoke(coverFile);
+        galleryFiles.forEach(revoke);
+        formData.rooms.forEach((room) => room.photos.forEach(revoke));
 
-        galleryFiles.forEach((image) => {
-            URL.revokeObjectURL(image.preview);
-        });
+        // Edit mode: back to the saved establishment.
+        const original = isEdit ? originalRef.current : null;
 
-        formData.rooms.forEach((room) => {
-            room.photos.forEach((photo) => {
-                if (photo.preview) URL.revokeObjectURL(photo.preview);
-            });
-        });
-
-        setFormData(initialForm);
-        setCoverFile(null);
-        setGalleryFiles([]);
+        setFormData(original ? original.form : initialForm);
+        setCoverFile(original ? original.cover : null);
+        setGalleryFiles(original ? [...original.gallery] : []);
         setErrors({});
         setOtherService("");
         setSocialUrl("");
@@ -192,9 +286,7 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
             return;
         }
 
-        formData.rooms[index].photos.forEach((photo) => {
-            if (photo.preview) URL.revokeObjectURL(photo.preview);
-        });
+        formData.rooms[index].photos.forEach(revoke);
 
         setFormData((prev) => ({
             ...prev,
@@ -241,7 +333,7 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
         const photos = [...formData.rooms[roomIndex].photos];
         const removed = photos[photoIndex];
 
-        if (removed?.preview) URL.revokeObjectURL(removed.preview);
+        revoke(removed);
 
         photos.splice(photoIndex, 1);
         updateRoom(roomIndex, "photos", photos);
@@ -257,14 +349,14 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
             return;
         }
 
-        if (coverFile?.preview) URL.revokeObjectURL(coverFile.preview);
+        revoke(coverFile);
 
         setCoverFile(createPreview(file));
         event.target.value = "";
     };
 
     const removeCover = () => {
-        if (coverFile?.preview) URL.revokeObjectURL(coverFile.preview);
+        revoke(coverFile);
         setCoverFile(null);
     };
 
@@ -296,7 +388,7 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
     const removeGalleryImage = (index) => {
         const image = galleryFiles[index];
 
-        if (image?.preview) URL.revokeObjectURL(image.preview);
+        revoke(image);
 
         setGalleryFiles((prev) => prev.filter((_, i) => i !== index));
     };
@@ -448,18 +540,20 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
                 numberOfRooms: Number(formData.numberOfRooms || 0),
                 numberOfFloors: Number(formData.numberOfFloors || 0),
 
+                // Saved photos to keep are sent back (edit mode); new
+                // files are uploaded below.
                 rooms: formData.rooms.map((room) => ({
                     ...room,
                     quantity: Number(room.quantity),
                     maxGuests: Number(room.maxGuests),
                     pricePerNight: Number(room.pricePerNight),
-                    photos: [],
+                    photos: room.photos.filter((photo) => photo.existing).map((photo) => photo.image),
                 })),
 
                 media: {
                     ...formData.media,
-                    coverPhoto: null,
-                    gallery: [],
+                    coverPhoto: coverFile?.existing ? coverFile.image : null,
+                    gallery: galleryFiles.filter((image) => image.existing).map((image) => image.image),
                 },
             };
 
@@ -472,7 +566,7 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
             }
 
             galleryFiles.forEach((image) => {
-                body.append("gallery", image.file);
+                if (image.file) body.append("gallery", image.file);
             });
 
             formData.rooms.forEach((room, roomIndex) => {
@@ -482,6 +576,14 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
                     }
                 });
             });
+
+            if (isEdit) {
+                const response = await axiosInstance.put(`/establishments/${establishmentId}`, body);
+
+                notify(response.data?.message || "Establishment updated successfully.");
+                onSaved?.(response.data?.establishment);
+                return;
+            }
 
             const response = await axiosInstance.post(
                 "/establishments",
@@ -514,8 +616,21 @@ export default function EstablishmentInsertForm({ onAddEstablishment }) {
         }
     };
 
+    if (isEdit && pageLoading) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (isEdit && loadError) {
+        return <Alert severity="error" sx={{ m: 2 }}>{loadError}</Alert>;
+    }
+
     return (
         <EstablishmentForm
+            isEdit={isEdit}
             formData={formData}
             errors={errors}
             loading={loading}

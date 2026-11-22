@@ -1,15 +1,24 @@
 import jwt from "jsonwebtoken";
 
-const authMiddleware = (req, res, next) => {
+import { getAccountStatus } from "../services/accountStatus.js";
+
+// Same options as the login cookie, so the browser really removes it.
+export const authCookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
+};
+
+// Set AUTH_DEBUG=true in .env to log every authentication.
+const debug = (...args) => {
+    if (process.env.AUTH_DEBUG === "true") console.log("[Auth]", ...args);
+};
+
+const authMiddleware = async (req, res, next) => {
     const token = req.cookies?.token;
 
-    console.log("\n========== AUTH MIDDLEWARE ==========");
-    console.log("[Auth] Token exists:", Boolean(token));
-
     if (!token) {
-        console.log("[Auth] No token found.");
-        console.log("=====================================\n");
-
         return res.status(401).json({
             message: "Authentication required",
             code: "NO_TOKEN",
@@ -24,35 +33,14 @@ const authMiddleware = (req, res, next) => {
         });
     }
 
+    let decoded;
+
     try {
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET,
-            { algorithms: ["HS256"] }
-        );
-
-        if (!decoded.userId) {
-            console.log("[Auth] Token has no userId.");
-
-            return res.status(401).json({
-                message: "Invalid authentication token",
-                code: "INVALID_TOKEN",
-            });
-        }
-
-        req.user = {
-            userId: decoded.userId,
-        };
-
-        console.log("[Auth] Authentication successful.");
-        console.log("[Auth] User ID:", decoded.userId);
-        console.log("=====================================\n");
-
-        return next();
-
+        decoded = jwt.verify(token, process.env.JWT_SECRET, {
+            algorithms: ["HS256"],
+        });
     } catch (error) {
-        console.error("[Auth] Token verification failed:", error.message);
-        console.log("=====================================\n");
+        debug("Token verification failed:", error.message);
 
         if (error.name === "TokenExpiredError") {
             return res.status(401).json({
@@ -66,6 +54,52 @@ const authMiddleware = (req, res, next) => {
             code: "INVALID_TOKEN",
         });
     }
+
+    if (!decoded?.userId) {
+        return res.status(401).json({
+            message: "Invalid authentication token",
+            code: "INVALID_TOKEN",
+        });
+    }
+
+    try {
+        // Deleted or suspended accounts lose access immediately
+        // (status is cached for 30 seconds).
+        const account = await getAccountStatus(decoded.userId);
+
+        if (!account.exists) {
+            res.clearCookie("token", authCookieOptions);
+
+            return res.status(401).json({
+                message: "Your account no longer exists.",
+                code: "ACCOUNT_NOT_FOUND",
+            });
+        }
+
+        if (account.status === "suspended") {
+            res.clearCookie("token", authCookieOptions);
+
+            return res.status(403).json({
+                message: "Your account has been suspended.",
+                code: "ACCOUNT_SUSPENDED",
+                reason: account.reason,
+            });
+        }
+    } catch (error) {
+        console.error("[Auth] Account status check failed:", error.message);
+
+        return res.status(500).json({
+            message: "Unable to verify your account. Please try again.",
+        });
+    }
+
+    req.user = {
+        userId: decoded.userId,
+    };
+
+    debug("Authenticated user", decoded.userId);
+
+    return next();
 };
 
 export default authMiddleware;

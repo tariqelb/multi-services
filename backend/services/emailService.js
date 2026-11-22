@@ -472,3 +472,186 @@ export const sendPasswordResetEmail = async ({
         html,
     });
 };
+
+// Account suspended / reactivated by an administrator.
+export const sendAccountStatusEmail = async ({
+    to,
+    status,
+    reason = "",
+    language = "en",
+}) => {
+    if (!to || !["active", "suspended"].includes(status)) {
+        throw new Error("Recipient email and a valid status are required.");
+    }
+
+    const lang = normalizeLanguage(language);
+
+    const content = {
+        en: {
+            suspended: {
+                subject: "Your MultiServices account has been suspended",
+                heading: "Account suspended",
+                intro: "An administrator suspended your account. You cannot log in and your publications are hidden for now.",
+            },
+            active: {
+                subject: "Your MultiServices account is active again",
+                heading: "Account reactivated",
+                intro: "Your account has been reactivated. You can log in again and your publications are visible.",
+            },
+            reason: "Reason",
+            contact: "If you think this is a mistake, reply to this email or contact us from the website.",
+            button: "Open MultiServices",
+        },
+        fr: {
+            suspended: {
+                subject: "Votre compte MultiServices a été suspendu",
+                heading: "Compte suspendu",
+                intro: "Un administrateur a suspendu votre compte. Vous ne pouvez plus vous connecter et vos publications sont masquées pour le moment.",
+            },
+            active: {
+                subject: "Votre compte MultiServices est de nouveau actif",
+                heading: "Compte réactivé",
+                intro: "Votre compte a été réactivé. Vous pouvez vous reconnecter et vos publications sont de nouveau visibles.",
+            },
+            reason: "Motif",
+            contact: "Si vous pensez qu'il s'agit d'une erreur, répondez à cet e-mail ou contactez-nous depuis le site.",
+            button: "Ouvrir MultiServices",
+        },
+        ar: {
+            suspended: {
+                subject: "تم تعليق حسابك على MultiServices",
+                heading: "تم تعليق الحساب",
+                intro: "قام أحد المسؤولين بتعليق حسابك. لا يمكنك تسجيل الدخول ومنشوراتك مخفية حالياً.",
+            },
+            active: {
+                subject: "حسابك على MultiServices نشط من جديد",
+                heading: "تمت إعادة تفعيل الحساب",
+                intro: "تمت إعادة تفعيل حسابك. يمكنك تسجيل الدخول مجدداً ومنشوراتك ظاهرة من جديد.",
+            },
+            reason: "السبب",
+            contact: "إذا كنت تعتقد أن هذا خطأ، يمكنك الرد على هذا البريد أو التواصل معنا عبر الموقع.",
+            button: "فتح MultiServices",
+        },
+    }[lang];
+
+    const text = content[status];
+    const transporter = createTransporter();
+    const showReason = status === "suspended" && reason.trim();
+
+    const html = makeEmailLayout({
+        language: lang,
+        heading: text.heading,
+        intro: text.intro,
+        content: `
+            ${showReason ? `<p><strong>${escapeHtml(content.reason)}:</strong> ${escapeHtml(reason.trim())}</p>` : ""}
+            <p style="color: #64748b; font-size: 13px;">${escapeHtml(content.contact)}</p>
+        `,
+        buttonText: content.button,
+        buttonUrl: getFrontendUrl(),
+    });
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+        to,
+        subject: text.subject,
+        text: [
+            text.heading,
+            "",
+            text.intro,
+            showReason ? `${content.reason}: ${reason.trim()}` : "",
+            "",
+            content.contact,
+        ].join("\n"),
+        html,
+    });
+};
+
+// -----------------------------------------------------------------------------
+// Listing expiry (60 days without confirmation)
+//   kind "reminder": will become inactive in {days} days
+//   kind "expired":  became inactive
+// -----------------------------------------------------------------------------
+
+const LISTING_EXPIRY_TEXT = {
+    en: {
+        reminder: {
+            subject: "Is your listing still available?",
+            heading: "Is your listing still available?",
+            intro: "Your listing \"{title}\" has not been confirmed for a while. It will become inactive in {days} days unless you confirm it is still available.",
+            button: "Confirm in My Publications",
+        },
+        expired: {
+            subject: "Your listing is now inactive",
+            heading: "Listing set to inactive",
+            intro: "Your listing \"{title}\" was not confirmed, so it is now inactive: it is hidden from searches and visitors cannot contact you.",
+            button: "Reactivate in My Publications",
+        },
+        footer: "Listings are confirmed again when you edit them, change their status or click \"Still available\".",
+    },
+    fr: {
+        reminder: {
+            subject: "Votre annonce est-elle toujours disponible ?",
+            heading: "Votre annonce est-elle toujours disponible ?",
+            intro: "Votre annonce « {title} » n'a pas été confirmée depuis un moment. Elle deviendra inactive dans {days} jours si vous ne confirmez pas qu'elle est toujours disponible.",
+            button: "Confirmer dans Mes publications",
+        },
+        expired: {
+            subject: "Votre annonce est maintenant inactive",
+            heading: "Annonce passée en inactive",
+            intro: "Votre annonce « {title} » n'a pas été confirmée : elle est maintenant inactive, masquée des recherches, et les visiteurs ne peuvent plus vous contacter.",
+            button: "Réactiver dans Mes publications",
+        },
+        footer: "Une annonce est confirmée quand vous la modifiez, changez son statut ou cliquez sur « Toujours disponible ».",
+    },
+    ar: {
+        reminder: {
+            subject: "هل إعلانك ما زال متاحاً؟",
+            heading: "هل إعلانك ما زال متاحاً؟",
+            intro: "لم يتم تأكيد إعلانك «{title}» منذ مدة. سيصبح غير نشط خلال {days} أيام إذا لم تؤكد أنه ما زال متاحاً.",
+            button: "التأكيد في منشوراتي",
+        },
+        expired: {
+            subject: "أصبح إعلانك غير نشط",
+            heading: "تم تحويل الإعلان إلى غير نشط",
+            intro: "لم يتم تأكيد إعلانك «{title}»، لذلك أصبح غير نشط: لن يظهر في نتائج البحث ولا يمكن للزوار التواصل معك.",
+            button: "إعادة التفعيل في منشوراتي",
+        },
+        footer: "يتم تأكيد الإعلان عند تعديله أو تغيير حالته أو الضغط على «ما زال متاحاً».",
+    },
+};
+
+export const getListingExpiryText = (language, kind) => {
+    const lang = normalizeLanguage(language);
+    return { ...LISTING_EXPIRY_TEXT[lang][kind], footer: LISTING_EXPIRY_TEXT[lang].footer };
+};
+
+const fillTemplate = (template, values) =>
+    String(template).replace(/\{(\w+)\}/g, (_match, key) => String(values[key] ?? ""));
+
+export const sendListingExpiryEmail = async ({ to, language = "en", kind, title = "", days = 7 }) => {
+    if (!to || !["reminder", "expired"].includes(kind)) {
+        throw new Error("Recipient email and a valid kind are required.");
+    }
+
+    const lang = normalizeLanguage(language);
+    const text = getListingExpiryText(lang, kind);
+    const intro = fillTemplate(text.intro, { title, days });
+    const buttonUrl = `${getFrontendUrl()}/mypublication`;
+
+    const html = makeEmailLayout({
+        language: lang,
+        heading: text.heading,
+        intro,
+        content: `<p style="color: #64748b; font-size: 13px;">${escapeHtml(text.footer)}</p>`,
+        buttonText: text.button,
+        buttonUrl,
+    });
+
+    await createTransporter().sendMail({
+        from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+        to,
+        subject: text.subject,
+        text: [text.heading, "", intro, "", `${text.button}: ${buttonUrl}`, "", text.footer].join("\n"),
+        html,
+    });
+};

@@ -6,6 +6,7 @@ import { generateToken } from "../../utils/generateToken.js"
 import { randomInt } from "crypto";
 import PendingSignup from "../../DatabaseModels/Schema/PendingSignup.js";
 import { sendVerificationEmail } from "../../services/emailService.js";
+import { getUserWhatsApp, getWhatsAppPreferencesView } from "../../utils/whatsapp.js";
 
 const authCookieOptions = {
     httpOnly: true,
@@ -332,6 +333,16 @@ export const login = async (req, res) => {
             });
         }
 
+        // Suspended by an administrator: no login.
+        if (user.accountStatus === "suspended") {
+            return res.status(403).json({
+                success: false,
+                code: "ACCOUNT_SUSPENDED",
+                message: "Your account has been suspended. Contact us if you think this is a mistake.",
+                reason: user.suspendedReason || "",
+            });
+        }
+
         // Check JWT configuration.
         if (!process.env.JWT_SECRET) {
             console.error("[LOGIN] JWT_SECRET is not configured.");
@@ -404,7 +415,7 @@ export const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.userId)
             .select(
-                "firstName lastName email language phoneNumber emailVerified phoneVerified notificationPreferences role address bio profileImage createdAt"
+                "firstName lastName email language phoneNumber emailVerified phoneVerified whatsappNumber whatsappVerified notificationPreferences role address bio profileImage createdAt passwordSet +googleId"
             );
 
         if (!user) {
@@ -426,18 +437,11 @@ export const getMe = async (req, res) => {
                 emailVerified: user.emailVerified,
                 phoneVerified: user.phoneVerified,
 
-                // WhatsApp information
+                // WhatsApp number (next to the phone) and notification switches.
+                whatsappNumber: user.whatsappNumber || "",
+                whatsappVerified: getUserWhatsApp(user).verified,
                 notificationPreferences: {
-                    whatsapp: {
-                        enabled:
-                            user.notificationPreferences?.whatsapp?.enabled ?? false,
-                        phoneNumber:
-                            user.notificationPreferences?.whatsapp?.phoneNumber ?? "",
-                        propertyAlerts:
-                            user.notificationPreferences?.whatsapp?.propertyAlerts ?? false,
-                        verified:
-                            user.notificationPreferences?.whatsapp?.verified ?? false,
-                    },
+                    whatsapp: getWhatsAppPreferencesView(user),
                 },
 
                 role: user.role,
@@ -445,6 +449,10 @@ export const getMe = async (req, res) => {
                 bio: user.bio,
                 profileImage: user.profileImage,
                 createdAt: user.createdAt,
+
+                // Google accounts may have no password yet.
+                hasPassword: user.passwordSet !== false,
+                googleLinked: Boolean(user.googleId),
             },
         });
     } catch (error) {

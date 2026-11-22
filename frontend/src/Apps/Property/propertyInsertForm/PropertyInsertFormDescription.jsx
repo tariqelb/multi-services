@@ -45,7 +45,7 @@ export default function PropertyInsertFormDescription({
                     value={formData.description || ""}
                     onChange={handleChange}
                     sx={fieldSx}
-                    inputProps={{ maxLength: 3000 }}
+                    slotProps={{ htmlInput: { maxLength: 3000 } }}
                     helperText={
                         <Box
                             component="span"

@@ -66,6 +66,7 @@ import {
     getInitials,
     getLocale,
     translateValue,
+    translateCity,
 } from "../shared/analyticsUtils";
 
 const WHATSAPP_COLOR = "#22C55E";
@@ -381,7 +382,7 @@ export default function ClientContactActionsSection() {
                             key: item.propertyId || item.listingId,
                             primary: item.title,
                             secondary: [
-                                item.city,
+                                item.city && translateCity(t, i18n.language, item.city),
                                 item.listingType &&
                                     translateValue(t, "contactActions.listingTypes", item.listingType),
                                 t("contactActions.channelSplit", "{{calls}} calls · {{whatsapp}} WhatsApp", {

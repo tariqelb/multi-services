@@ -17,6 +17,7 @@ import CircleIcon from "@mui/icons-material/Circle";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PhoneAndroidOutlinedIcon from "@mui/icons-material/PhoneAndroidOutlined";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 function VerificationStatus({ verified }) {
     const { t } = useTranslation();
@@ -53,14 +54,19 @@ function VerificationStep({
     const [message, setMessage] = useState("");
 
     const isEmail = type === "email";
+    const isWhatsApp = type === "whatsapp";
 
     const label = isEmail
         ? t("settings.verification.emailAddress")
-        : t("settings.verification.phoneNumber");
+        : isWhatsApp
+          ? t("settings.verification.whatsappNumber", "WhatsApp number")
+          : t("settings.verification.phoneNumber");
 
     const Icon = isEmail
         ? EmailOutlinedIcon
-        : PhoneAndroidOutlinedIcon;
+        : isWhatsApp
+          ? WhatsAppIcon
+          : PhoneAndroidOutlinedIcon;
 
     useEffect(() => {
         setStep("initial");
@@ -98,7 +104,9 @@ function VerificationStep({
             setMessage(
                 isEmail
                     ? t("settings.verification.emailCodeSent")
-                    : result?.sandboxCode
+                    : isWhatsApp && !result?.sandboxCode
+                      ? t("settings.verification.whatsappCodeSent", "We sent a code to your WhatsApp.")
+                      : result?.sandboxCode
                       ? t("settings.verification.sandboxCodeMessage", {
                             code: result.sandboxCode,
                         })
@@ -187,9 +195,14 @@ function VerificationStep({
                             sx={{ color: "text.secondary", overflowWrap: "anywhere" }}
                         >
                             {value ||
-                                t("settings.verification.noContact", {
-                                    contact: label.toLowerCase(),
-                                })}
+                                (isWhatsApp
+                                    ? t(
+                                          "settings.verification.noWhatsapp",
+                                          "Add your WhatsApp number in your profile above."
+                                      )
+                                    : t("settings.verification.noContact", {
+                                          contact: label.toLowerCase(),
+                                      }))}
                         </Typography>
                     </Box>
                 </Stack>
@@ -219,7 +232,12 @@ function VerificationStep({
                             >
                                 {isEmail
                                     ? t("settings.verification.emailStepOne")
-                                    : t("settings.verification.phoneStepOne")}
+                                    : isWhatsApp
+                                      ? t(
+                                            "settings.verification.whatsappStepOne",
+                                            "We will send a 6-digit code to this number on WhatsApp."
+                                        )
+                                      : t("settings.verification.phoneStepOne")}
                             </Typography>
 
                             <Button
@@ -231,6 +249,8 @@ function VerificationStep({
                                     <CircularProgress size={20} />
                                 ) : isEmail ? (
                                     t("settings.verification.sendEmailCode")
+                                ) : isWhatsApp ? (
+                                    t("settings.verification.sendWhatsappCode", "Send WhatsApp code")
                                 ) : (
                                     t("settings.verification.sendSmsCode")
                                 )}
@@ -254,10 +274,12 @@ function VerificationStep({
                                             .slice(0, 6)
                                     )
                                 }
-                                inputProps={{
-                                    inputMode: "numeric",
-                                    maxLength: 6,
-                                    autoComplete: "one-time-code",
+                                slotProps={{
+                                    htmlInput: {
+                                        inputMode: "numeric",
+                                        maxLength: 6,
+                                        autoComplete: "one-time-code",
+                                    },
                                 }}
                                 fullWidth
                             />
@@ -319,6 +341,10 @@ export default function ContactVerification({
     emailVerified = false,
     phoneNumber,
     phoneVerified = false,
+    whatsappNumber,
+    whatsappVerified = false,
+    onSendWhatsAppCode,
+    onConfirmWhatsAppCode,
     onSendEmailCode,
     onConfirmEmailCode,
     onSendPhoneCode,
@@ -327,7 +353,7 @@ export default function ContactVerification({
 }) {
     const { t } = useTranslation();
 
-    const allVerified = emailVerified && phoneVerified;
+    const allVerified = emailVerified && phoneVerified && whatsappVerified;
 
     return (
         <Box
@@ -376,6 +402,15 @@ export default function ContactVerification({
                     onSendCode={onSendPhoneCode}
                     onResendCode={onResendPhoneCode || onSendPhoneCode}
                     onConfirmCode={onConfirmPhoneCode}
+                />
+
+                <VerificationStep
+                    type="whatsapp"
+                    value={whatsappNumber}
+                    verified={whatsappVerified}
+                    onSendCode={onSendWhatsAppCode}
+                    onResendCode={onSendWhatsAppCode}
+                    onConfirmCode={onConfirmWhatsAppCode}
                 />
             </Stack>
         </Box>

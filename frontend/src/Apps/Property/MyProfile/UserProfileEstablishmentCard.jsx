@@ -22,6 +22,7 @@ import {
     LocationOn,
     Visibility,
     Delete,
+    EditNote,
     Hotel,
     MeetingRoom,
 } from "@mui/icons-material";
@@ -436,6 +437,20 @@ export default function UserProfileEstablishmentCard({
                                     "properties.profileCard.viewDetails",
                                     "View details"
                                 )}
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                size="small"
+                                startIcon={<EditNote />}
+                                onClick={() => navigate(`/establishments/${establishmentId}/edit`)}
+                                sx={{
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                    whiteSpace: "nowrap",
+                                }}
+                            >
+                                {t("properties.profileCard.edit", "Edit")}
                             </Button>
 
                             <Button

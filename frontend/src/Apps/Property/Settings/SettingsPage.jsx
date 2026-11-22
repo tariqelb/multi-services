@@ -22,6 +22,8 @@ const emptyProfile = {
     emailVerified: false,
     phoneNumber: "",
     phoneVerified: false,
+    whatsappNumber: "",
+    whatsappVerified: false,
     address: "",
     bio: "",
     profileImage: "",
@@ -32,16 +34,10 @@ const defaultPreferences = {
         enabled: true,
         propertyAlerts: true,
     },
+    // Switches only: the number is in the profile (whatsappNumber).
     whatsapp: {
         enabled: false,
         propertyAlerts: false,
-        phoneNumber: "",
-        verified: false,
-        verificationCodeSent: false,
-        verificationCode: "",
-        sandboxCode: "",
-        resendAfterSeconds: 0,
-        verificationExpires: "",
     },
 };
 
@@ -69,21 +65,18 @@ const normalizeProfile = (data = {}) => ({
     emailVerified: data.emailVerified ?? false,
     phoneNumber: data.phoneNumber ?? "",
     phoneVerified: data.phoneVerified ?? false,
+    whatsappNumber: data.whatsappNumber ?? "",
+    whatsappVerified: data.whatsappVerified === true,
     address: data.address ?? "",
     bio: data.bio ?? "",
     profileImage: data.profileImage ?? "",
+    // false: account created with Google, no password yet.
+    hasPassword: data.hasPassword !== false,
 });
 
 const normalizeWhatsApp = (data = {}) => ({
     enabled: data.enabled ?? false,
     propertyAlerts: data.propertyAlerts ?? false,
-    phoneNumber: data.phoneNumber ?? "",
-    verified: data.verified === true,
-    verificationCodeSent: false,
-    verificationCode: "",
-    sandboxCode: "",
-    resendAfterSeconds: 0,
-    verificationExpires: "",
 });
 
 export default function SettingsPage() {
@@ -108,8 +101,6 @@ export default function SettingsPage() {
     const [whatsappSaving, setWhatsappSaving] = useState(false);
     const [preferencesError, setPreferencesError] = useState("");
 
-    const [sendingCode, setSendingCode] = useState(false);
-    const [confirmingCode, setConfirmingCode] = useState(false);
 
     const [notice, setNotice] = useState(null);
 
@@ -154,7 +145,7 @@ export default function SettingsPage() {
         setDeletionError("");
 
         try {
-            await axiosInstance.post("/api/account/deletion/cancel");
+            await axiosInstance.post("/profile/me/account-deletion/cancel");
             setScheduledDeletionAt(null);
         } catch (error) {
             setDeletionError(
@@ -217,7 +208,7 @@ export default function SettingsPage() {
                 throw new Error(t("settings.errors.emptyPreferences"));
             }
 
-            setPreferences((previous) => ({
+            setPreferences(() => ({
                 email: {
                     enabled:
                         data.email?.enabled ??
@@ -226,18 +217,7 @@ export default function SettingsPage() {
                         data.email?.propertyAlerts ??
                         defaultPreferences.email.propertyAlerts,
                 },
-                whatsapp: {
-                    ...normalizeWhatsApp(data.whatsapp),
-                    verificationCodeSent:
-                        previous.whatsapp.verificationCodeSent,
-                    verificationCode:
-                        previous.whatsapp.verificationCode,
-                    sandboxCode: previous.whatsapp.sandboxCode,
-                    resendAfterSeconds:
-                        previous.whatsapp.resendAfterSeconds,
-                    verificationExpires:
-                        previous.whatsapp.verificationExpires,
-                },
+                whatsapp: normalizeWhatsApp(data.whatsapp),
             }));
         } catch (error) {
             setPreferencesError(
@@ -314,6 +294,27 @@ export default function SettingsPage() {
         [loadProfile]
     );
 
+    // WhatsApp number verification (the number is saved in the profile)
+    const sendWhatsAppVerificationCode = useCallback(async () => {
+        const response = await axiosInstance.post(
+            "/profile/me/verification/whatsapp/send"
+        );
+        return response.data;
+    }, []);
+
+    const confirmWhatsAppVerificationCode = useCallback(
+        async (code) => {
+            const response = await axiosInstance.post(
+                "/profile/me/verification/whatsapp/confirm",
+                { code }
+            );
+
+            await loadProfile();
+            return response.data;
+        },
+        [loadProfile]
+    );
+
     const saveProfile = async (event) => {
         event.preventDefault();
         setProfileError("");
@@ -331,6 +332,7 @@ export default function SettingsPage() {
             "lastName",
             "email",
             "phoneNumber",
+            "whatsappNumber",
             "address",
             "bio",
         ]) {
@@ -391,6 +393,15 @@ export default function SettingsPage() {
             return;
         }
 
+        if (
+            "whatsappNumber" in payload &&
+            payload.whatsappNumber &&
+            !/^\+[1-9]\d{6,14}$/.test(payload.whatsappNumber.replace(/[\s().-]/g, ""))
+        ) {
+            setProfileError(t("settings.validation.whatsappPhone"));
+            return;
+        }
+
         if ("address" in payload && payload.address.length > 300) {
             setProfileError(t("settings.validation.address"));
             return;
@@ -406,6 +417,8 @@ export default function SettingsPage() {
         try {
             await dispatch(updateProfile(payload)).unwrap();
             await loadProfile();
+            // A new WhatsApp number may switch WhatsApp notifications off.
+            if ("whatsappNumber" in payload) await loadPreferences();
 
             setNotice({
                 type: "success",
@@ -462,132 +475,12 @@ export default function SettingsPage() {
         }
     };
 
-    const handleSendWhatsAppVerification = async () => {
-        const whatsapp = preferences.whatsapp;
-        const phoneNumber = whatsapp.phoneNumber?.trim() ?? "";
-
-        if (!/^\+[1-9]\d{6,14}$/.test(phoneNumber)) {
-            setPreferencesError(t("settings.validation.whatsappPhone"));
-            return;
-        }
-
-        setSendingCode(true);
-        setPreferencesError("");
-        setNotice(null);
-
-        try {
-            const response = await axiosInstance.post(
-                "/profile/me/verification/whatsapp/send",
-                { phoneNumber }
-            );
-
-            const data = response.data ?? {};
-
-            updateWhatsApp((previous) => ({
-                ...previous,
-                phoneNumber,
-                verified: false,
-                enabled: false,
-                propertyAlerts: false,
-                verificationCodeSent: true,
-                verificationCode: "",
-                sandboxCode:
-                    import.meta.env.DEV && data.sandbox
-                        ? data.sandboxCode ?? ""
-                        : "",
-                resendAfterSeconds: data.resendAfterSeconds ?? 60,
-                verificationExpires: data.expiresAt ?? "",
-            }));
-
-            setNotice({
-                type: "success",
-                message:
-                    data.message ||
-                    t("settings.whatsapp.verificationAccepted"),
-            });
-
-            console.info("[WhatsApp UI] Verification request accepted", {
-                status: response.status,
-                sandbox: data.sandbox === true,
-                sandboxCodeReturned: Boolean(data.sandboxCode),
-                resendAfterSeconds: data.resendAfterSeconds,
-            });
-        } catch (error) {
-            const message = errorMessage(
-                error,
-                t("settings.whatsapp.sendCodeError")
-            );
-
-            setPreferencesError(message);
-            setNotice({ type: "error", message });
-        } finally {
-            setSendingCode(false);
-        }
-    };
-
-    const handleConfirmWhatsAppVerification = async () => {
-        const code = preferences.whatsapp.verificationCode?.trim() ?? "";
-
-        if (!/^\d{6}$/.test(code)) {
-            setPreferencesError(t("settings.validation.verificationCode"));
-            return;
-        }
-
-        setConfirmingCode(true);
-        setPreferencesError("");
-        setNotice(null);
-
-        try {
-            const response = await axiosInstance.post(
-                "/profile/me/verification/whatsapp/confirm",
-                { code }
-            );
-
-            const saved = response.data?.preferences?.whatsapp;
-
-            if (
-                response.data?.verified === false ||
-                saved?.verified === false
-            ) {
-                throw new Error(
-                    t("settings.whatsapp.verificationNotConfirmed")
-                );
-            }
-
-            updateWhatsApp((previous) => ({
-                ...previous,
-                ...(saved ?? {}),
-                verified: true,
-                enabled: false,
-                propertyAlerts: false,
-                verificationCodeSent: false,
-                verificationCode: "",
-                sandboxCode: "",
-            }));
-
-            setNotice({
-                type: "success",
-                message: t("settings.whatsapp.verified"),
-            });
-        } catch (error) {
-            const message = errorMessage(
-                error,
-                t("settings.whatsapp.verifyError")
-            );
-
-            setPreferencesError(message);
-            setNotice({ type: "error", message });
-        } finally {
-            setConfirmingCode(false);
-        }
-    };
-
     const saveWhatsappPreferences = async () => {
         const whatsapp = preferences.whatsapp;
 
         if (
             whatsapp.enabled &&
-            (!whatsapp.phoneNumber.trim() || !whatsapp.verified)
+            (!profile.whatsappNumber?.trim() || !profile.whatsappVerified)
         ) {
             setNotice({
                 type: "error",
@@ -606,20 +499,13 @@ export default function SettingsPage() {
                 {
                     enabled: whatsapp.enabled,
                     propertyAlerts: whatsapp.propertyAlerts,
-                    phoneNumber: whatsapp.phoneNumber.trim(),
                 }
             );
 
             const saved = response.data?.preferences?.whatsapp;
 
             if (saved) {
-                updateWhatsApp((previous) => ({
-                    ...previous,
-                    enabled: saved.enabled ?? false,
-                    propertyAlerts: saved.propertyAlerts ?? false,
-                    phoneNumber: saved.phoneNumber ?? "",
-                    verified: saved.verified === true,
-                }));
+                updateWhatsApp(normalizeWhatsApp(saved));
             }
 
             setNotice({
@@ -652,7 +538,9 @@ export default function SettingsPage() {
             confirmPassword,
         } = passwords;
 
-        if (!currentPassword || !newPassword || !confirmPassword) {
+        const firstPassword = savedProfile?.hasPassword === false;
+
+        if ((!firstPassword && !currentPassword) || !newPassword || !confirmPassword) {
             setPasswordError(t("settings.password.required"));
             return;
         }
@@ -667,7 +555,7 @@ export default function SettingsPage() {
             return;
         }
 
-        if (newPassword === currentPassword) {
+        if (!firstPassword && newPassword === currentPassword) {
             setPasswordError(t("settings.password.sameAsCurrent"));
             return;
         }
@@ -690,6 +578,10 @@ export default function SettingsPage() {
                 response.data?.message ||
                     t("settings.password.updated")
             );
+
+            if (firstPassword) {
+                setSavedProfile((previous) => (previous ? { ...previous, hasPassword: true } : previous));
+            }
         } catch (error) {
             setPasswordError(
                 errorMessage(error, t("settings.password.updateError"))
@@ -714,7 +606,6 @@ export default function SettingsPage() {
             icon={<SettingsOutlinedIcon />}
             title={t("settings.title")}
             subtitle={t("settings.subtitle")}
-            maxWidth={900}
         >
             {notice && (
                 <Alert
@@ -745,6 +636,10 @@ export default function SettingsPage() {
                     emailVerified={profile.emailVerified}
                     phoneNumber={profile.phoneNumber}
                     phoneVerified={profile.phoneVerified}
+                    whatsappNumber={savedProfile?.whatsappNumber ?? profile.whatsappNumber}
+                    whatsappVerified={profile.whatsappVerified}
+                    onSendWhatsAppCode={sendWhatsAppVerificationCode}
+                    onConfirmWhatsAppCode={confirmWhatsAppVerificationCode}
                     onSendEmailCode={sendEmailVerificationCode}
                     onConfirmEmailCode={confirmEmailVerificationCode}
                     onSendPhoneCode={sendPhoneVerificationCode}
@@ -776,14 +671,12 @@ export default function SettingsPage() {
                 <WhatsappNotifications
                     settings={preferences.whatsapp}
                     setSettings={updateWhatsApp}
+                    whatsappNumber={savedProfile?.whatsappNumber ?? ""}
+                    whatsappVerified={profile.whatsappVerified}
                     loading={preferencesLoading}
                     saving={whatsappSaving}
                     error={preferencesError}
                     onSave={saveWhatsappPreferences}
-                    onSendVerification={handleSendWhatsAppVerification}
-                    onConfirmVerification={handleConfirmWhatsAppVerification}
-                    sendingCode={sendingCode}
-                    confirmingCode={confirmingCode}
                 />
 
                 <ChangePassword
@@ -793,6 +686,7 @@ export default function SettingsPage() {
                     success={passwordSuccess}
                     loading={passwordLoading}
                     onSubmit={changePassword}
+                    hasPassword={savedProfile?.hasPassword !== false}
                 />
 
                 <DeleteAccount

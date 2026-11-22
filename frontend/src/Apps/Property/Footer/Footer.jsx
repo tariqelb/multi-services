@@ -17,15 +17,13 @@ import {
     PeopleAltRounded,
     HotelRounded,
     TravelExploreRounded,
-    FacebookRounded,
-    Instagram,
-    LinkedIn,
-    X,
     LocationOnOutlined,
     EmailOutlined,
 } from "@mui/icons-material";
 
 import logo from "../../../assets/iconlogo.png";
+import { socialLinks } from "./socialLinks";
+import { getInfoContent } from "../Info/infoContent";
 
 const services = [
     {
@@ -79,28 +77,7 @@ const supportLinks = [
     { label: "sendFeedback", path: "/feedback" },
 ];
 
-const socialLinks = [
-    {
-        icon: <FacebookRounded />,
-        href: "https://web.facebook.com/tariqelbouhali",
-        label: "Facebook",
-    },
-    {
-        icon: <Instagram />,
-        href: "https://www.instagram.com/tariqelbouhali/",
-        label: "Instagram",
-    },
-    {
-        icon: <LinkedIn />,
-        href: "https://www.linkedin.com/in/tariq-el-bouhali-13b776284/",
-        label: "LinkedIn",
-    },
-    {
-        icon: <X />,
-        href: "https://x.com/TariqElBouhali",
-        label: "X",
-    },
-];
+
 
 function FooterLink({ to, children }) {
     return (
@@ -124,7 +101,8 @@ function FooterLink({ to, children }) {
 }
 
 export default function Footer() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const info = getInfoContent(i18n.resolvedLanguage || i18n.language);
 
     return (
         <Box
@@ -406,9 +384,32 @@ export default function Footer() {
                         {t("footer.rightsReserved")}
                     </Typography>
 
-                    <Typography sx={bottomText}>
-                        {t("footer.motto")}
-                    </Typography>
+                    <Stack
+                        direction="row"
+                        component="nav"
+                        aria-label="legal"
+                        sx={{ flexWrap: "wrap", columnGap: 2, rowGap: 0.5 }}
+                    >
+                        {[
+                            ["/about", info.nav.about],
+                            ["/contact", info.nav.contact],
+                            ["/privacy", info.nav.privacy],
+                            ["/terms", info.nav.terms],
+                        ].map(([to, label]) => (
+                            <Box
+                                key={to}
+                                component={Link}
+                                to={to}
+                                sx={{
+                                    ...bottomText,
+                                    textDecoration: "none",
+                                    "&:hover": { color: "primary.main" },
+                                }}
+                            >
+                                {label}
+                            </Box>
+                        ))}
+                    </Stack>
 
                     <Typography sx={bottomText}>
                         {t("footer.madeWithCare")}

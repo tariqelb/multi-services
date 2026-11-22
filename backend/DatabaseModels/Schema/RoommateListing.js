@@ -229,6 +229,24 @@ const roommateListingSchema = new mongoose.Schema(
             default: "Open",
             index: true,
         },
+        // 60-day expiry (unfurnished properties, roommate announcements):
+        // last time the owner confirmed the listing (publish, edit,
+        // status change, "Still available").
+        lastConfirmedAt: {
+            type: Date,
+            default: Date.now,
+            index: true,
+        },
+        expiryReminderSentAt: {
+            type: Date,
+            default: null,
+        },
+        // Set when the listing became Inactive automatically.
+        expiredAt: {
+            type: Date,
+            default: null,
+        },
+
         location: {
             lat: {
                 type: Number,

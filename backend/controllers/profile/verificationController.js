@@ -8,6 +8,12 @@ import {
     resendVerificationSms,
 } from "../../services/smsService.js";
 import axios from "axios";
+import {
+    getUserWhatsApp,
+    getWhatsAppPreferencesView,
+    isValidInternationalPhone,
+    normalizePhoneNumber,
+} from "../../utils/whatsapp.js";
 const ENVOISMS_BASE_URL =
     process.env.ENVOISMS_BASE_URL || "https://api.envoisms.ma/v1";
 
@@ -322,6 +328,15 @@ export async function confirmPhoneVerificationCode(req, res) {
         }
 
         user.phoneVerified = true;
+
+        // Same number on WhatsApp: verified too.
+        if (
+            user.whatsappNumber &&
+            normalizePhoneNumber(user.whatsappNumber) ===
+                normalizePhoneNumber(user.phoneNumber || "")
+        ) {
+            user.whatsappVerified = true;
+        }
         user.phoneVerificationSessionId = undefined;
         user.phoneVerificationExpires = undefined;
 
@@ -397,236 +412,126 @@ export async function resendPhoneVerificationCode(req, res) {
 }
 
 
-const normalizePhoneNumber = (value = "") =>
-    value.replace(/[\s().-]/g, "");
-
-const getWhatsAppPreferences = (user) => {
-    const preferences = user.notificationPreferences?.whatsapp;
-
-    const accountPhone = normalizePhoneNumber(user.phoneNumber || "");
-    const whatsappPhone = normalizePhoneNumber(
-        preferences?.phoneNumber || ""
-    );
-
-    // Reuse account verification only when the numbers match.
-    const isSameVerifiedNumber =
-        Boolean(accountPhone) &&
-        accountPhone === whatsappPhone &&
-        user.phoneVerified === true;
-
-    return {
-        enabled: preferences?.enabled ?? false,
-        propertyAlerts: preferences?.propertyAlerts ?? false,
-        phoneNumber: preferences?.phoneNumber ?? "",
-        verified: isSameVerifiedNumber
-            ? true
-            : preferences?.verified ?? false,
-    };
-};
+// WhatsApp number: user.whatsappNumber / user.whatsappVerified.
+// notificationPreferences.whatsapp holds the switches only.
 
 export async function getMyWhatsAppPreferences(req, res) {
     try {
-        const userId = req.user?.userId;
-
-        if (!userId) {
-            return res.status(401).json({
-                message: "Authentication required.",
-            });
-        }
-
-        const user = await User.findById(userId);
+        const user = await User.findById(req.user?.userId);
 
         if (!user) {
-            return res.status(404).json({
-                message: "User not found.",
-            });
+            return res.status(404).json({ message: "User not found." });
         }
 
         return res.status(200).json({
-            preferences: getWhatsAppPreferences(user),
+            preferences: getWhatsAppPreferencesView(user),
+            whatsappNumber: user.whatsappNumber || "",
+            whatsappVerified: getUserWhatsApp(user).verified,
             phoneVerified: user.phoneVerified,
             accountPhoneNumber: user.phoneNumber,
         });
     } catch (error) {
         console.error("Get WhatsApp preferences error:", error);
 
-        return res.status(500).json({
-            message: "Unable to load WhatsApp preferences.",
-        });
+        return res.status(500).json({ message: "Unable to load WhatsApp preferences." });
     }
 }
 
+// PUT /profile/me/verification/whatsapp   { enabled, propertyAlerts }
+// The number itself is changed from the profile (PUT /profile/me).
 export async function updateMyWhatsAppPreferences(req, res) {
     try {
-        const userId = req.user?.userId;
-        console.log("update whatsapppreferences called")
-        if (!userId) {
-            return res.status(401).json({
-                message: "Authentication required.",
-            });
+        const { enabled, propertyAlerts } = req.body || {};
+
+        if (typeof enabled !== "boolean" || typeof propertyAlerts !== "boolean") {
+            return res.status(400).json({ message: "Invalid WhatsApp notification preferences." });
         }
 
-        const {
-            enabled,
-            propertyAlerts,
-            phoneNumber,
-        } = req.body;
-
-        if (
-            typeof enabled !== "boolean" ||
-            typeof propertyAlerts !== "boolean" ||
-            typeof phoneNumber !== "string"
-        ) {
-            return res.status(400).json({
-                message: "Invalid WhatsApp notification preferences.",
-            });
-        }
-
-        const normalizedPhone = normalizePhoneNumber(
-            phoneNumber.trim()
-        );
-
-        if (
-            normalizedPhone &&
-            !/^\+[1-9]\d{6,14}$/.test(normalizedPhone)
-        ) {
-            return res.status(400).json({
-                message: "Enter a valid international phone number.",
-            });
-        }
-
-        if (enabled && !normalizedPhone) {
-            return res.status(400).json({
-                message: "Enter a WhatsApp phone number to enable notifications.",
-            });
-        }
-
-        if (enabled && !propertyAlerts) {
-            // Enabling the channel without alerts is allowed.
-            // No additional action is required.
-        }
-
-        const user = await User.findById(userId);
+        const user = await User.findById(req.user?.userId);
 
         if (!user) {
-            return res.status(404).json({
-                message: "User not found.",
-            });
+            return res.status(404).json({ message: "User not found." });
         }
 
-        const currentWhatsApp =
-            user.notificationPreferences?.whatsapp;
+        const { number, verified } = getUserWhatsApp(user);
 
-        const previousPhone = normalizePhoneNumber(
-            currentWhatsApp?.phoneNumber || ""
-        );
-
-        const phoneChanged = previousPhone !== normalizedPhone;
-
-        const accountPhone = normalizePhoneNumber(
-            user.phoneNumber || ""
-        );
-
-        const matchesVerifiedAccount =
-            Boolean(normalizedPhone) &&
-            normalizedPhone === accountPhone &&
-            user.phoneVerified === true;
-
-        // Do not enable messages to an unverified WhatsApp number.
-       if (enabled && currentWhatsApp?.verified !== true) {
+        if (enabled && (!number || !verified)) {
             return res.status(400).json({
-                message: "Verify your WhatsApp number before enabling notifications.",
+                message: "Add and verify your WhatsApp number in your profile before enabling notifications.",
                 code: "WHATSAPP_VERIFICATION_REQUIRED",
-            });
-        }
-
-        user.notificationPreferences.whatsapp.enabled = enabled;
-        user.notificationPreferences.whatsapp.propertyAlerts =
-            propertyAlerts;
-        user.notificationPreferences.whatsapp.phoneNumber =
-            normalizedPhone;
-
-        if (phoneChanged) {
-            user.notificationPreferences.whatsapp.verified =
-                matchesVerifiedAccount;
-        } else if (matchesVerifiedAccount) {
-            user.notificationPreferences.whatsapp.verified = true;
-        }
-
-        await user.save();
-
-        return res.status(200).json({
-            message: "WhatsApp preferences saved successfully.",
-            preferences: getWhatsAppPreferences(user),
-        });
-    } catch (error) {
-        console.error("Update WhatsApp preferences error:", error);
-
-        return res.status(500).json({
-            message: "Unable to save WhatsApp preferences.",
-        });
-    }
-}
-
-// ---------------- WHATSAPP VERIFICATION ----------------
-
-export async function sendWhatsAppVerificationCode(req, res) {
-    try {
-        console.log("send whatsapp verification code called")
-        const userId = req.user?.userId;
-        const phoneNumber = normalizePhoneNumber(
-            String(req.body.phoneNumber || "").trim()
-        );
-
-        if (!/^\+[1-9]\d{6,14}$/.test(phoneNumber)) {
-            return res.status(400).json({
-                message: "Enter a valid international phone number.",
-            });
-        }
-
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found.",
             });
         }
 
         user.notificationPreferences ??= {};
         user.notificationPreferences.whatsapp ??= {};
+        user.notificationPreferences.whatsapp.enabled = enabled;
+        user.notificationPreferences.whatsapp.propertyAlerts = enabled && propertyAlerts;
 
-        const whatsapp = user.notificationPreferences.whatsapp;
-        const currentNumber = normalizePhoneNumber(
-            whatsapp.phoneNumber || ""
-        );
+        // Remember a "same as phone" verification.
+        if (verified && !user.whatsappVerified) user.whatsappVerified = true;
 
-        if (currentNumber !== phoneNumber) {
-            whatsapp.phoneNumber = phoneNumber;
-            whatsapp.verified = false;
-            whatsapp.enabled = false;
-            whatsapp.propertyAlerts = false;
+        await user.save();
+
+        return res.status(200).json({
+            message: "WhatsApp preferences saved successfully.",
+            preferences: getWhatsAppPreferencesView(user),
+        });
+    } catch (error) {
+        console.error("Update WhatsApp preferences error:", error);
+
+        return res.status(500).json({ message: "Unable to save WhatsApp preferences." });
+    }
+}
+
+// ---------------- WHATSAPP VERIFICATION ----------------
+
+// POST /profile/me/verification/whatsapp/send   { phoneNumber? }
+// Without phoneNumber, the saved WhatsApp number is used.
+export async function sendWhatsAppVerificationCode(req, res) {
+    try {
+        const user = await User.findById(req.user?.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
         }
 
-        if (
-            normalizePhoneNumber(whatsapp.phoneNumber || "") === phoneNumber &&
-            whatsapp.verified === true
-        ) {
+        const requested = normalizePhoneNumber(req.body?.phoneNumber || user.whatsappNumber || "");
+
+        if (!isValidInternationalPhone(requested)) {
             return res.status(400).json({
-                message: "This WhatsApp number is already verified.",
+                message: "Add a valid WhatsApp number in international format (e.g. +2126...) first.",
             });
         }
 
+        if (requested !== normalizePhoneNumber(user.whatsappNumber || "")) {
+            user.whatsappNumber = requested;
+            user.whatsappVerified = false;
+            user.notificationPreferences.whatsapp.enabled = false;
+            user.notificationPreferences.whatsapp.propertyAlerts = false;
+        }
+
+        if (getUserWhatsApp(user).verified) {
+            if (!user.whatsappVerified) {
+                user.whatsappVerified = true;
+                await user.save();
+            }
+
+            return res.status(400).json({ message: "This WhatsApp number is already verified." });
+        }
+
         const result = await envoismsRequest("/verify/send", {
-            to: phoneNumber,
+            to: requested,
             channel: "whatsapp",
             purpose: "otp",
         });
 
+        if (!result?.session_id) {
+            return res.status(502).json({ message: "Could not send the WhatsApp verification code." });
+        }
+
         // Store the provider's session ID, never the OTP itself.
-        whatsapp.verificationSessionId = result.session_id;
-        whatsapp.verificationExpires = result.expires_at
-            ? new Date(result.expires_at)
-            : undefined;
+        user.whatsappVerificationSessionId = result.session_id;
+        user.whatsappVerificationExpires = result.expires_at ? new Date(result.expires_at) : undefined;
 
         await user.save();
 
@@ -642,95 +547,71 @@ export async function sendWhatsAppVerificationCode(req, res) {
 
         return res.status(200).json(payload);
     } catch (error) {
-        console.error(
-            "Send WhatsApp verification error:",
-            error.response?.data || error.message
-        );
+        console.error("Send WhatsApp verification error:", error.response?.data || error.message);
 
         return res.status(502).json({
-            message:
-                error.response?.data?.message ||
-                "Could not send the WhatsApp verification code.",
+            message: error.response?.data?.message || "Could not send the WhatsApp verification code.",
         });
     }
 }
 
+// POST /profile/me/verification/whatsapp/confirm   { code }
 export async function confirmWhatsAppVerificationCode(req, res) {
     try {
-        const { code } = req.body;
+        const { code } = req.body || {};
 
         if (!validEmailCode(code)) {
-            return res.status(400).json({
-                message: "Enter the six-digit verification code.",
-            });
+            return res.status(400).json({ message: "Enter the six-digit verification code." });
         }
 
         const user = await User.findById(req.user?.userId).select(
-            "+notificationPreferences.whatsapp.verificationSessionId " +
-            "+notificationPreferences.whatsapp.verificationExpires"
+            "+whatsappVerificationSessionId +whatsappVerificationExpires"
         );
 
         if (!user) {
-            return res.status(404).json({
-                message: "User not found.",
-            });
+            return res.status(404).json({ message: "User not found." });
         }
 
-        const whatsapp = user.notificationPreferences?.whatsapp;
-
-        if (!whatsapp?.verificationSessionId) {
-            return res.status(400).json({
-                message: "Request a new WhatsApp verification code first.",
-            });
+        if (!user.whatsappVerificationSessionId) {
+            return res.status(400).json({ message: "Request a new WhatsApp verification code first." });
         }
 
-        if (
-            whatsapp.verificationExpires &&
-            whatsapp.verificationExpires.getTime() <= Date.now()
-        ) {
-            whatsapp.verificationSessionId = undefined;
-            whatsapp.verificationExpires = undefined;
+        if (user.whatsappVerificationExpires && user.whatsappVerificationExpires.getTime() <= Date.now()) {
+            user.whatsappVerificationSessionId = undefined;
+            user.whatsappVerificationExpires = undefined;
             await user.save();
 
-            return res.status(400).json({
-                message: "The code expired. Request a new code.",
-            });
+            return res.status(400).json({ message: "The code expired. Request a new code." });
         }
 
         const result = await envoismsRequest("/verify/check", {
-            session_id: whatsapp.verificationSessionId,
+            session_id: user.whatsappVerificationSessionId,
             code: String(code),
         });
 
-        if (!result.verified) {
-            return res.status(400).json({
-                message: "The verification code is incorrect.",
-            });
+        if (!result?.verified) {
+            return res.status(400).json({ message: "The verification code is incorrect." });
         }
 
-        whatsapp.verified = true;
-        whatsapp.enabled = false;
-        whatsapp.verificationSessionId = undefined;
-        whatsapp.verificationExpires = undefined;
+        user.whatsappVerified = true;
+        user.whatsappVerificationSessionId = undefined;
+        user.whatsappVerificationExpires = undefined;
 
         await user.save();
 
         return res.status(200).json({
             message: "WhatsApp number verified successfully.",
+            whatsappNumber: user.whatsappNumber,
+            whatsappVerified: true,
             preferences: {
-                whatsapp: getWhatsAppPreferences(user),
+                whatsapp: getWhatsAppPreferencesView(user),
             },
         });
     } catch (error) {
-        console.error(
-            "Confirm WhatsApp verification error:",
-            error.response?.data || error.message
-        );
+        console.error("Confirm WhatsApp verification error:", error.response?.data || error.message);
 
         return res.status(400).json({
-            message:
-                error.response?.data?.message ||
-                "Could not verify the WhatsApp number.",
+            message: error.response?.data?.message || "Could not verify the WhatsApp number.",
         });
     }
 }

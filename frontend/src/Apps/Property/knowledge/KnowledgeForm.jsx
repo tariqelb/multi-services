@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import axiosInstance from "../../../api/axiosInstance";
+import { DEFAULT_ARTICLE_IMAGE } from "./knowledgeImages";
 
 import {
     Alert,
@@ -141,9 +142,11 @@ export default function KnowledgeForm({
 
     const previewThumbnail =
         form.thumbnailUrl.trim() ||
-        (youtubeId
-            ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
-            : "");
+        (form.type === "article"
+            ? DEFAULT_ARTICLE_IMAGE
+            : youtubeId
+              ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+              : "");
 
     const updateField = (field, value) => {
         setForm((previous) => ({
@@ -204,6 +207,8 @@ export default function KnowledgeForm({
         if (form.type === "article") {
             payload.sourceUrl = form.sourceUrl.trim();
             payload.sourceName = form.sourceName.trim();
+            // Optional: empty = the default article image is shown.
+            payload.thumbnailUrl = form.thumbnailUrl.trim();
         } else {
             payload.youtubeUrl = form.youtubeUrl.trim();
             payload.thumbnailUrl = form.thumbnailUrl.trim();
@@ -306,7 +311,7 @@ export default function KnowledgeForm({
                             }
                             required
                             fullWidth
-                            inputProps={{ maxLength: 200 }}
+                            slotProps={{ htmlInput: { maxLength: 200 } }}
                         />
 
                         <TextField
@@ -319,7 +324,7 @@ export default function KnowledgeForm({
                             minRows={3}
                             maxRows={7}
                             fullWidth
-                            inputProps={{ maxLength: 3000 }}
+                            slotProps={{ htmlInput: { maxLength: 3000 } }}
                             helperText={t("characterCount", {
                                 count: form.description.length,
                                 max: 3000,
@@ -349,6 +354,49 @@ export default function KnowledgeForm({
                                     placeholder={t("sourceNamePlaceholder")}
                                     fullWidth
                                 />
+
+                                <TextField
+                                    label={t("articleImageUrl")}
+                                    type="url"
+                                    value={form.thumbnailUrl}
+                                    onChange={(event) =>
+                                        updateField("thumbnailUrl", event.target.value)
+                                    }
+                                    placeholder="https://example.com/image.jpg"
+                                    fullWidth
+                                    helperText={t("articleImageHelper")}
+                                />
+
+                                <Box>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ color: "text.secondary", mb: 1 }}
+                                    >
+                                        {t("thumbnailPreview")}
+                                    </Typography>
+
+                                    <Box
+                                        key={previewThumbnail}
+                                        component="img"
+                                        src={previewThumbnail}
+                                        alt={t("thumbnailAlt")}
+                                        onError={(event) => {
+                                            // Broken link: show the default image instead.
+                                            if (!event.currentTarget.src.endsWith(DEFAULT_ARTICLE_IMAGE)) {
+                                                event.currentTarget.src = DEFAULT_ARTICLE_IMAGE;
+                                            }
+                                        }}
+                                        sx={{
+                                            display: "block",
+                                            width: "100%",
+                                            maxWidth: 420,
+                                            aspectRatio: "16 / 9",
+                                            objectFit: "cover",
+                                            borderRadius: 2,
+                                            bgcolor: "action.hover",
+                                        }}
+                                    />
+                                </Box>
 
                                 <Alert severity="info">
                                     {t("articleInfo")}

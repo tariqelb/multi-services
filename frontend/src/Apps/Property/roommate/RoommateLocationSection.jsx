@@ -144,7 +144,7 @@ export default function RoommateLocationSection({
                     name="surface"
                     value={formData.surface}
                     onChange={onChange}
-                    inputProps={{ min: 0 }}
+                    slotProps={{ htmlInput: { min: 0 } }}
                 />
 
                 <TextField
@@ -194,7 +194,7 @@ export default function RoommateLocationSection({
                         name={field.name}
                         value={formData[field.name]}
                         onChange={onChange}
-                        inputProps={{ min: 0 }}
+                        slotProps={{ htmlInput: { min: 0 } }}
                     />
                 ))}
             </Stack>

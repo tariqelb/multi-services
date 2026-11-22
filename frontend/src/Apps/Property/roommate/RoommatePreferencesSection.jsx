@@ -57,6 +57,11 @@ export default function RoommatePreferencesSection({
                     value={formData.preferredGender || ""}
                     onChange={onChange}
                 >
+                    {/* "Any" is the saved default */}
+                    <MenuItem value="Any">
+                        {translate("roommates.gender.any", "No preference")}
+                    </MenuItem>
+
                     <MenuItem value="Male">
                         {translate("roommates.gender.male", "Man")}
                     </MenuItem>

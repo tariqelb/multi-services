@@ -4,11 +4,15 @@ import React, {
     useState,
 } from "react";
 
+import PageHeader from "../../../Components/ui/PageHeader";
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
+import TravelExploreOutlinedIcon from "@mui/icons-material/TravelExploreOutlined";
 import {
     Alert,
     Box,
     CircularProgress,
     Typography,
+    Chip,
 } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
@@ -502,27 +506,22 @@ export default function FindByMap() {
         filteredEstablishments.length;
 
     return (
-        <Box className="find-map-page">
+        <Box className="find-map-page" sx={pagePaddingSx}>
             {/* Header */}
-            <Box className="find-map-header">
-                <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                        {t("findMap.title")}
-                    </Typography>
-
-                    <Typography
-                        variant="body2" sx={{ color: "text.secondary" }}
-                    >
-                        {t("findMap.subtitle")}
-                    </Typography>
-                </Box>
-
-                <Typography className="find-map-count">
-                    {t("findMap.listingsOnMap", {
-                        count: totalDisplayed,
-                    })}
-                </Typography>
-            </Box>
+            <PageHeader
+                icon={<TravelExploreOutlinedIcon />}
+                title={t("findMap.title")}
+                subtitle={t("findMap.subtitle")}
+                action={
+                    <Chip
+                        color="primary"
+                        variant="outlined"
+                        label={t("findMap.listingsOnMap", { count: totalDisplayed })}
+                        sx={{ fontWeight: 700 }}
+                    />
+                }
+                sx={{ mb: 0 }}
+            />
 
             {/* Filters */}
             <FindByMapFilters

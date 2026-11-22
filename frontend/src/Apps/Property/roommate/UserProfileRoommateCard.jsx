@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import ListingExpiryNotice from "../listings/ListingExpiryNotice";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -25,6 +26,7 @@ import {
     Visibility,
     Delete,
     Edit,
+    EditNote,
     People,
     Bed,
 } from "@mui/icons-material";
@@ -414,6 +416,17 @@ export default function UserProfileRoommateCard({
                                 </Box>
                             </Stack>
                         </Stack>
+
+                        {/* 60-day expiry: reminder / reactivate */}
+                        <ListingExpiryNotice
+                            kind="roommate"
+                            id={roommateId}
+                            expiry={roommate.expiry}
+                            hidden={currentStatus !== initialStatus}
+                            onConfirmed={(status) => {
+                                if (status && status !== currentStatus) setCurrentStatus(status);
+                            }}
+                        />
                     </Box>
 
                     {/* Actions Toolbar */}
@@ -438,6 +451,31 @@ export default function UserProfileRoommateCard({
                                 minWidth: 0,
                             }}
                         >
+                            {/* Edit the announcement */}
+                            <Button
+                                variant="contained"
+                                size="small"
+                                startIcon={<EditNote />}
+                                onClick={() => navigate(`/roommates/${roommateId}/edit`)}
+                                sx={{
+                                    textTransform: "none",
+                                    fontWeight: 700,
+                                    whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                    px: { xs: 0.8, sm: 1.5 },
+                                    fontSize: { xs: "0.68rem", sm: "0.875rem" },
+                                    "& .MuiButton-startIcon": {
+                                        mr: { xs: 0.5, sm: 1 },
+                                        ml: 0,
+                                        "& > *:nth-of-type(1)": {
+                                            fontSize: { xs: 15, sm: 20 },
+                                        },
+                                    },
+                                }}
+                            >
+                                {translate("profileRoommate.edit", "Edit")}
+                            </Button>
+
                             {/* Edit Status Button */}
                             <Button
                                 variant="outlined"

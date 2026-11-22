@@ -2,6 +2,7 @@
 import axiosInstance from "../../../api/axiosInstance";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import PageLayout from "../../../Components/Home/PageLayout";
 
 import {
@@ -87,10 +88,37 @@ const INITIAL_FORM = {
     pageUrl: window.location.href,
 };
 
+// "Report this listing" (details pages): /feedback?report=/properties/<id>&title=...&owner=...
+// Only paths of this website are accepted.
+function readListingReport(searchParams) {
+    const path = searchParams.get("report") || "";
+
+    if (!/^\/(properties|furnishedproperties|roommates|establishments)\/[\w-]+$/.test(path)) return null;
+
+    return {
+        path,
+        url: `${window.location.origin}${path}`,
+        title: (searchParams.get("title") || "").slice(0, 100),
+        owner: (searchParams.get("owner") || "").slice(0, 100),
+    };
+}
+
 export default function FeedbackPage() {
     const { t } = useTranslation();
+    const [searchParams] = useSearchParams();
+    const [listingReport] = useState(() => readListingReport(searchParams));
 
-    const [formData, setFormData] = useState(INITIAL_FORM);
+    const [formData, setFormData] = useState(() =>
+        listingReport
+            ? {
+                ...INITIAL_FORM,
+                type: "user_report",
+                subject: `${t("feedback.listingReport.subjectPrefix", "Report a listing")}: ${listingReport.title}`.slice(0, 120),
+                reportedUser: listingReport.owner || listingReport.title || listingReport.path,
+                pageUrl: listingReport.url,
+            }
+            : INITIAL_FORM
+    );
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -276,7 +304,8 @@ export default function FeedbackPage() {
                     ? formData.reportedUser.trim()
                     : ""
             );
-            payload.append("pageUrl", window.location.href);
+            // The reported listing, otherwise this page.
+            payload.append("pageUrl", formData.pageUrl || window.location.href);
 
             attachments.forEach((file) => {
                 payload.append("attachments", file);
@@ -345,7 +374,6 @@ export default function FeedbackPage() {
         <PageLayout
             title={t("feedback.title")}
             subtitle={t("feedback.subtitle")}
-            maxWidth={1100}
             icon={
                 <Box
                     sx={{
@@ -365,6 +393,20 @@ export default function FeedbackPage() {
         >
             <Box component="form" onSubmit={handleSubmit} noValidate>
                 <Stack spacing={3}>
+                    {listingReport && (
+                        <Alert severity="info">
+                            {t("feedback.listingReport.notice", "You are reporting this listing:")}{" "}
+                            <Box
+                                component={RouterLink}
+                                to={listingReport.path}
+                                sx={{ fontWeight: 700, color: "inherit" }}
+                            >
+                                {listingReport.title || listingReport.path}
+                            </Box>
+                            . {t("feedback.listingReport.help", "Tell us what is wrong (scam, wrong price or photos, already sold...).")}
+                        </Alert>
+                    )}
+
                     {/* Report type */}
                     <Card
                         variant="outlined"
@@ -473,10 +515,12 @@ export default function FeedbackPage() {
                                                     <Radio
                                                         checked={selected}
                                                         value={type.value}
-                                                        inputProps={{
-                                                            "aria-label": t(
-                                                                `feedback.${type.labelKey}`
-                                                            ),
+                                                        slotProps={{
+                                                            input: {
+                                                                "aria-label": t(
+                                                                    `feedback.${type.labelKey}`
+                                                                ),
+                                                            },
                                                         }}
                                                         sx={{
                                                             p: 0,
@@ -556,7 +600,7 @@ export default function FeedbackPage() {
                                             max: 120,
                                         })
                                     }
-                                    inputProps={{ maxLength: 120 }}
+                                    slotProps={{ htmlInput: { maxLength: 120 } }}
                                     fullWidth
                                     required
                                 />
@@ -581,7 +625,7 @@ export default function FeedbackPage() {
                                     multiline
                                     minRows={5}
                                     maxRows={12}
-                                    inputProps={{ maxLength: 5000 }}
+                                    slotProps={{ htmlInput: { maxLength: 5000 } }}
                                     fullWidth
                                     required
                                 />

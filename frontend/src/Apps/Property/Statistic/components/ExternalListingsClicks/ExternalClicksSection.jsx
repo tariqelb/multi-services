@@ -50,6 +50,8 @@ import {
     formatPercent,
     getLocale,
     translateValue,
+    translateCity,
+    translateCityRows,
 } from "../shared/analyticsUtils";
 
 const API_URL = "/external-listings/analytics";
@@ -221,7 +223,7 @@ const ExternalClicksSection = () => {
                 <ChartCard title={t("adminExternalClicks.charts.cities", "By city")} height={300}>
                     <BarChartView
                         layout="vertical"
-                        data={charts.cities || []}
+                        data={translateCityRows(t, i18n.language, charts.cities || [])}
                         bars={[{ key: "clicks", name: clicksLabel, color: "#2563EB" }]}
                         locale={locale}
                         labelWidth={95}
@@ -250,7 +252,7 @@ const ExternalClicksSection = () => {
                         items={(data?.topListings || []).map((item) => ({
                             key: item.externalListingId,
                             primary: item.title || t("adminExternalClicks.card.untitled", "Untitled listing"),
-                            secondary: [item.sourceName || item.sourceDomain, item.city]
+                            secondary: [item.sourceName || item.sourceDomain, item.city && translateCity(t, i18n.language, item.city)]
                                 .filter(Boolean)
                                 .join(" · "),
                             value: item.clicks,

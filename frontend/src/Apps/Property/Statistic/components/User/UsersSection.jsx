@@ -1,5 +1,6 @@
 // admin/components/User/UsersSection.jsx
 
+import { FilterGrid, FilterPanel, FilterSearch, FilterSelect } from "../../../../../Components/ui/FilterKit";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -178,22 +179,12 @@ export default function UsersSection() {
     if (loading && !data) return <LoadingState />;
 
     const filterSelect = (label, value, onChange, options) => (
-        <FormControl fullWidth size="small">
-            <InputLabel>{label}</InputLabel>
-
-            <Select
-                value={value}
-                label={label}
-                onChange={(event) => onChange(event.target.value)}
-            >
-                {options.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                    </MenuItem>
-                ))}
-            </Select>
-        </FormControl>
+        <FilterSelect label={label} value={value} onChange={onChange} options={options} />
     );
+
+    const activeFilterCount =
+        (search.trim() ? 1 : 0) +
+        [roleFilter, statusFilter, verificationFilter, activityFilter].filter((value) => value !== "all").length;
 
     return (
         <Stack spacing={3} sx={{ mb: 3, minWidth: 0 }}>
@@ -365,38 +356,23 @@ export default function UsersSection() {
             </ChartGrid>
 
             {/* Search and filters */}
-            <Stack spacing={2}>
-                <TextField
-                    fullWidth
-                    size="small"
+            <FilterPanel
+                activeCount={activeFilterCount}
+                onClear={clearFilters}
+                clearLabel={t("usersSection.clearFilters", "Clear filters")}
+                action={
+                    <Typography variant="body2" sx={{ color: "text.secondary", display: { xs: "none", sm: "block" } }}>
+                        {t("usersSection.filteredCount", "{{count}} matching users", { count: filteredUsers.length })}
+                    </Typography>
+                }
+                sx={{ mb: 0 }}
+            >
+                <FilterSearch
                     value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder={t(
-                        "usersSection.searchPlaceholder",
-                        "Search by name, email, phone or address"
-                    )}
-                    slotProps={{
-                        input: {
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchOutlined color="action" />
-                                </InputAdornment>
-                            ),
-                        },
-                    }}
+                    onChange={(value) => setSearch(value)}
+                    placeholder={t("usersSection.searchPlaceholder", "Search by name, email, phone or address")}
                 />
-
-                <Box
-                    sx={{
-                        display: "grid",
-                        gridTemplateColumns: {
-                            xs: "1fr",
-                            sm: "repeat(2, minmax(0, 1fr))",
-                            lg: "repeat(5, minmax(0, 1fr))",
-                        },
-                        gap: 1.5,
-                    }}
-                >
+                <FilterGrid min={170}>
                     {filterSelect(t("usersSection.role", "Role"), roleFilter, setRoleFilter, [
                         { value: "all", label: t("usersSection.allRoles", "All roles") },
                         ...roleOptions.map((role) => ({
@@ -446,27 +422,8 @@ export default function UsersSection() {
                         { value: "saved", label: t("usersSection.mostSaved", "Most saved properties") },
                         { value: "reports", label: t("usersSection.mostFeedback", "Most feedback") },
                     ])}
-                </Box>
-
-                <Stack
-                    direction="row" sx={{ justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1 }}
-                >
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                        {t("usersSection.filteredCount", "{{count}} matching users", {
-                            count: filteredUsers.length,
-                        })}
-                    </Typography>
-
-                    <Chip
-                        icon={<VerifiedUserOutlined />}
-                        label={t("usersSection.clearFilters", "Clear filters")}
-                        variant="outlined"
-                        size="small"
-                        onClick={clearFilters}
-                        clickable
-                    />
-                </Stack>
-            </Stack>
+                </FilterGrid>
+            </FilterPanel>
 
             {/* List */}
             {pagedUsers.length === 0 ? (

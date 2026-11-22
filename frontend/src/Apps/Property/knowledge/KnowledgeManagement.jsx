@@ -1,4 +1,5 @@
 
+import { FilterGrid, FilterPanel, FilterSearch, FilterSelect } from "../../../Components/ui/FilterKit";
 import { useCallback, useEffect, useState } from "react";
 import { useRouteLoaderData, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -319,78 +320,54 @@ export default function KnowledgeManagement() {
                     </Alert>
                 )}
 
-                <Paper
-                    variant="outlined"
-                    sx={{ p: 2, borderRadius: 3 }}
-                >
-                    <Stack
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={2} sx={{ alignItems: { md: "center" } }}
-                    >
-                        <TextField
-                            label={t("searchContent")}
-                            placeholder={t("searchPlaceholder")}
-                            value={search}
-                            onChange={handleSearchChange}
-                            size="small"
-                            fullWidth
-                            sx={{ flex: 2 }}
-                        />
-
-                        <TextField
-                            select
-                            label={t("contentType")}
-                            value={type}
-                            onChange={handleFilterChange(setType)}
-                            size="small"
-                            sx={{ minWidth: { xs: "100%", md: 160 } }}
-                        >
-                            <MenuItem value="">
-                                {t("allTypes")}
-                            </MenuItem>
-                            <MenuItem value="article">
-                                {t("articles")}
-                            </MenuItem>
-                            <MenuItem value="video">
-                                {t("videos")}
-                            </MenuItem>
-                        </TextField>
-
-                        <TextField
-                            select
-                            label={t("status")}
-                            value={status}
-                            onChange={handleFilterChange(setStatus)}
-                            size="small"
-                            sx={{ minWidth: { xs: "100%", md: 160 } }}
-                        >
-                            <MenuItem value="">
-                                {t("allStatuses")}
-                            </MenuItem>
-                            <MenuItem value="draft">
-                                {t("draft")}
-                            </MenuItem>
-                            <MenuItem value="published">
-                                {t("published")}
-                            </MenuItem>
-                            <MenuItem value="archived">
-                                {t("archived")}
-                            </MenuItem>
-                        </TextField>
-
+                <FilterPanel
+                    activeCount={(search.trim() ? 1 : 0) + (type ? 1 : 0) + (status ? 1 : 0)}
+                    onClear={() => {
+                        setSearch("");
+                        setType("");
+                        setStatus("");
+                        setPagination((previous) => ({ ...previous, page: 1 }));
+                    }}
+                    action={
                         <Tooltip title={t("refresh")}>
                             <span>
-                                <IconButton
-                                    onClick={loadContent}
-                                    disabled={loading}
-                                    color="primary"
-                                >
-                                    <RefreshIcon />
+                                <IconButton size="small" onClick={loadContent} disabled={loading} color="primary">
+                                    <RefreshIcon fontSize="small" />
                                 </IconButton>
                             </span>
                         </Tooltip>
-                    </Stack>
-                </Paper>
+                    }
+                    sx={{ mb: 0 }}
+                >
+                    <FilterSearch
+                        value={search}
+                        onChange={(value) => handleSearchChange({ target: { value } })}
+                        placeholder={t("searchPlaceholder")}
+                    />
+                    <FilterGrid>
+                        <FilterSelect
+                            label={t("contentType")}
+                            value={type}
+                            onChange={(value) => handleFilterChange(setType)({ target: { value } })}
+                            options={[
+                                { value: "", label: t("allTypes") },
+                                { value: "article", label: t("articles") },
+                                { value: "video", label: t("videos") },
+                            ]}
+                        />
+                        <FilterSelect
+                            label={t("status")}
+                            value={status}
+                            onChange={(value) => handleFilterChange(setStatus)({ target: { value } })}
+                            options={[
+                                { value: "", label: t("allStatuses") },
+                                { value: "draft", label: t("draft") },
+                                { value: "published", label: t("published") },
+                                { value: "archived", label: t("archived") },
+                            ]}
+                        />
+                    </FilterGrid>
+                </FilterPanel>
 
                 <Stack
                     direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}

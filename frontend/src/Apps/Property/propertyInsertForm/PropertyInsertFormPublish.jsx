@@ -8,16 +8,20 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 import { FormSubmitBar } from "../../../Components/ui/FormKit";
 
-export default function PropertyInsertFormPublish({ loading = false }) {
+export default function PropertyInsertFormPublish({ loading = false, isEdit = false }) {
     const { t } = useTranslation();
 
     return (
         <FormSubmitBar
             loading={loading}
-            title={t("properties.insert.publish.title")}
-            subtitle={t("properties.insert.publish.subtitle")}
-            submitLabel={t("properties.insert.publish.button")}
-            loadingLabel={t("properties.insert.publish.loading")}
+            title={isEdit ? t("properties.edit.saveTitle", "Save your changes") : t("properties.insert.publish.title")}
+            subtitle={
+                isEdit
+                    ? t("properties.edit.saveSubtitle", "Visitors see the new details right away.")
+                    : t("properties.insert.publish.subtitle")
+            }
+            submitLabel={isEdit ? t("properties.edit.saveButton", "Save changes") : t("properties.insert.publish.button")}
+            loadingLabel={isEdit ? t("properties.edit.saving", "Saving...") : t("properties.insert.publish.loading")}
             submitIcon={<CheckCircleRoundedIcon />}
         />
     );

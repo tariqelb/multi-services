@@ -1,4 +1,5 @@
 
+import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -222,7 +223,7 @@ export default function ProfileContent() {
 
     if (profileError && !profile?.email && !profile?.firstName) {
         return (
-            <Container maxWidth="lg" sx={{ py: 4 }}>
+            <Container maxWidth={false} disableGutters sx={pagePaddingSx}>
                 <Alert severity="error">
                     {profileError}
                 </Alert>
@@ -236,13 +237,7 @@ export default function ProfileContent() {
     };
 
     return (
-        <Container
-            maxWidth="xl"
-            sx={{
-                py: { xs: 2, md: 4 },
-                width: "100%",
-            }}
-        >
+        <Container maxWidth={false} disableGutters sx={pagePaddingSx}>
             <Stack spacing={3}>
                 {profileError && (
                     <Alert severity="warning">

@@ -11,6 +11,7 @@ import {
 import {
     extractGoogleMapsLocation,
 } from "../../utils/googleMapsLocation.js";
+import { hideSuspended, isHiddenForRequester, isPublisherSuspended, isRequesterAdmin } from "../../services/accountStatus.js";
 
 // --------------------------------------------------
 // REQUEST HELPERS
@@ -74,6 +75,26 @@ const getEstablishmentImages = (establishment) => {
 };
 
 
+const imageKey = (image) =>
+    typeof image === "string" ? image : image?.filename || image?.path || "";
+
+/**
+ * Edit mode: the client sends the saved photos it wants to keep.
+ * Only photos that really belong to the establishment are kept
+ * (a client can't add paths of its own).
+ */
+const keepExisting = (oldImages = [], submitted = []) => {
+    const wanted = new Set(
+        submitted
+            .flatMap((image) => [image?.filename, image?.path, typeof image === "string" ? image : null])
+            .filter(Boolean)
+    );
+
+    return oldImages.filter(
+        (image) => image && (wanted.has(image.filename) || wanted.has(image.path))
+    );
+};
+
 const mergeImages = (...imageGroups) => {
     const result = [];
     const seen = new Set();
@@ -131,7 +152,12 @@ const applyUploadedImages = (
     if (uploadedCover.length > 0) {
         data.media.coverPhoto = uploadedCover[0];
     } else if (existingEstablishment) {
-        data.media.coverPhoto = oldMedia?.coverPhoto || null;
+        // Kept only if the client still sends it.
+        const keptCover = keepExisting(
+            oldMedia?.coverPhoto ? [oldMedia.coverPhoto] : [],
+            data.media.coverPhoto ? [data.media.coverPhoto] : []
+        );
+        data.media.coverPhoto = keptCover[0] || null;
     } else {
         data.media.coverPhoto = null;
     }
@@ -147,11 +173,9 @@ const applyUploadedImages = (
 
     const uploadedGallery = uploadedByField.get("gallery") || [];
 
-    data.media.gallery = mergeImages(
-        existingEstablishment ? oldGallery : [],
-        submittedGallery,
-        uploadedGallery
-    );
+    data.media.gallery = existingEstablishment
+        ? mergeImages(keepExisting(oldGallery, submittedGallery), uploadedGallery)
+        : mergeImages(submittedGallery, uploadedGallery);
 
     // Room photos
     if (Array.isArray(data.rooms)) {
@@ -178,11 +202,9 @@ const applyUploadedImages = (
 
             return {
                 ...room,
-                photos: mergeImages(
-                    oldPhotos,
-                    submittedPhotos,
-                    uploadedRoomPhotos
-                ),
+                photos: existingEstablishment
+                    ? mergeImages(keepExisting(oldPhotos, submittedPhotos), uploadedRoomPhotos)
+                    : mergeImages(submittedPhotos, uploadedRoomPhotos),
             };
         });
     }
@@ -330,14 +352,17 @@ export const getAllEstablishments = async (req, res) => {
             Math.max(1, Number(limit) || 12)
         );
 
+        // Hide establishments of suspended users.
+        const visibleFilter = await hideSuspended(filter);
+
         const [establishments, total] = await Promise.all([
-            Establishment.find(filter)
+            Establishment.find(visibleFilter)
                 .sort({ createdAt: -1 })
                 .skip((currentPage - 1) * itemsPerPage)
                 .limit(itemsPerPage)
                 .lean(),
 
-            Establishment.countDocuments(filter),
+            Establishment.countDocuments(visibleFilter),
         ]);
 
         return res.status(200).json({
@@ -413,7 +438,8 @@ export const getEstablishmentById = async (req, res) => {
 
         const establishment = await Establishment.findById(id).lean();
 
-        if (!establishment) {
+        // Publisher suspended: hidden (administrators still see it).
+        if (!establishment || (await isHiddenForRequester(establishment.userId, req))) {
             return res.status(404).json({
                 success: false,
                 message: "Establishment not found.",
@@ -460,17 +486,20 @@ export const updateEstablishment = async (req, res) => {
             });
         }
 
-        const existing = await Establishment.findOne({
-            _id: id,
-            userId,
-        });
+        const existing = await Establishment.findById(id);
 
-        if (!existing) {
+        // Owner or administrator.
+        if (
+            !existing ||
+            (String(existing.userId) !== String(userId) && !(await isRequesterAdmin(req)))
+        ) {
             return res.status(404).json({
                 success: false,
                 message: "Establishment not found or you are not its owner.",
             });
         }
+
+        const imagesBefore = getEstablishmentImages(existing.toObject ? existing.toObject() : existing);
 
         const data = getRequestData(req);
         const files = normalizeFiles(req.files);
@@ -510,6 +539,18 @@ export const updateEstablishment = async (req, res) => {
         existing.set(updateData);
 
         const updatedEstablishment = await existing.save();
+
+        // Delete photos that were removed, after the save succeeded.
+        const keptKeys = new Set(getEstablishmentImages(updatedEstablishment).map(imageKey));
+        const removedImages = imagesBefore.filter((image) => !keptKeys.has(imageKey(image)));
+
+        if (removedImages.length > 0) {
+            try {
+                await deleteEstablishmentImages(removedImages);
+            } catch (cleanupError) {
+                console.error("Removed establishment image cleanup error:", cleanupError);
+            }
+        }
 
         // Newly uploaded files are now safely stored in the database.
         return res.status(200).json({
@@ -611,6 +652,10 @@ export const getEstablishmentsByUser = async (req, res) => {
         const filter = {
             userId: new mongoose.Types.ObjectId(userId),
         };
+
+        if (await isPublisherSuspended(userId)) {
+            filter._id = { $in: [] }; // suspended publisher: nothing public
+        }
 
         const [establishments, totalEstablishments] = await Promise.all([
             Establishment.find(filter)

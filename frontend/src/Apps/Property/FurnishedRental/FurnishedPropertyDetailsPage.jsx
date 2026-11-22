@@ -75,7 +75,15 @@ export default function FurnishedPropertyDetailsPage() {
                 setProperty(propertyData);
 
                 // 2. Fetch all properties to find similar furnished rentals.
-                const listRes = await axiosInstance.get("/property/getlist");
+                const listRes = await axiosInstance.get("/property/getlist", {
+                    params: {
+                        page: 1,
+                        limit: 12,
+                        furnished: "only",
+                        propertyType: propertyData.propertyType,
+                        excludeId: propertyData._id || propertyData.id,
+                    },
+                });
 
                 const allProperties = Array.isArray(listRes.data)
                     ? listRes.data

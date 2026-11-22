@@ -8,16 +8,34 @@ import { fileURLToPath } from "node:url";
 import multer from "multer";
 
 import routes from "./routes/index.js";
+import { getAllowedOrigins, isOriginAllowed } from "./config/allowedOrigins.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Allow all origins while supporting credentialed requests.
+// Behind the hosting proxy: use the visitor's real IP (rate limits, logs).
+app.set("trust proxy", 1);
+
+// Only our own frontend may call the API with the login cookie.
+// Configure FRONTEND_URLS (or FRONTEND_URL) in .env.
+const allowedOrigins = getAllowedOrigins();
+
+if (process.env.NODE_ENV === "production" && allowedOrigins.length === 0) {
+    console.error(
+        "[CORS] FRONTEND_URLS / FRONTEND_URL is not set: every website is allowed. Set it in .env."
+    );
+}
+
 const corsOptions = {
     origin: (origin, callback) => {
-        callback(null, true);
+        if (allowedOrigins.length === 0 || isOriginAllowed(origin, allowedOrigins)) {
+            return callback(null, true);
+        }
+
+        // Not an error page: the browser simply blocks the response.
+        return callback(null, false);
     },
     credentials: true,
     methods: [
@@ -42,6 +60,16 @@ app.use(cors(corsOptions));
 
 // Handle all preflight requests.
 app.options(/.*/, cors(corsOptions));
+
+app.disable("x-powered-by");
+
+// Basic security headers (API only returns JSON).
+app.use((req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    next();
+});
 
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));

@@ -14,7 +14,10 @@ import {
     Button,
     Card,
     CardContent,
+    Checkbox,
     Divider,
+    FormControlLabel,
+    InputAdornment,
     Stack,
     TextField,
     Typography,
@@ -25,6 +28,7 @@ import {
     AccountCircle,
     CameraAlt,
     SaveOutlined,
+    WhatsApp,
 } from "@mui/icons-material";
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
@@ -158,6 +162,83 @@ function getProfileImageUrl(image) {
     return image;
 }
 
+/** Country code + local number, stored as an international number. */
+function PhoneNumberInput({ label, value, onChange, disabled, startIcon, helperText }) {
+    const { t } = useTranslation();
+
+    const [selectedCountry, setSelectedCountry] = useState("MA");
+    const [localNumber, setLocalNumber] = useState("");
+
+    // Last value this input produced: typing must not re-parse the number.
+    const emittedRef = useRef(null);
+
+    useEffect(() => {
+        if (value === emittedRef.current) return;
+
+        const parsed = splitPhoneNumber(value || "");
+
+        setSelectedCountry(parsed.country);
+        setLocalNumber(parsed.localNumber);
+    }, [value]);
+
+    const emit = (country, local) => {
+        const next = buildInternationalPhoneNumber(country, local);
+        emittedRef.current = next;
+        onChange(next);
+    };
+
+    return (
+        <Box
+            sx={{
+                display: "grid",
+                gridTemplateColumns: "minmax(115px, 0.8fr) minmax(0, 2fr)",
+                gap: 1.5,
+                gridColumn: { sm: "1 / -1" },
+            }}
+        >
+            <TextField
+                select
+                label={t("settings.profile.countryCode")}
+                value={selectedCountry}
+                disabled={disabled}
+                onChange={(event) => {
+                    const country = event.target.value;
+                    setSelectedCountry(country);
+                    emit(country, localNumber);
+                }}
+                fullWidth
+            >
+                {COUNTRY_CODES.map((country) => (
+                    <MenuItem key={country.country} value={country.country}>
+                        {country.label}
+                    </MenuItem>
+                ))}
+            </TextField>
+
+            <TextField
+                label={label}
+                type="tel"
+                value={localNumber}
+                disabled={disabled}
+                onChange={(event) => {
+                    const next = event.target.value.replace(/\D/g, "");
+                    setLocalNumber(next);
+                    emit(selectedCountry, next);
+                }}
+                placeholder={selectedCountry === "MA" ? "0612345678" : ""}
+                helperText={helperText}
+                slotProps={{
+                    htmlInput: { inputMode: "numeric" },
+                    input: startIcon
+                        ? { startAdornment: <InputAdornment position="start">{startIcon}</InputAdornment> }
+                        : undefined,
+                }}
+                fullWidth
+            />
+        </Box>
+    );
+}
+
 export default function AccountProfile({
     profile,
     setProfile,
@@ -173,16 +254,6 @@ export default function AccountProfile({
 
     const imageInputRef = useRef(null);
 
-    const [selectedCountry, setSelectedCountry] = useState("MA");
-    const [localNumber, setLocalNumber] = useState("");
-
-    useEffect(() => {
-        const parsed = splitPhoneNumber(profile.phoneNumber);
-
-        setSelectedCountry(parsed.country);
-        setLocalNumber(parsed.localNumber);
-    }, [profile.phoneNumber]);
-
     const handleChange = (event) => {
         const { name, value } = event.target;
 
@@ -192,35 +263,37 @@ export default function AccountProfile({
         }));
     };
 
-    const handleCountryChange = (event) => {
-        const country = event.target.value;
+    // WhatsApp follows the phone number while "same as phone" is ticked.
+    const whatsappSameAsPhone =
+        Boolean(profile.phoneNumber) &&
+        (profile.whatsappNumber || "") === profile.phoneNumber;
 
-        setSelectedCountry(country);
+    const [sameAsPhone, setSameAsPhone] = useState(whatsappSameAsPhone);
 
+    useEffect(() => {
+        setSameAsPhone(whatsappSameAsPhone);
+        // Only when the saved profile is (re)loaded.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [savedProfile]);
+
+    const handlePhoneChange = (phoneNumber) => {
         setProfile((previous) => ({
             ...previous,
-            phoneNumber: buildInternationalPhoneNumber(
-                country,
-                localNumber
-            ),
+            phoneNumber,
+            ...(sameAsPhone ? { whatsappNumber: phoneNumber } : {}),
         }));
     };
 
-    const handlePhoneNumberChange = (event) => {
-        const nextLocalNumber = event.target.value.replace(
-            /\D/g,
-            ""
-        );
+    const handleWhatsAppChange = (whatsappNumber) => {
+        setProfile((previous) => ({ ...previous, whatsappNumber }));
+    };
 
-        setLocalNumber(nextLocalNumber);
+    const handleSameAsPhone = (checked) => {
+        setSameAsPhone(checked);
 
-        setProfile((previous) => ({
-            ...previous,
-            phoneNumber: buildInternationalPhoneNumber(
-                selectedCountry,
-                nextLocalNumber
-            ),
-        }));
+        if (checked) {
+            setProfile((previous) => ({ ...previous, whatsappNumber: previous.phoneNumber || "" }));
+        }
     };
 
     const handleImageChange = (event) => {
@@ -484,50 +557,36 @@ export default function AccountProfile({
                             sx={{ gridColumn: { sm: "1 / -1" } }}
                         />
 
-                        <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: {
-                                    xs: "minmax(115px, 0.8fr) minmax(0, 2fr)",
-                                    sm: "minmax(115px, 0.8fr) minmax(0, 2fr)",
-                                },
-                                gap: 1.5,
-                                gridColumn: { sm: "1 / -1" },
-                            }}
-                        >
-                            <TextField
-                                select
-                                label={t("settings.profile.countryCode")}
-                                value={selectedCountry}
-                                onChange={handleCountryChange}
-                                fullWidth
-                            >
-                                {COUNTRY_CODES.map((country) => (
-                                    <MenuItem
-                                        key={country.country}
-                                        value={country.country}
-                                    >
-                                        {country.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                        <PhoneNumberInput
+                            label={t("settings.profile.phoneNumber")}
+                            value={profile.phoneNumber}
+                            onChange={handlePhoneChange}
+                        />
 
-                            <TextField
-                                label={t("settings.profile.phoneNumber")}
-                                type="tel"
-                                value={localNumber}
-                                onChange={handlePhoneNumberChange}
-                                inputProps={{
-                                    inputMode: "numeric",
-                                }}
-                                placeholder={
-                                    selectedCountry === "MA"
-                                        ? "0612345678"
-                                        : "Phone number"
+                        <Box sx={{ gridColumn: { sm: "1 / -1" } }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={sameAsPhone}
+                                        onChange={(event) => handleSameAsPhone(event.target.checked)}
+                                    />
                                 }
-                                fullWidth
+                                label={t("settings.profile.whatsappSameAsPhone", "My WhatsApp number is the same as my phone number")}
                             />
                         </Box>
+
+                        {!sameAsPhone && (
+                            <PhoneNumberInput
+                                label={t("settings.profile.whatsappNumber", "WhatsApp number")}
+                                value={profile.whatsappNumber}
+                                onChange={handleWhatsAppChange}
+                                startIcon={<WhatsApp fontSize="small" sx={{ color: "#25D366" }} />}
+                                helperText={t(
+                                    "settings.profile.whatsappHelper",
+                                    "Shown on your publications. Verify it below after saving."
+                                )}
+                            />
+                        )}
 
                         <TextField
                             label={t("settings.profile.address")}

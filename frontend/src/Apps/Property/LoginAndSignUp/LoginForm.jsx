@@ -1,5 +1,5 @@
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -18,6 +18,7 @@ import {
 } from "../../../redux/actions/loginFormAction";
 
 import { activeFormAction } from "../../../redux/actions/activeFormAction";
+import GoogleSignInButton from "./GoogleSignInButton";
 
 function LoginForm() {
     const dispatch = useDispatch();
@@ -40,6 +41,36 @@ function LoginForm() {
             state.loginForm?.user ??
             null
     );
+
+    const suspendedStatus = (reason) => ({
+        type: "error",
+        code: "SUSPENDED",
+        title: t("auth.suspended.title", "Account suspended"),
+        message: [
+            t(
+                "auth.suspended.message",
+                "Your account has been suspended. Contact us if you think this is a mistake."
+            ),
+            reason ? `${t("auth.suspended.reason", "Reason")}: ${reason}` : "",
+        ]
+            .filter(Boolean)
+            .join(" "),
+    });
+
+    // Sent here after being suspended during a session (see axiosInstance).
+    useEffect(() => {
+        try {
+            const stored = sessionStorage.getItem("accountSuspended");
+
+            if (stored !== null) {
+                sessionStorage.removeItem("accountSuspended");
+                setLoginStatus(suspendedStatus(stored));
+            }
+        } catch {
+            // sessionStorage unavailable: nothing to show.
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -135,6 +166,20 @@ function LoginForm() {
                 message =
                     requestError.message ||
                     "An unexpected error occurred.";
+            }
+
+            const errorCode = requestError.response?.data?.code;
+
+            if (errorCode === "ACCOUNT_SUSPENDED") {
+                const suspended = suspendedStatus(requestError.response?.data?.reason);
+                ({ title, message } = suspended);
+                code = suspended.code;
+            } else if (status === 429) {
+                title = t("auth.tooManyAttempts.title", "Too many attempts");
+                message = t(
+                    "auth.tooManyAttempts.message",
+                    "Too many login attempts. Please wait 15 minutes and try again."
+                );
             }
 
             setLoginStatus({
@@ -325,6 +370,9 @@ function LoginForm() {
                         : t("auth.loginButton")}
                 </button>
             </form>
+
+            {/* Google */}
+            <GoogleSignInButton text="signin_with" />
 
             {/* Signup */}
             <p className="mt-4 text-center text-sm text-black sm:text-base">
