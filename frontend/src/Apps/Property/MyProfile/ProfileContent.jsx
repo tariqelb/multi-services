@@ -3,10 +3,13 @@ import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
+import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import {
     Alert,
     Box,
+    Button,
     CircularProgress,
     Container,
     Stack,
@@ -42,10 +45,12 @@ export default function ProfileContent() {
         (state) => state.profile ?? {}
     );
 
-    const currentUser =
-        useSelector((state) => state.profile?.user) ||
-        useSelector((state) => state.auth?.user) ||
-        useSelector((state) => state.loginForm?.user);
+    // Every selector runs on every render (hooks must keep the same order;
+    // "a || useSelector(...)" skipped some once the profile had loaded).
+    const profileUser = useSelector((state) => state.profile?.user);
+    const authUser = useSelector((state) => state.auth?.user);
+    const loginUser = useSelector((state) => state.loginForm?.user);
+    const currentUser = profileUser || authUser || loginUser;
 
     // Support both profile reducer shapes:
     // { firstName, lastName, ... } and { user: {...} }
@@ -58,6 +63,7 @@ export default function ProfileContent() {
         getUserId(profile) ||
         getUserId(currentUser);
 
+    const navigate = useNavigate();
     const profileLoading = Boolean(profileState.loading);
     const profileError = profileState.error;
 
@@ -95,7 +101,7 @@ export default function ProfileContent() {
 
             try {
                 const response = await axiosInstance.get(
-                    `/profile/${userId}/reviews`,
+                    `/property/profiles/${userId}/reviews`,
                     {
                         params: {
                             page,
@@ -251,6 +257,20 @@ export default function ProfileContent() {
                     rating={reviewRating}
                     totalReviews={totalReviews}
                 />
+
+                {/* Same place as in the vehicles profile */}
+                {userId && (
+                    <Stack direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "flex-end" }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<VisibilityOutlined />}
+                            onClick={() => navigate(`/profile/${userId}`)}
+                            sx={{ textTransform: "none", fontWeight: 600 }}
+                        >
+                            {t("myProfile.seePublic", "See my public profile")}
+                        </Button>
+                    </Stack>
+                )}
 
                 {/* Same statistics cards as PublicProfile */}
                 <PublicProfileStats

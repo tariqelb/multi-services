@@ -97,7 +97,7 @@ export default function FindByMap() {
         };
 
         const fetchRoommates = async () => {
-            const response = await axiosInstance.get("/roommates", {
+            const response = await axiosInstance.get("/property/roommates", {
                 params: {
                     page: 1,
                     limit: 30,
@@ -130,7 +130,7 @@ export default function FindByMap() {
 
                 for (let page = 2; page <= totalPages; page++) {
                     remainingRequests.push(
-                        axiosInstance.get("/roommates", {
+                        axiosInstance.get("/property/roommates", {
                             params: {
                                 page,
                                 limit: 30,
@@ -171,7 +171,7 @@ export default function FindByMap() {
             const limit = 50;
 
             const firstResponse = await axiosInstance.get(
-                "/establishments",
+                "/property/establishments",
                 {
                     params: {
                         page: 1,
@@ -196,7 +196,7 @@ export default function FindByMap() {
 
             for (let page = 2; page <= totalPages; page++) {
                 remainingRequests.push(
-                    axiosInstance.get("/establishments", {
+                    axiosInstance.get("/property/establishments", {
                         params: {
                             page,
                             limit,

@@ -3,7 +3,7 @@ import moroccanCities from "../../../data/moroccanCities";
 
 export const API_URLS = {
     property: "/property/alerts",
-    roommate: "/roommate/alerts",
+    roommate: "/property/roommates/alerts",
 };
 
 export const ALERT_TYPES = {

@@ -41,7 +41,7 @@ export default function WhatsappNotifications({
             ...previous,
             [field]: value,
             // Alerts need the channel switched on.
-            ...(field === "enabled" && !value ? { propertyAlerts: false } : {}),
+            ...(field === "enabled" && !value ? { propertyAlerts: false, vehicleAlerts: false } : {}),
         }));
     };
 
@@ -177,6 +177,28 @@ export default function WhatsappNotifications({
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
                                     {t("settings.whatsappNotifications.propertyAlertsDescription")}
+                                </Typography>
+                            </Box>
+                        }
+                    />
+
+                    <FormControlLabel
+                        sx={{ alignItems: "flex-start", ml: 0 }}
+                        control={
+                            <Switch
+                                checked={Boolean(settings.vehicleAlerts)}
+                                disabled={loading || saving || !ready || !settings.enabled}
+                                onChange={(event) => update("vehicleAlerts", event.target.checked)}
+                                sx={{ mt: 0.5, mr: 2 }}
+                            />
+                        }
+                        label={
+                            <Box>
+                                <Typography sx={{ fontWeight: 700, fontSize: "1.05rem" }}>
+                                    {t("settings.whatsappNotifications.vehicleAlerts", "Vehicle alerts")}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                                    {t("settings.whatsappNotifications.vehicleAlertsDescription", "Receive a WhatsApp message when a vehicle, moto or bike matching one of your vehicle alerts is published.")}
                                 </Typography>
                             </Box>
                         }

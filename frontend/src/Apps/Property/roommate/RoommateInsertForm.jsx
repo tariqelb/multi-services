@@ -249,7 +249,7 @@ export default function RoommateInsertForm({ onAddListing, listingId = null, onS
                 setListingLoading(true);
                 setLoadError("");
 
-                const response = await axiosInstance.get(`/roommates/${listingId}`);
+                const response = await axiosInstance.get(`/property/roommates/${listingId}`);
                 const listing = response.data?.listing || response.data;
 
                 if (!listing?._id) throw new Error("Announcement not found");
@@ -903,7 +903,7 @@ export default function RoommateInsertForm({ onAddListing, listingId = null, onS
             try {
                 setLoading(true);
 
-                const response = await axiosInstance.put(`/roommates/${listingId}`, payload);
+                const response = await axiosInstance.put(`/property/roommates/${listingId}`, payload);
 
                 showNotification(
                     translate("roommates.edit.saved", "Your announcement has been updated."),
@@ -928,7 +928,7 @@ export default function RoommateInsertForm({ onAddListing, listingId = null, onS
             setLoading(true);
 
             const response = await axiosInstance.post(
-                "/roommates",
+                "/property/roommates",
                 payload,
                 {
                     withCredentials: true,

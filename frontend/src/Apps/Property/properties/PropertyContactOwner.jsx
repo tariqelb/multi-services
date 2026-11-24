@@ -28,7 +28,9 @@ const whatsappSx = {
  * - With `withMobileBar`, also renders a fixed Call / WhatsApp bar on phones.
  * Contact clicks are tracked (statistics) without blocking the action.
  */
-export default function PropertyContactOwner({ property, withMobileBar = false }) {
+// saveButton: the "Save" button, shown right under WhatsApp (same place on
+// every details page).
+export default function PropertyContactOwner({ property, withMobileBar = false, saveButton = null }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [error, setError] = useState("");
@@ -155,6 +157,8 @@ export default function PropertyContactOwner({ property, withMobileBar = false }
                     >
                         {t("properties.contactOwner.whatsapp", "WhatsApp")}
                     </Button>
+
+                    {saveButton}
 
                     <Button
                         variant="outlined"

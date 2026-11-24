@@ -246,7 +246,7 @@ export default function ReviewsRankingPage() {
             try {
                 setLoading(true);
                 setError("");
-                const response = await axiosInstance.get("/reviews/users", {
+                const response = await axiosInstance.get("/property/reviews/users", {
                     params: { q: q || undefined, page, limit: PAGE_SIZE },
                 });
                 if (!cancelled) setData(response.data);

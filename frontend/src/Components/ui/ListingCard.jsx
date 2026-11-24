@@ -59,6 +59,10 @@ export function CardBadge({ label, tone = "light", icon }) {
  * - title, location
  * - price, priceCaption, priceNote
  * - features: [{ icon, label }] short facts displayed as chips
+ * - imageReferrerPolicy: e.g. "no-referrer" for pictures of other websites
+ *   that refuse to show to other sites (optional)
+ * - featureRows: keep room for this many rows of features, so every card
+ *   of a grid has the same height (optional)
  * - footer: bottom element (owner, action button...)
  * - onClick
  */
@@ -81,6 +85,8 @@ export default function ListingCard({
     footer,
     onClick,
     imageHeight = { xs: 200, sm: 190 },
+    featureRows,
+    imageReferrerPolicy,
 }) {
     const [imageFailed, setImageFailed] = useState(false);
     const showImage = Boolean(image) && !imageFailed;
@@ -107,6 +113,7 @@ export default function ListingCard({
                         src={image}
                         alt={imageAlt}
                         loading="lazy"
+                        referrerPolicy={imageReferrerPolicy}
                         onError={() => setImageFailed(true)}
                         sx={{
                             width: "100%",
@@ -212,8 +219,19 @@ export default function ListingCard({
                     </Stack>
                 )}
 
-                {visibleFeatures.length > 0 && (
-                    <Stack direction="row" useFlexGap sx={{ flexWrap: "wrap", gap: 0.75, mt: 1.5 }}>
+                {(visibleFeatures.length > 0 || featureRows > 0) && (
+                    <Stack
+                        direction="row"
+                        useFlexGap
+                        sx={{
+                            flexWrap: "wrap",
+                            gap: 0.75,
+                            mt: 1.5,
+                            alignContent: "flex-start",
+                            // One feature chip is 26px high, rows are 6px apart.
+                            ...(featureRows > 0 ? { minHeight: featureRows * 26 + (featureRows - 1) * 6 } : {}),
+                        }}
+                    >
                         {visibleFeatures.map((feature, index) => (
                             <Stack
                                 key={`${feature.label}-${index}`}

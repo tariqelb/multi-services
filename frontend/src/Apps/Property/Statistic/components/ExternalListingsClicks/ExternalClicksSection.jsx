@@ -54,7 +54,7 @@ import {
     translateCityRows,
 } from "../shared/analyticsUtils";
 
-const API_URL = "/external-listings/analytics";
+const API_URL = "/property/external-listings/analytics";
 const ITEMS_PER_PAGE = 6;
 
 const ExternalClicksSection = () => {

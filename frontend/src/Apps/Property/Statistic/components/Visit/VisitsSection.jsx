@@ -264,7 +264,7 @@ export default function VisitsSection() {
     }, [range, filter]);
 
     const { data, loading, error, reload } = useAnalyticsData(
-        "/dashboard/visits",
+        "/property/dashboard/visits",
         { range, filter, page, limit: PAGE_SIZE },
         { refreshMs: LIVE_REFRESH_MS }
     );

@@ -13,7 +13,7 @@ import axiosInstance from "../../../api/axiosInstance";
 
 const ENDPOINTS = {
     property: (id) => `/property/${id}/still-available`,
-    roommate: (id) => `/roommates/${id}/still-available`,
+    roommate: (id) => `/property/roommates/${id}/still-available`,
 };
 
 /**

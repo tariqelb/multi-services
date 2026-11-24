@@ -62,7 +62,7 @@ export default function SavedPropertyDemandSection({
     const range = parentRange || ownRange;
 
     const { data, loading, error } = useAnalyticsData(
-        "/dashboard/saved-property-demand",
+        "/property/dashboard/saved-property-demand",
         { range }
     );
 

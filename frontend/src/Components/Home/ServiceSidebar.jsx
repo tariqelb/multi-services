@@ -1,5 +1,5 @@
 // /home/tariq/multi-services/app/frontend/src/Components/Home/ServiceSidebar.jsx
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import {
     Box,
@@ -14,7 +14,33 @@ import {
 import {
     DescriptionOutlined,
     Circle,
+    DirectionsCarOutlined,
+    CloudUpload,
+    BuildOutlined,
+    LibraryBooksOutlined,
+    TwoWheelerOutlined,
+    MapOutlined,
+    NotificationsActiveOutlined,
+    ReviewsOutlined,
+    BookmarksOutlined,
+    ManageSearch,
 } from "@mui/icons-material";
+
+// Icons for the service items (items[].icon).
+const ITEM_ICONS = {
+    browse: DirectionsCarOutlined,
+    // Same icon as "Publish a property" / "Publish an establishment".
+    publish: CloudUpload,
+    mine: LibraryBooksOutlined,
+    browseMoto: TwoWheelerOutlined,
+    publishMoto: CloudUpload,
+    parts: BuildOutlined,
+    search: ManageSearch,
+    map: MapOutlined,
+    alerts: NotificationsActiveOutlined,
+    reviews: ReviewsOutlined,
+    saved: BookmarksOutlined,
+};
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -25,6 +51,8 @@ export default function ServiceSidebar({
     title,
     descriptionPath,
     translationKey,
+    items = [],
+    itemsFirst = false,
 }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -80,10 +108,57 @@ export default function ServiceSidebar({
         location.pathname === descriptionPath ||
         location.pathname.startsWith(`${descriptionPath}/`);
 
-    const handleNavigation = () => {
-        navigate(descriptionPath);
+    const goTo = (path) => {
+        navigate(path);
         setSidebarOpen(false);
     };
+
+    const handleNavigation = () => goTo(descriptionPath);
+
+    // Service pages: exact match, or the path and its sub-pages.
+    const isItemActive = (item) =>
+        item.exact
+            ? location.pathname === item.path
+            : location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+
+    const serviceItems = items.map((item) => {
+                        const active = isItemActive(item);
+                        const Icon = ITEM_ICONS[item.icon] || DescriptionOutlined;
+
+                        return (
+                            <ListItem key={item.path} disablePadding sx={{ mb: 1 }}>
+                                <ListItemButton
+                                    onClick={() => goTo(item.path)}
+                                    selected={active}
+                                    sx={{
+                                        borderRadius: "10px",
+                                        bgcolor: active ? "#2563EB" : "transparent",
+                                        "&.Mui-selected": { bgcolor: "#2563EB" },
+                                        "&.Mui-selected:hover": { bgcolor: "#1D4ED8" },
+                                        "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+                                        py: 1.3,
+                                        minWidth: 0,
+                                    }}
+                                >
+                                    <ListItemIcon sx={{ color: "#ffffff", minWidth: "35px" }}>
+                                        <Icon />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={t(item.labelKey, { defaultValue: item.label })}
+                                        slotProps={{
+                                            primary: {
+                                                sx: {
+                                                    fontSize: "0.875rem",
+                                                    fontWeight: active ? 600 : 400,
+                                                    textAlign: "start",
+                                                },
+                                            },
+                                        }}
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                        );
+                    });
 
     return (
         <Box
@@ -97,7 +172,7 @@ export default function ServiceSidebar({
                 flex: "0 0 290px",
                 flexShrink: 0,
 
-                bgcolor: "#1D4ED8",
+                bgcolor: "#14539a",
                 color: "#ffffff",
 
                 display: "flex",
@@ -194,6 +269,8 @@ export default function ServiceSidebar({
 
                 {/* Description navigation */}
                 <List sx={{ px: 0, py: 0 }}>
+                    {itemsFirst && serviceItems}
+
                     <ListItem disablePadding sx={{ mb: 1 }}>
                         <ListItemButton
                             onClick={handleNavigation}
@@ -238,6 +315,8 @@ export default function ServiceSidebar({
                             />
                         </ListItemButton>
                     </ListItem>
+
+                    {!itemsFirst && serviceItems}
                 </List>
             </Box>
 

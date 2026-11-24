@@ -7,7 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import multer from "multer";
 
-import routes from "./routes/index.js";
+import services from "./apps/index.js";
 import { getAllowedOrigins, isOriginAllowed } from "./config/allowedOrigins.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -83,8 +83,10 @@ if (process.env.NODE_ENV !== "production") {
     );
 }
 
-// API routes.
-app.use("/api", routes);
+// API routes: each service under its own path (/api/property, /api/cars, main at /api).
+for (const service of services) {
+    app.use(service.basePath, service.router);
+}
 
 // Backend health check.
 app.get("/", (req, res) => {

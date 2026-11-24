@@ -79,7 +79,7 @@ export default function PropertyDemandSection() {
     const [range, setRange] = useState("30d");
 
     const { data, loading, error, reload } = useAnalyticsData(
-        "/dashboard/property-demand",
+        "/property/dashboard/property-demand",
         { range }
     );
 

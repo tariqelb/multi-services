@@ -192,7 +192,7 @@ export default function EstablishmentInsertForm({ onAddEstablishment, establishm
                 setPageLoading(true);
                 setLoadError("");
 
-                const response = await axiosInstance.get(`/establishments/${establishmentId}`);
+                const response = await axiosInstance.get(`/property/establishments/${establishmentId}`);
                 const establishment = response.data?.establishment;
 
                 if (!establishment?._id) throw new Error("Establishment not found");
@@ -578,7 +578,7 @@ export default function EstablishmentInsertForm({ onAddEstablishment, establishm
             });
 
             if (isEdit) {
-                const response = await axiosInstance.put(`/establishments/${establishmentId}`, body);
+                const response = await axiosInstance.put(`/property/establishments/${establishmentId}`, body);
 
                 notify(response.data?.message || "Establishment updated successfully.");
                 onSaved?.(response.data?.establishment);
@@ -586,7 +586,7 @@ export default function EstablishmentInsertForm({ onAddEstablishment, establishm
             }
 
             const response = await axiosInstance.post(
-                "/establishments",
+                "/property/establishments",
                 body
             );
 

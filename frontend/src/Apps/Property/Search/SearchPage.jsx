@@ -92,7 +92,7 @@ export default function SearchPage() {
                 setError("");
 
                 const query = Object.fromEntries(paramsFromCriteria(applied, page));
-                const response = await axiosInstance.get("/search", { params: { ...query, page, limit: PAGE_SIZE } });
+                const response = await axiosInstance.get("/property/search", { params: { ...query, page, limit: PAGE_SIZE } });
 
                 if (!cancelled) {
                     setData(response.data);

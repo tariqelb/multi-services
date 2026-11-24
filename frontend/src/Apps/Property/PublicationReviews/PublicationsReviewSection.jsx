@@ -34,7 +34,7 @@ export default function PublicationsReviewSection() {
             setLoading(true);
             setError("");
 
-            const response = await axiosInstance.get("/dashboard/publications", {
+            const response = await axiosInstance.get("/property/dashboard/publications", {
                 params: { period, type: kind },
             });
 

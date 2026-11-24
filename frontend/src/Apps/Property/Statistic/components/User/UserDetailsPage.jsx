@@ -1,4 +1,5 @@
 
+import { accessOf } from "../../../../../Components/Admin/adminSections";
 import { pagePaddingSx } from "../../../../../Components/ui/PageContainer";
 import { useEffect, useState } from "react";
 import {
@@ -186,8 +187,8 @@ export default function UserDetailsPage() {
     const [loadingTab, setLoadingTab] = useState(false);
     const [tabError, setTabError] = useState("");
 
-    const isAdmin =
-        String(authenticatedUser?.role || "").toLowerCase() === "admin";
+    // Admins, and team members with the "users" section.
+    const isAdmin = accessOf(authenticatedUser).can("users");
 
     useEffect(() => {
         let cancelled = false;
@@ -237,7 +238,7 @@ export default function UserDetailsPage() {
                 setTabError("");
 
                 const response = await axiosInstance.get(
-                    `/dashboard/users/${userId}/${endpointByTab[activeTab]}`
+                    `/property/dashboard/users/${userId}/${endpointByTab[activeTab]}`
                 );
 
                 if (cancelled) return;

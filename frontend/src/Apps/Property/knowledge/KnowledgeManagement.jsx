@@ -1,4 +1,5 @@
 
+import { accessOf } from "../../../Components/Admin/adminSections";
 import { FilterGrid, FilterPanel, FilterSearch, FilterSelect } from "../../../Components/ui/FilterKit";
 import { useCallback, useEffect, useState } from "react";
 import { useRouteLoaderData, Navigate } from "react-router-dom";
@@ -119,14 +120,15 @@ export default function KnowledgeManagement() {
     const [notice, setNotice] = useState("");
 
     // Frontend access guard. Backend routes are also protected.
-    const isAdmin = user?.role?.toLowerCase() === "admin";
+    // Admins, and team members with the "knowledge" section.
+    const isAdmin = accessOf(user).can("knowledge");
 
     const loadContent = useCallback(async () => {
         try {
             setLoading(true);
             setError("");
 
-            const response = await axiosInstance.get("/knowledge/admin", {
+            const response = await axiosInstance.get("/property/knowledge/admin", {
                 params: {
                     page: pagination.page,
                     limit: pagination.limit,
@@ -206,7 +208,7 @@ export default function KnowledgeManagement() {
             setError("");
 
             await axiosInstance.patch(
-                `/knowledge/${item._id}/status`,
+                `/property/knowledge/${item._id}/status`,
                 { status: nextStatus }
             );
 
@@ -242,7 +244,7 @@ export default function KnowledgeManagement() {
             setActionLoading(item._id);
             setError("");
 
-            await axiosInstance.delete(`/knowledge/${item._id}`);
+            await axiosInstance.delete(`/property/knowledge/${item._id}`);
 
             setNotice(t("deletedSuccess"));
 

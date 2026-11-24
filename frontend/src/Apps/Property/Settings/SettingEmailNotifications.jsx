@@ -29,6 +29,7 @@ export default function SettingEmailNotifications({
 
     const enabled = settings?.enabled ?? true;
     const propertyAlerts = settings?.propertyAlerts ?? true;
+    const vehicleAlerts = settings?.vehicleAlerts ?? true;
 
     const update = (field, value) => {
         setSettings((previous) => ({
@@ -167,6 +168,31 @@ export default function SettingEmailNotifications({
                                     sx={{ color: "text.secondary", mt: 0.5 }}
                                 >
                                     {t("settings.emailNotifications.propertyAlertsDescription")}
+                                </Typography>
+                            </Box>
+                        }
+                    />
+
+                    <Divider />
+
+                    <FormControlLabel
+                        sx={{ alignItems: "flex-start", ml: 0 }}
+                        control={
+                            <Switch
+                                checked={vehicleAlerts}
+                                disabled={loading || !enabled}
+                                onChange={(event) => update("vehicleAlerts", event.target.checked)}
+                                color="primary"
+                                sx={{ mt: 0.5, mr: 2 }}
+                            />
+                        }
+                        label={
+                            <Box>
+                                <Typography sx={{ fontWeight: 700, fontSize: "1.05rem" }}>
+                                    {t("settings.emailNotifications.vehicleAlerts", "Vehicle alerts")}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                                    {t("settings.emailNotifications.vehicleAlertsDescription", "Receive an email when a vehicle, moto or bike matching one of your vehicle alerts is published.")}
                                 </Typography>
                             </Box>
                         }

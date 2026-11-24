@@ -70,7 +70,7 @@ const RoommateList = () => {
                 params.search = search.trim();
             }
 
-            const response = await axiosInstance.get("/roommates", {
+            const response = await axiosInstance.get("/property/roommates", {
                 params,
             });
 

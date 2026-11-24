@@ -219,11 +219,11 @@ export default function KnowledgeForm({
 
             if (isEditing) {
                 await axiosInstance.put(
-                    `/knowledge/${editingItem._id}`,
+                    `/property/knowledge/${editingItem._id}`,
                     payload
                 );
             } else {
-                await axiosInstance.post("/knowledge", payload);
+                await axiosInstance.post("/property/knowledge", payload);
             }
 
             onSaved?.();

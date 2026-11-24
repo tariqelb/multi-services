@@ -57,8 +57,10 @@ import { filterFieldSx } from "../../../Components/ui/FilterKit";
 import { SectionCard, StatTile } from "./sourcesUi";
 import { formatDate, getLocale } from "./sourcesFormat";
 import AvailabilityCheck from "./AvailabilityCheck";
+import WebsiteSearchSettingsDialog from "./WebsiteSearchSettingsDialog";
+import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 
-const API = "/external-listings";
+const API = "/property/external-listings";
 const POLL_INTERVAL = 2000;
 const DEFAULT_COUNT = 10;
 
@@ -90,6 +92,8 @@ export default function ExternalListingSources() {
     const [notice, setNotice] = useState("");
     const [refreshing, setRefreshing] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
+    // Website whose live search settings are open.
+    const [searchTarget, setSearchTarget] = useState(null);
 
     // Availability check (see AvailabilityCheck.jsx)
     const [checkRunning, setCheckRunning] = useState(false);
@@ -266,6 +270,7 @@ export default function ExternalListingSources() {
     const phaseLabel = (phase) =>
         ({
             starting: tr("collect.phase.starting", "Starting..."),
+            robots: tr("collect.phase.robots", "Reading the website's robots.txt..."),
             discovering: tr("collect.phase.discovering", "Looking for listings on the website..."),
             extracting: tr("collect.phase.extracting", "Reading a new listing..."),
         })[phase] || tr("collect.phase.working", "Working...");
@@ -276,6 +281,7 @@ export default function ExternalListingSources() {
             running: { color: "info", label: tr("collect.status.running", "Running") },
             cancelled: { color: "warning", label: tr("collect.status.cancelled", "Stopped") },
             failed: { color: "error", label: tr("collect.status.failed", "Failed") },
+            skipped: { color: "default", label: tr("collect.status.skipped", "Skipped (robots.txt)") },
         };
         const item = map[status] || { color: "default", label: status };
 
@@ -757,6 +763,28 @@ export default function ExternalListingSources() {
                                                     : tr("collect.pathKnown", "Listings: {{path}}", { path: item.pathPrefix })
                                             }
                                         />
+                                        <Chip
+                                            size="small"
+                                            variant="outlined"
+                                            color={item.search?.templates?.length ? "primary" : "default"}
+                                            label={
+                                                item.search?.templates?.length
+                                                    ? tr("searchSettings.live", "Live search: results page")
+                                                    : tr("searchSettings.engine", "Live search: search engine")
+                                            }
+                                        />
+                                        {item.robots && (
+                                            <Chip
+                                                size="small"
+                                                color={item.robots.allowed ? "success" : "error"}
+                                                variant={item.robots.allowed ? "outlined" : "filled"}
+                                                label={
+                                                    item.robots.allowed
+                                                        ? tr("collect.robotsAllowed", "robots.txt: allowed")
+                                                        : tr("collect.robotsBlocked", "robots.txt: not allowed, skipped")
+                                                }
+                                            />
+                                        )}
                                     </Stack>
 
                                     <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mt: 1.25 }}>
@@ -782,6 +810,13 @@ export default function ExternalListingSources() {
                                         >
                                             {tr("collect.button", "Collect")}
                                         </Button>
+                                        <Tooltip title={tr("searchSettings.button", "Live search settings")}>
+                                            <span>
+                                                <IconButton size="small" aria-label={tr("searchSettings.button", "Live search settings")} onClick={() => setSearchTarget(item)} sx={{ border: 1, borderColor: "divider", borderRadius: 1.5 }}>
+                                                    <TuneRoundedIcon fontSize="small" />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
                                         <Button
                                             size="small"
                                             variant="outlined"
@@ -863,6 +898,14 @@ export default function ExternalListingSources() {
                     </Button>
                 </DialogActions>
             </Dialog>
+            {searchTarget && (
+                <WebsiteSearchSettingsDialog
+                    key={searchTarget.hostname}
+                    website={searchTarget}
+                    onClose={() => setSearchTarget(null)}
+                    onSaved={loadWebsites}
+                />
+            )}
         </Box>
     );
 }

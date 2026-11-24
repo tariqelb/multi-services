@@ -99,8 +99,8 @@ export default function ProfilePropertyList({
                 establishmentResult,
             ] = await Promise.allSettled([
                 axiosInstance.get("/property/user-listings"),
-                axiosInstance.get("/roommates/my-listings"),
-                axiosInstance.get("/establishments/my-establishments"),
+                axiosInstance.get("/property/roommates/my-listings"),
+                axiosInstance.get("/property/establishments/my-establishments"),
             ]);
 
             if (cancelled) return;
@@ -232,7 +232,7 @@ export default function ProfilePropertyList({
     // Delete roommate publication
     const handleDeleteRoommate = async (roommateId) => {
         try {
-            await axiosInstance.delete(`/roommates/${roommateId}`);
+            await axiosInstance.delete(`/property/roommates/${roommateId}`);
 
             setRoommates((prev) =>
                 prev.filter(
@@ -261,7 +261,7 @@ export default function ProfilePropertyList({
 
         try {
             await axiosInstance.delete(
-                `/establishments/${establishmentId}`
+                `/property/establishments/${establishmentId}`
             );
 
             setEstablishments((prev) =>
@@ -289,7 +289,7 @@ export default function ProfilePropertyList({
     const handleUpdateRoommateStatus = async (roommateId, status) => {
         try {
             await axiosInstance.patch(
-                `/roommates/${roommateId}/status`,
+                `/property/roommates/${roommateId}/status`,
                 { status }
             );
 

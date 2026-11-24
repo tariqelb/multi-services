@@ -1,5 +1,4 @@
 
-import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -11,7 +10,10 @@ import {
     Truck,
     CarTaxiFront,
     Building2,
+    ShieldCheck,
 } from "lucide-react";
+
+import { isAdminPath, useAdminAccess } from "../Admin/adminSections";
 
 const services = [
     {
@@ -40,11 +42,11 @@ const services = [
         ],
     },
     {
-        id: "cars",
-        label: "Cars",
-        path: "/cars/description",
+        id: "vehicles",
+        label: "Vehicles",
+        path: "/vehicles",
         icon: CarFront,
-        paths: ["/cars"],
+        paths: ["/vehicles", "/motos"],
     },
     {
         id: "daily-worker",
@@ -83,7 +85,13 @@ export default function MainSideBar() {
 
     const currentPath = location.pathname;
 
+    // Admin panel: admins and team members with at least one section.
+    const access = useAdminAccess();
+    const adminActive = isAdminPath(currentPath);
+
     const isServiceActive = (service) => {
+        if (adminActive) return false;
+
         if (service.exact) {
             return currentPath === "/";
         }
@@ -188,6 +196,53 @@ export default function MainSideBar() {
                         </button>
                     );
                 })}
+
+                {/* Admin panel (bottom of the bar on desktop) */}
+                {access.hasPanel && (
+                    <button
+                        type="button"
+                        title={t("adminPanel.title", "Admin panel")}
+                        aria-label={t("adminPanel.title", "Admin panel")}
+                        aria-current={adminActive ? "page" : undefined}
+                        onClick={() => navigate(access.firstPath || "/admin")}
+                        className={`
+                            group relative
+                            flex h-10 w-10 min-w-10 shrink-0
+                            items-center justify-center
+                            rounded-xl
+                            transition-all duration-200
+                            ms-auto md:ms-0 md:mt-auto
+                            md:h-11 md:w-11 md:min-w-11
+                            border
+                            ${
+                                adminActive
+                                    ? "border-white bg-white text-[#0B2E5C] shadow-md"
+                                    : "border-white/20 text-amber-300 hover:bg-white/15 hover:text-amber-200"
+                            }
+                        `}
+                    >
+                        <ShieldCheck size={20} strokeWidth={adminActive ? 2.4 : 1.9} />
+
+                        {/* Desktop tooltip */}
+                        <span
+                            className="
+                                pointer-events-none absolute
+                                start-full top-1/2 z-50 ms-3
+                                hidden -translate-y-1/2 translate-x-1
+                                whitespace-nowrap rounded-lg
+                                bg-slate-900 px-3 py-2
+                                text-xs font-medium text-white
+                                opacity-0 shadow-lg
+                                transition-all duration-200
+                                group-hover:translate-x-0
+                                group-hover:opacity-100
+                                md:block
+                            "
+                        >
+                            {t("adminPanel.title", "Admin panel")}
+                        </span>
+                    </button>
+                )}
             </nav>
         </aside>
     );

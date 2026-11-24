@@ -116,7 +116,7 @@ export default function PublicProfile() {
         setProfileError("");
 
         try {
-            const response = await axiosInstance.get(`/profile/${userId}`);
+            const response = await axiosInstance.get(`/property/profiles/${userId}`);
             const data = response.data;
 
             setUser(data.user || null);
@@ -164,7 +164,7 @@ export default function PublicProfile() {
 
             try {
                 const response = await axiosInstance.get(
-                    `/roommates/user/${userId}`,
+                    `/property/roommates/user/${userId}`,
                     {
                         params: {
                             page,
@@ -234,7 +234,7 @@ export default function PublicProfile() {
 
             try {
                 const response = await axiosInstance.get(
-                    `/establishments/user/${userId}`,
+                    `/property/establishments/user/${userId}`,
                     {
                         params: {
                             page,
@@ -305,7 +305,7 @@ export default function PublicProfile() {
 
             try {
                 const response = await axiosInstance.get(
-                    `/profile/${userId}/reviews`,
+                    `/property/profiles/${userId}/reviews`,
                     {
                         params: {
                             page,
@@ -433,7 +433,7 @@ export default function PublicProfile() {
 
         try {
             const response = await axiosInstance.get(
-                `/profile/${userId}`,
+                `/property/profiles/${userId}`,
                 {
                     params: {
                         page,
@@ -517,7 +517,7 @@ export default function PublicProfile() {
 
         try {
             await axiosInstance.post(
-                `/profile/${userId}/reviews`,
+                `/property/profiles/${userId}/reviews`,
                 {
                     rating,
                     comment,

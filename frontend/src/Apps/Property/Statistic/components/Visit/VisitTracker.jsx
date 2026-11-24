@@ -45,7 +45,7 @@ export default function VisitTracker() {
 
             try {
                 await axiosInstance.post(
-                    "/dashboard/visits/heartbeat",
+                    "/property/dashboard/visits/heartbeat",
                     {
                         visitorId,
                         page:

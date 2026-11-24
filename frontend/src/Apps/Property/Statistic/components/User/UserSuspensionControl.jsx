@@ -3,6 +3,7 @@
 // Suspended users cannot log in, are signed out everywhere and their
 // publications are hidden from visitors.
 
+import { accessOf } from "../../../../../Components/Admin/adminSections";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouteLoaderData } from "react-router-dom";
@@ -46,6 +47,12 @@ export function UserSuspensionButton({ user, onChanged }) {
 
     // Admins (and yourself) cannot be suspended; reactivation stays possible.
     if (isSelf || (isAdmin && !suspended)) return null;
+
+    // View-only members, and members acting on another team member: no button
+    // (the server refuses it too).
+    const access = accessOf(currentUser);
+    if (!access.can("users", "write")) return null;
+    if (!access.isAdmin && String(user.role || "").toLowerCase() === "member") return null;
 
     const handleOpen = () => {
         setReason("");

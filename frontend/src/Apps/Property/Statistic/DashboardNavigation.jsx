@@ -3,9 +3,7 @@
 import { Box, Card, Tab, Tabs } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import MouseOutlinedIcon from "@mui/icons-material/MouseOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import QueryStatsOutlinedIcon from "@mui/icons-material/QueryStatsOutlined";
 import PhoneInTalkOutlinedIcon from "@mui/icons-material/PhoneInTalkOutlined";
@@ -18,19 +16,9 @@ const navigationItems = [
         icon: <DashboardOutlinedIcon />,
     },
     {
-        label: "Users",
-        value: "users",
-        icon: <PeopleAltOutlinedIcon />,
-    },
-    {
         label: "External Listings Clicks",
         value: "external listings clicks",
         icon: <MouseOutlinedIcon />,
-    },
-    {
-        label: "Visits",
-        value: "visits",
-        icon: <VisibilityOutlinedIcon />,
     },
     {
         label: "Internal Property Clicks",

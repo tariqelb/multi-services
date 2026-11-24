@@ -312,7 +312,7 @@ export default function FeedbackPage() {
             });
 
             const response = await axiosInstance.post(
-                "/feedback",
+                "/property/feedback",
                 payload
             );
 

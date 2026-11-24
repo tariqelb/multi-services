@@ -117,7 +117,7 @@ export default function Establishments() {
             }
 
             const response = await axiosInstance.get(
-                "/establishments",
+                "/property/establishments",
                 { params }
             );
 

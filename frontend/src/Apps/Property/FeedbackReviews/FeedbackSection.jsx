@@ -54,7 +54,7 @@ export default function FeedbackSection() {
             setError("");
 
             const response = await axiosInstance.get(
-                "/feedback/admin-list",
+                "/property/feedback/admin-list",
                 {
                     params: {
                         limit,
@@ -105,7 +105,7 @@ export default function FeedbackSection() {
     const handleStatusUpdate = async (feedbackId, newStatus) => {
         try {
             const response = await axiosInstance.patch(
-                `/feedback/${feedbackId}/status`,
+                `/property/feedback/${feedbackId}/status`,
                 {
                     status: newStatus,
                 }

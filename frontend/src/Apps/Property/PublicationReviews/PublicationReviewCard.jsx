@@ -1,6 +1,7 @@
 // Admin review card for one publication: a property, an establishment or a
 // roommate announcement (publication.kind).
 
+import { useAdminAccess } from "../../../Components/Admin/adminSections";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -179,6 +180,8 @@ export default function PublicationReviewCard({ publication, property, onDeleted
 
     const item = publication || (property ? { ...property, kind: "property" } : {});
 
+    // View-only team members: no Delete button.
+    const canDelete = useAdminAccess().can("propertyPublications", "write");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [imageFailed, setImageFailed] = useState(false);
@@ -231,7 +234,7 @@ export default function PublicationReviewCard({ publication, property, onDeleted
 
         try {
             setDeleting(true);
-            await axiosInstance.delete(`/dashboard/publications/${view.kind}/${view.id}`);
+            await axiosInstance.delete(`/property/dashboard/publications/${view.kind}/${view.id}`);
             setDeleteDialogOpen(false);
             // The page removes the card and shows the success message.
             onDeleted?.(view.id, view.kind);
@@ -420,16 +423,18 @@ export default function PublicationReviewCard({ publication, property, onDeleted
                             >
                                 {t("adminPublications.card.viewDetails")}
                             </Button>
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                size="small"
-                                startIcon={<Delete />}
-                                onClick={() => setDeleteDialogOpen(true)}
-                                sx={{ whiteSpace: "nowrap" }}
-                            >
-                                {t("adminPublications.card.delete")}
-                            </Button>
+                            {canDelete && (
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    size="small"
+                                    startIcon={<Delete />}
+                                    onClick={() => setDeleteDialogOpen(true)}
+                                    sx={{ whiteSpace: "nowrap" }}
+                                >
+                                    {t("adminPublications.card.delete")}
+                                </Button>
+                            )}
                         </Stack>
                     </Box>
                 </Box>

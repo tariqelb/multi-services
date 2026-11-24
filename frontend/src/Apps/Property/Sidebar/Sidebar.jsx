@@ -1,5 +1,5 @@
 // /home/tariq/multi-services/app/frontend/src/Apps/Property/Sidebar/Sidebar.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
 import {
     Box,
@@ -20,22 +20,14 @@ import {
     CloudUpload as CloudUploadIcon,
     NotificationsActive as NotificationsActiveIcon,
     RateReviewOutlined as RateReviewOutlinedIcon,
-    DashboardOutlined as DashboardOutlinedIcon,
     Public as PublicIcon,
-    AddLink as AddLinkIcon,
     PeopleAlt as PeopleAltIcon,
     MenuBook as MenuBookIcon,
-    VideoLibrary as VideoLibraryIcon,
-    ArticleOutlined as ArticleOutlinedIcon,
-    FeedbackOutlined as FeedbackOutlinedIcon,
-    AdminPanelSettings as AdminPanelSettingsIcon,
-    ArrowBack as ArrowBackIcon,
     ManageSearch as ManageSearchIcon,
     ReviewsOutlined as ReviewsOutlinedIcon,
 } from "@mui/icons-material";
 
 import { useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 export default function Sidebar({
@@ -50,7 +42,6 @@ export default function Sidebar({
 
     const { t, i18n } = useTranslation();
 
-    const [showAdminMenu, setShowAdminMenu] = useState(false);
 
     const currentLanguage = (
         i18n.resolvedLanguage ||
@@ -62,15 +53,6 @@ export default function Sidebar({
 
     const isRTL = currentLanguage === "ar";
 
-    // Get the user's role from Redux.
-    const role = useSelector(
-        (state) =>
-            state.profile?.role ||
-            state.auth?.user?.role ||
-            state.loginForm?.user?.role
-    );
-
-    const isAdmin = role?.toLowerCase() === "admin";
 
     // Close mobile sidebar when clicking outside.
     useEffect(() => {
@@ -178,39 +160,9 @@ export default function Sidebar({
         },
     ];
 
-    // Admin-only navigation items.
-    const adminNavigationItems = [
-        {
-            name: t("sidebar.statistics"),
-            icon: DashboardOutlinedIcon,
-            path: "/dashboard",
-        },
-        {
-            name: t("sidebar.addExternalListing"),
-            icon: AddLinkIcon,
-            path: "/addexternalListings",
-        },
-        {
-            name: t("sidebar.knowledgeManagement"),
-            icon: VideoLibraryIcon,
-            path: "/admin/knowledge",
-        },
-        {
-            name: t("sidebar.publicationReviews"),
-            icon: ArticleOutlinedIcon,
-            path: "/admin/publications",
-        },
-        {
-            name: t("sidebar.feedbackReviews"),
-            icon: FeedbackOutlinedIcon,
-            path: "/admin/feedback",
-        },
-    ];
 
-    // Display the appropriate menu.
-    const displayedItems = showAdminMenu
-        ? adminNavigationItems
-        : navigationItems;
+    // Admin pages are in the admin panel (admin icon of the main bar).
+    const displayedItems = navigationItems;
 
     const handleNavigation = (item) => {
         setActiveNav(item.name);
@@ -218,13 +170,6 @@ export default function Sidebar({
         navigate(item.path);
     };
 
-    const handleAdminToggle = () => {
-        setShowAdminMenu((previous) => !previous);
-    };
-
-    const handleBackToMainMenu = () => {
-        setShowAdminMenu(false);
-    };
 
     return (
         <Box
@@ -314,58 +259,6 @@ export default function Sidebar({
                     minHeight: 0,
                 }}
             >
-                {/* Admin menu header and Back button */}
-                {showAdminMenu && (
-                    <Box sx={{ mb: 2 }}>
-                        <ListItemButton
-                            onClick={handleBackToMainMenu}
-                            sx={{
-                                borderRadius: "10px",
-                                border: "1px solid rgba(255,255,255,0.15)",
-                                py: 1.3,
-                                "&:hover": {
-                                    bgcolor: "rgba(255,255,255,0.08)",
-                                },
-                            }}
-                        >
-                            <ListItemIcon
-                                sx={{
-                                    color: "#ffffff",
-                                    minWidth: "35px",
-                                }}
-                            >
-                                <ArrowBackIcon />
-                            </ListItemIcon>
-
-                            <ListItemText
-                                primary={t("sidebar.backToMainMenu", {
-                                    defaultValue: "Back to main menu",
-                                })} slotProps={{ primary: { sx: {
-                                    fontSize: "0.875rem",
-                                    fontWeight: 500,
-                                } } }}
-                            />
-                        </ListItemButton>
-
-                        <Typography
-                            sx={{
-                                color: "#93C5FD",
-                                fontSize: "0.60rem",
-                                fontWeight: 700,
-                                letterSpacing: "1px",
-                                textTransform: "uppercase",
-                                px: 2,
-                                pt: 3,
-                                pb: 1,
-                            }}
-                        >
-                            {t("sidebar.adminPanel", {
-                                defaultValue: "Admin Panel",
-                            })}
-                        </Typography>
-                    </Box>
-                )}
-
                 {/* Navigation items */}
                 <List sx={{ px: 0, py: 0 }}>
                     {displayedItems.map((item) => {
@@ -430,56 +323,6 @@ export default function Sidebar({
                     flexShrink: 0,
                 }}
             >
-                {/* Admin panel toggle - administrators only */}
-                {isAdmin && (
-                    <ListItemButton
-                        onClick={handleAdminToggle}
-                        sx={{
-                            mb: 2,
-                            px: 2,
-                            py: 1.5,
-                            borderRadius: "10px",
-                            bgcolor: showAdminMenu
-                                ? "#2563EB"
-                                : "rgba(255,255,255,0.08)",
-                            border: "1px solid rgba(255,255,255,0.12)",
-                            "&:hover": {
-                                bgcolor: showAdminMenu
-                                    ? "#1D4ED8"
-                                    : "rgba(255,255,255,0.14)",
-                            },
-                        }}
-                    >
-                        <ListItemIcon
-                            sx={{
-                                color: "#ffffff",
-                                minWidth: "40px",
-                            }}
-                        >
-                            <AdminPanelSettingsIcon />
-                        </ListItemIcon>
-
-                        <ListItemText
-                            primary={t("sidebar.adminPanel", {
-                                defaultValue: "Admin Panel",
-                            })} slotProps={{ primary: { sx: {
-                                fontSize: "0.875rem",
-                                fontWeight: 600,
-                            } } }}
-                        />
-
-                        <Typography
-                            sx={{
-                                color: "#93C5FD",
-                                fontSize: "0.7rem",
-                                fontWeight: 600,
-                            }}
-                        >
-                            {showAdminMenu ? "ON" : "OFF"}
-                        </Typography>
-                    </ListItemButton>
-                )}
-
                 {/* System status */}
                 <Box
                     sx={{

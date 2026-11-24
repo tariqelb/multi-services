@@ -49,7 +49,7 @@
                 "details": "Découvrez des milliers de biens immobiliers résidentiels et commerciaux vérifiés, disponibles à l'achat, à la vente ou à la location dans votre région."
             },
             "cars": {
-                "title": "Voitures",
+                "title": "Véhicules",
                 "description": "Acheter, vendre et louer des véhicules",
                 "details": "Parcourez une large sélection de voitures, camions et SUV neufs ou d'occasion, avec des prix transparents et un contact direct avec les propriétaires."
             },
@@ -1012,7 +1012,9 @@
             "saving": "Enregistrement...",
             "save": "Enregistrer les préférences e-mail",
             "saved": "Préférences e-mail enregistrées avec succès.",
-            "saveError": "Impossible d'enregistrer les préférences e-mail."
+            "saveError": "Impossible d'enregistrer les préférences e-mail.",
+            "vehicleAlerts": "Alertes véhicules",
+            "vehicleAlertsDescription": "Recevoir un email quand un véhicule, une moto ou un vélo correspondant à une de vos alertes est publié."
         },
         "whatsappNotifications": {
             "title": "Notifications WhatsApp",
@@ -1045,7 +1047,9 @@
             "saveError": "Impossible d'enregistrer les préférences WhatsApp.",
             "numberLabel": "Les messages sont envoyés à",
             "noNumber": "Pas encore de numéro WhatsApp",
-            "setupHint": "Ajoutez votre numéro WhatsApp dans votre profil et vérifiez-le dans « Vérification des contacts » pour activer ces notifications."
+            "setupHint": "Ajoutez votre numéro WhatsApp dans votre profil et vérifiez-le dans « Vérification des contacts » pour activer ces notifications.",
+            "vehicleAlerts": "Alertes véhicules",
+            "vehicleAlertsDescription": "Recevoir un message WhatsApp quand un véhicule, une moto ou un vélo correspondant à une de vos alertes est publié."
         },
         "deletion": {
             "cancelError": "Impossible d'annuler la demande de suppression.",
@@ -1457,13 +1461,15 @@
                 "starting": "Démarrage...",
                 "discovering": "Recherche des annonces sur le site...",
                 "extracting": "Lecture d'une nouvelle annonce...",
-                "working": "En cours..."
+                "working": "En cours...",
+                "robots": "Lecture du robots.txt du site..."
             },
             "status": {
                 "completed": "Terminée",
                 "running": "En cours",
                 "cancelled": "Arrêtée",
-                "failed": "Échouée"
+                "failed": "Échouée",
+                "skipped": "Ignoré (robots.txt)"
             },
             "pageSubtitle": "Collectez de nouvelles annonces immobilières sur des sites externes. Les annonces déjà présentes dans votre application sont ignorées automatiquement.",
             "refreshExisting": "Actualiser les annonces existantes",
@@ -1504,7 +1510,9 @@
             "historySubtitle": "Depuis le dernier démarrage du serveur.",
             "historyLine": "{{saved}}/{{requested}} ajoutées · {{already}} déjà présentes",
             "deleteTitle": "Supprimer ce site ?",
-            "deleteText": "{{site}} ne sera plus collecté. Les annonces déjà ajoutées restent dans votre application."
+            "deleteText": "{{site}} ne sera plus collecté. Les annonces déjà ajoutées restent dans votre application.",
+            "robotsAllowed": "robots.txt : autorisé",
+            "robotsBlocked": "robots.txt : non autorisé, ignoré"
         },
         "availability": {
             "title": "Vérifier la disponibilité des annonces",
@@ -1568,6 +1576,25 @@
             "unreachableReport": "{{count}} injoignable(s) (seraient supprimées).",
             "unreachableRemoved": "{{count}} des annonces supprimées étaient injoignables.",
             "offline": "Notre serveur n'a pas pu accéder à internet : les annonces injoignables ont été conservées."
+        },
+        "searchSettings": {
+            "live": "Recherche en direct : page de résultats",
+            "engine": "Recherche en direct : moteur de recherche",
+            "button": "Réglages de la recherche en direct",
+            "title": "Recherche en direct : {{name}}",
+            "help": "Modèles d'adresse des pages de résultats du site, du plus précis au plus général. Champs : {city}, {type}, {transaction} et tout nom de \"maps\". Valeurs : For Sale / For Rent, Apartment, Villa... Laisser vide pour consulter ce site via le moteur de recherche.",
+            "testTitle": "Essayer avec une recherche",
+            "city": "Ville (ou all)",
+            "type": "Type",
+            "offer": "Offre",
+            "any": "Tous",
+            "found": "{{count}} annonces correspondantes",
+            "cards": "{{count}} cartes lues",
+            "noUrl": "Aucun modèle ne convient à cette recherche.",
+            "cancel": "Annuler",
+            "test": "Tester",
+            "save": "Enregistrer",
+            "invalidJson": "Les réglages ne sont pas un JSON valide : {{message}}"
         }
     },
     "common": {
@@ -1806,7 +1833,7 @@
         },
         "services": {
             "realEstate": "Immobilier",
-            "cars": "Voitures",
+            "cars": "Véhicules",
             "services": "Services",
             "deliveryTransport": "Livraison et transport",
             "furnishedRentals": "Locations meublées",
@@ -3112,30 +3139,6 @@
             }
         }
     },
-    "cars": {
-        "sidebar": {
-            "description": "Description"
-        },
-        "brand": "MultiServices / Voitures",
-        "heroTitle": "Trouvez votre prochain véhicule",
-        "heroDescription": "Découvrez des voitures et d'autres véhicules disponibles à la vente ou à la location. Comparez les offres, explorez les annonces et contactez directement les propriétaires et les concessionnaires.",
-        "sectionTitle": "Découvrez le service Voitures",
-        "sectionDescription": "Tout ce dont vous avez besoin pour trouver ou publier un véhicule.",
-        "features": {
-            "discoverVehicles": {
-                "title": "Découvrir les véhicules",
-                "description": "Explorez les voitures et autres véhicules disponibles à la vente ou à la location."
-            },
-            "buyOrRent": {
-                "title": "Acheter ou louer",
-                "description": "Trouvez des véhicules adaptés à votre budget et à vos besoins de transport."
-            },
-            "connectWithSellers": {
-                "title": "Contacter les vendeurs",
-                "description": "Contactez directement les propriétaires de véhicules et les concessionnaires."
-            }
-        }
-    },
     "actions": {
         "archive": "Archiver",
         "delete": "Supprimer",
@@ -3234,7 +3237,8 @@
             "notProvided": "Non renseigné",
             "subtitle": "Vos informations personnelles et coordonnées.",
             "title": "Informations personnelles"
-        }
+        },
+        "seePublic": "Voir mon profil public"
     },
     "overview": {
         "funnel": {
@@ -3542,5 +3546,950 @@
         "errors": {
             "load": "Impossible de charger les avis. Veuillez réessayer."
         }
+    },
+    "vehicles": {
+        "sidebar": {
+            "description": "Description"
+        },
+        "brand": "MultiServices / Véhicules",
+        "heroTitle": "Trouvez votre prochain véhicule",
+        "heroDescription": "Découvrez des voitures et d'autres véhicules disponibles à la vente ou à la location. Comparez les offres, explorez les annonces et contactez directement les propriétaires et les concessionnaires.",
+        "sectionTitle": "Découvrez le service Véhicules",
+        "sectionDescription": "Tout ce dont vous avez besoin pour trouver ou publier un véhicule.",
+        "features": {
+            "discoverVehicles": {
+                "title": "Découvrir les véhicules",
+                "description": "Explorez les voitures et autres véhicules disponibles à la vente ou à la location."
+            },
+            "buyOrRent": {
+                "title": "Acheter ou louer",
+                "description": "Trouvez des véhicules adaptés à votre budget et à vos besoins de transport."
+            },
+            "connectWithSellers": {
+                "title": "Contacter les vendeurs",
+                "description": "Contactez directement les propriétaires de véhicules et les concessionnaires."
+            }
+        }
+    },
+    "vehiclesApp": {
+        "banner": {
+            "badge": "Véhicules",
+            "description": "Voitures, SUV et utilitaires de particuliers, d'agences et de showrooms, avec des contacts vérifiés.",
+            "title": "Achetez, vendez et louez des véhicules partout au Maroc",
+            "motoBadge": "Motos & vélos",
+            "motoTitle": "Motos, scooters et vélos partout au Maroc",
+            "motoDescription": "Motos, scooters, vélos, trottinettes et triporteurs à acheter ou à louer.",
+            "partBadge": "Pièces détachées",
+            "partTitle": "Pièces détachées auto et moto",
+            "partDescription": "Pièces neuves, d'occasion et reconditionnées de particuliers, magasins de pièces et casses."
+        },
+        "card": {
+            "km": "{{value}} km",
+            "negotiable": "Négociable",
+            "noPhoto": "Pas de photo",
+            "perDay": "jour",
+            "reference": "RÉF",
+            "seats_one": "{{count}} place",
+            "seats_other": "{{count}} places"
+        },
+        "categories": {
+            "all": "Tous les véhicules",
+            "title": "Explorer les catégories",
+            "allMotos": "Toutes les motos & vélos"
+        },
+        "details": {
+            "back": "Retour aux véhicules",
+            "characteristics": "Caractéristiques",
+            "description": "Description",
+            "edit": "Modifier ce véhicule",
+            "error": "Impossible de charger ce véhicule.",
+            "inactiveNoContact": "Ce véhicule n'est pas disponible pour le moment. L'annonceur n'accepte pas de contacts.",
+            "kmPerDay": "{{km}} km par jour",
+            "location": "Lieu",
+            "noEquipment": "Non précisé",
+            "published": "Votre véhicule est publié.",
+            "rentCaption": "Location",
+            "saleConditions": "Conditions de vente",
+            "updated": "Vos modifications sont enregistrées.",
+            "verified": "Vérifié",
+            "video": "Vidéo",
+            "viewOnMaps": "Voir sur Google Maps",
+            "yes": "Oui",
+            "backMotos": "Retour aux motos & vélos",
+            "ratingCount": "{{value}} · {{count}} avis",
+            "noReviews": "Pas encore d'avis"
+        },
+        "fab": {
+            "label": "Ajouter un véhicule",
+            "tooltip": "Publier une nouvelle annonce de véhicule",
+            "motoLabel": "Ajouter une moto ou un vélo",
+            "motoTooltip": "Publier une moto, un scooter ou un vélo"
+        },
+        "filters": {
+            "all": "Tout",
+            "any": "Tous",
+            "bodyType": "Carrosserie",
+            "city": "Ville",
+            "clear": "Effacer",
+            "comprehensive": "Assurance tous risques",
+            "condition": "État",
+            "fuel": "Carburant",
+            "less": "Moins de filtres",
+            "make": "Marque",
+            "maxMileage": "Km max",
+            "maxPrice": "Prix max",
+            "maxYear": "Année max",
+            "minPrice": "Prix min",
+            "minSeats": "Places min",
+            "minYear": "Année min",
+            "model": "Modèle",
+            "more": "Plus de filtres",
+            "publisherType": "Publié par",
+            "rentOptions": "Options de location",
+            "search": "Rechercher",
+            "searchPlaceholder": "Marque, modèle, agence…",
+            "title": "Trouver un véhicule",
+            "transmission": "Boîte de vitesses",
+            "withDriver": "Avec chauffeur",
+            "motoTitle": "Trouver une moto ou un vélo"
+        },
+        "form": {
+            "badge": "Marché des véhicules",
+            "custom": {
+                "add": "Ajouter un détail",
+                "label": "Titre",
+                "labelExample": "Pneus",
+                "limit": "{{count}} / {{max}} détails",
+                "remove": "Retirer",
+                "subtitle": "Ajoutez tout ce qui est utile à savoir, sous forme de titre et de valeur. Par exemple : Pneus → Neufs, Clés → 2.",
+                "title": "Détails supplémentaires",
+                "value": "Valeur",
+                "valueExample": "Neufs, Michelin"
+            },
+            "description": {
+                "helper": "Donnez des détails utiles aux acheteurs et aux locataires.",
+                "label": "Description (facultatif)",
+                "placeholder": "État, entretien, options, raison de la vente…",
+                "subtitle": "Décrivez le véhicule et mettez en avant ses points forts.",
+                "title": "Description du véhicule"
+            },
+            "details": {
+                "condition": "État",
+                "listingType": "Type de transaction",
+                "subtitle": "L'offre, le véhicule, où il se trouve et son prix.",
+                "title": "Détails du véhicule",
+                "titleField": "Titre de l'annonce",
+                "titleHelp": "Laissez vide pour utiliser : {{title}}"
+            },
+            "editBadge": "Modifier",
+            "editSubtitle": "Mettez à jour les détails et les photos de votre véhicule.",
+            "editTitle": "Modifier votre véhicule",
+            "errors": {
+                "check": "Veuillez vérifier les champs en rouge.",
+                "customFields": "Chaque détail supplémentaire doit avoir un titre et une valeur.",
+                "images": "Ajoutez au moins une photo du véhicule.",
+                "load": "Impossible de charger ce véhicule.",
+                "notOwner": "Vous ne pouvez modifier que vos propres véhicules.",
+                "required": "Obligatoire.",
+                "submit": "Impossible d'enregistrer ce véhicule. Veuillez réessayer.",
+                "tooManyImages": "Un véhicule peut avoir au maximum {{max}} photos.",
+                "year": "Saisissez une année entre 1950 et l'année prochaine."
+            },
+            "history": {
+                "accidentFree": "Sans accident",
+                "equipment": "Équipements",
+                "equipmentSubtitle": "Cochez tout ce que le véhicule possède.",
+                "firstHand": "Première main",
+                "origin": "Origine",
+                "papers": "Historique et papiers",
+                "previousOwners": "Propriétaires précédents",
+                "serviceHistory": "Carnet d'entretien",
+                "subtitle": "Ce que les acheteurs et les locataires vérifient d'abord.",
+                "technicalInspection": "Visite technique valable jusqu'au",
+                "title": "Historique, papiers et équipements",
+                "vignettePaid": "Vignette payée"
+            },
+            "images": {
+                "browse": "Parcourir",
+                "count": "{{count}} / {{max}}",
+                "cover": "Principale",
+                "remove": "Retirer",
+                "requirements": "JPG, JPEG, PNG ou WEBP · 5 Mo maximum par image",
+                "selected": "Images sélectionnées",
+                "subtitle": "La première photo sert de couverture. Montrez l'extérieur, l'intérieur et le tableau de bord.",
+                "title": "Images du véhicule",
+                "uploadDescription": "Sélectionnez jusqu'à {{max}} images pour présenter votre véhicule.",
+                "uploadTitle": "Cliquez pour ajouter les images de votre véhicule"
+            },
+            "loading": "Chargement de votre véhicule...",
+            "location": {
+                "city": "Ville",
+                "mapLink": "Lien de localisation Google Maps",
+                "neighborhood": "Quartier / Zone",
+                "subtitle": "Aidez les gens à trouver le véhicule plus facilement.",
+                "title": "Localisation du véhicule",
+                "youtube": "Lien vidéo YouTube (facultatif)",
+                "youtubeHelp": "Ajoutez une vidéo YouTube pour présenter le véhicule. Seuls les liens YouTube sont acceptés."
+            },
+            "publish": "Publier l'annonce",
+            "publishSubtitle": "Vérifiez vos informations avant d'envoyer votre annonce.",
+            "publishTitle": "Prêt à publier ?",
+            "publisher": {
+                "businessAddress": "Adresse de l'entreprise",
+                "businessName": "Nom de l'entreprise",
+                "contactNumber": "Téléphone / WhatsApp",
+                "email": "Adresse e-mail",
+                "firstName": "Prénom",
+                "lastName": "Nom",
+                "mapLink": "Lien Google Maps de l'entreprise",
+                "mapLinkHelp": "Dans Google Maps : Partager → Copier le lien. Nous en lisons l'emplacement.",
+                "noNumber": "Aucun numéro sur votre compte",
+                "numberMissing": "Ajoutez un numéro de téléphone ou WhatsApp dans votre profil pour qu'on puisse vous appeler.",
+                "numberUsed": "Le numéro actuel de votre compte est affiché sur l'annonce.",
+                "profileLoaded": "Rempli depuis votre profil professionnel. Vos modifications le mettent à jour pour vos prochains véhicules.",
+                "showEmail": "Afficher mon e-mail publiquement",
+                "subtitle": "Qui publie ce véhicule ?",
+                "title": "Informations de l'annonceur",
+                "type": "Vous êtes"
+            },
+            "rent": {
+                "delivery": "Livraison (aéroport, hôtel)",
+                "deposit": "Caution",
+                "insurance": "Assurance incluse",
+                "insuranceExcess": "Franchise",
+                "kmPerDay": "Km par jour",
+                "mileagePolicy": "Kilométrage",
+                "minDays": "Jours minimum",
+                "minDriverAge": "Âge minimum du conducteur",
+                "minLicenseYears": "Années de permis",
+                "pricePerDay": "Prix par jour",
+                "pricePerMonth": "Prix par mois",
+                "pricePerWeek": "Prix par semaine",
+                "subtitle": "Prix, assurance et conditions pour le locataire.",
+                "title": "Prix et conditions de location",
+                "withDriver": "Avec chauffeur possible"
+            },
+            "requiredFields": "Les champs marqués d'un * sont obligatoires",
+            "sale": {
+                "creditAvailable": "Crédit bancaire possible",
+                "insuranceValidUntil": "Assurance valable jusqu'au",
+                "negotiable": "Négociable",
+                "price": "Prix",
+                "subtitle": "Prix de vente et conditions.",
+                "title": "Prix et conditions",
+                "tradeInAccepted": "Reprise acceptée"
+            },
+            "save": "Enregistrer",
+            "saveSubtitle": "Les visiteurs voient les nouvelles informations tout de suite.",
+            "saveTitle": "Enregistrer vos modifications",
+            "saving": "Enregistrement...",
+            "subtitle": "Ajoutez les détails de votre véhicule, son prix et des photos nettes pour toucher acheteurs et locataires.",
+            "title": "Publier un véhicule",
+            "vehicle": {
+                "bodyType": "Carrosserie",
+                "doors": "Portes",
+                "engineSize": "Cylindrée",
+                "exteriorColor": "Couleur",
+                "fiscalPower": "Puissance fiscale",
+                "fuel": "Carburant",
+                "interiorColor": "Intérieur",
+                "interiorPlaceholder": "Cuir noir",
+                "make": "Marque",
+                "makeName": "Saisissez la marque",
+                "mileage": "Kilométrage",
+                "model": "Modèle",
+                "otherMake": "Autre",
+                "seats": "Places",
+                "subtitle": "Marque, modèle et caractéristiques principales.",
+                "title": "Véhicule",
+                "transmission": "Boîte de vitesses",
+                "version": "Version / finition",
+                "year": "Année",
+                "rangeKm": "Autonomie"
+            },
+            "motoBadge": "Motos & vélos",
+            "motoTitle": "Publier une moto ou un vélo",
+            "editMotoTitle": "Modifier votre moto ou vélo",
+            "motoSubtitle": "Moto, scooter, vélo, trottinette ou triporteur : ajoutez ses détails, son prix et des photos claires.",
+            "publishMoto": "Publier l'annonce",
+            "moto": {
+                "title": "Moto",
+                "subtitle": "Type, marque, modèle et caractéristiques principales.",
+                "type": "Type",
+                "power": "Motorisation",
+                "engineCc": "Cylindrée",
+                "seats": "Places"
+            }
+        },
+        "list": {
+            "categoryTitle": "Annonces : {{category}}",
+            "empty": "Aucun véhicule ne correspond à ces filtres",
+            "emptyHint": "Essayez avec moins de filtres, ou une autre ville.",
+            "error": "Impossible de charger les véhicules.",
+            "publish": "Publier un véhicule",
+            "title": "Annonces de véhicules",
+            "count_one": "{{count}} véhicule",
+            "count_other": "{{count}} véhicules",
+            "motoTitle": "Annonces motos & vélos",
+            "publishMoto": "Publier une moto ou un vélo",
+            "motoCount_one": "{{count}} moto",
+            "motoCount_other": "{{count}} motos"
+        },
+        "mine": {
+            "cancel": "Annuler",
+            "delete": "Supprimer",
+            "deleteError": "Impossible de supprimer ce véhicule.",
+            "deleteText": "« {{title}} » et ses photos seront supprimés. Cette action est définitive.",
+            "deleteTitle": "Supprimer cette annonce ?",
+            "edit": "Modifier",
+            "empty": "Vous n'avez pas encore publié de véhicule",
+            "error": "Impossible de charger vos véhicules.",
+            "status": "Statut",
+            "statusError": "Impossible de changer le statut.",
+            "subtitle": "Changez le statut quand un véhicule est vendu ou loué, modifiez-le ou supprimez-le.",
+            "title": "Mes véhicules",
+            "view": "Voir",
+            "pageSubtitle": "Gérez vos véhicules, vos motos & vélos et vos pièces détachées : modifiez-les, changez leur statut ou supprimez-les.",
+            "tabVehicles": "Mes véhicules ({{count}})",
+            "tabMotos": "Mes motos & vélos ({{count}})",
+            "vehiclesTitle": "Mes véhicules",
+            "motosTitle": "Mes motos & vélos",
+            "count_one": "{{count}} annonce",
+            "count_other": "{{count}} annonces",
+            "allStatuses": "Tous les statuts",
+            "allCities": "Toutes les villes",
+            "noMatch": "Aucune annonce ne correspond à ces filtres",
+            "emptyMotos": "Vous n'avez encore publié aucune moto ni aucun vélo",
+            "emptySubtitle": "Vos annonces apparaîtront ici une fois publiées.",
+            "clearFilters": "Effacer les filtres",
+            "publishedOn": "Publié le",
+            "editStatus": "Modifier le statut",
+            "updating": "Mise à jour...",
+            "viewDetails": "Voir les détails",
+            "confirmDelete": "Supprimer",
+            "tabParts": "Mes pièces détachées ({{count}})"
+        },
+        "price": {
+            "currency": "DH",
+            "onRequest": "Prix sur demande",
+            "perDay": "{{amount}} / jour"
+        },
+        "sidebar": {
+            "browse": "Trouver un véhicule",
+            "mine": "Mes véhicules",
+            "publish": "Publier un véhicule",
+            "browseMotos": "Motos & vélos",
+            "publishMoto": "Publier une moto ou un vélo",
+            "map": "Trouver sur la carte",
+            "alerts": "Alertes véhicules",
+            "reviews": "Avis",
+            "saved": "Véhicules enregistrés",
+            "parts": "Pièces détachées",
+            "publishPart": "Publier une pièce détachée",
+            "search": "Recherche"
+        },
+        "sort": {
+            "label": "Trier par",
+            "mileageAsc": "Kilométrage le plus bas",
+            "newest": "Plus récents",
+            "priceAsc": "Prix croissant",
+            "priceDesc": "Prix décroissant",
+            "yearDesc": "Année la plus récente"
+        },
+        "options": {
+            "publisherType": {
+                "owner": "Particulier",
+                "agency": "Agence",
+                "showroom": "Showroom"
+            },
+            "listingType": {
+                "sale": "À vendre",
+                "rent": "À louer"
+            },
+            "condition": {
+                "used": "Occasion",
+                "new": "Neuf"
+            },
+            "fuel": {
+                "diesel": "Diesel",
+                "petrol": "Essence",
+                "hybrid": "Hybride",
+                "plug_in_hybrid": "Hybride rechargeable",
+                "electric": "Électrique",
+                "lpg": "GPL",
+                "none": "Sans moteur (pédales)"
+            },
+            "transmission": {
+                "manual": "Manuelle",
+                "automatic": "Automatique"
+            },
+            "bodyType": {
+                "city_car": "Citadine",
+                "sedan": "Berline",
+                "suv": "SUV",
+                "4x4": "4x4",
+                "estate": "Break",
+                "coupe": "Coupé",
+                "convertible": "Cabriolet",
+                "minivan": "Monospace",
+                "van": "Utilitaire",
+                "pickup": "Pick-up"
+            },
+            "color": {
+                "white": "Blanc",
+                "black": "Noir",
+                "grey": "Gris",
+                "silver": "Argent",
+                "blue": "Bleu",
+                "red": "Rouge",
+                "green": "Vert",
+                "beige": "Beige",
+                "brown": "Marron",
+                "yellow": "Jaune",
+                "orange": "Orange",
+                "other": "Autre"
+            },
+            "origin": {
+                "morocco": "Achetée au Maroc",
+                "imported": "Importée, dédouanée",
+                "foreign_plates": "Plaque étrangère (WW)"
+            },
+            "insurance": {
+                "third_party": "Au tiers",
+                "comprehensive": "Tous risques"
+            },
+            "mileagePolicy": {
+                "unlimited": "Illimité",
+                "limited": "Limité"
+            },
+            "equipment": {
+                "air_conditioning": "Climatisation",
+                "automatic_climate": "Clim automatique",
+                "gps": "GPS",
+                "reverse_camera": "Caméra de recul",
+                "parking_sensors": "Radar de recul",
+                "bluetooth": "Bluetooth",
+                "carplay_android_auto": "CarPlay / Android Auto",
+                "cruise_control": "Régulateur de vitesse",
+                "sunroof": "Toit ouvrant",
+                "leather_seats": "Sièges cuir",
+                "heated_seats": "Sièges chauffants",
+                "alloy_wheels": "Jantes alu",
+                "abs": "ABS",
+                "esp": "ESP",
+                "airbags": "Airbags",
+                "isofix": "ISOFIX",
+                "keyless": "Démarrage sans clé",
+                "led_lights": "Phares LED",
+                "four_wheel_drive": "4 roues motrices",
+                "start_stop": "Start & stop",
+                "disc_brakes": "Freins à disque",
+                "top_case": "Top case",
+                "side_cases": "Valises latérales",
+                "windshield": "Pare-brise",
+                "alarm": "Alarme",
+                "usb_charger": "Chargeur USB",
+                "heated_grips": "Poignées chauffantes",
+                "suspension": "Suspension",
+                "basket": "Panier",
+                "removable_battery": "Batterie amovible",
+                "helmet_included": "Casque inclus",
+                "lock_included": "Antivol inclus"
+            },
+            "motoType": {
+                "motorcycle": "Moto",
+                "scooter": "Scooter",
+                "bicycle": "Vélo",
+                "kick_scooter": "Trottinette",
+                "tricycle": "Triporteur"
+            },
+            "partVehicleType": {
+                "car": "Voiture",
+                "moto": "Moto & vélo"
+            },
+            "partCategory": {
+                "engine": "Moteur",
+                "transmission": "Boîte & embrayage",
+                "brakes": "Freinage",
+                "suspension": "Suspension & direction",
+                "electrical": "Électricité & batterie",
+                "lighting": "Éclairage",
+                "body": "Carrosserie & rétros",
+                "interior": "Intérieur & sièges",
+                "wheels": "Jantes & pneus",
+                "exhaust": "Échappement",
+                "cooling": "Refroidissement & clim",
+                "filters": "Filtres & huiles",
+                "accessories": "Accessoires",
+                "other": "Autre"
+            },
+            "partCondition": {
+                "new": "Neuf",
+                "used": "Occasion",
+                "refurbished": "Reconditionné"
+            },
+            "sellerType": {
+                "owner": "Particulier",
+                "shop": "Magasin de pièces",
+                "scrapyard": "Casse auto"
+            }
+        },
+        "status": {
+            "Available": "Disponible",
+            "Sold": "Vendu",
+            "Rented": "Loué",
+            "Inactive": "Inactif"
+        },
+        "similar": {
+            "title": "Véhicules similaires",
+            "motoTitle": "Motos & vélos similaires"
+        },
+        "topbar": {
+            "title": "Véhicules",
+            "about": "À propos du service"
+        },
+        "map": {
+            "title": "Trouver des véhicules sur la carte",
+            "subtitle": "Voitures, motos et vélos à vendre ou à louer. Survolez un repère pour l'aperçu, cliquez pour l'ouvrir.",
+            "count_one": "{{count}} sur la carte",
+            "count_other": "{{count}} sur la carte",
+            "section": "Rubrique",
+            "allSections": "Voitures, motos & vélos",
+            "cars": "Voitures",
+            "motos": "Motos & vélos",
+            "type": "Type",
+            "allTypes": "Tous les types",
+            "offer": "Offre",
+            "allOffers": "Vente et location",
+            "city": "Ville",
+            "allCities": "Tout le Maroc",
+            "publisher": "Annonceur",
+            "allPublishers": "Tous",
+            "maxPrice": "Prix maximum (MAD)",
+            "loading": "Chargement des véhicules...",
+            "loadError": "Impossible de charger la carte des véhicules.",
+            "emptyTitle": "Aucun véhicule sur la carte",
+            "emptySubtitle": "Essayez une autre rubrique, ville ou un autre prix.",
+            "legendCars": "Voitures ({{count}})",
+            "legendMotos": "Motos & vélos ({{count}})",
+            "legendApproximate": "Centre-ville, sans position exacte ({{count}})",
+            "approximateNote": "Position approximative (centre-ville)",
+            "viewDetails": "Voir les détails",
+            "markerLabel": "Voir {{title}}"
+        },
+        "alerts": {
+            "title": "Alertes véhicules",
+            "subtitle": "Soyez prévenu dès qu'un véhicule, une moto ou un vélo que vous cherchez est publié.",
+            "createTitle": "Créer une alerte véhicule",
+            "createSubtitle": "Choisissez ce que vous cherchez. Vous recevez une notification, un email et un message WhatsApp (s'il est activé dans vos paramètres).",
+            "city": "Ville",
+            "allCities": "Toutes les villes",
+            "offer": "À vendre, à louer ou les deux",
+            "section": "Véhicules, motos & vélos ou les deux",
+            "vehicles": "Véhicules",
+            "motos": "Motos & vélos",
+            "vehicleTypes": "Types de véhicule",
+            "motoTypes": "Types de moto et vélo",
+            "anyTypeHint": "Laissez vide pour être prévenu pour tous les types.",
+            "anyVehicleType": "Tout type de véhicule",
+            "anyMotoType": "Toute moto ou vélo",
+            "optional": "Plus précis (facultatif)",
+            "makes": "Marques",
+            "anyMake": "Toutes les marques",
+            "makesHelp": "Jusqu'à 10. Vide : toutes les marques.",
+            "maxPrice": "Prix maximum",
+            "maxPriceHelp": "Par jour pour les locations. Vide : tout prix.",
+            "maxPriceChip": "≤ {{price}} MAD",
+            "channelsHint": "Les emails et messages WhatsApp s'activent ou se désactivent dans les",
+            "settingsLink": "Paramètres",
+            "created": "Alerte créée. Nous vous préviendrons dès qu'un véhicule correspondant sera publié.",
+            "archived": "Alerte archivée : elle ne vous préviendra plus.",
+            "restored": "Alerte restaurée : vous serez de nouveau prévenu.",
+            "activeTab": "Actives ({{count}})",
+            "archivedTab": "Archivées · silencieuses ({{count}})",
+            "emptyActive": "Aucune alerte active",
+            "emptyArchived": "Aucune alerte archivée",
+            "matched": "{{count}} correspondance(s) · dernière le {{date}}",
+            "notMatchedYet": "Aucune correspondance pour l'instant",
+            "archiveHelp": "Archiver : l'alerte reste enregistrée mais ne vous prévient plus",
+            "restoreHelp": "Restaurer : vous serez de nouveau prévenu",
+            "silent": "Archivée · silencieuse",
+            "errors": {
+                "offer": "Choisissez à vendre, à louer ou les deux.",
+                "section": "Choisissez véhicules, motos & vélos ou les deux."
+            }
+        },
+        "profile": {
+            "stats": {
+                "vehicles": "Véhicules",
+                "availableVehicles": "Véhicules disponibles",
+                "motos": "Motos & vélos",
+                "availableMotos": "Motos & vélos disponibles",
+                "reviews": "Avis",
+                "parts": "Pièces détachées"
+            },
+            "tabs": {
+                "vehicles": "Véhicules",
+                "motos": "Motos & vélos",
+                "myVehicles": "Mes véhicules",
+                "myMotos": "Mes motos & vélos",
+                "reviews": "Avis",
+                "parts": "Pièces détachées",
+                "myParts": "Mes pièces détachées"
+            },
+            "emptyVehicles": "Aucun véhicule publié",
+            "emptyMotos": "Aucune moto ni vélo publié",
+            "reviewNeedsPublication": "Vous pourrez laisser un avis quand cette personne aura publié un véhicule, une moto, un vélo ou une pièce détachée.",
+            "loginToReview": "Connectez-vous pour laisser un avis.",
+            "seePublic": "Voir mon profil public",
+            "errors": {
+                "publications": "Impossible de charger les publications."
+            },
+            "emptyParts": "Aucune pièce détachée publiée"
+        },
+        "reviews": {
+            "title": "Avis véhicules",
+            "subtitle": "Voyez comment les vendeurs, agences et showrooms sont notés par les autres clients avant de les contacter."
+        },
+        "saved": {
+            "title": "Véhicules enregistrés",
+            "subtitle": "Les véhicules, motos, vélos et pièces détachées que vous avez enregistrés, pour les comparer et les retrouver.",
+            "tabVehicles": "Véhicules ({{count}})",
+            "tabMotos": "Motos & vélos ({{count}})",
+            "empty": "Aucun véhicule enregistré",
+            "emptyMotos": "Aucune moto ni vélo enregistré",
+            "emptyHint": "Ouvrez une annonce et appuyez sur « Enregistrer ce véhicule » pour la garder ici.",
+            "savedOn": "Enregistré le {{date}}",
+            "remove": "Retirer",
+            "saveButton": "Enregistrer ce véhicule",
+            "savedButton": "Enregistré",
+            "added": "Enregistré. Retrouvez-le dans Véhicules enregistrés.",
+            "removed": "Retiré de vos véhicules enregistrés.",
+            "error": "Impossible de mettre à jour vos véhicules enregistrés.",
+            "loadError": "Impossible de charger vos véhicules enregistrés.",
+            "tabParts": "Pièces détachées ({{count}})",
+            "emptyParts": "Aucune pièce détachée enregistrée"
+        },
+        "parts": {
+            "listError": "Impossible de charger les pièces détachées.",
+            "filtersTitle": "Trouver une pièce détachée",
+            "searchPlaceholder": "Pièce, marque, référence, constructeur…",
+            "fitsMake": "Pour la marque",
+            "fitsModel": "Modèle",
+            "fitsYear": "Année du véhicule",
+            "soldBy": "Vendu par",
+            "options": "Options",
+            "delivery": "Livraison",
+            "listTitle": "Annonces de pièces détachées",
+            "count": "{{count}} pièces",
+            "empty": "Aucune pièce ne correspond à ces filtres",
+            "fabTooltip": "Publier une pièce détachée",
+            "fabLabel": "Ajouter une pièce",
+            "universal": "Universelle",
+            "perUnit": "l'unité",
+            "allParts": "Toutes les pièces",
+            "allVehicles": "Voitures et motos",
+            "saved": "Enregistrée. Retrouvez-la dans Véhicules enregistrés, onglet Pièces détachées.",
+            "saveButton": "Enregistrer cette pièce",
+            "similar": "Pièces similaires",
+            "detailsError": "Impossible de charger cette pièce détachée.",
+            "back": "Retour aux pièces détachées",
+            "inactiveNoContact": "Cette pièce n'est pas disponible pour le moment. Le vendeur n'accepte pas de contacts.",
+            "edit": "Modifier cette pièce",
+            "published": "Votre pièce détachée est publiée.",
+            "warrantyMonths": "{{count}} mois",
+            "fits": "Compatible avec",
+            "allModels": "Tous les modèles",
+            "years": "Années",
+            "alsoFits": "Compatible aussi avec",
+            "conditions": "Prix et livraison",
+            "myTitle": "Mes pièces détachées",
+            "mineEmpty": "Vous n'avez pas encore publié de pièce détachée",
+            "mineError": "Impossible de charger vos pièces détachées.",
+            "deleteError": "Impossible de supprimer cette pièce détachée.",
+            "form": {
+                "badge": "Pièces détachées",
+                "title": "Publier une pièce détachée",
+                "editTitle": "Modifier votre pièce détachée",
+                "subtitle": "Pièce auto ou moto : dites ce que c'est, sur quels véhicules elle se monte, son prix, et ajoutez des photos nettes.",
+                "editSubtitle": "Mettez à jour les informations et les photos de votre pièce.",
+                "sellerTitle": "Vendeur",
+                "sellerSubtitle": "Les acheteurs vous contactent au téléphone / WhatsApp de votre compte.",
+                "sellerType": "Vous êtes",
+                "businessName": "Nom du magasin / de la casse",
+                "partTitle": "La pièce",
+                "partSubtitle": "Ce que c'est, son état et sa référence.",
+                "forVehicle": "Pour",
+                "category": "Catégorie",
+                "name": "Nom de la pièce",
+                "namePlaceholder": "ex. Plaquettes de frein avant, phare, alternateur…",
+                "brand": "Marque de la pièce",
+                "brandHelp": "Bosch, Valeo, pièce d'origine…",
+                "partNumber": "Référence (numéro OEM)",
+                "quantity": "Quantité",
+                "warranty": "Garantie",
+                "months": "mois",
+                "compatibilityTitle": "Véhicules compatibles",
+                "compatibilitySubtitle": "Les acheteurs cherchent par marque, modèle et année : indiquez sur quels véhicules la pièce se monte.",
+                "universal": "Pièce universelle (tous véhicules)",
+                "modelHelp": "Vide : tous les modèles de la marque.",
+                "yearFrom": "De l'année",
+                "yearTo": "À l'année",
+                "notes": "Autres véhicules compatibles (facultatif)",
+                "notesPlaceholder": "ex. Se monte aussi sur Renault Clio 3 et Sandero 1",
+                "priceTitle": "Prix et emplacement",
+                "priceSubtitle": "Prix à l'unité, livraison et où se trouve la pièce.",
+                "price": "Prix à l'unité",
+                "delivery": "Livraison possible",
+                "installation": "Montage proposé",
+                "mapLink": "Lien Google Maps (facultatif)",
+                "mapLinkHelp": "Où les acheteurs peuvent venir voir la pièce.",
+                "showEmail": "Afficher mon e-mail sur l'annonce",
+                "descriptionTitle": "Description",
+                "descriptionSubtitle": "État, usure, ce qui est inclus, pourquoi vous la vendez.",
+                "imagesTitle": "Photos de la pièce",
+                "imagesSubtitle": "La première photo est la couverture. Montrez l'étiquette de référence s'il y en a une.",
+                "uploadTitle": "Cliquez pour ajouter des photos de la pièce",
+                "uploadHint": "Jusqu'à {{max}} photos.",
+                "publish": "Publier la pièce",
+                "titleError": "Saisissez le nom de la pièce (3 caractères minimum).",
+                "makeError": "Choisissez la marque, ou indiquez que la pièce est universelle.",
+                "yearsError": "La dernière année doit être après la première.",
+                "imagesError": "Ajoutez au moins une photo de la pièce.",
+                "notOwner": "Vous ne pouvez modifier que vos propres pièces.",
+                "loadError": "Impossible de charger cette pièce détachée.",
+                "submitError": "Impossible d'enregistrer cette pièce. Veuillez réessayer.",
+                "tooManyImages": "Une pièce peut avoir au maximum {{max}} photos."
+            }
+        },
+        "search": {
+            "title": "Rechercher un véhicule",
+            "subtitle": "Voitures, motos & vélos et pièces détachées : une seule recherche, les résultats sur la carte.",
+            "criteria": "Critères de recherche",
+            "reset": "Réinitialiser",
+            "submit": "Rechercher",
+            "what": "Que cherchez-vous ?",
+            "services": {
+                "car": "Voitures",
+                "moto": "Motos & vélos",
+                "part": "Pièces détachées"
+            },
+            "kinds": {
+                "car": "Voiture",
+                "moto": "Moto & vélo",
+                "part": "Pièce détachée"
+            },
+            "city": "Ville",
+            "anyCity": "Toutes les villes",
+            "any": "Tous",
+            "offer": "Offre",
+            "minYear": "Année",
+            "fromYear": "{{year}} ou plus récent",
+            "partCategory": "Catégorie de pièce",
+            "price": "Prix",
+            "anyPrice": "Tous les prix",
+            "priceMode": {
+                "below": "Moins de",
+                "above": "Plus de",
+                "exact": "Exactement",
+                "between": "Entre"
+            },
+            "priceMin": "De (MAD)",
+            "priceMax": "À (MAD)",
+            "amount": "Montant (MAD)",
+            "keywords": "Mots-clés (titre, marque, référence, quartier)",
+            "priceHelp": "Prix : total pour les ventes, par jour pour les locations, à l'unité pour les pièces.",
+            "makeHelp": "Pièces détachées : celles qui vont sur cette marque et ce modèle, et les pièces universelles.",
+            "failed": "La recherche a échoué. Veuillez réessayer.",
+            "searching": "Recherche...",
+            "count": "{{count}} résultat(s)",
+            "mapJump": "Carte",
+            "sort": {
+                "label": "Trier par",
+                "mixed": "Mélangé : tous les types",
+                "newest": "Plus récents",
+                "priceAsc": "Prix croissant",
+                "priceDesc": "Prix décroissant"
+            },
+            "emptyTitle": "Aucune annonce ne correspond à ces critères",
+            "emptyText": "Essayez une autre ville, une autre marque, une fourchette de prix plus large ou moins de critères.",
+            "mapTitle": "Résultats sur la carte",
+            "mapTitleCity": "Résultats sur la carte : {{city}}",
+            "mapHelp": "Survolez un numéro pour voir l'annonce, cliquez pour les détails.",
+            "mapMissingKey": "La carte n'est pas configurée (VITE_MAPTILER_API_KEY).",
+            "mapError": "La carte n'a pas pu être chargée.",
+            "notLocated": "{{count}} résultat(s) de cette page n'ont pas de position et ne sont pas sur la carte.",
+            "noLocation": "Pas sur la carte",
+            "close": "Fermer",
+            "seeDetails": "Voir tous les détails"
+        },
+        "admin": {
+            "title": "Revue des publications véhicules",
+            "subtitle": "Vérifiez les voitures, motos & vélos et pièces détachées publiées par les utilisateurs.",
+            "kinds": {
+                "all": "Toutes",
+                "car": "Voitures",
+                "moto": "Motos & vélos",
+                "part": "Pièces détachées"
+            },
+            "kind": {
+                "car": "Voiture",
+                "moto": "Moto & vélo",
+                "part": "Pièce détachée"
+            }
+        }
+    },
+    "externalSearch": {
+        "tab": "Trouver un bien",
+        "allTab": "Toutes les annonces",
+        "title": "Trouver un bien sur d'autres sites",
+        "subtitle": "Nous cherchons pour vous sur les sites d'annonces marocains et affichons jusqu'à 200 biens correspondants.",
+        "city": "Ville",
+        "propertyType": "Type de bien",
+        "anyType": "Tous les types",
+        "transaction": "Transaction",
+        "saleOrRent": "Vente ou location",
+        "maxPrice": "Prix maximum",
+        "maxPriceRent": "Par mois",
+        "websites": "Sites (facultatif)",
+        "onlyThese": "Seulement ces sites",
+        "excludeThese": "Tous sauf ces sites",
+        "websitesPlaceholder": "Tapez ou choisissez un site, ex. agenz.ma",
+        "includeHelp": "Vide : tous les sites sont consultés.",
+        "excludeHelp": "Ces sites seront exclus.",
+        "robotsBlocked": "Non autorisé (robots.txt)",
+        "reset": "Réinitialiser",
+        "search": "Rechercher",
+        "unknownSites": "Absents de notre liste de sites, ignorés : {{sites}}",
+        "skippedSites": "Ignorés car leur robots.txt n'autorise pas la visite : {{sites}}",
+        "searching": "Recherche en direct sur {{count}} sites...",
+        "start": "Indiquez ce que vous cherchez et lancez la recherche",
+        "startHelp": "{{count}} sites marocains sont consultés en direct : Agenz, Hespress Immo, Masaken...",
+        "emptyTitle": "Aucun bien trouvé",
+        "emptyHelp": "Essayez un prix plus élevé, un autre type de bien, ou tous les sites.",
+        "found_one": "{{count}} bien trouvé",
+        "found_other": "{{count}} biens trouvés",
+        "searchedOn_one": "sur {{count}} site",
+        "searchedOn_other": "sur {{count}} sites",
+        "partialMatch": "Certains détails ne sont pas indiqués sur le site",
+        "errors": {
+            "failed": "La recherche a échoué. Veuillez réessayer."
+        },
+        "open": "Ouvrir",
+        "allCities": "Toutes les villes",
+        "searchingHelp": "Chaque site est consulté en direct : cela prend 20 à 40 secondes.",
+        "websitesSearched": "Sites consultés",
+        "viaEngine": "Via le moteur de recherche",
+        "status": {
+            "blocked": "robots.txt",
+            "offerNotListed": "ne propose pas cette offre",
+            "notSupported": "non consultable",
+            "failed": "n'a pas répondu"
+        },
+        "statusHelp": {
+            "engine": "Trouvé via le moteur de recherche",
+            "live": "Lu maintenant sur la page de résultats du site",
+            "noResults": "Consulté, rien de correspondant",
+            "blocked": "Ignoré : son robots.txt n'autorise pas la visite",
+            "offerNotListed": "Ce site ne propose que l'autre offre (vente ou location)",
+            "notSupported": "Ses pages ne peuvent pas être lues automatiquement et le moteur de recherche n'est pas configuré",
+            "failed": "Le site n'a pas répondu à temps"
+        },
+        "method": {
+            "website": "Consulté sur le site",
+            "engine": "Via le moteur de recherche",
+            "none": "Non consultable"
+        }
+    },
+    "savedListings": {
+        "save": "Enregistrer",
+        "saved": "Enregistré",
+        "added": "Enregistré. Retrouvez-le dans Enregistrés.",
+        "removed": "Retiré de votre liste.",
+        "error": "Impossible de mettre à jour votre liste.",
+        "loadError": "Impossible de charger votre liste.",
+        "pageSubtitle": "Les biens, annonces de colocation et hôtels que vous avez enregistrés, pour les comparer et les contacter plus tard.",
+        "tabProperties": "Biens",
+        "tabRoommates": "Colocation",
+        "tabEstablishments": "Hôtels & riads",
+        "emptyRoommates": "Aucune annonce de colocation enregistrée",
+        "emptyEstablishments": "Aucun hôtel ni riad enregistré",
+        "browseRoommates": "Trouver un colocataire",
+        "browseEstablishments": "Voir les hôtels & riads",
+        "emptyHint": "Ouvrez une annonce et appuyez sur « Enregistrer » pour la garder ici.",
+        "savedOn": "Enregistré le {{date}}",
+        "remove": "Retirer"
+    },
+    "adminPanel": {
+        "title": "Panneau d'administration",
+        "groups": {
+            "account": "Comptes",
+            "property": "Immobilier",
+            "vehicles": "Véhicules",
+            "dailyWorker": "Travailleur journalier",
+            "deliveryMan": "Livreur",
+            "driver": "Chauffeur",
+            "servicesCompanies": "Services & entreprises"
+        },
+        "items": {
+            "users": "Utilisateurs",
+            "visits": "Visites",
+            "roles": "Rôles & accès"
+        },
+        "roles": {
+            "admin": "Administrateur",
+            "member": "Membre de l'équipe"
+        },
+        "soon": "Bientôt",
+        "view": "Lecture",
+        "viewOnly": "Lecture seule : vous pouvez voir cette page, mais les modifications (supprimer, modifier, statut) sont réservées aux membres ayant l'accès en écriture.",
+        "usersSubtitle": "Tous les comptes : activité, vérification, publications, suspension.",
+        "visitsSubtitle": "Visiteurs et sessions sur toute la plateforme.",
+        "statisticsTitle": "Statistiques immobilier",
+        "statisticsSubtitle": "Clics, demande et contacts sur les annonces immobilières."
+    },
+    "adminRoles": {
+        "title": "Rôles & accès",
+        "subtitle": "Donnez aux membres de l'équipe l'accès à des parties du panneau, ou nommez un administrateur.",
+        "roles": {
+            "client": "Client",
+            "member": "Membre",
+            "admin": "Admin"
+        },
+        "roleHelp": {
+            "client": "Utilisateur normal : pas de panneau d'administration.",
+            "member": "Membre de l'équipe : seulement les sections choisies, chacune en lecture ou en lecture & modification.",
+            "admin": "Accès complet, lecture et écriture, rôles compris."
+        },
+        "filter": "Rôle",
+        "filters": {
+            "all": "Tous",
+            "client": "Clients",
+            "member": "Membres",
+            "admin": "Admins"
+        },
+        "search": "Nom ou e-mail…",
+        "loadError": "Impossible de charger les utilisateurs.",
+        "empty": "Aucun utilisateur ne correspond.",
+        "you": "Vous",
+        "suspended": "Suspendu",
+        "change": "Changer le rôle",
+        "saved": "{{name}} est maintenant : {{role}}.",
+        "dialogTitle": "Rôle de {{name}}",
+        "sectionsTitle": "Accès au panneau d'administration",
+        "sectionsHelp": "Lecture : voir la page. Lecture & modification : aussi supprimer, changer le statut, modifier.",
+        "allView": "Tout en lecture",
+        "clear": "Effacer",
+        "levels": {
+            "none": "Aucun accès",
+            "read": "Lecture",
+            "write": "Lecture & modification"
+        },
+        "rolesNote": "Rôles & accès reste toujours réservé aux administrateurs.",
+        "adminWarning": "Un administrateur peut tout voir et tout modifier, y compris les rôles.",
+        "needSection": "Donnez à ce membre l'accès à au moins une section.",
+        "saveError": "Impossible de changer le rôle.",
+        "cancel": "Annuler",
+        "save": "Enregistrer"
     }
 }

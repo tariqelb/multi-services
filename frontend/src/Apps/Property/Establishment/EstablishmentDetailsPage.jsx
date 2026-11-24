@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import SaveListingButton from "../saved/SaveListingButton";
 import ReportListingLink from "../listings/ReportListingLink";
 
 import {
@@ -156,7 +157,7 @@ export default function EstablishmentDetailsPage() {
                 setError("");
 
                 const response = await axiosInstance.get(
-                    `/establishments/${id}`
+                    `/property/establishments/${id}`
                 );
 
                 if (active) {
@@ -559,6 +560,7 @@ export default function EstablishmentDetailsPage() {
                             {tr("whatsapp", "Contact on WhatsApp")}
                         </Button>
                     )}
+                    <SaveListingButton type="establishment" listingId={establishment._id || id} ownerId={establishment.userId?._id || establishment.userId} />
                     {contactLinks.map((link) => (
                         <Button
                             key={link.key}

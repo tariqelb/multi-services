@@ -1,0 +1,833 @@
+[
+    {
+        "sourceName": "Aqari Annonces",
+        "hostnames": [
+            "aqari-annonces.com",
+            "www.aqari-annonces.com"
+        ],
+        "pathPrefix": "/properties/",
+        "search": {
+            "note": "Links seen: /catalog?operation=sale|rent, ?property_type=apartment, ?city=slug.",
+            "templates": [
+                {
+                    "url": "/catalog?operation={transaction}&property_type={type}&city={city}"
+                }
+            ],
+            "maps": {
+                "transaction": {
+                    "For Sale": "sale",
+                    "For Rent": "rent"
+                },
+                "type": {
+                    "Apartment": "apartment",
+                    "House": "house",
+                    "Villa": "villa",
+                    "Studio": "studio",
+                    "Room": "room",
+                    "Commercial space": "commercial",
+                    "Store": "commercial",
+                    "Office": "office",
+                    "Land": "land",
+                    "Warehouse": "warehouse"
+                },
+                "city": {
+                    "Tanger": "tangier",
+                    "Marrakesh": "marrakech",
+                    "El Kelaa Des Sraghna": "kalaat-sraghna",
+                    "Fquih Ben Salah": "fkih-ben-salah",
+                    "Inezgane": "inezgane-ait-melloul",
+                    "Aït Melloul": "inezgane-ait-melloul",
+                    "Jerada": "jrada",
+                    "Ouezzane": "ouazzane",
+                    "M'diq": "mdiq-fnideq",
+                    "Fnideq": "mdiq-fnideq",
+                    "Oulad Teima": "ouled-teima"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:00:00.023Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:00:12.284Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 2,
+            "alreadyInDb": 17,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Mr Semsar",
+        "hostnames": [
+            "mrsemsar.ma",
+            "www.mrsemsar.ma"
+        ],
+        "pathPrefix": "/listing/",
+        "robots": {
+            "allowed": true,
+            "reason": "no-robots",
+            "checkedAt": "2026-11-24T00:00:12.534Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:00:14.263Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "3a9arai",
+        "hostnames": [
+            "3a9arai.ma",
+            "www.3a9arai.ma"
+        ],
+        "pathPrefix": "/annonce/",
+        "search": {
+            "note": "Links seen: /recherche/{vente|location|toutes-transactions}/{city|maroc}/{type}.",
+            "allCities": "maroc",
+            "templates": [
+                {
+                    "url": "/recherche/{transaction}/{city}/{type}"
+                },
+                {
+                    "url": "/recherche/{transaction}/{city}"
+                }
+            ],
+            "maps": {
+                "transaction": {
+                    "For Sale": "vente",
+                    "For Rent": "location",
+                    "any": "toutes-transactions"
+                },
+                "type": {
+                    "Apartment": "appartement",
+                    "Villa": "villa",
+                    "House": "villa",
+                    "Land": "terrain",
+                    "Commercial space": "commerce",
+                    "Store": "commerce"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:00:14.535Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:00:18.190Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "immo.hespress",
+        "hostnames": [
+            "immo.hespress.com",
+            "www.immo.hespress.com"
+        ],
+        "pathPrefix": "/fr/biens/",
+        "lastCollectedAt": "2026-11-24T00:01:32.744Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 30,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 1,
+            "status": "completed"
+        },
+        "search": {
+            "note": "Links seen: /fr/{type}-a-{louer|vendre}-{city}, /fr/biens?city={id}&property_type={id}.",
+            "templates": [
+                {
+                    "url": "/fr/{type}-a-{transaction}-{city}"
+                },
+                {
+                    "url": "/fr/biens?city={cityId}&property_type={typeId}"
+                }
+            ],
+            "maps": {
+                "transaction": {
+                    "For Sale": "vendre",
+                    "For Rent": "louer"
+                },
+                "type": {
+                    "Apartment": "appartement",
+                    "Villa": "villa",
+                    "House": "maison",
+                    "Studio": "studio",
+                    "Land": "terrain",
+                    "Office": "bureau",
+                    "Commercial space": "local-commercial",
+                    "Store": "local-commercial"
+                },
+                "cityId": {
+                    "Casablanca": "1",
+                    "Marrakesh": "2",
+                    "Tanger": "3",
+                    "Rabat": "4",
+                    "Kenitra": "5",
+                    "Agadir": "6",
+                    "Fes": "9"
+                },
+                "typeId": {
+                    "Apartment": "1",
+                    "Villa": "2",
+                    "House": "3",
+                    "Studio": "6",
+                    "Land": "8",
+                    "Office": "10",
+                    "Commercial space": "11",
+                    "Store": "11"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:00:18.538Z"
+        }
+    },
+    {
+        "sourceName": "immofind",
+        "hostnames": [
+            "immofind.ma",
+            "www.immofind.ma"
+        ],
+        "pathPrefix": "/annonce/",
+        "lastCollectedAt": "2026-11-24T00:02:40.060Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 30,
+            "alreadyInDb": 10,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        },
+        "search": {
+            "note": "Links seen: /vente/{city}/appartements, /location/{city}, /vente, /location.",
+            "templates": [
+                {
+                    "url": "/{transaction}/{city}/{type}"
+                },
+                {
+                    "url": "/{transaction}/{city}"
+                },
+                {
+                    "url": "/{transaction}"
+                }
+            ],
+            "maps": {
+                "transaction": {
+                    "For Sale": "vente",
+                    "For Rent": "location"
+                },
+                "type": {
+                    "Apartment": "appartements",
+                    "Villa": "villas",
+                    "House": "maisons",
+                    "Land": "terrains",
+                    "Office": "bureaux"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:01:33.161Z"
+        }
+    },
+    {
+        "sourceName": "Innka",
+        "hostnames": [
+            "innka.ma",
+            "www.innka.ma"
+        ],
+        "pathPrefix": "/annonces/",
+        "search": {
+            "note": "No city pages. Links seen: /annonce_cat/{type}/, /annonce_status/{vente|location}/, /annonces/.",
+            "templates": [
+                {
+                    "url": "/annonce_cat/{type}/"
+                },
+                {
+                    "url": "/annonce_status/{transaction}/"
+                },
+                {
+                    "url": "/annonces/"
+                }
+            ],
+            "maps": {
+                "transaction": {
+                    "For Sale": "vente",
+                    "For Rent": "location"
+                },
+                "type": {
+                    "Apartment": "apartments",
+                    "House": "maisons",
+                    "Villa": "villas",
+                    "Office": "bureaux",
+                    "Store": "magasins-et-commerces",
+                    "Commercial space": "magasins-et-commerces",
+                    "Land": "terrains",
+                    "Warehouse": "usines-et-hangars"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:02:40.226Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:03:28.189Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 9,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 2,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Maghrebna",
+        "hostnames": [
+            "maghrebna.ma",
+            "www.maghrebna.ma"
+        ],
+        "pathPrefix": "/listing/",
+        "search": {
+            "note": "Rentals only. Links seen: /region/{city}/.",
+            "offers": [
+                "For Rent"
+            ],
+            "templates": [
+                {
+                    "url": "/region/{city}/",
+                    "listingType": "For Rent"
+                },
+                {
+                    "url": "/listings/",
+                    "listingType": "For Rent"
+                }
+            ],
+            "maps": {
+                "city": {
+                    "Marrakesh": "marrakesh",
+                    "Fes": "fez",
+                    "Tanger": "tangier"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:03:28.267Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:05:01.767Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 21,
+            "alreadyInDb": 21,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Mroom",
+        "hostnames": [
+            "mroom.ma",
+            "www.mroom.ma"
+        ],
+        "pathPrefix": "/listings/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:05:01.875Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:06:05.571Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 30,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Immolink",
+        "hostnames": [
+            "immolink.ma",
+            "www.immolink.ma"
+        ],
+        "pathPrefix": "/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:06:05.913Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:06:07.424Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "360 Annonces",
+        "hostnames": [
+            "360annonces.com",
+            "www.360annonces.com"
+        ],
+        "pathPrefix": "/annonce/",
+        "search": {
+            "note": "Links seen: /{acheter|louer}/{type}/{city}, /immobilier/{city}, /acheter, /louer.",
+            "templates": [
+                {
+                    "url": "/{transaction}/{type}/{city}"
+                },
+                {
+                    "url": "/immobilier/{city}"
+                },
+                {
+                    "url": "/{transaction}"
+                }
+            ],
+            "maps": {
+                "transaction": {
+                    "For Sale": "acheter",
+                    "For Rent": "louer"
+                },
+                "type": {
+                    "Apartment": "appartement",
+                    "Studio": "studio",
+                    "Villa": "villa",
+                    "Office": "bureau",
+                    "Land": "terrain",
+                    "Commercial space": "commerce",
+                    "Store": "commerce"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:06:07.916Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:07:29.898Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 30,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Nachri Dari",
+        "hostnames": [
+            "nachridari.com",
+            "www.nachridari.com"
+        ],
+        "pathPrefix": "/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:07:30.091Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:07:33.247Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Immoby",
+        "hostnames": [
+            "immoby.immo",
+            "www.immoby.immo"
+        ],
+        "pathPrefix": "/property/",
+        "search": {
+            "note": "No city pages. Links seen: /property-type/{type}/, /property/.",
+            "templates": [
+                {
+                    "url": "/property-type/{type}/"
+                },
+                {
+                    "url": "/property/"
+                }
+            ],
+            "maps": {
+                "type": {
+                    "Studio": "studios",
+                    "Apartment": "appartements",
+                    "Villa": "villas",
+                    "Office": "plateaux-bureaux",
+                    "Commercial space": "locaux-commerciaux",
+                    "Store": "locaux-commerciaux",
+                    "Land": "terrains"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "no-robots",
+            "checkedAt": "2026-11-24T00:07:33.595Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:08:50.956Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 14,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 2,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "2P",
+        "hostnames": [
+            "2p.ma",
+            "www.2p.ma"
+        ],
+        "pathPrefix": "/annonce/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:08:51.156Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:09:51.919Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 30,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Chri Dari",
+        "hostnames": [
+            "chridari.ma",
+            "www.chridari.ma"
+        ],
+        "pathPrefix": "/en/properties/",
+        "search": {
+            "note": "New homes for sale only. Links seen: /fr/offers?city=slug.",
+            "offers": [
+                "For Sale"
+            ],
+            "templates": [
+                {
+                    "url": "/fr/offers?city={city}",
+                    "listingType": "For Sale"
+                }
+            ],
+            "maps": {
+                "city": {
+                    "Marrakesh": "marrakesh",
+                    "Tanger": "tangier"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:09:52.210Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:10:59.107Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 30,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "1immo",
+        "hostnames": [
+            "1immo.ma",
+            "www.1immo.ma"
+        ],
+        "pathPrefix": "/",
+        "search": {
+            "note": "Links seen: /s/{city|maroc}/{type}-a-{vendre|louer}, /s/{city}/{vente|location}-immobilier, /s/{city}.",
+            "allCities": "maroc",
+            "templates": [
+                {
+                    "url": "/s/{city}/{type}-a-{transaction}"
+                },
+                {
+                    "url": "/s/{city}/{deal}-immobilier"
+                },
+                {
+                    "url": "/s/{city}"
+                }
+            ],
+            "maps": {
+                "transaction": {
+                    "For Sale": "vendre",
+                    "For Rent": "louer"
+                },
+                "deal": {
+                    "For Sale": "vente",
+                    "For Rent": "location"
+                },
+                "type": {
+                    "Apartment": "appartement",
+                    "House": "maison",
+                    "Villa": "villa",
+                    "Office": "bureau",
+                    "Commercial space": "local-commercial",
+                    "Store": "local-commercial",
+                    "Land": "terrain"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:10:59.300Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:11:06.980Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Agenz",
+        "hostnames": [
+            "agenz.ma",
+            "www.agenz.ma"
+        ],
+        "pathPrefix": "/",
+        "search": {
+            "note": "Links seen on agenz.ma: /fr/acheter/immo-{city}/vente-{type}, /fr/louer/immo-{city}/location-{type}.",
+            "templates": [
+                {
+                    "url": "/fr/acheter/immo-{city}/vente-{type}",
+                    "listingType": "For Sale"
+                },
+                {
+                    "url": "/fr/acheter/immo-{city}",
+                    "listingType": "For Sale"
+                },
+                {
+                    "url": "/fr/acheter/vente-{type}",
+                    "listingType": "For Sale"
+                },
+                {
+                    "url": "/fr/louer/immo-{city}/location-{type}",
+                    "listingType": "For Rent"
+                },
+                {
+                    "url": "/fr/louer/immo-{city}",
+                    "listingType": "For Rent"
+                },
+                {
+                    "url": "/fr/louer/location-{type}",
+                    "listingType": "For Rent"
+                }
+            ],
+            "maps": {
+                "type": {
+                    "Apartment": "appartements",
+                    "Villa": "villas",
+                    "Studio": "studios",
+                    "Land": "terrains",
+                    "Office": "bureaux",
+                    "Store": "locaux-magasins",
+                    "Commercial space": "locaux-magasins",
+                    "Warehouse": "locaux-industriels",
+                    "House": "maisons"
+                },
+                "city": {
+                    "Marrakesh": "marrakech",
+                    "Oujda": "oujda-angad",
+                    "Taroudant": "taroudannt",
+                    "M'diq": "mdiq-fnideq",
+                    "Fnideq": "mdiq-fnideq",
+                    "Dar Bouazza (Tamaris)": "dar-bouazza",
+                    "Aït Melloul": "ait-melloul"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:11:07.308Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:11:09.435Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Darioo",
+        "hostnames": [
+            "darioo.ma",
+            "www.darioo.ma"
+        ],
+        "pathPrefix": "/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:11:09.811Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:11:12.016Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Masaken",
+        "hostnames": [
+            "masaken.ma",
+            "www.masaken.ma"
+        ],
+        "pathPrefix": "/",
+        "search": {
+            "note": "Links seen: /fr/{louer|vendre}/{appartement|maison|terrain}/{city}.",
+            "templates": [
+                {
+                    "url": "/fr/{transaction}/{type}/{city}"
+                }
+            ],
+            "maps": {
+                "transaction": {
+                    "For Sale": "vendre",
+                    "For Rent": "louer"
+                },
+                "type": {
+                    "Apartment": "appartement",
+                    "House": "maison",
+                    "Land": "terrain",
+                    "Villa": "villa"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "no-robots",
+            "checkedAt": "2026-11-24T00:11:12.313Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:11:15.168Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Bien.ma",
+        "hostnames": [
+            "bien.ma",
+            "www.bien.ma"
+        ],
+        "pathPrefix": "/",
+        "search": {
+            "note": "Links seen: /property_city/{city}/, /property_category/{type}/, /properties-liste/.",
+            "templates": [
+                {
+                    "url": "/property_city/{city}/"
+                },
+                {
+                    "url": "/property_category/{type}/"
+                },
+                {
+                    "url": "/properties-liste/"
+                }
+            ],
+            "maps": {
+                "type": {
+                    "Apartment": "appartement",
+                    "Studio": "studio",
+                    "Villa": "villa",
+                    "Land": "terrain",
+                    "Office": "bureau",
+                    "Store": "boutique",
+                    "Commercial space": "commercial"
+                }
+            }
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:11:15.314Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:11:21.716Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Lotti",
+        "hostnames": [
+            "lotti.ma",
+            "www.lotti.ma"
+        ],
+        "pathPrefix": "/terrain/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-24T00:11:21.821Z"
+        },
+        "lastCollectedAt": "2026-11-24T00:12:19.836Z",
+        "lastCollectSummary": {
+            "requested": 30,
+            "saved": 30,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    }
+]

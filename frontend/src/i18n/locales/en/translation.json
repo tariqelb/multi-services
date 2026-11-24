@@ -49,7 +49,7 @@
                 "details": "Explore thousands of verified residential and commercial properties available for immediate purchase, sale, or lease in your area."
             },
             "cars": {
-                "title": "Cars",
+                "title": "Vehicles",
                 "description": "Buy, Sell & Rent Vehicles",
                 "details": "Browse a wide selection of brand new and pre-owned cars, trucks, and SUVs with transparent pricing and direct owner contacts."
             },
@@ -1012,7 +1012,9 @@
             "saving": "Saving...",
             "save": "Save email preferences",
             "saved": "Email preferences saved successfully.",
-            "saveError": "Could not save email preferences."
+            "saveError": "Could not save email preferences.",
+            "vehicleAlerts": "Vehicle alerts",
+            "vehicleAlertsDescription": "Receive an email when a vehicle, moto or bike matching one of your vehicle alerts is published."
         },
         "whatsappNotifications": {
             "title": "WhatsApp Notifications",
@@ -1045,7 +1047,9 @@
             "saveError": "Could not save WhatsApp preferences.",
             "numberLabel": "Messages are sent to",
             "noNumber": "No WhatsApp number yet",
-            "setupHint": "Add your WhatsApp number in your profile and verify it in “Contact verification” to turn these notifications on."
+            "setupHint": "Add your WhatsApp number in your profile and verify it in “Contact verification” to turn these notifications on.",
+            "vehicleAlerts": "Vehicle alerts",
+            "vehicleAlertsDescription": "Receive a WhatsApp message when a vehicle, moto or bike matching one of your vehicle alerts is published."
         },
         "deletion": {
             "cancelError": "Unable to cancel the deletion request.",
@@ -1457,13 +1461,15 @@
                 "starting": "Starting...",
                 "discovering": "Looking for listings on the website...",
                 "extracting": "Reading a new listing...",
-                "working": "Working..."
+                "working": "Working...",
+                "robots": "Reading the website's robots.txt..."
             },
             "status": {
                 "completed": "Completed",
                 "running": "Running",
                 "cancelled": "Stopped",
-                "failed": "Failed"
+                "failed": "Failed",
+                "skipped": "Skipped (robots.txt)"
             },
             "pageSubtitle": "Collect new property listings from external websites. Listings already in your application are skipped automatically.",
             "refreshExisting": "Refresh existing listings",
@@ -1504,7 +1510,9 @@
             "historySubtitle": "Since the server last started.",
             "historyLine": "{{saved}}/{{requested}} added · {{already}} already in app",
             "deleteTitle": "Remove this website?",
-            "deleteText": "{{site}} will no longer be collected. The listings already added stay in your application."
+            "deleteText": "{{site}} will no longer be collected. The listings already added stay in your application.",
+            "robotsAllowed": "robots.txt: allowed",
+            "robotsBlocked": "robots.txt: not allowed, skipped"
         },
         "availability": {
             "title": "Check listings availability",
@@ -1568,6 +1576,25 @@
             "unreachableReport": "{{count}} could not be reached (would be removed).",
             "unreachableRemoved": "{{count}} of the removed listings could not be reached.",
             "offline": "Our server could not reach the internet, so listings that could not be reached were kept."
+        },
+        "searchSettings": {
+            "live": "Live search: results page",
+            "engine": "Live search: search engine",
+            "button": "Live search settings",
+            "title": "Live search settings: {{name}}",
+            "help": "Address patterns of the website's results pages, most precise first. Placeholders: {city}, {type}, {transaction} and any name of \"maps\". Values: For Sale / For Rent, Apartment, Villa... Leave empty to search this website through the search engine.",
+            "testTitle": "Try with a search",
+            "city": "City (or all)",
+            "type": "Type",
+            "offer": "Offer",
+            "any": "Any",
+            "found": "{{count}} matching listings",
+            "cards": "{{count}} cards read",
+            "noUrl": "No template fits this search.",
+            "cancel": "Cancel",
+            "test": "Test",
+            "save": "Save",
+            "invalidJson": "The settings are not valid JSON: {{message}}"
         }
     },
     "common": {
@@ -1740,7 +1767,7 @@
         },
         "services": {
             "realEstate": "Real Estate",
-            "cars": "Cars",
+            "cars": "Vehicles",
             "services": "Services",
             "deliveryTransport": "Delivery & Transport",
             "furnishedRentals": "Furnished Rentals",
@@ -3114,30 +3141,6 @@
             }
         }
     },
-    "cars": {
-        "sidebar": {
-            "description": "Description"
-        },
-        "brand": "MultiServices / Cars",
-        "heroTitle": "Find your next vehicle",
-        "heroDescription": "Discover cars and vehicles available for sale or rent. Compare options, explore listings, and connect directly with vehicle owners and dealerships.",
-        "sectionTitle": "Explore the Cars service",
-        "sectionDescription": "Everything you need to find or publish a vehicle.",
-        "features": {
-            "discoverVehicles": {
-                "title": "Discover vehicles",
-                "description": "Explore cars and other vehicles available for sale or rent."
-            },
-            "buyOrRent": {
-                "title": "Buy or rent",
-                "description": "Find vehicles that match your budget and transportation needs."
-            },
-            "connectWithSellers": {
-                "title": "Connect with sellers",
-                "description": "Contact vehicle owners and dealerships directly."
-            }
-        }
-    },
     "actions": {
         "archive": "Archive",
         "delete": "Delete",
@@ -3236,7 +3239,8 @@
             "notProvided": "Not provided",
             "subtitle": "Your personal details and contact information.",
             "title": "Personal information"
-        }
+        },
+        "seePublic": "See my public profile"
     },
     "overview": {
         "funnel": {
@@ -3542,5 +3546,950 @@
         "errors": {
             "load": "Unable to load reviews. Please try again."
         }
+    },
+    "vehicles": {
+        "sidebar": {
+            "description": "Description"
+        },
+        "brand": "MultiServices / Vehicles",
+        "heroTitle": "Find your next vehicle",
+        "heroDescription": "Discover cars and vehicles available for sale or rent. Compare options, explore listings, and connect directly with vehicle owners and dealerships.",
+        "sectionTitle": "Explore the Vehicles service",
+        "sectionDescription": "Everything you need to find or publish a vehicle.",
+        "features": {
+            "discoverVehicles": {
+                "title": "Discover vehicles",
+                "description": "Explore cars and other vehicles available for sale or rent."
+            },
+            "buyOrRent": {
+                "title": "Buy or rent",
+                "description": "Find vehicles that match your budget and transportation needs."
+            },
+            "connectWithSellers": {
+                "title": "Connect with sellers",
+                "description": "Contact vehicle owners and dealerships directly."
+            }
+        }
+    },
+    "vehiclesApp": {
+        "price": {
+            "onRequest": "Price on request",
+            "currency": "MAD",
+            "perDay": "{{amount}} / day"
+        },
+        "details": {
+            "yes": "Yes",
+            "verified": "Verified",
+            "error": "Unable to load this vehicle.",
+            "back": "Back to vehicles",
+            "kmPerDay": "{{km}} km per day",
+            "characteristics": "Characteristics",
+            "saleConditions": "Sale conditions",
+            "noEquipment": "Not specified",
+            "description": "Description",
+            "video": "Video",
+            "inactiveNoContact": "This vehicle is not available at the moment. The publisher is not accepting contacts.",
+            "edit": "Edit this vehicle",
+            "location": "Location",
+            "viewOnMaps": "View on Google Maps",
+            "published": "Your vehicle is published.",
+            "updated": "Your changes are saved.",
+            "rentCaption": "Rental",
+            "backMotos": "Back to motos & bikes",
+            "ratingCount": "{{value}} · {{count}} reviews",
+            "noReviews": "No reviews yet"
+        },
+        "form": {
+            "vehicle": {
+                "year": "Year",
+                "mileage": "Mileage",
+                "fuel": "Fuel",
+                "transmission": "Gearbox",
+                "bodyType": "Body type",
+                "seats": "Seats",
+                "doors": "Doors",
+                "fiscalPower": "Tax horsepower",
+                "engineSize": "Engine size",
+                "exteriorColor": "Colour",
+                "interiorColor": "Interior",
+                "version": "Version / trim",
+                "make": "Make",
+                "otherMake": "Other",
+                "makeName": "Type the make",
+                "model": "Model",
+                "title": "Vehicle",
+                "subtitle": "Make, model and main characteristics.",
+                "interiorPlaceholder": "Black leather",
+                "rangeKm": "Range"
+            },
+            "details": {
+                "condition": "Condition",
+                "title": "Vehicle Details",
+                "subtitle": "The offer, the vehicle, where it is and its price.",
+                "titleField": "Listing Title",
+                "titleHelp": "Leave empty to use: {{title}}",
+                "listingType": "Transaction Type"
+            },
+            "history": {
+                "firstHand": "First hand",
+                "previousOwners": "Previous owners",
+                "accidentFree": "No accident",
+                "serviceHistory": "Service history",
+                "origin": "Origin",
+                "vignettePaid": "Vignette paid",
+                "technicalInspection": "Technical inspection valid until",
+                "papers": "History and Papers",
+                "equipment": "Equipment",
+                "title": "History, Papers and Equipment",
+                "subtitle": "What buyers and renters check first.",
+                "equipmentSubtitle": "Select everything the vehicle has."
+            },
+            "rent": {
+                "pricePerDay": "Price per day",
+                "pricePerWeek": "Price per week",
+                "pricePerMonth": "Price per month",
+                "deposit": "Deposit",
+                "minDays": "Minimum days",
+                "insurance": "Insurance included",
+                "insuranceExcess": "Insurance excess",
+                "mileagePolicy": "Mileage",
+                "minDriverAge": "Driver minimum age",
+                "minLicenseYears": "Years with a licence",
+                "withDriver": "With driver available",
+                "delivery": "Delivery (airport, hotel)",
+                "title": "Rental price and conditions",
+                "subtitle": "Prices, insurance and what the renter needs.",
+                "kmPerDay": "Km per Day"
+            },
+            "sale": {
+                "negotiable": "Negotiable",
+                "creditAvailable": "Bank credit possible",
+                "tradeInAccepted": "Trade-in accepted",
+                "insuranceValidUntil": "Insurance valid until",
+                "title": "Price and Conditions",
+                "subtitle": "Selling price and conditions.",
+                "price": "Price"
+            },
+            "custom": {
+                "title": "Additional Details",
+                "subtitle": "Add anything else worth knowing, as a title and a value. For example: Tyres → New, Keys → 2.",
+                "label": "Title",
+                "labelExample": "Tyres",
+                "value": "Value",
+                "valueExample": "New, Michelin",
+                "remove": "Remove",
+                "add": "Add a detail",
+                "limit": "{{count}} / {{max}} details"
+            },
+            "publisher": {
+                "businessAddress": "Business address",
+                "title": "Publisher Information",
+                "subtitle": "Who is publishing this vehicle?",
+                "type": "You are",
+                "profileLoaded": "Filled in from your business profile. Changes here update it for your next vehicles.",
+                "businessName": "Business name",
+                "mapLink": "Google Maps link of the business",
+                "mapLinkHelp": "In Google Maps: Share → Copy link. We read the location from it.",
+                "firstName": "First Name",
+                "lastName": "Last Name",
+                "email": "Email Address",
+                "showEmail": "Display my email publicly",
+                "contactNumber": "Phone / WhatsApp",
+                "noNumber": "No number on your account",
+                "numberUsed": "Your current number from your account is shown on the listing.",
+                "numberMissing": "Add a phone or WhatsApp number in your profile so people can call you."
+            },
+            "errors": {
+                "required": "Required.",
+                "year": "Enter a year between 1950 and next year.",
+                "customFields": "Each additional detail needs a title and a value.",
+                "images": "Add at least one photo of the vehicle.",
+                "notOwner": "You can only edit your own vehicles.",
+                "load": "Unable to load this vehicle.",
+                "tooManyImages": "A vehicle can have at most {{max}} photos.",
+                "check": "Please check the highlighted fields.",
+                "submit": "Unable to save this vehicle. Please try again."
+            },
+            "editBadge": "Edit",
+            "badge": "Vehicle marketplace",
+            "editTitle": "Edit your vehicle",
+            "title": "Publish a Vehicle",
+            "editSubtitle": "Update the details and photos of your vehicle.",
+            "subtitle": "Add your vehicle details, its price and clear photos to reach buyers and renters.",
+            "requiredFields": "Fields marked with * are required",
+            "loading": "Loading your vehicle...",
+            "saveTitle": "Save your changes",
+            "publishTitle": "Ready to publish?",
+            "saveSubtitle": "Visitors see the new details right away.",
+            "publishSubtitle": "Review your details before submitting your listing.",
+            "save": "Save changes",
+            "publish": "Publish Vehicle Listing",
+            "saving": "Saving...",
+            "location": {
+                "title": "Vehicle Location",
+                "subtitle": "Help people find the vehicle more easily.",
+                "city": "City",
+                "neighborhood": "Neighborhood / Area",
+                "mapLink": "Google Maps Location Link",
+                "youtube": "YouTube video link (optional)",
+                "youtubeHelp": "Add a YouTube video to showcase the vehicle. Only YouTube links are accepted."
+            },
+            "description": {
+                "title": "Vehicle Description",
+                "subtitle": "Describe the vehicle and highlight its main features.",
+                "label": "Description (optional)",
+                "placeholder": "Condition, maintenance, options, reason for selling…",
+                "helper": "Provide useful details to help buyers and renters."
+            },
+            "images": {
+                "title": "Vehicle Images",
+                "subtitle": "The first photo is the cover. Show the outside, the inside and the dashboard.",
+                "uploadTitle": "Click to upload your vehicle images",
+                "uploadDescription": "Select up to {{max}} images to showcase your vehicle.",
+                "browse": "Browse Files",
+                "requirements": "JPG, JPEG, PNG or WEBP · Maximum 5 MB per image",
+                "selected": "Selected Images",
+                "count": "{{count}} / {{max}}",
+                "cover": "Main",
+                "remove": "Remove"
+            },
+            "motoBadge": "Motos & bikes",
+            "motoTitle": "Publish a Moto or Bike",
+            "editMotoTitle": "Edit your moto or bike",
+            "motoSubtitle": "Motorcycle, scooter, bicycle, kick scooter or tricycle: add its details, price and clear photos.",
+            "publishMoto": "Publish the listing",
+            "moto": {
+                "title": "Moto",
+                "subtitle": "Type, make, model and main characteristics.",
+                "type": "Type",
+                "power": "Power",
+                "engineCc": "Engine",
+                "seats": "Places"
+            }
+        },
+        "card": {
+            "km": "{{value}} km",
+            "noPhoto": "No photo",
+            "negotiable": "Negotiable",
+            "reference": "REF",
+            "perDay": "day",
+            "seats_one": "{{count}} seat",
+            "seats_other": "{{count}} seats"
+        },
+        "fab": {
+            "tooltip": "Publish a new vehicle listing",
+            "label": "Add vehicle",
+            "motoLabel": "Add moto or bike",
+            "motoTooltip": "Publish a moto, scooter or bike"
+        },
+        "categories": {
+            "title": "Explore Categories",
+            "all": "All Vehicles",
+            "allMotos": "All motos & bikes"
+        },
+        "banner": {
+            "badge": "Vehicles",
+            "title": "Buy, Sell and Rent Vehicles Across Morocco",
+            "description": "Cars, SUVs and vans from owners, agencies and showrooms, with verified contacts.",
+            "motoBadge": "Motos & bikes",
+            "motoTitle": "Motorcycles, Scooters and Bikes Across Morocco",
+            "motoDescription": "Motorcycles, scooters, bicycles, kick scooters and tricycles to buy or rent.",
+            "partBadge": "Spare parts",
+            "partTitle": "Car and Motorcycle Spare Parts",
+            "partDescription": "New, used and refurbished parts from private sellers, parts shops and scrapyards."
+        },
+        "list": {
+            "error": "Unable to load vehicles.",
+            "categoryTitle": "{{category}} Listings",
+            "title": "Vehicle Listings",
+            "empty": "No vehicle matches these filters",
+            "emptyHint": "Try fewer filters, or another city.",
+            "publish": "Publish a vehicle",
+            "count_one": "{{count}} vehicle",
+            "count_other": "{{count}} vehicles",
+            "motoTitle": "Motos & Bikes Listings",
+            "publishMoto": "Publish a moto or bike",
+            "motoCount_one": "{{count}} moto",
+            "motoCount_other": "{{count}} motos"
+        },
+        "filters": {
+            "title": "Find a vehicle",
+            "clear": "Clear",
+            "all": "All",
+            "search": "Search",
+            "searchPlaceholder": "Make, model, agency…",
+            "make": "Make",
+            "model": "Model",
+            "city": "City",
+            "minPrice": "Min price",
+            "maxPrice": "Max price",
+            "minYear": "Year from",
+            "maxYear": "Year to",
+            "maxMileage": "Max km",
+            "minSeats": "Min seats",
+            "condition": "Condition",
+            "any": "Any",
+            "fuel": "Fuel",
+            "transmission": "Gearbox",
+            "bodyType": "Body type",
+            "publisherType": "Published by",
+            "rentOptions": "Rental options",
+            "withDriver": "With driver",
+            "comprehensive": "Comprehensive insurance",
+            "less": "Fewer filters",
+            "more": "More filters",
+            "motoTitle": "Find a moto or bike"
+        },
+        "sort": {
+            "label": "Sort by",
+            "newest": "Newest",
+            "priceAsc": "Price: low to high",
+            "priceDesc": "Price: high to low",
+            "yearDesc": "Most recent year",
+            "mileageAsc": "Lowest mileage"
+        },
+        "mine": {
+            "error": "Unable to load your vehicles.",
+            "statusError": "Unable to change the status.",
+            "deleteError": "Unable to delete this vehicle.",
+            "title": "My vehicles",
+            "subtitle": "Change the status when a vehicle is sold or rented, edit or delete it.",
+            "status": "Status",
+            "view": "View",
+            "edit": "Edit",
+            "delete": "Delete",
+            "empty": "You have not published a vehicle yet",
+            "deleteTitle": "Delete this listing?",
+            "deleteText": "“{{title}}” and its photos will be deleted. This cannot be undone.",
+            "cancel": "Cancel",
+            "pageSubtitle": "Manage your vehicles, your motos & bikes and your spare parts: edit them, change their status or delete them.",
+            "tabVehicles": "My vehicles ({{count}})",
+            "tabMotos": "My motos & bikes ({{count}})",
+            "vehiclesTitle": "My vehicles",
+            "motosTitle": "My motos & bikes",
+            "count_one": "{{count}} listing",
+            "count_other": "{{count}} listings",
+            "allStatuses": "All statuses",
+            "allCities": "All cities",
+            "noMatch": "No listing matches these filters",
+            "emptyMotos": "You have not published a moto or bike yet",
+            "emptySubtitle": "Your listings will appear here once published.",
+            "clearFilters": "Clear filters",
+            "publishedOn": "Published on",
+            "editStatus": "Edit status",
+            "updating": "Updating...",
+            "viewDetails": "View details",
+            "confirmDelete": "Delete",
+            "tabParts": "My spare parts ({{count}})"
+        },
+        "sidebar": {
+            "browse": "Find a vehicle",
+            "publish": "Publish a vehicle",
+            "mine": "My vehicles",
+            "browseMotos": "Motos & bikes",
+            "publishMoto": "Publish a moto or bike",
+            "map": "Find on map",
+            "alerts": "Vehicle alerts",
+            "reviews": "Reviews",
+            "saved": "Saved vehicles",
+            "parts": "Spare parts",
+            "publishPart": "Publish a spare part",
+            "search": "Search"
+        },
+        "options": {
+            "publisherType": {
+                "owner": "Owner",
+                "agency": "Agency",
+                "showroom": "Showroom"
+            },
+            "listingType": {
+                "sale": "For sale",
+                "rent": "For rent"
+            },
+            "condition": {
+                "used": "Used",
+                "new": "New"
+            },
+            "fuel": {
+                "diesel": "Diesel",
+                "petrol": "Petrol",
+                "hybrid": "Hybrid",
+                "plug_in_hybrid": "Plug-in hybrid",
+                "electric": "Electric",
+                "lpg": "LPG",
+                "none": "No engine (pedal)"
+            },
+            "transmission": {
+                "manual": "Manual",
+                "automatic": "Automatic"
+            },
+            "bodyType": {
+                "city_car": "City car",
+                "sedan": "Sedan",
+                "suv": "SUV",
+                "4x4": "4x4",
+                "estate": "Estate",
+                "coupe": "Coupé",
+                "convertible": "Convertible",
+                "minivan": "Minivan",
+                "van": "Van",
+                "pickup": "Pick-up"
+            },
+            "color": {
+                "white": "White",
+                "black": "Black",
+                "grey": "Grey",
+                "silver": "Silver",
+                "blue": "Blue",
+                "red": "Red",
+                "green": "Green",
+                "beige": "Beige",
+                "brown": "Brown",
+                "yellow": "Yellow",
+                "orange": "Orange",
+                "other": "Other"
+            },
+            "origin": {
+                "morocco": "Bought in Morocco",
+                "imported": "Imported, customs cleared",
+                "foreign_plates": "Foreign plates (WW)"
+            },
+            "insurance": {
+                "third_party": "Third party",
+                "comprehensive": "Comprehensive"
+            },
+            "mileagePolicy": {
+                "unlimited": "Unlimited",
+                "limited": "Limited"
+            },
+            "equipment": {
+                "air_conditioning": "Air conditioning",
+                "automatic_climate": "Automatic climate",
+                "gps": "GPS",
+                "reverse_camera": "Reversing camera",
+                "parking_sensors": "Parking sensors",
+                "bluetooth": "Bluetooth",
+                "carplay_android_auto": "CarPlay / Android Auto",
+                "cruise_control": "Cruise control",
+                "sunroof": "Sunroof",
+                "leather_seats": "Leather seats",
+                "heated_seats": "Heated seats",
+                "alloy_wheels": "Alloy wheels",
+                "abs": "ABS",
+                "esp": "ESP",
+                "airbags": "Airbags",
+                "isofix": "ISOFIX",
+                "keyless": "Keyless entry",
+                "led_lights": "LED lights",
+                "four_wheel_drive": "Four-wheel drive",
+                "start_stop": "Start & stop",
+                "disc_brakes": "Disc brakes",
+                "top_case": "Top case",
+                "side_cases": "Side cases",
+                "windshield": "Windshield",
+                "alarm": "Alarm",
+                "usb_charger": "USB charger",
+                "heated_grips": "Heated grips",
+                "suspension": "Suspension",
+                "basket": "Basket",
+                "removable_battery": "Removable battery",
+                "helmet_included": "Helmet included",
+                "lock_included": "Lock included"
+            },
+            "motoType": {
+                "motorcycle": "Motorcycle",
+                "scooter": "Scooter",
+                "bicycle": "Bicycle",
+                "kick_scooter": "Kick scooter",
+                "tricycle": "Tricycle"
+            },
+            "partVehicleType": {
+                "car": "Car",
+                "moto": "Moto & bike"
+            },
+            "partCategory": {
+                "engine": "Engine",
+                "transmission": "Gearbox & clutch",
+                "brakes": "Brakes",
+                "suspension": "Suspension & steering",
+                "electrical": "Electrical & battery",
+                "lighting": "Lighting",
+                "body": "Body & mirrors",
+                "interior": "Interior & seats",
+                "wheels": "Wheels & tyres",
+                "exhaust": "Exhaust",
+                "cooling": "Cooling & A/C",
+                "filters": "Filters & oils",
+                "accessories": "Accessories",
+                "other": "Other"
+            },
+            "partCondition": {
+                "new": "New",
+                "used": "Used",
+                "refurbished": "Refurbished"
+            },
+            "sellerType": {
+                "owner": "Private seller",
+                "shop": "Parts shop",
+                "scrapyard": "Scrapyard"
+            }
+        },
+        "status": {
+            "Available": "Available",
+            "Sold": "Sold",
+            "Rented": "Rented",
+            "Inactive": "Inactive"
+        },
+        "similar": {
+            "title": "Similar Vehicles",
+            "motoTitle": "Similar Motos & Bikes"
+        },
+        "topbar": {
+            "title": "Vehicles",
+            "about": "About this service"
+        },
+        "map": {
+            "title": "Find vehicles on the map",
+            "subtitle": "Cars, motos and bikes for sale or rent. Hover a marker to preview it, click it to open it.",
+            "count_one": "{{count}} on the map",
+            "count_other": "{{count}} on the map",
+            "section": "Section",
+            "allSections": "Cars, motos & bikes",
+            "cars": "Cars",
+            "motos": "Motos & bikes",
+            "type": "Type",
+            "allTypes": "All types",
+            "offer": "Offer",
+            "allOffers": "Sale and rent",
+            "city": "City",
+            "allCities": "All Morocco",
+            "publisher": "Publisher",
+            "allPublishers": "Everyone",
+            "maxPrice": "Maximum price (MAD)",
+            "loading": "Loading vehicles...",
+            "loadError": "Unable to load the vehicles map.",
+            "emptyTitle": "No vehicle on the map",
+            "emptySubtitle": "Try another section, city or price.",
+            "legendCars": "Cars ({{count}})",
+            "legendMotos": "Motos & bikes ({{count}})",
+            "legendApproximate": "City centre, no exact location ({{count}})",
+            "approximateNote": "Approximate position (city centre)",
+            "viewDetails": "View details",
+            "markerLabel": "View {{title}}"
+        },
+        "alerts": {
+            "title": "Vehicle alerts",
+            "subtitle": "Be told as soon as a vehicle, moto or bike you are looking for is published.",
+            "createTitle": "Create a vehicle alert",
+            "createSubtitle": "Choose what you are looking for. You get a notification, an email and a WhatsApp message (if turned on in your settings).",
+            "city": "City",
+            "allCities": "All cities",
+            "offer": "For sale, for rent or both",
+            "section": "Vehicles, motos & bikes or both",
+            "vehicles": "Vehicles",
+            "motos": "Motos & bikes",
+            "vehicleTypes": "Vehicle types",
+            "motoTypes": "Moto and bike types",
+            "anyTypeHint": "Leave empty to be told about every type.",
+            "anyVehicleType": "Any vehicle type",
+            "anyMotoType": "Any moto or bike",
+            "optional": "More precise (optional)",
+            "makes": "Makes",
+            "anyMake": "Any make",
+            "makesHelp": "Up to 10. Empty: every make.",
+            "maxPrice": "Maximum price",
+            "maxPriceHelp": "Per day for rentals. Empty: any price.",
+            "maxPriceChip": "≤ {{price}} MAD",
+            "channelsHint": "Email and WhatsApp messages can be turned on or off in",
+            "settingsLink": "Settings",
+            "created": "Alert created. We will notify you when a matching vehicle is published.",
+            "archived": "Alert archived: it will not notify you anymore.",
+            "restored": "Alert restored: you will be notified again.",
+            "activeTab": "Active ({{count}})",
+            "archivedTab": "Archived · silent ({{count}})",
+            "emptyActive": "No active alert yet",
+            "emptyArchived": "No archived alert",
+            "matched": "Matched {{count}} times · last {{date}}",
+            "notMatchedYet": "No match yet",
+            "archiveHelp": "Archive: the alert stays saved but stops notifying you",
+            "restoreHelp": "Restore: you will be notified again",
+            "silent": "Archived · silent",
+            "errors": {
+                "offer": "Choose for sale, for rent or both.",
+                "section": "Choose vehicles, motos & bikes or both."
+            }
+        },
+        "profile": {
+            "stats": {
+                "vehicles": "Vehicles",
+                "availableVehicles": "Available vehicles",
+                "motos": "Motos & bikes",
+                "availableMotos": "Available motos & bikes",
+                "reviews": "Reviews",
+                "parts": "Spare parts"
+            },
+            "tabs": {
+                "vehicles": "Vehicles",
+                "motos": "Motos & bikes",
+                "myVehicles": "My vehicles",
+                "myMotos": "My motos & bikes",
+                "reviews": "Reviews",
+                "parts": "Spare parts",
+                "myParts": "My spare parts"
+            },
+            "emptyVehicles": "No vehicle published",
+            "emptyMotos": "No moto or bike published",
+            "reviewNeedsPublication": "You can leave a review once this person has published a vehicle, moto, bike or spare part.",
+            "loginToReview": "Log in to leave a review.",
+            "seePublic": "See my public profile",
+            "errors": {
+                "publications": "Unable to load the publications."
+            },
+            "emptyParts": "No spare part published"
+        },
+        "reviews": {
+            "title": "Vehicle reviews",
+            "subtitle": "See how sellers, agencies and showrooms are rated by other clients before you contact them."
+        },
+        "saved": {
+            "title": "Saved vehicles",
+            "subtitle": "The vehicles, motos, bikes and spare parts you saved, to compare them and find them again.",
+            "tabVehicles": "Vehicles ({{count}})",
+            "tabMotos": "Motos & bikes ({{count}})",
+            "empty": "No saved vehicle yet",
+            "emptyMotos": "No saved moto or bike yet",
+            "emptyHint": "Open a listing and press “Save this vehicle” to keep it here.",
+            "savedOn": "Saved on {{date}}",
+            "remove": "Remove",
+            "saveButton": "Save this vehicle",
+            "savedButton": "Saved",
+            "added": "Saved. Find it in Saved vehicles.",
+            "removed": "Removed from your saved vehicles.",
+            "error": "Unable to update your saved vehicles.",
+            "loadError": "Unable to load your saved vehicles.",
+            "tabParts": "Spare parts ({{count}})",
+            "emptyParts": "No saved spare part yet"
+        },
+        "parts": {
+            "listError": "Unable to load spare parts.",
+            "filtersTitle": "Find a spare part",
+            "searchPlaceholder": "Part, brand, reference, make…",
+            "fitsMake": "For make",
+            "fitsModel": "Model",
+            "fitsYear": "Vehicle year",
+            "soldBy": "Sold by",
+            "options": "Options",
+            "delivery": "Delivery",
+            "listTitle": "Spare Part Listings",
+            "count": "{{count}} parts",
+            "empty": "No spare part matches these filters",
+            "fabTooltip": "Publish a spare part",
+            "fabLabel": "Add part",
+            "universal": "Universal",
+            "perUnit": "each",
+            "allParts": "All parts",
+            "allVehicles": "Cars and motos",
+            "saved": "Saved. Find it in Saved vehicles, Spare parts tab.",
+            "saveButton": "Save this part",
+            "similar": "Similar spare parts",
+            "detailsError": "Unable to load this spare part.",
+            "back": "Back to spare parts",
+            "inactiveNoContact": "This part is not available at the moment. The seller is not accepting contacts.",
+            "edit": "Edit this part",
+            "published": "Your spare part is published.",
+            "warrantyMonths": "{{count}} months",
+            "fits": "Fits",
+            "allModels": "All models",
+            "years": "Years",
+            "alsoFits": "Also fits",
+            "conditions": "Price and Delivery",
+            "myTitle": "My spare parts",
+            "mineEmpty": "You have not published a spare part yet",
+            "mineError": "Unable to load your spare parts.",
+            "deleteError": "Unable to delete this spare part.",
+            "form": {
+                "badge": "Spare parts",
+                "title": "Publish a Spare Part",
+                "editTitle": "Edit your spare part",
+                "subtitle": "Car or moto part: say what it is, which vehicles it fits, its price and add clear photos.",
+                "editSubtitle": "Update the details and photos of your part.",
+                "sellerTitle": "Seller",
+                "sellerSubtitle": "Buyers call you on the phone / WhatsApp of your account.",
+                "sellerType": "You are",
+                "businessName": "Shop / scrapyard name",
+                "partTitle": "The Part",
+                "partSubtitle": "What it is, its condition and its reference.",
+                "forVehicle": "For",
+                "category": "Category",
+                "name": "Part name",
+                "namePlaceholder": "e.g. Front brake pads, headlight, alternator…",
+                "brand": "Part brand",
+                "brandHelp": "Bosch, Valeo, original part…",
+                "partNumber": "Reference (OEM number)",
+                "quantity": "Quantity",
+                "warranty": "Warranty",
+                "months": "months",
+                "compatibilityTitle": "Compatible Vehicles",
+                "compatibilitySubtitle": "Buyers search by make, model and year: say which vehicles the part fits.",
+                "universal": "Universal part (fits every vehicle)",
+                "modelHelp": "Empty: every model of the make.",
+                "yearFrom": "From year",
+                "yearTo": "To year",
+                "notes": "Other compatible vehicles (optional)",
+                "notesPlaceholder": "e.g. Also fits Renault Clio 3 and Sandero 1",
+                "priceTitle": "Price and Location",
+                "priceSubtitle": "Price per unit, delivery and where the part is.",
+                "price": "Price per unit",
+                "delivery": "Delivery possible",
+                "installation": "Fitting offered",
+                "mapLink": "Google Maps link (optional)",
+                "mapLinkHelp": "Where buyers can come and see the part.",
+                "showEmail": "Show my email on the listing",
+                "descriptionTitle": "Description",
+                "descriptionSubtitle": "Condition, wear, what is included, why you sell it.",
+                "imagesTitle": "Part Photos",
+                "imagesSubtitle": "The first photo is the cover. Show the reference label if there is one.",
+                "uploadTitle": "Click to upload photos of the part",
+                "uploadHint": "Up to {{max}} photos.",
+                "publish": "Publish Spare Part",
+                "titleError": "Enter the part name (3 characters at least).",
+                "makeError": "Choose the make, or mark the part as universal.",
+                "yearsError": "The last year must be after the first year.",
+                "imagesError": "Add at least one photo of the part.",
+                "notOwner": "You can only edit your own spare parts.",
+                "loadError": "Unable to load this spare part.",
+                "submitError": "Unable to save this spare part. Please try again.",
+                "tooManyImages": "A spare part can have at most {{max}} photos."
+            }
+        },
+        "search": {
+            "title": "Search vehicles",
+            "subtitle": "Cars, motos & bikes and spare parts: one search, results on the map.",
+            "criteria": "Search criteria",
+            "reset": "Reset",
+            "submit": "Search",
+            "what": "What are you looking for?",
+            "services": {
+                "car": "Cars",
+                "moto": "Motos & bikes",
+                "part": "Spare parts"
+            },
+            "kinds": {
+                "car": "Car",
+                "moto": "Moto & bike",
+                "part": "Spare part"
+            },
+            "city": "City",
+            "anyCity": "All cities",
+            "any": "Any",
+            "offer": "Offer",
+            "minYear": "Year",
+            "fromYear": "{{year}} or newer",
+            "partCategory": "Part category",
+            "price": "Price",
+            "anyPrice": "Any price",
+            "priceMode": {
+                "below": "Less than",
+                "above": "More than",
+                "exact": "Exactly",
+                "between": "Between"
+            },
+            "priceMin": "From (MAD)",
+            "priceMax": "To (MAD)",
+            "amount": "Amount (MAD)",
+            "keywords": "Keywords (title, make, brand, reference, neighbourhood)",
+            "priceHelp": "Prices: total for sales, per day for rentals, per unit for spare parts.",
+            "makeHelp": "Spare parts: parts that fit this make and model, and universal parts.",
+            "failed": "Search failed. Please try again.",
+            "searching": "Searching...",
+            "count": "{{count}} result(s)",
+            "mapJump": "Map",
+            "sort": {
+                "label": "Sort by",
+                "mixed": "Mixed: all types",
+                "newest": "Newest",
+                "priceAsc": "Price: low to high",
+                "priceDesc": "Price: high to low"
+            },
+            "emptyTitle": "No listing matches these criteria",
+            "emptyText": "Try another city, another make, a wider price range or fewer criteria.",
+            "mapTitle": "Results on the map",
+            "mapTitleCity": "Results on the map: {{city}}",
+            "mapHelp": "Hover a number to preview a listing, click it for details.",
+            "mapMissingKey": "The map is not configured (VITE_MAPTILER_API_KEY).",
+            "mapError": "The map could not be loaded.",
+            "notLocated": "{{count}} result(s) of this page have no location and are not on the map.",
+            "noLocation": "Not on the map",
+            "close": "Close",
+            "seeDetails": "See all details"
+        },
+        "admin": {
+            "title": "Vehicle Publication Reviews",
+            "subtitle": "Review the cars, motos & bikes and spare parts published by users.",
+            "kinds": {
+                "all": "All",
+                "car": "Cars",
+                "moto": "Motos & bikes",
+                "part": "Spare parts"
+            },
+            "kind": {
+                "car": "Car",
+                "moto": "Moto & bike",
+                "part": "Spare part"
+            }
+        }
+    },
+    "externalSearch": {
+        "tab": "Find a property",
+        "allTab": "All listings",
+        "title": "Find a property on other websites",
+        "subtitle": "We look through Moroccan listing websites for you and show up to 200 matching properties.",
+        "city": "City",
+        "propertyType": "Property type",
+        "anyType": "Any type",
+        "transaction": "Transaction",
+        "saleOrRent": "Sale or rent",
+        "maxPrice": "Maximum price",
+        "maxPriceRent": "Per month",
+        "websites": "Websites (optional)",
+        "onlyThese": "Only these websites",
+        "excludeThese": "All except these",
+        "websitesPlaceholder": "Type or pick a website, e.g. agenz.ma",
+        "includeHelp": "Empty: every website is searched.",
+        "excludeHelp": "These websites will be left out.",
+        "robotsBlocked": "Not allowed (robots.txt)",
+        "reset": "Reset",
+        "search": "Search",
+        "unknownSites": "Not in our list of websites, ignored: {{sites}}",
+        "skippedSites": "Skipped because their robots.txt does not allow visiting them: {{sites}}",
+        "searching": "Searching {{count}} websites now...",
+        "start": "Fill in what you are looking for and search",
+        "startHelp": "{{count}} Moroccan websites are searched live: Agenz, Hespress Immo, Masaken...",
+        "emptyTitle": "No property found",
+        "emptyHelp": "Try a higher price, another property type, or search every website.",
+        "found_one": "{{count}} property found",
+        "found_other": "{{count}} properties found",
+        "searchedOn_one": "on {{count}} website",
+        "searchedOn_other": "on {{count}} websites",
+        "partialMatch": "Some details not stated on the website",
+        "errors": {
+            "failed": "The search failed. Please try again."
+        },
+        "open": "Open",
+        "allCities": "All cities",
+        "searchingHelp": "Each website is opened live: this takes 20 to 40 seconds.",
+        "websitesSearched": "Websites searched",
+        "viaEngine": "Via search engine",
+        "status": {
+            "blocked": "robots.txt",
+            "offerNotListed": "does not list this offer",
+            "notSupported": "cannot be searched",
+            "failed": "did not answer"
+        },
+        "statusHelp": {
+            "engine": "Found through the search engine",
+            "live": "Read now on the website's results page",
+            "noResults": "Searched, nothing matching",
+            "blocked": "Skipped: its robots.txt does not allow visiting it",
+            "offerNotListed": "This website only lists the other offer (sale or rent)",
+            "notSupported": "Its pages cannot be read automatically and the search engine is not set up",
+            "failed": "The website did not answer in time"
+        },
+        "method": {
+            "website": "Searched on the website",
+            "engine": "Via search engine",
+            "none": "Cannot be searched"
+        }
+    },
+    "savedListings": {
+        "save": "Save",
+        "saved": "Saved",
+        "added": "Saved. Find it in Saved.",
+        "removed": "Removed from your saved list.",
+        "error": "Unable to update your saved list.",
+        "loadError": "Unable to load your saved list.",
+        "pageSubtitle": "Properties, roommate announcements and hotels you saved, to compare and contact later.",
+        "tabProperties": "Properties",
+        "tabRoommates": "Roommates",
+        "tabEstablishments": "Hotels & riads",
+        "emptyRoommates": "No saved roommate announcement yet",
+        "emptyEstablishments": "No saved hotel or riad yet",
+        "browseRoommates": "Find a roommate",
+        "browseEstablishments": "Browse hotels & riads",
+        "emptyHint": "Open a listing and press “Save” to keep it here.",
+        "savedOn": "Saved on {{date}}",
+        "remove": "Remove"
+    },
+    "adminPanel": {
+        "title": "Admin panel",
+        "groups": {
+            "account": "Account",
+            "property": "Property",
+            "vehicles": "Vehicles",
+            "dailyWorker": "Daily Worker",
+            "deliveryMan": "Delivery Man",
+            "driver": "Driver",
+            "servicesCompanies": "Services & Companies"
+        },
+        "items": {
+            "users": "Users",
+            "visits": "Visits",
+            "roles": "Roles & access"
+        },
+        "roles": {
+            "admin": "Administrator",
+            "member": "Team member"
+        },
+        "soon": "Soon",
+        "view": "View",
+        "viewOnly": "View only: you can see this page, but changes (delete, edit, status) are reserved to the team members with write access.",
+        "usersSubtitle": "Every account: activity, verification, publications, suspension.",
+        "visitsSubtitle": "Visitors and sessions across the platform.",
+        "statisticsTitle": "Property statistics",
+        "statisticsSubtitle": "Clicks, demand and contacts on the property listings."
+    },
+    "adminRoles": {
+        "title": "Roles & access",
+        "subtitle": "Give team members access to parts of the admin panel, or make someone an administrator.",
+        "roles": {
+            "client": "Client",
+            "member": "Member",
+            "admin": "Admin"
+        },
+        "roleHelp": {
+            "client": "Ordinary user: no admin panel.",
+            "member": "Team member: only the sections you choose, each in view or view & edit.",
+            "admin": "Full access, read and write, including roles."
+        },
+        "filter": "Role",
+        "filters": {
+            "all": "All",
+            "client": "Clients",
+            "member": "Members",
+            "admin": "Admins"
+        },
+        "search": "Name or email…",
+        "loadError": "Unable to load the users.",
+        "empty": "No user matches.",
+        "you": "You",
+        "suspended": "Suspended",
+        "change": "Change role",
+        "saved": "{{name}} is now: {{role}}.",
+        "dialogTitle": "Role of {{name}}",
+        "sectionsTitle": "Admin panel access",
+        "sectionsHelp": "View: see the page. View & edit: also delete, change status, edit.",
+        "allView": "View all",
+        "clear": "Clear",
+        "levels": {
+            "none": "No access",
+            "read": "View",
+            "write": "View & edit"
+        },
+        "rolesNote": "Roles & access always stays reserved to administrators.",
+        "adminWarning": "An administrator can see and change everything, including roles.",
+        "needSection": "Give this member access to at least one section.",
+        "saveError": "Unable to change the role.",
+        "cancel": "Cancel",
+        "save": "Save"
     }
 }

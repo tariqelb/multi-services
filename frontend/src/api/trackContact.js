@@ -15,7 +15,7 @@ export const trackPropertyContact = (propertyId, action) => {
     if (!propertyId) return;
 
     axiosInstance
-        .post("/dashboard/property-contacts", { propertyId, action })
+        .post("/property/dashboard/property-contacts", { propertyId, action })
         .catch(report("Property contact"));
 };
 
@@ -25,6 +25,6 @@ export const trackListingContact = (listingType, listingId, action, target = "")
     if (!listingId) return;
 
     axiosInstance
-        .post("/dashboard/listing-contacts", { listingType, listingId, action, target })
+        .post("/property/dashboard/listing-contacts", { listingType, listingId, action, target })
         .catch(report("Listing contact"));
 };

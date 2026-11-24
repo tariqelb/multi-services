@@ -3,7 +3,7 @@
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import { getAllowedOrigins } from "./allowedOrigins.js";
-import { getAccountStatus } from "../services/accountStatus.js";
+import { getAccountStatus } from "../apps/main/services/accountStatus.js";
 
 const initializeSocket = (server) => {
     const allowedOrigins = getAllowedOrigins();

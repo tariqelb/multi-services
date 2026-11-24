@@ -2,7 +2,7 @@
 import axiosInstance from "../../api/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
     Menu,
@@ -16,6 +16,13 @@ import {
     Bookmark,
     Library,
     MessageSquare,
+    Car,
+    Bike,
+    MapPinned,
+    CloudUpload,
+    Star,
+    Wrench,
+    SearchCheck,
 } from "lucide-react";
 
 import logo from "../../assets/iconlogo.png";
@@ -25,6 +32,23 @@ import {
     connectSocket,
     disconnectSocket,
 } from "../../Socket/Socket";
+import { serviceForPath } from "./serviceNavigation";
+
+// Icons of the service entries in the profile menu (see serviceNavigation.js),
+// the same as the real estate ones.
+const SERVICE_ICONS = {
+    browse: Car,
+    browseMoto: Bike,
+    map: MapPinned,
+    publish: CloudUpload,
+    publishMoto: CloudUpload,
+    parts: Wrench,
+    search: SearchCheck,
+    mine: Library,
+    alerts: Bell,
+    reviews: Star,
+    saved: Bookmark,
+};
 
 export default function TopBar({ sidebarOpen, setSidebarOpen }) {
     const [profileOpen, setProfileOpen] = useState(false);
@@ -38,6 +62,11 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Each service has its own entries in the profile menu (its pages are
+    // in its sidebar). Real estate pages keep the default menu.
+    const service = serviceForPath(location.pathname);
 
     const { t, i18n } = useTranslation();
 
@@ -340,11 +369,31 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         }
     };
 
-    // Profile menu items.
+    // Profile menu items: the service entries go between Notifications and
+    // Feedback (real estate: My publications and Saved).
+    const serviceProfileItems = service
+        ? service.profile.map((item) => ({
+            label: t(item.labelKey, item.label),
+            path: item.path,
+            icon: SERVICE_ICONS[item.icon] || Library,
+        }))
+        : [
+            {
+                label: t("topbar.myPublication"),
+                path: "/mypublication",
+                icon: Library,
+            },
+            {
+                label: t("topbar.saved"),
+                path: "/saved",
+                icon: Bookmark,
+            },
+        ];
+
     const menuItems = [
         {
             label: t("topbar.myProfile"),
-            path: "/profile",
+            path: service?.profilePath || "/profile",
             icon: UserRound,
         },
         {
@@ -352,16 +401,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             path: "/notificationpage",
             icon: Bell,
         },
-        {
-            label: t("topbar.myPublication"),
-            path: "/mypublication",
-            icon: Library,
-        },
-        {
-            label: t("topbar.saved"),
-            path: "/saved",
-            icon: Bookmark,
-        },
+        ...serviceProfileItems,
         {
             label: t("topbar.feedback", "Feedback"),
             path: "/feedback",
@@ -373,6 +413,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
             icon: Settings,
         },
     ];
+
 
     return (
         <header className="sticky top-0 z-[60] flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white px-2 sm:px-4 md:px-6">

@@ -303,14 +303,14 @@ export default function KnowledgeCenter() {
             let response;
 
             if (submittedSearch.trim()) {
-                response = await axiosInstance.get("/knowledge/search", {
+                response = await axiosInstance.get("/property/knowledge/search", {
                     params: {
                         ...params,
                         q: submittedSearch.trim(),
                     },
                 });
             } else {
-                response = await axiosInstance.get("/knowledge", {
+                response = await axiosInstance.get("/property/knowledge", {
                     params,
                 });
             }
@@ -363,7 +363,7 @@ export default function KnowledgeCenter() {
                 setSuggestionsLoading(true);
 
                 const response = await axiosInstance.get(
-                    "/knowledge/search",
+                    "/property/knowledge/search",
                     {
                         params: {
                             q: query,

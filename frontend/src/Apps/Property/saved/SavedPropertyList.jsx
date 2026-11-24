@@ -22,7 +22,8 @@ import axiosInstance from "../../../api/axiosInstance";
 import SavedPropertyCard from "./SavedPropertyCard";
 import PropertyCategoryBar from "../properties/PropertyCategoryBar";
 
-export default function SavedPropertiesList({ onViewDetails }) {
+// embedded: inside the Saved page tabs (no page header, smaller empty state).
+export default function SavedPropertiesList({ onViewDetails, embedded = false }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -125,7 +126,8 @@ export default function SavedPropertiesList({ onViewDetails }) {
             return;
         }
 
-        navigate(`/property/${propertyId}`, {
+        // The public page (contact + "Saved" button), not the owner's view.
+        navigate(`/properties/${propertyId}`, {
             state: {
                 property,
                 from: "/saved",
@@ -187,7 +189,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
         return (
             <Box
                 sx={{
-                    minHeight: "100vh",
+                    minHeight: embedded ? 240 : "100vh",
                     width: "100%",
                     display: "flex",
                     justifyContent: "center",
@@ -203,7 +205,7 @@ export default function SavedPropertiesList({ onViewDetails }) {
         return (
             <Box
                 sx={{
-                    minHeight: "100vh",
+                    minHeight: embedded ? 0 : "100vh",
                     width: "100%",
                     display: "flex",
                     flexDirection: "column",
@@ -212,7 +214,8 @@ export default function SavedPropertiesList({ onViewDetails }) {
                     textAlign: "center",
                     px: 3,
                     py: 6,
-                    backgroundColor: "#ffffff",
+                    backgroundColor: embedded ? "#F5F7FB" : "#ffffff",
+                    ...(embedded && { border: "1px dashed #CBD5E1", borderRadius: "16px" }),
                 }}
             >
                 <BookmarkRemove
@@ -270,15 +273,17 @@ export default function SavedPropertiesList({ onViewDetails }) {
 
     return (
         <Box
-            sx={{
+            sx={embedded ? undefined : {
                 ...pagePaddingSx,
             }}
         >
-            <PageHeader
-                icon={<BookmarkBorderRoundedIcon />}
-                title={t("topbar.saved", "Saved")}
-                subtitle={t("properties.savedList.pageSubtitle", "Properties you bookmarked to compare and contact later.")}
-            />
+            {!embedded && (
+                <PageHeader
+                    icon={<BookmarkBorderRoundedIcon />}
+                    title={t("topbar.saved", "Saved")}
+                    subtitle={t("properties.savedList.pageSubtitle", "Properties you bookmarked to compare and contact later.")}
+                />
+            )}
 
             {validSavedRecords.length > 0 && (
                 <PropertyCategoryBar

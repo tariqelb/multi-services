@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { FilterField, FilterGrid, FilterPanel, FilterSearch, FilterSelect } from "../../../Components/ui/FilterKit";
 import TravelExploreOutlinedIcon from "@mui/icons-material/TravelExploreOutlined";
@@ -14,8 +15,12 @@ import {
     Grid,
     Pagination,
     Stack,
+    Tab,
+    Tabs,
     Typography,
 } from "@mui/material";
+import ManageSearchRoundedIcon from "@mui/icons-material/ManageSearchRounded";
+import ViewModuleRoundedIcon from "@mui/icons-material/ViewModuleRounded";
 
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
@@ -28,8 +33,9 @@ import { useTranslation } from "react-i18next";
 import axiosInstance from "../../../api/axiosInstance";
 import PageLayout from "../../../Components/Home/PageLayout";
 import cities from "../../../data/moroccanCities";
+import ExternalPropertySearch from "./ExternalPropertySearch";
 
-const API_URL = "/external-listings";
+const API_URL = "/property/external-listings";
 const ITEMS_PER_PAGE = 9;
 
 const initialFilters = {
@@ -310,6 +316,7 @@ function PropertyCard({ listing, onTrackClick, t, locale }) {
                   icon: <BedOutlinedIcon fontSize="small" />,
                   label: t("externalListings.details.rooms", {
                       value: listing.rooms,
+                      count: Number(listing.rooms),
                   }),
               }
             : null,
@@ -319,6 +326,7 @@ function PropertyCard({ listing, onTrackClick, t, locale }) {
                   icon: <BathtubOutlinedIcon fontSize="small" />,
                   label: t("externalListings.details.bathrooms", {
                       value: listing.bathrooms,
+                      count: Number(listing.bathrooms),
                   }),
               }
             : null,
@@ -623,6 +631,11 @@ export default function ExternalListings() {
     const isRTL = currentLanguage === "ar";
     const locale = getLocale(currentLanguage);
 
+    // Two tabs: "Find a property" (search on the websites, default) and
+    // "All listings" (every collected listing). ?tab=all opens the second.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const tab = searchParams.get("tab") === "all" ? "all" : "search";
+
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -707,9 +720,10 @@ export default function ExternalListings() {
         }
     }, [t]);
 
+    // Every listing is loaded only when the "All listings" tab is open.
     useEffect(() => {
-        loadListings();
-    }, [loadListings]);
+        if (tab === "all") loadListings();
+    }, [loadListings, tab]);
 
     const handleFilterChange = (field, value) => {
         setFilters((current) => ({
@@ -830,6 +844,23 @@ export default function ExternalListings() {
                 title={t("externalListings.title")}
                 subtitle={t("externalListings.subtitle")}
             >
+                <Box sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}>
+                    <Tabs
+                        value={tab}
+                        onChange={(_event, value) => setSearchParams(value === "all" ? { tab: "all" } : {})}
+                        variant="scrollable"
+                        allowScrollButtonsMobile
+                        sx={{ "& .MuiTab-root": { minHeight: 52, textTransform: "none", fontWeight: 600, fontSize: { xs: 13, sm: 15 } } }}
+                    >
+                        <Tab value="search" icon={<ManageSearchRoundedIcon />} iconPosition="start" label={t("externalSearch.tab", "Find a property")} />
+                        <Tab value="all" icon={<ViewModuleRoundedIcon />} iconPosition="start" label={t("externalSearch.allTab", "All listings")} />
+                    </Tabs>
+                </Box>
+
+                {tab === "search" ? (
+                    <ExternalPropertySearch />
+                ) : (
+                <>
                 {error && (
                     <Alert
                         severity="error"
@@ -979,6 +1010,8 @@ export default function ExternalListings() {
                             </>
                         )}
                     </>
+                )}
+                </>
                 )}
             </PageLayout>
         </Box>

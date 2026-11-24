@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "node --watch server.js",
     "start": "node server.js",
-    "job:account-deletion": "node scripts/runAccountDeletion.js",
-    "job:external-listings": "node scripts/runExternalListings.js",
-    "migrate:whatsapp": "node scripts/migrateWhatsappNumber.js",
-    "fix:property-status": "node scripts/fixPropertyStatuses.js"
+    "job:account-deletion": "node apps/main/scripts/runAccountDeletion.js",
+    "job:external-listings": "node apps/property/scripts/runExternalListings.js",
+    "migrate:whatsapp": "node apps/main/scripts/migrateWhatsappNumber.js",
+    "fix:property-status": "node apps/property/scripts/fixPropertyStatuses.js",
+    "job:listing-expiry": "node apps/property/scripts/runListingExpiry.js"
   },
   "keywords": [],
   "author": "",

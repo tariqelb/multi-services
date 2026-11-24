@@ -215,7 +215,7 @@ export default function KnowledgeDetails() {
                 setRelatedItems([]);
 
                 const response = await axiosInstance.get(
-                    `/knowledge/${id}`
+                    `/property/knowledge/${id}`
                 );
 
                 if (!active) return;

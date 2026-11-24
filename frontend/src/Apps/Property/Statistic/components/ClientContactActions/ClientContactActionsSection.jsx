@@ -75,19 +75,19 @@ const OTHER_COLOR = "#F59E0B";
 
 const LISTING_TYPES = {
     property: {
-        url: "/dashboard/property-contacts",
+        url: "/property/dashboard/property-contacts",
         detailsPath: "/properties",
         icon: <HomeWorkOutlined fontSize="small" />,
         label: "Properties",
     },
     roommate: {
-        url: "/dashboard/listing-contacts",
+        url: "/property/dashboard/listing-contacts",
         detailsPath: "/roommates",
         icon: <GroupOutlined fontSize="small" />,
         label: "Roommates",
     },
     establishment: {
-        url: "/dashboard/listing-contacts",
+        url: "/property/dashboard/listing-contacts",
         detailsPath: "/establishments",
         icon: <HotelOutlined fontSize="small" />,
         label: "Establishments",

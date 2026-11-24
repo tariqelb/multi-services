@@ -253,7 +253,7 @@ export default function FeedbackDetails({
             setDownloadError("");
 
             const response = await axiosInstance.get(
-                `/feedback/${feedbackId}/attachments/${attachment._id}`,
+                `/property/feedback/${feedbackId}/attachments/${attachment._id}`,
                 {
                     responseType: "blob",
                 }

@@ -6,7 +6,6 @@ import {
     redirect,
     useLoaderData,
     Outlet,
-    useRouteLoaderData,
     useLocation,
 } from "react-router-dom";
 
@@ -23,7 +22,24 @@ import NotFound from "./pages/NotFound";
 
 import MainSideBar from "./Components/Home/MainSideBar";
 
-import CarsDescription from "./Apps/cars/Components/Descriprion/Description";
+import VehiclesDescription from "./Apps/vehicles/Components/Descriprion/Description";
+import VehiclesPage from "./Apps/vehicles/VehicleList/VehiclesPage";
+import VehicleDetailsPage from "./Apps/vehicles/VehicleDetails/VehicleDetailsPage";
+import PublishVehiclePage from "./Apps/vehicles/VehicleForm/PublishVehiclePage";
+import PublishMotoPage from "./Apps/vehicles/VehicleForm/PublishMotoPage";
+import VehiclesMapPage from "./Apps/vehicles/VehicleMap/VehiclesMapPage";
+import EditVehiclePage from "./Apps/vehicles/VehicleForm/EditVehiclePage";
+import MyVehiclesPage from "./Apps/vehicles/MyVehicles/MyVehiclesPage";
+import VehicleAlertsPage from "./Apps/vehicles/VehicleAlerts/VehicleAlertsPage";
+import MyVehicleProfile from "./Apps/vehicles/Profile/MyVehicleProfile";
+import VehiclePublicProfile from "./Apps/vehicles/Profile/VehiclePublicProfile";
+import VehicleReviewsPage from "./Apps/vehicles/Reviews/VehicleReviewsPage";
+import SavedVehiclesPage from "./Apps/vehicles/Saved/SavedVehiclesPage";
+import SparePartsPage from "./Apps/vehicles/SpareParts/SparePartsPage";
+import VehicleSearchPage from "./Apps/vehicles/Search/VehicleSearchPage";
+import VehiclePublicationsReview from "./Apps/vehicles/Admin/VehiclePublicationsReview";
+import SparePartForm, { EditSparePartPage } from "./Apps/vehicles/SpareParts/SparePartForm";
+import SparePartDetailsPage from "./Apps/vehicles/SpareParts/SparePartDetailsPage";
 import DailyWorkerDescription from "./Apps/DailyWorker/Components/Descriprion/Description";
 import DeliveryManDescription from "./Apps/DelivryMan/Components/Descriprion/Description";
 import DriverDescription from "./Apps/Driver/Components/Descriprion/Description";
@@ -39,7 +55,7 @@ import ProfilePropertyDetails from "./Apps/Property/properties/ProfilePropertyDe
 import Properties from "./Apps/Property/properties/Properties";
 import PropertyDetailsPage from "./Apps/Property/properties/PropertyDetailsPage";
 import PublishPropertyPage from "./Apps/Property/propertyInsertForm/PublishPropertyPage";
-import SavedPropertiesList from "./Apps/Property/saved/SavedPropertyList";
+import SavedPage from "./Apps/Property/saved/SavedPage";
 import Alert from "./Apps/Property/Alert/Alert";
 import NotificationPage from "./Apps/Property/Notification/NotificationPage";
 import SettingPage from "./Apps/Property/Settings/SettingsPage";
@@ -96,6 +112,12 @@ import PublicationsReviewSection from "./Apps/Property/PublicationReviews/Public
 import FeedbackSection from "./Apps/Property/FeedbackReviews/FeedbackSection";
 
 import ServiceSidebar from "./Components/Home/ServiceSidebar";
+import { VEHICLE_NAV } from "./Components/Home/serviceNavigation";
+import AdminSidebar from "./Components/Admin/AdminSidebar";
+import AdminRoute, { AdminHome } from "./Components/Admin/AdminRoute";
+import AdminRolesPage from "./Components/Admin/AdminRolesPage";
+import { AdminUsersPage, AdminVisitsPage } from "./Components/Admin/AdminSectionPages";
+import { isAdminPath } from "./Components/Admin/adminSections";
 
 // -----------------------------------------------------------------------------
 // Authentication loader
@@ -131,17 +153,11 @@ async function requireAuth() {
 // Persistent layout with TopBar, Sidebar and Footer
 // -----------------------------------------------------------------------------
 
-function AdminOnly({ children }) {
-    const user = useRouteLoaderData("dashboard-layout");
-
-    if (user?.role?.toLowerCase() !== "admin") {
-        return <Navigate to="/" replace />;
-    }
-
-    return children;
-}
 
 
+
+// Vehicles sidebar items: see Components/Home/serviceNavigation.js
+// (shared with the vehicles top bar).
 
 function DashboardLayout() {
     const user = useLoaderData();
@@ -179,10 +195,14 @@ function DashboardLayout() {
             translationKey: "dailyWorker",
         },
         {
-            prefix: "/cars",
-            title: "Cars",
-            descriptionPath: "/cars/description",
-            translationKey: "cars",
+            prefix: "/vehicles",
+            // Motos are part of the vehicles service.
+            prefixes: ["/vehicles", "/motos"],
+            title: "Vehicles",
+            descriptionPath: "/vehicles/description",
+            translationKey: "vehicles",
+            items: VEHICLE_NAV,
+            itemsFirst: true,
         },
         {
             prefix: "/delivery-man",
@@ -205,7 +225,7 @@ function DashboardLayout() {
     ];
 
     const activeServiceSidebar = serviceSidebarConfig.find((service) =>
-        location.pathname.startsWith(service.prefix)
+        (service.prefixes || [service.prefix]).some((prefix) => location.pathname.startsWith(prefix))
     );
     return (
         <Box
@@ -281,14 +301,18 @@ function DashboardLayout() {
                         />
                     )}
 
-                    {/* Property sidebar */}
-                    {activeServiceSidebar ? (
+                    {/* Admin panel sidebar, service sidebar, or the property sidebar */}
+                    {isAdminPath(location.pathname) ? (
+                        <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                    ) : activeServiceSidebar ? (
                         <ServiceSidebar
                             sidebarOpen={sidebarOpen}
                             setSidebarOpen={setSidebarOpen}
                             title={activeServiceSidebar.title}
                             descriptionPath={activeServiceSidebar.descriptionPath}
                             translationKey={activeServiceSidebar.translationKey}
+                            items={activeServiceSidebar.items}
+                            itemsFirst={activeServiceSidebar.itemsFirst}
                         />
                     ) : (
                         <Sidebar
@@ -489,7 +513,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/saved",
-                element: <SavedPropertiesList />,
+                element: <SavedPage />,
             },
             {
                 path: "/notificationpage",
@@ -526,9 +550,9 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard",
                 element: (
-                    <AdminOnly>
+                    <AdminRoute section="propertyStatistics">
                         <Dashboard />
-                    </AdminOnly>
+                    </AdminRoute>
                 ),
             },
             {
@@ -551,9 +575,9 @@ const router = createBrowserRouter([
             {
                 path: "/addexternalListings",
                 element: (
-                    <AdminOnly>
+                    <AdminRoute section="externalListings">
                         <ExternalListingSources />
-                    </AdminOnly>
+                    </AdminRoute>
                 ),
             },
 
@@ -561,20 +585,54 @@ const router = createBrowserRouter([
             // Admin
             // -----------------------------------------------------------------
 
+            // Admin panel home: first page this user can open.
+            { path: "/admin", element: <AdminHome /> },
+            {
+                path: "/admin/users",
+                element: (
+                    <AdminRoute section="users">
+                        <AdminUsersPage />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/visits",
+                element: (
+                    <AdminRoute section="visits">
+                        <AdminVisitsPage />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/roles",
+                element: (
+                    <AdminRoute section="roles">
+                        <AdminRolesPage />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/vehicles/publications",
+                element: (
+                    <AdminRoute section="vehiclePublications">
+                        <VehiclePublicationsReview />
+                    </AdminRoute>
+                ),
+            },
             {
                 path: "/admin/users/:userId",
                 element: (
-                    <AdminOnly>
+                    <AdminRoute section="users">
                         <UserDetailsPage />
-                    </AdminOnly>
+                    </AdminRoute>
                 ),
             },
             {
                 path: "/admin/knowledge",
                 element: (
-                    <AdminOnly>
+                    <AdminRoute section="knowledge">
                         <KnowledgeManagement />
-                    </AdminOnly>
+                    </AdminRoute>
                 ),
             },
             // -----------------------------------------------------------------
@@ -584,17 +642,17 @@ const router = createBrowserRouter([
             {
                 path: "/admin/publications",
                 element: (
-                    <AdminOnly>
+                    <AdminRoute section="propertyPublications">
                         <PublicationsReviewSection />
-                    </AdminOnly>
+                    </AdminRoute>
                 ),
             },
             {
                 path: "/admin/feedback",
                 element: (
-                    <AdminOnly>
+                    <AdminRoute section="feedback">
                         <FeedbackSection />
-                    </AdminOnly>
+                    </AdminRoute>
                 ),
             },
 
@@ -615,9 +673,33 @@ const router = createBrowserRouter([
             // -----------------------------------------------------------------
 
             {
-                path: "/cars/description",
-                element: <CarsDescription />,
+                path: "/vehicles/description",
+                element: <VehiclesDescription />,
             },
+
+            // Vehicles service
+            // key: /vehicles and /motos are two pages (filters reset on switch).
+            { path: "/vehicles", element: <VehiclesPage key="car" category="car" /> },
+            { path: "/vehicles/publish", element: <PublishVehiclePage /> },
+            { path: "/motos", element: <VehiclesPage key="moto" category="moto" /> },
+            { path: "/motos/publish", element: <PublishMotoPage /> },
+            { path: "/vehicles/map", element: <VehiclesMapPage /> },
+            { path: "/vehicles/search", element: <VehicleSearchPage /> },
+            // Old address of the vehicles publication reviews (now in the admin panel).
+            { path: "/vehicles/admin/publications", element: <Navigate to="/admin/vehicles/publications" replace /> },
+            { path: "/vehicles/mine", element: <MyVehiclesPage /> },
+            { path: "/vehicles/alerts", element: <VehicleAlertsPage /> },
+            { path: "/vehicles/reviews", element: <VehicleReviewsPage /> },
+            { path: "/vehicles/saved", element: <SavedVehiclesPage /> },
+            // Car and motorcycle spare parts (before /vehicles/:id).
+            { path: "/vehicles/parts", element: <SparePartsPage /> },
+            { path: "/vehicles/parts/publish", element: <SparePartForm /> },
+            { path: "/vehicles/parts/:id", element: <SparePartDetailsPage /> },
+            { path: "/vehicles/parts/:id/edit", element: <EditSparePartPage /> },
+            { path: "/vehicles/profile", element: <MyVehicleProfile /> },
+            { path: "/vehicles/profile/:userId", element: <VehiclePublicProfile /> },
+            { path: "/vehicles/:id", element: <VehicleDetailsPage /> },
+            { path: "/vehicles/:id/edit", element: <EditVehiclePage /> },
             {
                 path: "/daily-worker/description",
                 element: <DailyWorkerDescription />,

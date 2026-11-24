@@ -8,17 +8,14 @@ import { Box } from "@mui/material";
 import PageLayout from "./PageLayout";
 import DashboardNavigation from "./DashboardNavigation";
 import OverviewSection from "./components/Overview/OverviewSection";
-import UsersSection from "./components/User/UsersSection";
-import VisitsSection from "./components/Visit/VisitsSection";
 import ExternalClicksSection from "./components/ExternalListingsClicks/ExternalClicksSection";
 import PropertyClicksSection from "./components/PropertyClicks/PropertyClicksSection";
 import PropertyDemandSection from "./components/PropertyDemand/PropertyDemandSection";
 import ClientContactActionsSection from "./components/ClientContactActions/ClientContactActionsSection";
 
+// Users and Visits moved to Admin panel > Account.
 const SECTIONS = {
     overview: OverviewSection,
-    users: UsersSection,
-    visits: VisitsSection,
     "internal property clicks": PropertyClicksSection,
     "external listings clicks": ExternalClicksSection,
     "property demand": PropertyDemandSection,
@@ -34,8 +31,8 @@ export default function Dashboard() {
     return (
         <PageLayout
             icon={<InsightsOutlinedIcon />}
-            title={t("adminDashboard.title")}
-            subtitle={t("adminDashboard.subtitle")}
+            title={t("adminPanel.statisticsTitle", "Property statistics")}
+            subtitle={t("adminPanel.statisticsSubtitle", "Clicks, demand and contacts on the property listings.")}
         >
             <DashboardNavigation
                 activeTab={activeTab}

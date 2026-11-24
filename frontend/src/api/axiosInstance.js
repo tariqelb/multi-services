@@ -69,10 +69,10 @@ const AUTH_REQUESTS = [
 
 // Background tracking requests must never kick a visitor to /login.
 const TRACKING_REQUESTS = [
-    "/dashboard/visits/heartbeat",
-    "/dashboard/visits/end",
+    "/property/dashboard/visits/heartbeat",
+    "/property/dashboard/visits/end",
     "/click",
-    "/dashboard/property-contacts",
+    "/property/dashboard/property-contacts",
     "/listing-contacts",
 ];
 

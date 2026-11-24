@@ -5,10 +5,8 @@ import http from "node:http";
 import app from "./app.js";
 import connectDB from "./config/db.js";
 import initializeSocket from "./config/socket.js";
-import { moveWhatsappNumber } from "./services/migrations/moveWhatsappNumber.js";
-import { startExternalListingsCollectionJob } from "./jobs/externalListingsCollectionJob.js";
-import { startExternalListingsAvailabilityJob } from "./jobs/externalListingsAvailabilityJob.js";
-import { startListingExpiryJob } from "./jobs/listingExpiryJob.js";
+import { moveWhatsappNumber } from "./apps/main/services/migrations/moveWhatsappNumber.js";
+import services from "./apps/index.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -51,20 +49,9 @@ const startServer = async () => {
             console.log(`Server running on port ${PORT}`);
         });
 
-        // Optional scheduled jobs, off unless enabled in .env:
-        //   EXTERNAL_LISTINGS_NIGHTLY_COLLECT=true   collect new listings every night
-        //   EXTERNAL_LISTINGS_WEEKLY_CHECK=true      remove unavailable listings every week
-        if (process.env.EXTERNAL_LISTINGS_NIGHTLY_COLLECT === "true") {
-            startExternalListingsCollectionJob();
-        }
-
-        if (process.env.EXTERNAL_LISTINGS_WEEKLY_CHECK === "true") {
-            startExternalListingsAvailabilityJob();
-        }
-
-        // 60-day listing expiry: on unless LISTING_EXPIRY_ENABLED=false.
-        if (process.env.LISTING_EXPIRY_ENABLED !== "false") {
-            startListingExpiryJob(io);
+        // Scheduled jobs of every service (see apps/<service>/index.js).
+        for (const service of services) {
+            service.startJobs({ io });
         }
     } catch (error) {
         console.error("Failed to start server:", error);

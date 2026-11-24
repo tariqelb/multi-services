@@ -33,11 +33,13 @@ const defaultPreferences = {
     email: {
         enabled: true,
         propertyAlerts: true,
+        vehicleAlerts: true,
     },
     // Switches only: the number is in the profile (whatsappNumber).
     whatsapp: {
         enabled: false,
         propertyAlerts: false,
+        vehicleAlerts: false,
     },
 };
 
@@ -77,6 +79,7 @@ const normalizeProfile = (data = {}) => ({
 const normalizeWhatsApp = (data = {}) => ({
     enabled: data.enabled ?? false,
     propertyAlerts: data.propertyAlerts ?? false,
+    vehicleAlerts: data.vehicleAlerts ?? false,
 });
 
 export default function SettingsPage() {
@@ -216,6 +219,9 @@ export default function SettingsPage() {
                     propertyAlerts:
                         data.email?.propertyAlerts ??
                         defaultPreferences.email.propertyAlerts,
+                    vehicleAlerts:
+                        data.email?.vehicleAlerts ??
+                        defaultPreferences.email.vehicleAlerts,
                 },
                 whatsapp: normalizeWhatsApp(data.whatsapp),
             }));
@@ -452,6 +458,7 @@ export default function SettingsPage() {
                     email: {
                         enabled: saved.enabled ?? true,
                         propertyAlerts: saved.propertyAlerts ?? true,
+                        vehicleAlerts: saved.vehicleAlerts ?? true,
                     },
                 }));
             }
@@ -499,6 +506,7 @@ export default function SettingsPage() {
                 {
                     enabled: whatsapp.enabled,
                     propertyAlerts: whatsapp.propertyAlerts,
+                    vehicleAlerts: whatsapp.vehicleAlerts,
                 }
             );
 

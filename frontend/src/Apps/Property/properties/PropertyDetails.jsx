@@ -7,8 +7,7 @@ import { VerifiedBadge } from "../listings/VerifiedContact";
 
 import { Alert, Button, Snackbar } from "@mui/material";
 
-import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded";
-import BookmarkAddedRoundedIcon from "@mui/icons-material/BookmarkAddedRounded";
+import SaveToggleButton from "../../../Components/ui/SaveToggleButton";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import SquareFootRoundedIcon from "@mui/icons-material/SquareFootRounded";
 import BedOutlinedIcon from "@mui/icons-material/BedOutlined";
@@ -424,21 +423,17 @@ export default function PropertyDetails({
         ].filter((item) => item.value !== null && item.value !== "")
         : [];
 
-    const saveButton = (
-        <Button
-            variant={saved ? "contained" : "outlined"}
-            color="primary"
-            startIcon={saved ? <BookmarkAddedRoundedIcon /> : <BookmarkBorderRoundedIcon />}
-            disabled={saving || !propertyId}
+    // In the contact card, under WhatsApp (same place on every details page).
+    const saveButton = showSave ? (
+        <SaveToggleButton
+            saved={saved}
+            saving={saving}
+            disabled={!propertyId}
             onClick={handleSaveClick}
-        >
-            {saving
-                ? t("properties.details.saving")
-                : saved
-                    ? t("properties.details.unsave")
-                    : t("properties.details.save")}
-        </Button>
-    );
+            saveLabel={t("properties.details.save")}
+            savedLabel={t("properties.details.unsave")}
+        />
+    ) : null;
 
     const main = (
         <>
@@ -480,7 +475,10 @@ export default function PropertyDetails({
 
     const sidebar = (
         <>
-            {showOwnerContact && <PropertyContactOwner property={property} withMobileBar />}
+            {showOwnerContact && <PropertyContactOwner property={property} withMobileBar saveButton={saveButton} />}
+
+            {/* No contact card (inactive listing): the save button stays at the top. */}
+            {!showOwnerContact && saveButton && <SidebarCard>{saveButton}</SidebarCard>}
 
             {showContact && contactClosed && (
                 <SidebarCard>
@@ -555,7 +553,6 @@ export default function PropertyDetails({
                 location={location}
                 price={price ? `${price} ${t("common.currency", "MAD")}` : null}
                 priceCaption={isRent && property.rentalPeriod ? getRentalValueLabel(property.rentalPeriod, t) : undefined}
-                actions={showSave ? saveButton : null}
             />
 
             <DetailsLayout main={main} sidebar={sidebar} />

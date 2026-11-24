@@ -40,7 +40,7 @@ import { filterFieldSx } from "../../../Components/ui/FilterKit";
 import { SectionCard, StatTile } from "./sourcesUi";
 import { formatDate } from "./sourcesFormat";
 
-const API = "/external-listings/availability";
+const API = "/property/external-listings/availability";
 const POLL_INTERVAL = 2000;
 const SHOWN_RESULTS = 50;
 

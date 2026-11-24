@@ -136,7 +136,7 @@ export default function OverviewSection() {
     const [range, setRange] = useState("30d");
 
     const { data, loading, error, reload } = useAnalyticsData(
-        "/dashboard/overview",
+        "/property/dashboard/overview",
         { range }
     );
 

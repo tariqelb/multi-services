@@ -35,7 +35,7 @@ export default function RoommateDetailsPage({
                 setError("");
 
                 const response = await axiosInstance.get(
-                    `/roommates/${id}`
+                    `/property/roommates/${id}`
                 );
 
                 if (!isMounted) return;

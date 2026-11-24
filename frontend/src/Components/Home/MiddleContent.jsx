@@ -51,8 +51,8 @@ export default function MiddleContent({ activeNav }) {
         {
             key: "cars",
             image: carsImage,
-            path: "/cars/description",
-            available: false,
+            path: "/vehicles",
+            available: true,
         },
         {
             key: "services",

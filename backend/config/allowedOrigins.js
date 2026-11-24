@@ -1,4 +1,4 @@
-// config/allowedOrigins.js
+// backend/config/allowedOrigins.js
 //
 // Websites allowed to call the API with the login cookie (CORS) and to open
 // the live connection (socket.io).

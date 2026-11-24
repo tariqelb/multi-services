@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ReportListingLink from "../listings/ReportListingLink";
 import VerifiedContact from "../listings/VerifiedContact";
+import SaveListingButton from "../saved/SaveListingButton";
 import { Alert, Button, Stack, Typography } from "@mui/material";
 
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
@@ -465,11 +466,15 @@ export default function RoommateDetails({ listing, showContact: showContactProp 
                                 {translate("roommates.details.whatsappOwner", "Contact via WhatsApp")}
                             </Button>
                         )}
+                        <SaveListingButton type="roommate" listingId={listing._id || listing.id} ownerId={ownerId} />
                     </Stack>
                 ) : (
-                    <Alert severity="info" sx={{ mt: 2 }}>
-                        {translate("roommates.details.noPhone", "The owner has not provided a phone number.")}
-                    </Alert>
+                    <>
+                        <Alert severity="info" sx={{ mt: 2 }}>
+                            {translate("roommates.details.noPhone", "The owner has not provided a phone number.")}
+                        </Alert>
+                        <SaveListingButton type="roommate" listingId={listing._id || listing.id} ownerId={ownerId} sx={{ mt: 1.25 }} />
+                    </>
                 )}
 
                 {ownerId && (
