@@ -1,6 +1,7 @@
 // backend/apps/property/controllers/dashboard/visitsController.js
 import VisitSession from "../../models/VisitSession.js";
 import User from "../../../main/models/User.js";
+import { isDatabaseConnectionError, isDatabaseReady, logDatabaseErrorOnce } from "../../../main/utils/dbErrors.js";
 
 import {
     bucketExpression,
@@ -49,6 +50,11 @@ const getSessionTimeoutStart = (now = new Date()) =>
 
 // POST /api/property/dashboard/visits/heartbeat
 export const trackVisit = async (req, res) => {
+    // Database unreachable: skip this heartbeat (the next one counts again).
+    if (!isDatabaseReady()) {
+        return res.status(503).json({ success: false, message: "Visit tracking is unavailable right now." });
+    }
+
     try {
         const { visitorId, page } = req.body;
 
@@ -199,6 +205,10 @@ export const trackVisit = async (req, res) => {
             sessionId: session._id,
         });
     } catch (error) {
+        if (isDatabaseConnectionError(error)) {
+            logDatabaseErrorOnce("Track visit", error);
+            return res.status(503).json({ success: false, message: "Visit tracking is unavailable right now." });
+        }
         console.error("Track visit error:", error);
 
         return res.status(500).json({
@@ -210,6 +220,10 @@ export const trackVisit = async (req, res) => {
 
 // POST /api/property/dashboard/visits/end
 export const endVisit = async (req, res) => {
+    if (!isDatabaseReady()) {
+        return res.status(503).json({ success: false, message: "Visit tracking is unavailable right now." });
+    }
+
     try {
         const { visitorId } = req.body;
 
@@ -232,6 +246,10 @@ export const endVisit = async (req, res) => {
 
         return res.status(200).json({ success: true });
     } catch (error) {
+        if (isDatabaseConnectionError(error)) {
+            logDatabaseErrorOnce("End visit", error);
+            return res.status(503).json({ success: false, message: "Visit tracking is unavailable right now." });
+        }
         console.error("End visit error:", error);
 
         return res.status(500).json({

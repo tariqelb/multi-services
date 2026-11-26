@@ -29,9 +29,11 @@ import {
     AddLinkOutlined,
     VideoLibraryOutlined,
     VisibilityOutlined,
+    CampaignOutlined,
 } from "@mui/icons-material";
 
 import { ADMIN_GROUPS, adminItemForPath, useAdminAccess } from "./adminSections";
+import AutoStoriesOutlined from "@mui/icons-material/AutoStoriesOutlined";
 
 const ICONS = {
     account: PersonOutlined,
@@ -49,6 +51,8 @@ const ICONS = {
     knowledge: VideoLibraryOutlined,
     publications: ArticleOutlined,
     feedback: FeedbackOutlined,
+    requests: CampaignOutlined,
+    portfolio: AutoStoriesOutlined,
 };
 
 export default function AdminSidebar({ sidebarOpen, setSidebarOpen }) {

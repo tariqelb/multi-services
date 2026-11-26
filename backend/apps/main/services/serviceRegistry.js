@@ -57,3 +57,27 @@ export async function deleteUserData(userId) {
         }
     }
 }
+
+/**
+ * What a user already publishes, to prefill "Receive requests" in Settings.
+ * Each service may return { property: {...} } or { vehicle: {...} } with
+ * { cities, transactions, types | categories, count }.
+ */
+export async function getPublishingActivity(userId) {
+    const results = await Promise.all(
+        hooksWith("getPublishingActivity").map(([, hooks]) => hooks.getPublishingActivity(userId).catch(() => ({})))
+    );
+    return Object.assign({}, ...results);
+}
+
+/**
+ * Summary of a listing linked in a reply to a request (only the owner's own
+ * listings): { kind, id, title, image, price, priceUnit, city, link } or null.
+ */
+export async function getListingSummary({ kind, id, ownerId }) {
+    for (const [, hooks] of hooksWith("getListingSummary")) {
+        const summary = await hooks.getListingSummary({ kind, id, ownerId });
+        if (summary) return summary;
+    }
+    return null;
+}

@@ -27,16 +27,19 @@ import { FilterGrid, FilterPanel, FilterSelect } from "../../../Components/ui/Fi
 import { optionLabel } from "../vehicleFormat";
 import MyVehicleCard from "./MyVehicleCard";
 import MySparePartsSection from "../SpareParts/MySparePartsSection";
+import VehicleRequestsList from "../Requests/VehicleRequestsList";
+import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
 
 const PER_PAGE = 5;
 const ALL = "all";
 const DEFAULT_FILTERS = { listingType: ALL, status: ALL, city: ALL };
 const STATUSES = ["Available", "Sold", "Rented", "Inactive"];
-const SECTIONS = ["vehicles", "motos", "parts"];
+const SECTIONS = ["vehicles", "motos", "parts", "requests"];
 const PUBLISH = {
     vehicles: { path: "/vehicles/publish", key: "vehiclesApp.sidebar.publish", label: "Publish a vehicle" },
     motos: { path: "/motos/publish", key: "vehiclesApp.sidebar.publishMoto", label: "Publish a moto or bike" },
     parts: { path: "/vehicles/parts/publish", key: "vehiclesApp.sidebar.publishPart", label: "Publish a spare part" },
+    requests: { path: "/vehicles/requests/new", key: "requests.post", label: "Post a request" },
 };
 
 export default function MyVehiclesPage({ embedded = false, section: sectionProp, onVehiclesChange, onPartsChange } = {}) {
@@ -139,6 +142,7 @@ export default function MyVehiclesPage({ embedded = false, section: sectionProp,
 
     const isMotos = section === "motos";
     const isParts = section === "parts";
+    const isRequests = section === "requests";
     const publish = PUBLISH[section];
     const publishPath = publish.path;
     const handlePartsChange = (parts) => {
@@ -190,11 +194,19 @@ export default function MyVehiclesPage({ embedded = false, section: sectionProp,
                             iconPosition="start"
                             label={t("vehiclesApp.mine.tabParts", "My spare parts ({{count}})", { count: partsCount ?? 0 })}
                         />
+                        <Tab
+                            value="requests"
+                            icon={<CampaignOutlinedIcon />}
+                            iconPosition="start"
+                            label={t("requests.nav.mine", "My requests")}
+                        />
                     </Tabs>
                 </Box>
             )}
 
-            {isParts ? (
+            {isRequests ? (
+                <VehicleRequestsList mode="mine" showPost={embedded} />
+            ) : isParts ? (
                 <MySparePartsSection onPartsChange={handlePartsChange} />
             ) : (
                 <>

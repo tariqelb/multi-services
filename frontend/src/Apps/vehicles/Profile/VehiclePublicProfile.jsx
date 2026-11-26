@@ -19,7 +19,10 @@ import VehicleProfileTabs from "./components/VehicleProfileTabs";
 import VehicleReviewsTab from "./components/VehicleReviewsTab";
 
 import VehiclePublicationsTab from "./VehiclePublicationsTab";
-import { PROFILE_TABS, REVIEWS_TAB, dealerBadge, profileTabs, useVehicleReviews } from "./vehicleProfileShared";
+import PublicContactCard from "../../../Components/Profile/PublicContactCard";
+import VehicleRequestsList from "../Requests/VehicleRequestsList";
+import PortfolioSection from "../../../Components/Profile/Portfolio/PortfolioSection";
+import { PROFILE_TABS, REQUESTS_TAB, REVIEWS_TAB, dealerBadge, profileTabs, useVehicleReviews } from "./vehicleProfileShared";
 
 const EMPTY_FORM = { rating: 0, comment: "" };
 
@@ -45,6 +48,26 @@ export default function VehiclePublicProfile() {
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState("");
     const reviews = useVehicleReviews(userId, t);
+
+    // Portfolio (articles and videos): first tab when the user has some.
+    const [portfolio, setPortfolio] = useState({ userId: null, items: [] });
+    const portfolioLoading = portfolio.userId !== userId;
+    const askedTab = searchParams.get("tab");
+    useEffect(() => {
+        let cancelled = false;
+        axiosInstance
+            .get(`/vehicles/portfolio/user/${userId}`)
+            .then(({ data }) => {
+                if (cancelled) return;
+                const items = data.items || [];
+                setPortfolio({ userId, items });
+                if (items.length && !askedTab) setActiveTab("portfolio");
+            })
+            .catch(() => !cancelled && setPortfolio({ userId, items: [] }));
+        return () => {
+            cancelled = true;
+        };
+    }, [userId, askedTab]);
     const { load: loadReviews } = reviews;
 
     // New profile or new ?tab: start again.
@@ -133,6 +156,8 @@ export default function VehiclePublicProfile() {
 
     const { user, dealer, statistics } = profile;
     const isMe = Boolean(currentUserId) && String(currentUserId) === String(userId);
+    // ?tab=requests while the requests are hidden: first tab.
+    const tabShown = activeTab === REQUESTS_TAB && profile.showRequests !== true ? 0 : activeTab;
     const hasPublications = (statistics?.totalVehicles || 0) + (statistics?.totalMotos || 0) + (statistics?.totalParts || 0) > 0;
 
     return (
@@ -146,15 +171,25 @@ export default function VehiclePublicProfile() {
 
                 <VehicleProfileHeader user={user} rating={reviews.rating} totalReviews={reviews.total} badge={dealerBadge(t, dealer)} />
 
+                {/* Only what the user chose to show (Settings > Public profile) */}
+                <PublicContactCard contact={profile.contact} socialLinks={profile.socialLinks} />
+
                 <VehicleProfileStats statistics={{ ...statistics, totalReviews: reviews.total }} />
 
-                <VehicleProfileTabs activeTab={activeTab} onChange={setActiveTab} tabs={profileTabs(false)} />
+                <VehicleProfileTabs
+                    activeTab={tabShown}
+                    onChange={setActiveTab}
+                    tabs={profileTabs(false, profile.showRequests === true)}
+                    showPortfolio={!portfolioLoading && portfolio.items.length > 0}
+                />
 
-                <Box role="tabpanel" id={`public-profile-panel-${activeTab}`} aria-labelledby={`public-profile-tab-${activeTab}`}>
-                    {activeTab === 0 && <VehiclePublicationsTab userId={userId} category="car" />}
-                    {activeTab === 1 && <VehiclePublicationsTab userId={userId} category="moto" />}
-                    {activeTab === 2 && <VehiclePublicationsTab userId={userId} category="part" />}
-                    {activeTab === REVIEWS_TAB && (
+                <Box role="tabpanel" id={`public-profile-panel-${tabShown}`} aria-labelledby={`public-profile-tab-${tabShown}`}>
+                    {tabShown === "portfolio" && <PortfolioSection api="/vehicles/portfolio" items={portfolio.items} loading={portfolioLoading} />}
+                    {tabShown === REQUESTS_TAB && <VehicleRequestsList mode="public" userId={userId} />}
+                    {tabShown === 0 && <VehiclePublicationsTab userId={userId} category="car" />}
+                    {tabShown === 1 && <VehiclePublicationsTab userId={userId} category="moto" />}
+                    {tabShown === 2 && <VehiclePublicationsTab userId={userId} category="part" />}
+                    {tabShown === REVIEWS_TAB && (
                         <Stack spacing={2}>
                             {/* Reviews are for people who published at least one vehicle. */}
                             {!isMe && currentUserId && !hasPublications && (

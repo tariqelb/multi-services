@@ -14,6 +14,8 @@ import WhatsappNotifications from "./WhatsappNotifications";
 import ChangePassword from "./ChangePassword";
 import DeleteAccount from "./DeleteAccount";
 import ContactVerification from "./ContactVerification";
+import ProfessionalProfileSettings from "../../../Components/Requests/ProfessionalProfileSettings";
+import PublicVisibilitySettings from "../../../Components/Profile/PublicVisibilitySettings";
 
 const emptyProfile = {
     firstName: "",
@@ -686,6 +688,12 @@ export default function SettingsPage() {
                     error={preferencesError}
                     onSave={saveWhatsappPreferences}
                 />
+
+                {/* What visitors see on my public profiles */}
+                <PublicVisibilitySettings />
+
+                {/* Owners, agencies, dealers: receive "I am looking for..." requests */}
+                <ProfessionalProfileSettings />
 
                 <ChangePassword
                     passwords={passwords}

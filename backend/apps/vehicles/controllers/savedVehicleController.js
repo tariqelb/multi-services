@@ -42,7 +42,7 @@ export const saveVehicle = async (req, res) => {
                 $setOnInsert: { userId, vehicleId: id },
                 $push: { activityHistory: historyEntry("saved", now) },
             },
-            { upsert: true, new: true, setDefaultsOnInsert: true },
+            { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
         );
 
         return res.status(200).json({ success: true, saved: true, message: "Vehicle saved." });
@@ -62,7 +62,7 @@ export const unsaveVehicle = async (req, res) => {
         const updated = await SavedVehicle.findOneAndUpdate(
             { userId, vehicleId: id, isSaved: { $ne: false } },
             { $set: { isSaved: false, unsavedAt: now }, $push: { activityHistory: historyEntry("unsaved", now) } },
-            { new: true },
+            { returnDocument: "after" },
         );
         if (!updated) return res.status(404).json({ success: false, message: "This vehicle is not in your saved vehicles." });
 

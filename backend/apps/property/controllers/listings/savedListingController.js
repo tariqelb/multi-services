@@ -53,7 +53,7 @@ export const saveListing = async (req, res) => {
                 $setOnInsert: { userId, listingType: target.type, listingId: target.id },
                 $push: { activityHistory: historyEntry("saved", now) },
             },
-            { upsert: true, new: true, setDefaultsOnInsert: true },
+            { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
         );
         return res.status(200).json({ success: true, saved: true, message: "Saved." });
     } catch (error) {
@@ -71,7 +71,7 @@ export const unsaveListing = async (req, res) => {
         const updated = await SavedListing.findOneAndUpdate(
             { userId: req.user.userId, listingType: target.type, listingId: target.id, isSaved: { $ne: false } },
             { $set: { isSaved: false, unsavedAt: now }, $push: { activityHistory: historyEntry("unsaved", now) } },
-            { new: true },
+            { returnDocument: "after" },
         );
         if (!updated) return res.status(404).json({ success: false, message: "This listing is not in your saved list." });
         return res.status(200).json({ success: true, saved: false, message: "Removed from your saved list." });

@@ -45,6 +45,7 @@ import {
 import SimilarVehicles from "./SimilarVehicles";
 import SaveVehicleButton from "../Saved/SaveVehicleButton";
 import { STATUS_TONES, formatVehiclePrice, formatCity, formatDate, formatNumber, getYoutubeVideoId, optionLabel } from "../vehicleFormat";
+import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
 
 const yesNo = (t, value) => (value ? t("vehiclesApp.details.yes", "Yes") : null);
 const waLink = (number) => `https://wa.me/${String(number).replace(/\D/g, "")}`;
@@ -321,6 +322,9 @@ function VehicleDetails({ id }) {
                         {t("vehiclesApp.details.edit", "Edit this vehicle")}
                     </Button>
                 )}
+
+                {/* Vehicles service: the publisher's vehicles profile (publications, reviews) */}
+                <VisitProfileButton service="vehicles" userId={publisherId} sx={{ mt: 1.25 }} />
             </SidebarCard>
 
             {(formatCity(vehicle, language) || vehicle.business?.address || mapsHref) && (

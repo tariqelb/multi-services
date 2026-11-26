@@ -24,6 +24,8 @@ import SearchResultCard from "./SearchResultCard";
 import SearchResultsMap from "./SearchResultsMap";
 import { KIND_COLORS, formatCity } from "./searchFormat";
 import "./search.css";
+import PropertyRequestCta from "../Requests/PropertyRequestCta";
+import { propertyRequestQuery } from "../Requests/propertyRequestOptions";
 
 const PAGE_SIZE = 12;
 const FIELDS = Object.keys(EMPTY_CRITERIA);
@@ -225,6 +227,8 @@ export default function SearchPage() {
                     <Typography variant="body2">
                         {t("search.results.emptyText", "Try another city, a wider price range or fewer criteria.")}
                     </Typography>
+                    {/* Nothing found: post a request instead */}
+                    <PropertyRequestCta query={propertyRequestQuery(applied)} />
                 </Stack>
             ) : (
                 <>

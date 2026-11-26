@@ -32,7 +32,9 @@ export const ADMIN_GROUPS = [
             { section: "externalListings", path: "/addexternalListings", labelKey: "sidebar.addExternalListing", label: "Add External listing", icon: "externalListings" },
             { section: "knowledge", path: "/admin/knowledge", labelKey: "sidebar.knowledgeManagement", label: "Knowledge Management", icon: "knowledge" },
             { section: "propertyPublications", path: "/admin/publications", labelKey: "sidebar.publicationReviews", label: "Publication Reviews", icon: "publications" },
+            { section: "propertyPublications", path: "/admin/portfolio", labelKey: "portfolioReview.navItem", label: "Portfolio Reviews", icon: "portfolio" },
             { section: "feedback", path: "/admin/feedback", labelKey: "sidebar.feedbackReviews", label: "Feedback Reviews", icon: "feedback" },
+            { section: "propertyRequests", path: "/admin/property/requests", labelKey: "requests.admin.navItem", label: "Requests", icon: "requests" },
         ],
     },
     {
@@ -42,6 +44,9 @@ export const ADMIN_GROUPS = [
         icon: "vehicles",
         items: [
             { section: "vehiclePublications", path: "/admin/vehicles/publications", labelKey: "sidebar.publicationReviews", label: "Publication Reviews", icon: "publications" },
+            { section: "vehiclePublications", path: "/admin/vehicles/portfolio", labelKey: "portfolioReview.navItem", label: "Portfolio Reviews", icon: "portfolio" },
+            { section: "vehicleRequests", path: "/admin/vehicles/requests", labelKey: "requests.admin.navItem", label: "Requests", icon: "requests" },
+            { section: "vehicleExternalListings", path: "/admin/vehicles/external-listings", labelKey: "vehicleExternal.admin.navItem", label: "External listings", icon: "externalListings" },
         ],
     },
     // Other services: no admin pages yet.

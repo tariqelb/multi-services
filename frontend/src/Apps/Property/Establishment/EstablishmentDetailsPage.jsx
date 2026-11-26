@@ -47,12 +47,15 @@ import {
     MediaGallery,
     MobileActionBar,
     SidebarCard,
+    OwnerSummary,
     StatusBadge,
     VideoEmbed,
 } from "../../../Components/ui/DetailsKit";
 
 import axiosInstance from "../../../api/axiosInstance";
 import { trackListingContact } from "../../../api/trackContact";
+import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
+import { ownerIdOf } from "../../../Components/Profile/profilePaths";
 
 const API_BASE_URL =
     import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -560,7 +563,7 @@ export default function EstablishmentDetailsPage() {
                             {tr("whatsapp", "Contact on WhatsApp")}
                         </Button>
                     )}
-                    <SaveListingButton type="establishment" listingId={establishment._id || id} ownerId={establishment.userId?._id || establishment.userId} />
+                    <SaveListingButton type="establishment" listingId={establishment._id || id} ownerId={ownerIdOf(establishment.userId)} />
                     {contactLinks.map((link) => (
                         <Button
                             key={link.key}
@@ -605,6 +608,18 @@ export default function EstablishmentDetailsPage() {
                     </Box>
                 )}
             </SidebarCard>
+
+            {/* Publisher: opens their property profile */}
+            {ownerIdOf(establishment.userId) && (
+                <SidebarCard>
+                    <OwnerSummary
+                        label={tr("publishedBy", "Published by")}
+                        name={[establishment.userId?.firstName, establishment.userId?.lastName].filter(Boolean).join(" ") || tr("publisher", "Publisher")}
+                        avatar={establishment.userId?.profileImage ? getImageUrl(establishment.userId.profileImage) : undefined}
+                    />
+                    <VisitProfileButton service="property" userId={establishment.userId} sx={{ mt: 2 }} />
+                </SidebarCard>
+            )}
 
             <SidebarCard>
                 <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>

@@ -12,6 +12,8 @@ import {
     People,
     Hotel,
     RateReview,
+    Campaign,
+    AutoStoriesOutlined,
 } from "@mui/icons-material";
 
 const tabs = [
@@ -31,11 +33,21 @@ const tabs = [
         label: "publicProfile.tabs.reviews",
         icon: <RateReview fontSize="small" />,
     },
+    // Last, so hiding it never moves the other tabs.
+    {
+        label: "publicProfile.tabs.requests",
+        icon: <Campaign fontSize="small" />,
+    },
 ];
 
 export default function PublicProfileTabs({
     activeTab,
     onChange,
+    // Public profiles show "Requests" only if the user chose to show them.
+    showRequests = true,
+    // "Portfolio" (articles and videos) comes first; its value is "portfolio",
+    // so the other tabs keep their numbers.
+    showPortfolio = false,
 }) {
     const { t } = useTranslation();
 
@@ -69,9 +81,20 @@ export default function PublicProfileTabs({
                     },
                 }}
             >
-                {tabs.map((tab, index) => (
+                {showPortfolio && (
+                    <Tab
+                        value="portfolio"
+                        icon={<AutoStoriesOutlined fontSize="small" />}
+                        iconPosition="start"
+                        label={t("portfolio.tab", "Portfolio")}
+                        id="public-profile-tab-portfolio"
+                        aria-controls="public-profile-panel-portfolio"
+                    />
+                )}
+                {(showRequests ? tabs : tabs.slice(0, -1)).map((tab, index) => (
                     <Tab
                         key={tab.label}
+                        value={index}
                         icon={tab.icon}
                         iconPosition="start"
                         label={t(tab.label)}

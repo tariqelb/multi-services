@@ -44,6 +44,7 @@ import {
     createListingContact,
     getListingContactAnalytics,
 } from "../controllers/dashboard/listingContactsController.js";
+import { portfolio } from "../controllers/portfolio/portfolioController.js";
 
 const router = express.Router();
 
@@ -147,5 +148,9 @@ router.delete(
     deleteAdminPublication
 );
 
+
+// Portfolio review: articles and videos of profiles (same reviewers as publications).
+router.get("/portfolio", authMiddleware, adminAccess("propertyPublications"), portfolio.adminList);
+router.delete("/portfolio/:id", authMiddleware, adminAccess("propertyPublications"), portfolio.adminDelete);
 
 export default router;

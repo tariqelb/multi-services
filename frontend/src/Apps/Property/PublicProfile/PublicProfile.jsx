@@ -25,9 +25,12 @@ import PropertyListingsTab from "./components/PropertyListingsTab";
 import RoommateListingsTab from "./components/RoommateListingsTab";
 import EstablishmentListingsTab from "./components/EstablishmentListingsTab";
 import ReviewsTab from "./components/ReviewsTab";
+import PublicContactCard from "../../../Components/Profile/PublicContactCard";
+import PropertyRequestsList from "../Requests/PropertyRequestsList";
+import PortfolioSection from "../../../Components/Profile/Portfolio/PortfolioSection";
 
 // Order of the tabs in PublicProfileTabs.
-const PROFILE_TABS = ["properties", "roommates", "establishments", "reviews"];
+const PROFILE_TABS = ["properties", "roommates", "establishments", "reviews", "requests"];
 
 const ITEMS_PER_PAGE = 12;
 const REVIEWS_PER_PAGE = 20;
@@ -60,6 +63,10 @@ export default function PublicProfile() {
 
     // Profile
     const [user, setUser] = useState(null);
+    // What the user chose to show (Settings > Public profile).
+    const [contact, setContact] = useState(null);
+    const [socialLinks, setSocialLinks] = useState([]);
+    const [showRequests, setShowRequests] = useState(false);
     const [statistics, setStatistics] = useState(initialStatistics);
     const [profileLoading, setProfileLoading] = useState(true);
     const [profileError, setProfileError] = useState("");
@@ -98,6 +105,26 @@ export default function PublicProfile() {
 
     // Tabs and review form
     const [activeTab, setActiveTab] = useState(0);
+
+    // Portfolio (articles and videos): first tab when the user has some.
+    const [portfolio, setPortfolio] = useState({ userId: null, items: [] });
+    const portfolioLoading = portfolio.userId !== userId;
+    const askedTab = searchParams.get("tab");
+    useEffect(() => {
+        let cancelled = false;
+        axiosInstance
+            .get(`/property/portfolio/user/${userId}`)
+            .then(({ data }) => {
+                if (cancelled) return;
+                const items = data.items || [];
+                setPortfolio({ userId, items });
+                if (items.length && !askedTab) setActiveTab("portfolio");
+            })
+            .catch(() => !cancelled && setPortfolio({ userId, items: [] }));
+        return () => {
+            cancelled = true;
+        };
+    }, [userId, askedTab]);
     const [reviewForm, setReviewForm] = useState({
         rating: 0,
         comment: "",
@@ -120,6 +147,11 @@ export default function PublicProfile() {
             const data = response.data;
 
             setUser(data.user || null);
+            setContact(data.contact || null);
+            setSocialLinks(Array.isArray(data.socialLinks) ? data.socialLinks : []);
+            setShowRequests(data.showRequests === true);
+            // ?tab=requests when the requests are hidden: first tab.
+            if (data.showRequests !== true) setActiveTab((tab) => (tab === PROFILE_TABS.indexOf("requests") ? 0 : tab));
             setProperties(data.properties || []);
 
             setStatistics({
@@ -624,11 +656,15 @@ export default function PublicProfile() {
                     totalReviews={totalReviews}
                 />
 
+                <PublicContactCard contact={contact} socialLinks={socialLinks} />
+
                 <PublicProfileStats statistics={statistics} />
 
                 <PublicProfileTabs
                     activeTab={activeTab}
                     onChange={setActiveTab}
+                    showRequests={showRequests}
+                    showPortfolio={!portfolioLoading && portfolio.items.length > 0}
                 />
 
                 <Box
@@ -667,6 +703,14 @@ export default function PublicProfile() {
                             onLoadMore={handleLoadMoreEstablishments}
                             onView={handleViewEstablishment}
                         />
+                    )}
+
+                    {activeTab === "portfolio" && (
+                        <PortfolioSection api="/property/portfolio" items={portfolio.items} loading={portfolioLoading} />
+                    )}
+
+                    {activeTab === 4 && showRequests && (
+                        <PropertyRequestsList mode="public" userId={userId} />
                     )}
 
                     {activeTab === 3 && (

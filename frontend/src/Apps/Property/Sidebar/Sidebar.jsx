@@ -18,13 +18,14 @@ import {
     Home as HomeIcon,
     Settings as SettingsIcon,
     CloudUpload as CloudUploadIcon,
-    NotificationsActive as NotificationsActiveIcon,
     RateReviewOutlined as RateReviewOutlinedIcon,
     Public as PublicIcon,
     PeopleAlt as PeopleAltIcon,
     MenuBook as MenuBookIcon,
     ManageSearch as ManageSearchIcon,
     ReviewsOutlined as ReviewsOutlinedIcon,
+    PostAddOutlined as PostAddOutlinedIcon,
+    CampaignOutlined as CampaignOutlinedIcon,
 } from "@mui/icons-material";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -132,11 +133,18 @@ export default function Sidebar({
             icon: CloudUploadIcon,
             path: "/establishments/publish",
         },
+        // Requests: "I am looking for..." (post one / board for owners and agencies).
         {
-            name: t("sidebar.alert"),
-            icon: NotificationsActiveIcon,
-            path: "/alert",
+            name: t("requests.nav.post", "Post a request"),
+            icon: PostAddOutlinedIcon,
+            path: "/requests/new",
         },
+        {
+            name: t("requests.nav.board", "Requests board"),
+            icon: CampaignOutlinedIcon,
+            path: "/requests/board",
+        },
+        // My requests, Alerts and Saved are in the profile menu of the top bar.
         // Publishers ranked by their reviews, before contacting one.
         {
             name: t("sidebar.reviews", "Reviews"),

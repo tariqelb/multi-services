@@ -168,7 +168,7 @@ export async function createExternalListing(
                 $set: data,
             },
             {
-                new: true,
+                returnDocument: "after",
                 upsert: true,
                 runValidators: true,
                 setDefaultsOnInsert: true,

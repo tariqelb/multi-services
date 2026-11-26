@@ -124,7 +124,7 @@ async function setArchived(req, res, archived) {
         const vehicleAlert = await VehicleAlert.findOneAndUpdate(
             { _id: id, user: userId, isArchived: archived ? { $ne: true } : true },
             { $set: { isArchived: archived, archivedAt: archived ? new Date() : null } },
-            { new: true },
+            { returnDocument: "after" },
         );
         if (!vehicleAlert) {
             return res.status(404).json({ message: archived ? "Active vehicle alert not found." : "Archived vehicle alert not found." });

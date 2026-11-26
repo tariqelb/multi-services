@@ -407,7 +407,7 @@ async function resolvePlace(userId, data, { resolve = extractGoogleMapsLocation 
         location: { lat: location.lat, lng: location.lng },
     };
 
-    const saved = await VehicleDealer.findOneAndUpdate({ userId }, { $set: profile, $setOnInsert: { userId } }, { upsert: true, new: true });
+    const saved = await VehicleDealer.findOneAndUpdate({ userId }, { $set: profile, $setOnInsert: { userId } }, { upsert: true, returnDocument: "after" });
     return { location: profile.location, dealer: saved };
 }
 

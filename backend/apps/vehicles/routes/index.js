@@ -14,6 +14,10 @@
 //   GET    /api/vehicles/profiles/:userId            public profile + statistics
 //   GET    /api/vehicles/profiles/:userId/vehicles   publications (?category=car|moto)
 //   /api/vehicles/parts/...      car and moto spare parts (see sparePartRouter.js)
+//   /api/vehicles/requests/...   "I am looking for..." requests (see requestRouter.js)
+//   /api/vehicles/external-listings/... listings of other websites (see externalListingRouter.js)
+//   /api/vehicles/portfolio/...  articles and videos of profiles (see portfolioRouter.js)
+//   GET    /api/vehicles/admin/portfolio  admin: review them (DELETE /admin/portfolio/:id)
 //   GET    /api/vehicles/profiles/:userId/reviews    reviews (POST: leave a review)
 //   GET    /api/vehicles/:id             details
 //   GET    /api/vehicles/:id/similar     similar vehicles (same section, offer and type)
@@ -27,6 +31,10 @@ import { Router } from "express";
 
 import vehicleRouter from "./vehicleRouter.js";
 import sparePartRouter from "./sparePartRouter.js";
+import requestRouter from "./requestRouter.js";
+import externalListingRouter from "./externalListingRouter.js";
+import portfolioRouter from "./portfolioRouter.js";
+import { portfolio } from "../controllers/portfolio/portfolioController.js";
 import { searchVehicles } from "../controllers/vehicleSearchController.js";
 import { searchLimiter } from "../../main/middleware/rateLimit.js";
 import authMiddleware from "../../main/middleware/authMiddleware.js";
@@ -45,10 +53,19 @@ router.get("/search", searchLimiter, searchVehicles);
 // Admin panel (before the vehicle router: /admin is not a vehicle id).
 router.get("/admin/publications", authMiddleware, adminAccess("vehiclePublications"), getVehiclePublications);
 router.delete("/admin/publications/:kind/:id", authMiddleware, adminAccess("vehiclePublications"), deleteVehiclePublication);
+// Portfolio review: articles and videos of profiles (same reviewers as publications).
+router.get("/admin/portfolio", authMiddleware, adminAccess("vehiclePublications"), portfolio.adminList);
+router.delete("/admin/portfolio/:id", authMiddleware, adminAccess("vehiclePublications"), portfolio.adminDelete);
 
 // Last: has GET /:id.
 // Spare parts first: /parts must not be read as a vehicle id.
 router.use("/parts", sparePartRouter);
+// Requests ("I am looking for..."): before the vehicle router too.
+router.use("/requests", requestRouter);
+// Listings of other websites (Avito, Moteur.ma...): before the vehicle router too.
+router.use("/external-listings", externalListingRouter);
+// Articles and videos of profiles: before the vehicle router too.
+router.use("/portfolio", portfolioRouter);
 router.use("/", vehicleRouter);
 
 export default router;

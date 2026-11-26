@@ -453,7 +453,7 @@ export const saveSparePart = async (req, res) => {
                 $setOnInsert: { userId, partId: id },
                 $push: { activityHistory: historyEntry("saved", now) },
             },
-            { upsert: true, new: true, setDefaultsOnInsert: true },
+            { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
         );
         return res.status(200).json({ success: true, saved: true, message: "Spare part saved." });
     } catch (error) {
@@ -470,7 +470,7 @@ export const unsaveSparePart = async (req, res) => {
         const updated = await SavedSparePart.findOneAndUpdate(
             { userId: req.user.userId, partId: id, isSaved: { $ne: false } },
             { $set: { isSaved: false, unsavedAt: now }, $push: { activityHistory: historyEntry("unsaved", now) } },
-            { new: true },
+            { returnDocument: "after" },
         );
         if (!updated) return res.status(404).json({ success: false, message: "This spare part is not in your saved list." });
         return res.status(200).json({ success: true, saved: false, message: "Removed from your saved spare parts." });

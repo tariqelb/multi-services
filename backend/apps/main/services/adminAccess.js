@@ -22,8 +22,11 @@ export const ADMIN_SECTIONS = [
     { id: "knowledge", group: "property" },
     { id: "propertyPublications", group: "property" },
     { id: "feedback", group: "property" },
+    { id: "propertyRequests", group: "property" },
     // Vehicles
     { id: "vehiclePublications", group: "vehicles" },
+    { id: "vehicleRequests", group: "vehicles" },
+    { id: "vehicleExternalListings", group: "vehicles" },
 ];
 
 export const ROLES = ["client", "member", "admin"];

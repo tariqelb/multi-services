@@ -55,7 +55,11 @@ export default function VisitTracker() {
                 );
             } catch (error) {
                 // Tracking should never interrupt normal navigation.
-                console.error("Visit tracking failed:", error);
+                // 503: the database is unreachable for a moment (the server
+                // already logs it); the next heartbeat tries again.
+                if (error?.response?.status !== 503) {
+                    console.warn("Visit tracking failed:", error?.message || error);
+                }
             }
         };
 

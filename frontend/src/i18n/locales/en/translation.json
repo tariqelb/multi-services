@@ -8,7 +8,8 @@
         "logout": "Logout",
         "member": "Member",
         "user": "User",
-        "feedback": "Feedback"
+        "feedback": "Feedback",
+        "alert": "Alert"
     },
     "sidebar": {
         "home": "Home",
@@ -2771,7 +2772,9 @@
             "fromPrice": "From",
             "noContact": "No contact information provided.",
             "noImages": "No photos available",
-            "whatsappShort": "WhatsApp"
+            "whatsappShort": "WhatsApp",
+            "publishedBy": "Published by",
+            "publisher": "Publisher"
         }
     },
     "profileEstablishment": {
@@ -2851,7 +2854,8 @@
             "properties": "Properties",
             "roommates": "Roommates",
             "establishments": "Hotels & Riads",
-            "reviews": "Reviews"
+            "reviews": "Reviews",
+            "requests": "Requests"
         },
         "empty": {
             "properties": "No properties published yet.",
@@ -4135,7 +4139,9 @@
                 "myMotos": "My motos & bikes",
                 "reviews": "Reviews",
                 "parts": "Spare parts",
-                "myParts": "My spare parts"
+                "myParts": "My spare parts",
+                "requests": "Requests",
+                "myRequests": "My requests"
             },
             "emptyVehicles": "No vehicle published",
             "emptyMotos": "No moto or bike published",
@@ -4491,5 +4497,760 @@
         "saveError": "Unable to change the role.",
         "cancel": "Cancel",
         "save": "Save"
+    },
+    "requests": {
+        "details": {
+            "whatsapp": "WhatsApp",
+            "perDay": "/ day",
+            "perMonth": "/ month",
+            "proposed": "Proposed listing",
+            "created": "Your request is published. It was sent to {{count}} professional(s); new ones see it on the requests board.",
+            "loadError": "Unable to load this request.",
+            "back": "Back",
+            "matchesYou": "Matches your settings",
+            "actionError": "Something went wrong. Please try again.",
+            "close": "Close (I found it / not needed)",
+            "renewed": "Renewed for 30 days.",
+            "extend": "Extend 30 days",
+            "reopen": "Reopen for 30 days",
+            "delete": "Delete",
+            "replies": "Replies ({{count}})",
+            "privacy": "Professionals don't see your phone or email. Contact them directly, or share your contact with the ones you choose.",
+            "noRepliesYet": "No reply yet. You will get a notification as soon as a professional replies.",
+            "noReplies": "No reply.",
+            "deletedUser": "Deleted account",
+            "new": "New",
+            "shared": "Your contact is shared",
+            "sharedNotice": "Your contact details were sent to {{name}}.",
+            "share": "Share my contact",
+            "closeTitle": "Close this request?",
+            "closeText": "Professionals will no longer see it. You can reopen it later.",
+            "reason": "Reason",
+            "closed": "Request closed.",
+            "confirmClose": "Close the request",
+            "deleteTitle": "Delete this request?",
+            "deleteText": "The request and its replies are deleted for good.",
+            "messageTooShort": "Write a short message (10 characters at least).",
+            "replySent": "Your reply was sent. You will be notified if they share their contact.",
+            "replyError": "Unable to send your reply.",
+            "postedBy": "{{name}} posted this request. Their contact details stay private until they choose to share them with you.",
+            "yourReply": "Your reply",
+            "contactYou": "{{name}} shared their contact with you:",
+            "waiting": "Sent. You will be notified when they share their contact details.",
+            "haveMatch": "I have a match",
+            "yourMessage": "Your message",
+            "messagePlaceholder": "Describe what you have: price, availability, visit…",
+            "attach": "Propose one of my listings (optional)",
+            "noListing": "No listing",
+            "send": "Send my reply",
+            "notActive": "This request is no longer active."
+        },
+        "mad": "MAD",
+        "cancel": "Cancel",
+        "anyProperty": "Any property",
+        "title": "{{what}} {{transaction}} in {{city}}",
+        "upTo": "Up to {{amount}}",
+        "from": "From {{amount}}",
+        "anyBudget": "Budget open",
+        "facts": {
+            "rooms": "{{count}}+ rooms",
+            "surface": "{{count}}+ m²",
+            "moveIn": "From {{date}}",
+            "mileage": "Max {{km}} km"
+        },
+        "daysLeft": "{{count}} days left",
+        "mine": {
+            "loadError": "Unable to load your requests.",
+            "title": "My requests",
+            "subtitle": "What you are looking for, and the professionals who replied.",
+            "service": "Service",
+            "status": "Status",
+            "empty": "No request yet",
+            "emptyText": "Didn't find what you need? Post a request: professionals in your city are notified and contact you with what they have."
+        },
+        "post": "Post a request",
+        "repliesCount": "{{count}} replies",
+        "newReplies": "{{count}} new",
+        "cta": {
+            "title": "Didn't find what you need?",
+            "textVehicle": "Post a request: dealers, rental companies and parts shops in your city are notified and contact you if they have it.",
+            "textProperty": "Post a request: owners and agencies in your city are notified and contact you if they have it, even if it isn't published."
+        },
+        "settings": {
+            "loadError": "Unable to load these settings.",
+            "checkForm": "Choose at least one field, your cities, and how to be notified.",
+            "saved": "Saved. You will receive the requests that match these choices.",
+            "saveError": "Unable to save these settings.",
+            "title": "Receive requests",
+            "subtitle": "Owner, agency or dealer? Get notified when someone is looking for what you have in your cities.",
+            "useListings": "Use my listings",
+            "suggestion": "You already publish listings. Fill these settings from your listings' fields and cities?",
+            "receive": "Receive requests",
+            "on": "On: you are notified of matching requests.",
+            "off": "Off: your choices are kept, no notifications.",
+            "fields": "I work in",
+            "fieldsRequired": "Choose at least one.",
+            "iAm": "I am",
+            "notSaid": "Not specified",
+            "businessName": "Business name",
+            "businessNameHelp": "Shown to the people you reply to.",
+            "propertyOffers": "Requests to",
+            "allIfEmpty": "Nothing selected = all.",
+            "propertyTypes": "Property types",
+            "vehicleCategories": "What you have",
+            "vehicleOffers": "Requests to",
+            "cities": "Where you work",
+            "someCities": "In these cities",
+            "allMorocco": "All Morocco",
+            "chooseCities": "Cities (one or several)",
+            "citiesRequired": "Choose at least one city, or All Morocco.",
+            "citiesHelp": "Up to 30 cities.",
+            "how": "How to notify you",
+            "channelsRequired": "Choose at least one.",
+            "inApp": "In-app notification",
+            "email": "Email",
+            "instant": "As soon as a request is posted",
+            "daily": "Once a day (a summary every morning)",
+            "save": "Save"
+        },
+        "services": {
+            "property": "Property",
+            "vehicle": "Vehicles",
+            "all": "All"
+        },
+        "errors": {
+            "invalid": "Check this field.",
+            "typesRequired": "Choose at least one type.",
+            "partName": "Write the part you need (3 characters at least).",
+            "required": "This field is required.",
+            "lessThanMin": "Must be more than the first value.",
+            "tooMany": "Too many.",
+            "tooShort": "Too short.",
+            "notYours": "Not one of your listings."
+        },
+        "form": {
+            "checkForm": "Please check the highlighted fields.",
+            "submitError": "Unable to publish your request.",
+            "badgeProperty": "Property request",
+            "badgeVehicle": "Vehicle request",
+            "title": "Post a request",
+            "subtitleProperty": "Describe what you are looking for. Owners and agencies working in your city receive it and contact you if they have a match.",
+            "subtitleVehicle": "Describe the vehicle or spare part you need. Dealers, rental companies, parts shops and owners in your city receive it.",
+            "whatProperty": "What are you looking for?",
+            "transaction": "I want to",
+            "propertyTypes": "Property types *",
+            "minRooms": "Rooms (at least)",
+            "minSurface": "Surface (m², at least)",
+            "moveInDate": "From (date)",
+            "features": "Important for me (optional)",
+            "whatVehicle": "What do you need?",
+            "partName": "Part needed",
+            "partNamePlaceholder": "e.g. Front brake pads, left headlight…",
+            "partCategory": "Part category",
+            "forMake": "For make",
+            "make": "Make",
+            "model": "Model",
+            "yearFrom": "Year from",
+            "yearTo": "Year to",
+            "transmission": "Gearbox",
+            "maxMileage": "Mileage (km, at most)",
+            "whereTitle": "Where?",
+            "city": "City",
+            "neighborhoods": "Neighbourhoods (optional)",
+            "area": "Area (optional)",
+            "neighborhoodsPlaceholder": "e.g. Talborjt, Founty, near the beach",
+            "budgetTitle": "Budget",
+            "budgetHelpProperty": "Monthly rent, price per night for furnished rentals, or total price to buy (MAD).",
+            "budgetHelpPart": "Price of the part (MAD).",
+            "budgetHelpVehicle": "Total price to buy, or price per day to rent (MAD).",
+            "budgetMin": "From (MAD)",
+            "budgetMax": "Up to (MAD)",
+            "messageTitle": "A word for the professionals",
+            "messageHelp": "Anything that helps: family size, timing, must-haves. Don't write your phone number: you choose who gets your contact.",
+            "message": "Message (optional)",
+            "submitTitle": "Ready to send?",
+            "submitSubtitle": "Your request stays active 30 days. Your contact details stay private until you share them.",
+            "submit": "Publish my request",
+            "submitting": "Publishing…"
+        },
+        "any": "Any",
+        "admin": {
+            "loadError": "Unable to load the requests.",
+            "deleteError": "Unable to delete this request.",
+            "titleVehicle": "Vehicle requests",
+            "titleProperty": "Property requests",
+            "subtitle": "What users are looking for. Remove fake or abusive requests.",
+            "period": "Posted",
+            "empty": "No request for these filters.",
+            "count": "{{count}} request(s)",
+            "stats": "{{recipients}} notified · {{replies}} replies",
+            "navItem": "Requests",
+            "periods": {
+                "all": "Any time",
+                "today": "Today",
+                "week": "Last 7 days",
+                "month": "Last 30 days",
+                "year": "Last year"
+            }
+        },
+        "board": {
+            "loadError": "Unable to load the requests.",
+            "titleVehicle": "Vehicle requests",
+            "titleProperty": "Property requests",
+            "subtitle": "People looking for something you may have. Reply with \"I have a match\": they choose whom to share their contact with.",
+            "settings": "What I receive",
+            "forMe": "For me",
+            "all": "All requests",
+            "myReplies": "My replies",
+            "setUp": "Set up",
+            "notConfigured": "Tell us your field and cities in Settings to see the requests for you, and to be notified of new ones.",
+            "paused": "Receiving requests is paused in your settings: you see them here but get no notifications.",
+            "anyCity": "All cities",
+            "offer": "Looking to",
+            "category": "Category",
+            "noReplies": "You have not replied to a request yet.",
+            "contactShared": "Contact shared",
+            "waiting": "Waiting for their answer",
+            "emptyForMe": "No request matches your settings right now. New ones are sent to you as they come.",
+            "empty": "No active request matches these filters.",
+            "count": "{{count}} active request(s)",
+            "replied": "Replied"
+        },
+        "nav": {
+            "post": "Post a request",
+            "board": "Requests board",
+            "mine": "My requests"
+        },
+        "transactions": {
+            "property": {
+                "rent": "to rent",
+                "furnished": "furnished rental",
+                "buy": "to buy"
+            },
+            "vehicle": {
+                "buy": "to buy",
+                "rent": "to rent"
+            }
+        },
+        "wantTo": {
+            "property": {
+                "rent": "Rent",
+                "furnished": "Rent furnished (short stay)",
+                "buy": "Buy"
+            },
+            "vehicle": {
+                "buy": "Buy",
+                "rent": "Rent"
+            }
+        },
+        "categories": {
+            "car": "Car",
+            "moto": "Moto or bike",
+            "part": "Spare part"
+        },
+        "status": {
+            "all": "All",
+            "active": "Active",
+            "closed": "Closed",
+            "expired": "Expired"
+        },
+        "features": {
+            "parking": "Parking",
+            "elevator": "Elevator",
+            "terrace": "Terrace",
+            "garden": "Garden",
+            "pool": "Pool",
+            "airConditioning": "Air conditioning",
+            "seaView": "Sea view",
+            "petsAllowed": "Pets allowed"
+        },
+        "business": {
+            "owner": "Private owner",
+            "agency": "Real estate agency / agent",
+            "dealer": "Car dealer / showroom",
+            "rental": "Rental company",
+            "partsShop": "Parts shop",
+            "scrapyard": "Scrapyard"
+        },
+        "closeReasons": {
+            "found": "I found what I needed",
+            "notNeeded": "I no longer need it",
+            "other": "Other reason"
+        },
+        "types": {
+            "Apartment": "Apartment",
+            "House": "House",
+            "Villa": "Villa",
+            "Studio": "Studio",
+            "Room": "Room",
+            "Store": "Store",
+            "Office": "Office",
+            "Land": "Land",
+            "Warehouse": "Warehouse",
+            "Commercial space": "Commercial space",
+            "Commercial store": "Shop",
+            "Garage": "Garage",
+            "Other": "Other"
+        },
+        "profile": {
+            "emptyPublic": "No active request."
+        }
+    },
+    "publicContact": {
+        "title": "Contact",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "address": "Address",
+        "verified": "Verified"
+    },
+    "publicVisibility": {
+        "title": "Public profile",
+        "subtitle": "Choose what visitors see on your public profiles (property and vehicles). Hidden by default.",
+        "contactTitle": "Contact details",
+        "fields": {
+            "email": "Email address",
+            "phone": "Phone number",
+            "whatsapp": "WhatsApp number",
+            "address": "Address",
+            "requests": "My active requests"
+        },
+        "notSet": "Not set in your profile yet: nothing will be shown.",
+        "requestsHelp": "A \"Requests\" tab on your profiles: what you are looking for. Professionals still reply without seeing your contact.",
+        "preview": "See my public profile",
+        "save": "Save",
+        "saved": "Saved. Your public profiles show what you chose.",
+        "saveError": "Unable to save these settings.",
+        "loadError": "Unable to load these settings."
+    },
+    "dashboardSidebar": {
+        "title": "MultiServices",
+        "overview": "Overview",
+        "aboutProperty": "About Property",
+        "aboutVehicles": "About Vehicles",
+        "aboutServicesCompanies": "About Services & Companies",
+        "aboutDailyWorker": "About Daily Worker",
+        "aboutDeliveryMan": "About Delivery Man",
+        "aboutDriver": "About Driver",
+        "aboutAccount": "Top bar & my account"
+    },
+    "aboutServices": {
+        "open": "Open",
+        "openService": "Open the service",
+        "what": "What you find",
+        "how": "How to use it",
+        "sidebarTitle": "The sidebar, entry by entry",
+        "menuTitle": "Your menu in this service",
+        "menuSubtitle": "Click your name at the top right. In this service, the menu opens these pages:",
+        "others": "Other services",
+        "comingSoon": "Coming soon",
+        "readMore": "Read the presentation",
+        "planned": "What is planned",
+        "property": {
+            "title": "About Property",
+            "intro": "Everything about housing in Morocco: buy, rent, rent furnished, share a flat, book a hotel or riad, and publish your own listings.",
+            "highlights": {
+                "one": "Find homes, land, shops and offices to buy or rent, furnished rentals by the night or month, roommates, hotels and riads.",
+                "two": "Publish your property, your roommate announcement or your establishment for free, and manage them in My Publication.",
+                "three": "Not found? Post a request: owners and agencies in your city are told and contact you. Get alerts when new listings match."
+            },
+            "sidebarSubtitle": "Click the house icon in the main bar to open the Property sidebar. Here is what each entry does.",
+            "entries": {
+                "findProperty": {
+                    "what": "Apartments, houses, villas, land, shops and offices for sale or for rent, with photos, price, surface, rooms and the owner's contact.",
+                    "how": "Choose for sale or for rent, then filter by city, type and price. Open a listing to see its details and call or message the owner on WhatsApp. Press Save to keep it."
+                },
+                "findRoommate": {
+                    "what": "Roommate announcements: people offering a room in their home and people looking for one, with price per person, places left and preferences.",
+                    "how": "Filter by city, budget and rental period, then open an announcement to contact its author. To publish your own, use the publish button on the same page."
+                },
+                "furnished": {
+                    "what": "Furnished villas, apartments, studios, rooms and houses for short stays (per night) or longer stays (per month).",
+                    "how": "Pick the rental period and the type, then the city. Prices are per night or per month as shown on each card."
+                },
+                "establishments": {
+                    "what": "Hotels, riads, guesthouses and other accommodation, with their rooms, prices, services and location.",
+                    "how": "Filter by city and type, open an establishment to see its rooms and contact it directly."
+                },
+                "externalListings": {
+                    "what": "Properties published on other Moroccan real estate websites, gathered in one place.",
+                    "how": "Choose a city, a type and a budget, then start the search: the websites are read live (20 to 40 seconds). Open a result to go to the original website."
+                },
+                "search": {
+                    "what": "One search across properties, furnished rentals, roommates, hotels and riads, with the results on a map.",
+                    "how": "Type a city or keywords and set the filters. Hover a number on the map to preview a listing, click it to open it."
+                },
+                "findByMap": {
+                    "what": "A map of Morocco with every property, roommate announcement, hotel and riad that has a location.",
+                    "how": "Move and zoom the map to your area, filter by kind of listing, and click a marker to open the listing."
+                },
+                "publishProperty": {
+                    "what": "The form to publish a property for sale or for rent, furnished or not.",
+                    "how": "Fill in the details, the location, the price and up to 15 photos, check your contact, then publish. Your listing is reviewed, then visible. Find it later in My Publication."
+                },
+                "publishEstablishment": {
+                    "what": "The form to publish a hotel, riad or guesthouse with its rooms and services.",
+                    "how": "Describe the establishment, add its rooms with their prices, photos and location, then publish. Manage it in My Publication > My Establishments."
+                },
+                "postRequest": {
+                    "what": "Say what you are looking for when you cannot find it: type of property, city, budget, rooms, date.",
+                    "how": "Fill in the form and publish. Owners and agencies working in that city are notified and reply. Your phone stays private until you choose to share it. A request lasts 30 days."
+                },
+                "requestBoard": {
+                    "what": "For owners and agencies: what people are looking for, matching your cities and your work.",
+                    "how": "Turn on Settings > Receive requests and choose your cities. Open a request and press \"I have a match\" to reply, with one of your listings if you want."
+                },
+                "reviews": {
+                    "what": "Publishers ranked by the reviews of other clients.",
+                    "how": "Search a name to see their rating and comments before you contact them. You can leave a review on a publisher's profile."
+                },
+                "knowledge": {
+                    "what": "Guides, legal information and videos about buying, renting and owning property in Morocco.",
+                    "how": "Browse the articles and videos, or search a topic, and open one to read or watch it."
+                }
+            },
+            "menu": {
+                "profile": "Your property profile: your details, and your properties, roommate announcements, establishments, reviews and requests as others see them.",
+                "notification": "Every notification: new listings matching your alerts, replies to your requests, reviews of your publications.",
+                "publication": "Manage what you published: properties, roommate announcements, establishments and requests. Edit, change the status or delete.",
+                "saved": "The properties, roommate announcements and hotels you saved, to compare and contact later.",
+                "feedback": "Report a bug, a problem with a user or a listing, or send an idea.",
+                "alert": "Your property and roommate alerts: choose a city, a type and a budget, and get notified when a match is published.",
+                "settings": "Your account: profile, password, contact verification, email and WhatsApp notifications, public profile and receiving requests."
+            }
+        },
+        "vehicles": {
+            "title": "About Vehicles",
+            "intro": "Cars, motos and bikes to buy or rent, and spare parts, from owners, agencies, showrooms and parts shops.",
+            "highlights": {
+                "one": "Find cars, SUVs, vans, motos, scooters and bikes for sale or for rent, and new or used spare parts that fit your vehicle.",
+                "two": "Publish a vehicle, a moto or a spare part, and manage them all in My Publication.",
+                "three": "Not found? Post a request for a vehicle or a part: dealers, rental agencies and parts shops in your city are told and contact you."
+            },
+            "sidebarSubtitle": "Click the car icon in the main bar to open the Vehicles sidebar. Here is what each entry does.",
+            "entries": {
+                "findVehicle": {
+                    "what": "Cars, SUVs and vans for sale or for rent, from owners, rental agencies and showrooms, with verified contacts.",
+                    "how": "Choose for sale or for rent and filter by make, model, city and price. Open a vehicle to see its details and call or message the seller."
+                },
+                "motos": {
+                    "what": "Motorcycles, scooters, bicycles, kick scooters and tricycles to buy or rent.",
+                    "how": "Pick a category, then filter like for cars. Open a listing to contact its owner."
+                },
+                "parts": {
+                    "what": "New, used and refurbished car and moto parts from private sellers, parts shops and scrapyards.",
+                    "how": "Search by make, model and year to see the parts that fit, or by part category. The seller's phone and WhatsApp are on each part."
+                },
+                "search": {
+                    "what": "One search for cars, motos & bikes and spare parts, with the results on a map.",
+                    "how": "Type what you need and set the filters. Hover a number on the map to preview a listing, click it to open it."
+                },
+                "map": {
+                    "what": "A map with the cars, motos and bikes for sale or rent near you.",
+                    "how": "Move and zoom to your area, hover a marker to preview it and click to open it."
+                },
+                "publishVehicle": {
+                    "what": "The form to sell or rent out a car, SUV or van.",
+                    "how": "Fill in the offer, the vehicle, its location, its price (and rental conditions) and photos, then publish. It is reviewed, then visible."
+                },
+                "publishMoto": {
+                    "what": "The form for a motorcycle, scooter, bicycle, kick scooter or tricycle.",
+                    "how": "Choose its type, add make, model, price and photos, then publish."
+                },
+                "publishPart": {
+                    "what": "The form to sell a car or moto part.",
+                    "how": "Say what the part is, its condition, the vehicles it fits, its price and add photos. Buyers call you on your account's phone or WhatsApp."
+                },
+                "postRequest": {
+                    "what": "Say which car, moto or spare part you need, in which city and for what budget.",
+                    "how": "Fill in the form and publish. Dealers, rental agencies and parts shops in that city are notified and reply. You choose who gets your contact. A request lasts 30 days."
+                },
+                "requestBoard": {
+                    "what": "For dealers, rental agencies and parts shops: what people are looking for in your cities.",
+                    "how": "Turn on Settings > Receive requests, choose Vehicles and your cities. Open a request and press \"I have a match\", with one of your vehicles or parts if you want."
+                },
+                "mine": {
+                    "what": "Your vehicles, motos & bikes, spare parts and requests in one place.",
+                    "how": "Switch between the tabs, edit a listing, mark it sold or rented, or delete it."
+                },
+                "reviews": {
+                    "what": "Sellers, agencies and showrooms ranked by the reviews of other clients.",
+                    "how": "Search a name to see the rating before you contact them."
+                },
+                "external": {
+                    "what": "Cars, motos and spare parts published on other Moroccan websites (Avito, Moteur.ma, Wandaloo...), in one place.",
+                    "how": "Use “Find a vehicle” to search the websites live by city, make, model and price, or browse “All listings”. A card opens the listing on its website."
+                }
+            },
+            "menu": {
+                "profile": "Your vehicles profile: your details, and your vehicles, motos, parts, reviews and requests as others see them.",
+                "notification": "Every notification: vehicles matching your alerts, replies to your requests, reviews of your publications.",
+                "publication": "Manage your vehicles, motos & bikes, spare parts and requests (same page as My Publication in the sidebar).",
+                "saved": "The vehicles, motos, bikes and spare parts you saved.",
+                "feedback": "Report a bug, a problem with a user or a listing, or send an idea.",
+                "alert": "Your vehicle alerts: get a notification, an email and a WhatsApp message when a matching vehicle is published.",
+                "settings": "Your account: profile, password, verification, notifications, public profile and receiving requests."
+            }
+        },
+        "servicesCompanies": {
+            "title": "About Services & Companies",
+            "intro": "A directory of local professionals, service providers and companies.",
+            "soon": "This service is not available yet. You will be able to find professionals and companies near you, see what they offer and their reviews, and contact them directly.",
+            "highlights": {
+                "one": "Search professionals and businesses offering services in your area.",
+                "two": "See company profiles, their information and their services.",
+                "three": "Read reviews from other clients to choose the right provider."
+            }
+        },
+        "dailyWorker": {
+            "title": "About Daily Worker",
+            "intro": "Daily and temporary jobs, for people looking for work and for those who need a hand.",
+            "soon": "This service is not available yet. You will be able to post a daily job or find one near you, by skills and availability.",
+            "highlights": {
+                "one": "Find daily and temporary work in your area.",
+                "two": "Work according to your skills and your schedule.",
+                "three": "Get in touch with people and businesses looking for workers."
+            }
+        },
+        "deliveryMan": {
+            "title": "About Delivery Man",
+            "intro": "Delivery professionals for your packages and goods.",
+            "soon": "This service is not available yet. You will be able to find a delivery person in your city to send a package or goods, at the time that suits you.",
+            "highlights": {
+                "one": "Send packages and goods with a delivery professional.",
+                "two": "Find delivery people available in your city.",
+                "three": "Choose the time that suits you."
+            }
+        },
+        "driver": {
+            "title": "About Driver",
+            "intro": "Rides where you agree on the price with the driver.",
+            "soon": "This service is not available yet. You will set your pickup and destination, receive offers from drivers and choose the one that suits you.",
+            "highlights": {
+                "one": "Set your pickup point and your destination.",
+                "two": "Receive and compare the drivers' offers.",
+                "three": "Agree on the fare before the ride."
+            }
+        },
+        "account": {
+            "title": "Top bar & my account",
+            "intro": "What you see on every page, whatever the service: the main bar, the top bar and your profile menu.",
+            "parts": {
+                "mainBar": {
+                    "title": "Main bar",
+                    "text": "The dark bar on the left (at the top on phones). Each icon opens a service: Dashboard, Property, Vehicles, then the services coming soon."
+                },
+                "sidebar": {
+                    "title": "Sidebar",
+                    "text": "Next to the main bar, it shows the pages of the service you are in. On the Dashboard, it shows these About pages."
+                },
+                "menuButton": {
+                    "title": "Menu button",
+                    "text": "On phones and small screens, the button at the top left opens and closes the sidebar."
+                },
+                "language": {
+                    "title": "Language",
+                    "text": "Switch between English, French and Arabic. Arabic shows the pages from right to left."
+                },
+                "notifications": {
+                    "title": "Notifications",
+                    "text": "The bell shows your latest notifications and how many are unread: alert matches, replies to your requests, reviews. Click one to open it."
+                },
+                "admin": {
+                    "title": "Admin panel",
+                    "text": "The shield icon at the bottom of the main bar, only for admins and team members: users, statistics, publication reviews and requests."
+                }
+            },
+            "menuTitle": "Your profile menu",
+            "menuSubtitle": "Click your name at the top right. My Profile, My Publication, Saved and Alert follow the service you are in: in Vehicles they open your vehicle pages.",
+            "menu": {
+                "profile": "Your public profile in the current service: your details and your publications as others see them.",
+                "notification": "All your notifications on one page, to read them or mark them as read.",
+                "publication": "Your publications in the current service: edit them, change their status or delete them.",
+                "saved": "The listings you saved in the current service.",
+                "feedback": "Report a bug, a user or a listing, or send us an idea.",
+                "alert": "Your alerts in the current service: be notified when a matching listing is published.",
+                "settings": "Your account for every service: profile, password, verification, notifications, what your public profile shows, and receiving requests."
+            },
+            "logout": "Sign out of your account on this device."
+        }
+    },
+    "vehicleExternal": {
+        "nav": "External listing",
+        "title": "External listings",
+        "subtitle": "Vehicles, motos and spare parts published on other Moroccan websites. A card opens the listing on its website.",
+        "searchTab": "Find a vehicle",
+        "search": {
+            "title": "Find a vehicle on other websites",
+            "subtitle": "We look through Moroccan vehicle websites (Avito, Moteur.ma, Wandaloo...) and show up to 200 matching listings.",
+            "category": "Car, moto or part",
+            "anyCategory": "Cars, motos and parts",
+            "make": "Make",
+            "anyMake": "Any make",
+            "model": "Model (optional)",
+            "maxPriceRent": "Per day",
+            "websitesPlaceholder": "Type or pick a website, e.g. avito.ma",
+            "emptyTitle": "No vehicle found",
+            "emptyHelp": "Try a higher price, another make, or search every website.",
+            "offerNotListed": "This website does not list this offer or this kind of vehicle",
+            "offerNotListedShort": "does not list this",
+            "found_one": "{{count}} listing found",
+            "found_other": "{{count}} listings found",
+            "startHelp_one": "{{count}} Moroccan website is searched live.",
+            "startHelp_other": "{{count}} Moroccan websites are searched live: Avito, Moteur.ma, Wandaloo..."
+        },
+        "list": {
+            "title": "Listings from other websites",
+            "filtered": "Matching listings",
+            "filters": "Filter the listings",
+            "clear": "Clear",
+            "searchButton": "Search",
+            "searchPlaceholder": "Make, model, city...",
+            "website": "Website",
+            "allWebsites": "All websites",
+            "minPrice": "Min price",
+            "maxPrice": "Max price",
+            "minYear": "From year",
+            "maxMileage": "Max km",
+            "sort": "Sort by",
+            "sorts": {
+                "newest": "Newest",
+                "priceAsc": "Lowest price",
+                "priceDesc": "Highest price"
+            },
+            "retry": "Retry",
+            "emptyTitle": "No listing yet",
+            "empty": "Search the websites now in “Find a vehicle”.",
+            "emptyFiltered": "Try other filters, or search the websites now in “Find a vehicle”.",
+            "loadFailed": "Could not load the listings.",
+            "count_one": "{{count}} listing",
+            "count_other": "{{count}} listings"
+        },
+        "admin": {
+            "navItem": "External listings",
+            "title": "Vehicle external listings",
+            "subtitle": "Collect new vehicle, moto and spare part listings from Avito, Moteur.ma, Wandaloo and other websites. Listings already in your application are skipped automatically.",
+            "websitePlaceholder": "e.g. avito.ma",
+            "settingsHelp": "Address patterns of the website's results pages, most precise first. Placeholders: {city}, {category}, {transaction}, {make}, {model}, {maxPrice}. Values: sale / rent, car / moto / part. A template can be limited with \"listingType\" and \"category\". Leave empty to search this website through the search engine."
+        },
+        "cleanup": {
+            "title": "Remove listings that are not vehicles",
+            "subtitle": "General classifieds websites also publish apartments and villas. New collections skip them; this removes the ones saved before and stops them from coming back.",
+            "find": "Find them",
+            "failed": "The cleanup failed.",
+            "foundSome": "{{found}} of {{checked}} listings are not vehicles.",
+            "foundNone": "All {{checked}} listings are vehicles.",
+            "reasons": {
+                "property": "Real estate",
+                "noTitle": "No real title",
+                "notVehicle": "Not a vehicle"
+            },
+            "notVehicleStat": "Skipped (not a vehicle)",
+            "remove_one": "Remove {{count}} listing",
+            "remove_other": "Remove {{count}} listings",
+            "removed_one": "{{count}} listing removed.",
+            "removed_other": "{{count}} listings removed."
+        }
+    },
+    "socialLinks": {
+        "title": "Social media",
+        "subtitle": "Add your accounts and your website. Choose for each one if visitors see it on your public profiles.",
+        "platform": "Platform",
+        "address": "Link or user name",
+        "public": "Public",
+        "privateShort": "Private",
+        "private": "Only you see it",
+        "remove": "Remove",
+        "addLink": "Add a link",
+        "max": "Up to {{max}} links.",
+        "none": "No links yet.",
+        "saved": "Saved. Public links are shown on your public profiles.",
+        "saveError": "Unable to save your social media links.",
+        "loadError": "Unable to load your social media links.",
+        "errors": {
+            "domain": "This address is not on {{platform}}.",
+            "invalid": "This address is not valid."
+        },
+        "platforms": {
+            "website": "Website"
+        },
+        "empty": "Add your Instagram, TikTok, YouTube, website... and choose which ones visitors see.",
+        "publicCount": "{{public}} of {{count}} shown on your public profile",
+        "edit": "Edit",
+        "add": "Add links"
+    },
+    "portfolio": {
+        "tab": "Portfolio",
+        "mineTitle": "Show your work",
+        "mineHelp": "Articles with photos and YouTube videos about you and your work. Visitors of your public profile see them first.",
+        "addArticle": "Add an article",
+        "addVideo": "Add a video",
+        "editTitle": "Edit",
+        "edit": "Edit",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "save": "Save",
+        "publish": "Publish",
+        "close": "Close",
+        "actions": "Actions",
+        "previous": "Previous photo",
+        "next": "Next photo",
+        "cover": "Cover",
+        "addPhoto": "Add",
+        "removePhoto": "Remove photo",
+        "types": {
+            "article": "Article",
+            "video": "YouTube video",
+            "videoShort": "Video"
+        },
+        "fields": {
+            "title": "Title",
+            "text": "Text",
+            "description": "Description (optional)",
+            "youtube": "YouTube link",
+            "photos": "Photos"
+        },
+        "youtubeHelp": "Only YouTube videos: watch, youtu.be and Shorts links work.",
+        "photosHelp": "1 to 4 photos, JPG, PNG or WEBP, 5 MB max. The first one is the cover.",
+        "errors": {
+            "title": "The title needs at least 3 characters.",
+            "youtube": "Paste a YouTube video link (youtube.com or youtu.be).",
+            "text": "Write at least 20 characters.",
+            "photo": "Add at least one photo.",
+            "fileType": "Only JPG, PNG and WEBP photos.",
+            "fileSize": "Each photo can be up to 5 MB.",
+            "maxPhotos": "Up to {{max}} photos.",
+            "save": "Unable to save. Please try again.",
+            "load": "Unable to load the portfolio.",
+            "delete": "Unable to delete."
+        },
+        "full": "You reached {{max}} items. Delete one to add another.",
+        "emptyMine": "Nothing published yet",
+        "emptyMineHelp": "Present your agency, a finished project, a visit in video...",
+        "empty": "No articles or videos yet",
+        "savedMessage": "Saved.",
+        "publishedMessage": "Published on your profile.",
+        "deletedMessage": "Deleted.",
+        "deleteTitle": "Delete this item?"
+    },
+    "portfolioReview": {
+        "navItem": "Portfolio Reviews",
+        "propertyTitle": "Property Portfolio Reviews",
+        "vehiclesTitle": "Vehicle Portfolio Reviews",
+        "subtitle": "Articles and YouTube videos users publish on their profiles. Open them and delete the inappropriate ones.",
+        "types": {
+            "all": "All",
+            "article": "Articles",
+            "video": "Videos"
+        },
+        "count": "Items",
+        "empty": "Nothing published in this period",
+        "profile": "Profile",
+        "deleteTitle": "Delete this item?",
+        "deleteHelp": "It is removed from {{name}}'s profile, with its photos. This cannot be undone.",
+        "deleted": "Deleted. The user's profile no longer shows it.",
+        "deleteError": "Unable to delete this item.",
+        "loadError": "Unable to load the portfolio items.",
+        "unknownUser": "Deleted account"
     }
 }

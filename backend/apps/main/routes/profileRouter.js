@@ -11,7 +11,12 @@ import {
     getMyNotificationPreferences,
     updateMyNotificationPreferences,
     updateMyLanguage,
+    getMyPublicVisibility,
+    updateMyPublicVisibility,
+    getMySocialLinks,
+    updateMySocialLinks,
 } from "../controllers/account/profileController.js";
+import { getMyProfessionalProfile, updateMyProfessionalProfile } from "../controllers/account/professionalProfileController.js";
 
 const router = Router();
 
@@ -50,6 +55,18 @@ router.patch(
     authMiddleware,
     updateMyLanguage
 );
+
+// What visitors see on my public profiles (email, phone, WhatsApp, address, requests)
+router.get("/me/public-visibility", authMiddleware, getMyPublicVisibility);
+router.put("/me/public-visibility", authMiddleware, updateMyPublicVisibility);
+
+// Social media links, each one public or private (Settings > Social media)
+router.get("/me/social-links", authMiddleware, getMySocialLinks);
+router.put("/me/social-links", authMiddleware, updateMySocialLinks);
+
+// Settings > Receive requests (requests themselves: /api/property/requests, /api/vehicles/requests)
+router.get("/me/professional", authMiddleware, getMyProfessionalProfile);
+router.put("/me/professional", authMiddleware, updateMyProfessionalProfile);
 
 // Public profiles and user reviews are served by each service
 // (property: /api/property/profiles/:userId).

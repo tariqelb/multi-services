@@ -196,7 +196,7 @@ export const archiveRoommateAlert = async (req, res) => {
                 },
             },
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true,
             }
         );
@@ -251,7 +251,7 @@ export const restoreRoommateAlert = async (req, res) => {
                 },
             },
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true,
             }
         );

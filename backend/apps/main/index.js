@@ -10,5 +10,6 @@ export default {
     router,
     startJobs() {
         // Account deletion runs as a script (npm run job:account-deletion).
+        // Requests jobs run in each service (property/, vehicles/).
     },
 };

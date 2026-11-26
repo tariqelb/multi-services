@@ -40,7 +40,7 @@ export const markNotificationAsRead = async (
                 $set: { isRead: true },
             },
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true,
             }
         );

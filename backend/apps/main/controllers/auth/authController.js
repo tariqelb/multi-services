@@ -91,7 +91,7 @@ export const signup = async (req, res) => {
                     expiresAt,
                 },
             },
-            { upsert: true, new: true, runValidators: true }
+            { upsert: true, returnDocument: "after", runValidators: true }
         );
 
         // Send verification email

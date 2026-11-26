@@ -1,5 +1,7 @@
 import User from "../../models/User.js";
 import { adminAccessView } from "../../services/adminAccess.js";
+import { cleanVisibility, visibilityOf } from "../../utils/publicProfile.js";
+import { MAX_SOCIAL_LINKS, PLATFORM_IDS, cleanSocialLinks, socialLinksOf } from "../../utils/socialLinks.js";
 import bcrypt from "bcryptjs";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -518,6 +520,7 @@ export async function getMyProfile(req, res) {
                     "address",
                     "bio",
                     "profileImage",
+                    "socialLinks",
                     "role",
                     "adminPermissions",
                     "createdAt",
@@ -570,6 +573,8 @@ export async function getMyProfile(req, res) {
                 address: user.address || "",
                 bio: user.bio || "",
                 profileImage: user.profileImage || "",
+                // All my links; "public" says which ones visitors see.
+                socialLinks: socialLinksOf(user),
                 role: user.role || "Member",
                 // Admin panel sections this user can open: { users: "write", ... }
                 adminAccess: adminAccessView(user),
@@ -829,7 +834,7 @@ export async function updateMyNotificationPreferences(req, res) {
             userId,
             { $set: updates },
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true,
                 setDefaultsOnInsert: true,
             }
@@ -894,7 +899,7 @@ export async function updateMyLanguage(req, res) {
                 },
             },
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true,
             }
         ).select("language");
@@ -917,3 +922,107 @@ export async function updateMyLanguage(req, res) {
         });
     }
 }
+
+/* --------------------------------------------------
+   Public profile visibility (Settings > Public profile)
+-------------------------------------------------- */
+
+// GET /api/profile/me/public-visibility
+export const getMyPublicVisibility = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId)
+            .select("email emailVerified phoneNumber phoneVerified whatsappNumber whatsappVerified address publicProfileVisibility")
+            .lean();
+        if (!user) return res.status(404).json({ success: false, message: "User not found." });
+
+        return res.status(200).json({
+            success: true,
+            visibility: visibilityOf(user),
+            // What would be shown (so the page can say "add a phone number first").
+            available: {
+                email: Boolean(user.email),
+                phone: Boolean(user.phoneNumber),
+                whatsapp: Boolean(user.whatsappNumber),
+                address: Boolean(String(user.address || "").trim()),
+            },
+        });
+    } catch (error) {
+        console.error("Get public visibility error:", error);
+        return res.status(500).json({ success: false, message: "Unable to load these settings." });
+    }
+};
+
+// PUT /api/profile/me/public-visibility   { email, phone, whatsapp, address, requests }
+export const updateMyPublicVisibility = async (req, res) => {
+    try {
+        const visibility = cleanVisibility(req.body);
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            { $set: { publicProfileVisibility: visibility } },
+            { returnDocument: "after", runValidators: true }
+        )
+            .select("publicProfileVisibility")
+            .lean();
+        if (!user) return res.status(404).json({ success: false, message: "User not found." });
+
+        return res.status(200).json({ success: true, message: "Public profile settings saved.", visibility: visibilityOf(user) });
+    } catch (error) {
+        console.error("Update public visibility error:", error);
+        return res.status(500).json({ success: false, message: "Unable to save these settings." });
+    }
+};
+
+/* --------------------------------------------------
+   Social media links (Settings > Social media)
+-------------------------------------------------- */
+
+// GET /api/profile/me/social-links
+export const getMySocialLinks = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select("socialLinks").lean();
+        if (!user) return res.status(404).json({ success: false, message: "User not found." });
+
+        return res.status(200).json({
+            success: true,
+            links: socialLinksOf(user),
+            platforms: PLATFORM_IDS,
+            max: MAX_SOCIAL_LINKS,
+        });
+    } catch (error) {
+        console.error("Get social links error:", error);
+        return res.status(500).json({ success: false, message: "Unable to load your social media links." });
+    }
+};
+
+// PUT /api/profile/me/social-links   { links: [{ platform, url, public }] }
+// Nothing is saved when a link is wrong: the page shows which one.
+export const updateMySocialLinks = async (req, res) => {
+    try {
+        const { links, errors } = cleanSocialLinks(req.body?.links);
+
+        if (errors.length) {
+            const tooMany = errors.some((item) => item.error === "tooMany");
+            return res.status(400).json({
+                success: false,
+                message: tooMany
+                    ? `You can add up to ${MAX_SOCIAL_LINKS} links.`
+                    : "Some links are not valid. Check the highlighted ones.",
+                errors,
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            { $set: { socialLinks: links } },
+            { returnDocument: "after", runValidators: true }
+        )
+            .select("socialLinks")
+            .lean();
+        if (!user) return res.status(404).json({ success: false, message: "User not found." });
+
+        return res.status(200).json({ success: true, message: "Social media links saved.", links: socialLinksOf(user) });
+    } catch (error) {
+        console.error("Update social links error:", error);
+        return res.status(500).json({ success: false, message: "Unable to save your social media links." });
+    }
+};

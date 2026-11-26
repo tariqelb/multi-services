@@ -23,7 +23,7 @@ export async function permanentlyDeleteUser(userId) {
         return;
     }
 
-    // Each service removes the user's data (listings, images, alerts, saved items...).
+    // Each service removes the user's data (listings, images, alerts, saved items, requests...).
     await deleteUserData(userId);
 
     // Delete notifications received by this user.

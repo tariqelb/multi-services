@@ -127,7 +127,7 @@ export const archivePropertyAlert = async (req, res) => {
                 },
             },
             {
-                new: true,
+                returnDocument: "after",
             }
         );
 
@@ -181,7 +181,7 @@ export const restorePropertyAlert = async (req, res) => {
                 },
             },
             {
-                new: true,
+                returnDocument: "after",
             }
         );
 

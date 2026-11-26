@@ -61,7 +61,7 @@ export const saveProperty = async (req, res) => {
                 },
             },
             {
-                new: true,
+                returnDocument: "after",
                 upsert: true,
                 runValidators: true,
                 setDefaultsOnInsert: true,
@@ -117,7 +117,7 @@ export const unsaveProperty = async (req, res) => {
                 },
             },
             {
-                new: true,
+                returnDocument: "after",
             }
         );
 

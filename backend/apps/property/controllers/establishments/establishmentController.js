@@ -436,7 +436,10 @@ export const getEstablishmentById = async (req, res) => {
             });
         }
 
-        const establishment = await Establishment.findById(id).lean();
+        // Publisher: name and photo for "Published by" / "Visit profile" (no contact details).
+        const establishment = await Establishment.findById(id)
+            .populate({ path: "userId", select: "firstName lastName profileImage" })
+            .lean();
 
         // Publisher suspended: hidden (administrators still see it).
         if (!establishment || (await isHiddenForRequester(establishment.userId, req))) {

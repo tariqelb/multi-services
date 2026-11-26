@@ -6,9 +6,12 @@ import {
     Tab,
     Tabs,
 } from "@mui/material";
+import AutoStoriesOutlined from "@mui/icons-material/AutoStoriesOutlined";
 
 // tabs: [{ label (translation key), icon }]
-export default function VehicleProfileTabs({ activeTab, onChange, tabs: items = [] }) {
+// showPortfolio: "Portfolio" (articles and videos) first, value "portfolio",
+// so the other tabs keep their numbers.
+export default function VehicleProfileTabs({ activeTab, onChange, tabs: items = [], showPortfolio = false }) {
     const { t } = useTranslation();
 
     return (
@@ -41,9 +44,20 @@ export default function VehicleProfileTabs({ activeTab, onChange, tabs: items = 
                     },
                 }}
             >
+                {showPortfolio && (
+                    <Tab
+                        value="portfolio"
+                        icon={<AutoStoriesOutlined fontSize="small" />}
+                        iconPosition="start"
+                        label={t("portfolio.tab", "Portfolio")}
+                        id="public-profile-tab-portfolio"
+                        aria-controls="public-profile-panel-portfolio"
+                    />
+                )}
                 {items.map((tab, index) => (
                     <Tab
                         key={tab.label}
+                        value={index}
                         icon={tab.icon}
                         iconPosition="start"
                         label={t(tab.label)}

@@ -24,7 +24,10 @@ import PublicProfileTabs from "../PublicProfile/components/PublicProfileTabs";
 import ReviewsTab from "../PublicProfile/components/ReviewsTab";
 
 import DisplayProfile from "./DisplayProfile";
+import { MySocialLinksCard } from "../../../Components/Profile/SocialLinks";
 import ProfilePropertyList from "./ProfilePropertyList";
+import PropertyRequestsList from "../Requests/PropertyRequestsList";
+import PortfolioSection from "../../../Components/Profile/Portfolio/PortfolioSection";
 
 const initialStatistics = {
     totalProperties: 0,
@@ -280,10 +283,14 @@ export default function ProfileContent() {
                 {/* Personal information */}
                 <DisplayProfile profile={profile} />
 
+                {/* Social media links (public or private, Settings > Social media) */}
+                <MySocialLinksCard links={profile?.socialLinks} />
+
                 {/* Same four-tab navigation as PublicProfile */}
                 <PublicProfileTabs
                     activeTab={activeTab}
                     onChange={setActiveTab}
+                    showPortfolio
                 />
 
                 <Box
@@ -320,6 +327,12 @@ export default function ProfileContent() {
                             showTabs={false}
                         />
                     )}
+
+                    {/* My property requests ("I am looking for...") */}
+                    {activeTab === 4 && <PropertyRequestsList mode="mine" />}
+
+                    {/* Articles and videos: add, edit, delete */}
+                    {activeTab === "portfolio" && <PortfolioSection api="/property/portfolio" mine />}
 
                     {/* Reviews received */}
                     {activeTab === 3 && (

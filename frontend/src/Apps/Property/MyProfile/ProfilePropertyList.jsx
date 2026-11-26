@@ -1,5 +1,7 @@
 // /home/tariq/multi-services/app/frontend/src/components/MyProfile/ProfilePropertyList.jsx
 
+import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
+import PropertyRequestsList from "../Requests/PropertyRequestsList";
 import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import PageHeader from "../../../Components/ui/PageHeader";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
@@ -69,7 +71,11 @@ export default function ProfilePropertyList({
     const [establishmentError, setEstablishmentError] = useState(null);
 
     // Internal and controlled tab state
-    const [internalActiveTab, setInternalActiveTab] = useState("properties");
+    // ?tab=roommates | establishments | requests opens that tab.
+    const [internalActiveTab, setInternalActiveTab] = useState(() => {
+        const requested = new URLSearchParams(window.location.search).get("tab");
+        return ["properties", "roommates", "establishments", "requests"].includes(requested) ? requested : "properties";
+    });
 
     const activeTab = controlledActiveTab ?? internalActiveTab;
 
@@ -505,7 +511,7 @@ export default function ProfilePropertyList({
             )}
 
             {/* Property filters */}
-            {activeTab !== "establishments" && (
+            {(activeTab === "properties" || activeTab === "roommates") && (
                 <Box sx={{ mt: showTabs ? 0 : 1 }}>
                     <PropertyCategoryBar
                         properties={properties}
@@ -572,9 +578,22 @@ export default function ProfilePropertyList({
                                 "My Establishments"
                             )}
                         />
+
+                        <Tab
+                            value="requests"
+                            icon={<CampaignOutlinedIcon />}
+                            iconPosition="start"
+                            label={t("requests.nav.mine", "My requests")}
+                        />
                     </Tabs>
                 </Box>
             )}
+
+            {/* My property requests ("I am looking for...") */}
+            {activeTab === "requests" ? (
+                <PropertyRequestsList mode="mine" />
+            ) : (
+            <>
 
             {/* Property fetch error */}
             {error && activeTab === "properties" && (
@@ -808,6 +827,8 @@ export default function ProfilePropertyList({
                         </Box>
                     )}
                 </>
+            )}
+            </>
             )}
         </Box>
     );

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import User from "../../../main/models/User.js";
 import Property from "../../models/Property.js";
+import { PUBLIC_CONTACT_FIELDS, publicContactOf, publicSocialLinksOf, visibilityOf } from "../../../main/utils/publicProfile.js";
 
 export const getPublicProfile = async (req, res) => {
     try {
@@ -23,7 +24,7 @@ export const getPublicProfile = async (req, res) => {
             deletionRequestedAt: null,
         })
             .select(
-                "firstName lastName bio profileImage createdAt role"
+                `firstName lastName bio profileImage createdAt role ${PUBLIC_CONTACT_FIELDS}`
             )
             .lean();
 
@@ -101,6 +102,12 @@ export const getPublicProfile = async (req, res) => {
                 role: user.role,
                 createdAt: user.createdAt,
             },
+
+            // Only what the user chose to show (Settings > Public profile).
+            contact: publicContactOf(user),
+            // Links the user made public in Settings > Social media.
+            socialLinks: publicSocialLinksOf(user),
+            showRequests: visibilityOf(user).requests,
 
             properties,
 

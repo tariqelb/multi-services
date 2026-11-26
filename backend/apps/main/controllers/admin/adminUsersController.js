@@ -48,6 +48,7 @@ export const getAdminUserOrRespond = async (userId, res) => {
                 "address",
                 "bio",
                 "profileImage",
+                "socialLinks",
                 "notificationPreferences",
                 "deletionRequestedAt",
                 "scheduledDeletionAt",

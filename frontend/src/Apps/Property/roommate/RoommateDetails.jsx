@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ReportListingLink from "../listings/ReportListingLink";
 import VerifiedContact from "../listings/VerifiedContact";
@@ -16,7 +15,6 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import PetsOutlinedIcon from "@mui/icons-material/PetsOutlined";
 import SmokingRoomsOutlinedIcon from "@mui/icons-material/SmokingRoomsOutlined";
 import WcOutlinedIcon from "@mui/icons-material/WcOutlined";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import ChairOutlinedIcon from "@mui/icons-material/ChairOutlined";
 import BalconyOutlinedIcon from "@mui/icons-material/BalconyOutlined";
 import LocalParkingOutlinedIcon from "@mui/icons-material/LocalParkingOutlined";
@@ -49,6 +47,7 @@ import {
 
 import getImageUrl from "../../../utils/getImageUrl";
 import { trackListingContact } from "../../../api/trackContact";
+import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
 
 const purposeTones = {
     "Share My Property": "success",
@@ -95,7 +94,6 @@ function getYouTubeEmbedUrl(url) {
 }
 
 export default function RoommateDetails({ listing, showContact: showContactProp = true }) {
-    const navigate = useNavigate();
     const { t, i18n } = useTranslation();
 
     // Inactive: the owner does not want to be contacted.
@@ -477,17 +475,8 @@ export default function RoommateDetails({ listing, showContact: showContactProp 
                     </>
                 )}
 
-                {ownerId && (
-                    <Button
-                        variant="outlined"
-                        startIcon={<AccountCircleOutlinedIcon />}
-                        onClick={() => navigate(`/profile/${ownerId}`)}
-                        fullWidth
-                        sx={{ mt: 1.25 }}
-                    >
-                        {translate("roommates.details.viewProfile", "View owner profile")}
-                    </Button>
-                )}
+                {/* Property service: the owner's property profile */}
+                <VisitProfileButton service="property" userId={ownerId} sx={{ mt: 1.25 }} />
             </SidebarCard>
 
             {/* Not on the owner's own view */}

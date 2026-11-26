@@ -8,6 +8,7 @@ import {
     Outlet,
     useLocation,
 } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -16,7 +17,7 @@ import { Box } from "@mui/material";
 
 import axiosInstance from "./api/axiosInstance";
 
-import Login from "./Apps/Property/LoginAndSignUp/Login";
+import Login from "./Components/LoginAndSignUp/Login";
 import NotFound from "./pages/NotFound";
 
 
@@ -33,11 +34,22 @@ import MyVehiclesPage from "./Apps/vehicles/MyVehicles/MyVehiclesPage";
 import VehicleAlertsPage from "./Apps/vehicles/VehicleAlerts/VehicleAlertsPage";
 import MyVehicleProfile from "./Apps/vehicles/Profile/MyVehicleProfile";
 import VehiclePublicProfile from "./Apps/vehicles/Profile/VehiclePublicProfile";
+import PortfolioReview from "./Components/Admin/PortfolioReview";
 import VehicleReviewsPage from "./Apps/vehicles/Reviews/VehicleReviewsPage";
 import SavedVehiclesPage from "./Apps/vehicles/Saved/SavedVehiclesPage";
 import SparePartsPage from "./Apps/vehicles/SpareParts/SparePartsPage";
 import VehicleSearchPage from "./Apps/vehicles/Search/VehicleSearchPage";
 import VehiclePublicationsReview from "./Apps/vehicles/Admin/VehiclePublicationsReview";
+import PropertyRequestFormPage from "./Apps/Property/Requests/PropertyRequestFormPage";
+import PropertyRequestBoardPage from "./Apps/Property/Requests/PropertyRequestBoardPage";
+import PropertyRequestDetailsPage from "./Apps/Property/Requests/PropertyRequestDetailsPage";
+import AdminPropertyRequestsPage from "./Apps/Property/Requests/AdminPropertyRequestsPage";
+import VehicleRequestFormPage from "./Apps/vehicles/Requests/VehicleRequestFormPage";
+import VehicleRequestBoardPage from "./Apps/vehicles/Requests/VehicleRequestBoardPage";
+import VehicleRequestDetailsPage from "./Apps/vehicles/Requests/VehicleRequestDetailsPage";
+import AdminVehicleRequestsPage from "./Apps/vehicles/Requests/AdminVehicleRequestsPage";
+import VehicleExternalListingsPage from "./Apps/vehicles/externalListings/VehicleExternalListingsPage";
+import VehicleExternalListingSources from "./Apps/vehicles/externalListings/VehicleExternalListingSources";
 import SparePartForm, { EditSparePartPage } from "./Apps/vehicles/SpareParts/SparePartForm";
 import SparePartDetailsPage from "./Apps/vehicles/SpareParts/SparePartDetailsPage";
 import DailyWorkerDescription from "./Apps/DailyWorker/Components/Descriprion/Description";
@@ -58,7 +70,7 @@ import PublishPropertyPage from "./Apps/Property/propertyInsertForm/PublishPrope
 import SavedPage from "./Apps/Property/saved/SavedPage";
 import Alert from "./Apps/Property/Alert/Alert";
 import NotificationPage from "./Apps/Property/Notification/NotificationPage";
-import SettingPage from "./Apps/Property/Settings/SettingsPage";
+import SettingPage from "./Components/Settings/SettingsPage";
 import FeedbackPage from "./Apps/Property/Feedback/FeedbackPage";
 
 // Roommate components
@@ -69,7 +81,7 @@ import RoommateProfileDetails from "./Apps/Property/roommate/RoommateProfileDeta
 import TopBar from "./Components/Home/TopBar";
 import Sidebar from "./Apps/Property/Sidebar/Sidebar";
 import MiddleContent from "./Components/Home/MiddleContent";
-import Footer from "./Apps/Property/Footer/Footer";
+import Footer from "./Components/Footer/Footer";
 
 import Dashboard from "./Apps/Property/Statistic/Dashboard";
 import VisitTracker from "./Apps/Property/Statistic/components/Visit/VisitTracker";
@@ -97,15 +109,15 @@ import Establishments from "./Apps/Property/Establishment/Establishments";
 import EstablishmentDetailsPage from "./Apps/Property/Establishment/EstablishmentDetailsPage";
 import EstablishmentInsertForm from "./Apps/Property/Establishment/EstablishmentInsertForm";
 
-import ForgotPassword from "./Apps/Property/LoginAndSignUp/ForgotPassword";
-import ResetPassword from "./Apps/Property/LoginAndSignUp/ResetPassword";
+import ForgotPassword from "./Components/LoginAndSignUp/ForgotPassword";
+import ResetPassword from "./Components/LoginAndSignUp/ResetPassword";
 
 import ScrollToTop from "./Components/Home/ScrollToTop";
 import EditPropertyPage from "./Apps/Property/propertyInsertForm/EditPropertyPage";
 import RoommateEditPage from "./Apps/Property/roommate/RoommateEditPage";
 import EstablishmentEditPage from "./Apps/Property/Establishment/EstablishmentEditPage";
-import PublicLayout from "./Apps/Property/Info/PublicLayout";
-import { AboutPage, ContactPage, PrivacyPage, TermsPage } from "./Apps/Property/Info/InfoPages";
+import PublicLayout from "./Components/Info/PublicLayout";
+import { AboutPage, ContactPage, PrivacyPage, TermsPage } from "./Components/Info/InfoPages";
 
 
 import PublicationsReviewSection from "./Apps/Property/PublicationReviews/PublicationsReviewSection";
@@ -113,6 +125,8 @@ import FeedbackSection from "./Apps/Property/FeedbackReviews/FeedbackSection";
 
 import ServiceSidebar from "./Components/Home/ServiceSidebar";
 import { VEHICLE_NAV } from "./Components/Home/serviceNavigation";
+import { DASHBOARD_NAV, isDashboardPath } from "./Components/Dashboard/dashboardNavigation";
+import AboutServicePage from "./Components/Dashboard/About/AboutServicePage";
 import AdminSidebar from "./Components/Admin/AdminSidebar";
 import AdminRoute, { AdminHome } from "./Components/Admin/AdminRoute";
 import AdminRolesPage from "./Components/Admin/AdminRolesPage";
@@ -163,6 +177,7 @@ function DashboardLayout() {
     const user = useLoaderData();
     const dispatch = useDispatch();
     const location = useLocation();
+    const { t } = useTranslation();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [activeNav, setActiveNav] = useState("Dashboard");
@@ -301,9 +316,17 @@ function DashboardLayout() {
                         />
                     )}
 
-                    {/* Admin panel sidebar, service sidebar, or the property sidebar */}
+                    {/* Admin panel sidebar, dashboard sidebar (default), service sidebar, or the property sidebar */}
                     {isAdminPath(location.pathname) ? (
                         <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                    ) : isDashboardPath(location.pathname) ? (
+                        <ServiceSidebar
+                            sidebarOpen={sidebarOpen}
+                            setSidebarOpen={setSidebarOpen}
+                            title={t("dashboardSidebar.title", "MultiServices")}
+                            items={DASHBOARD_NAV}
+                            itemsFirst
+                        />
                     ) : activeServiceSidebar ? (
                         <ServiceSidebar
                             sidebarOpen={sidebarOpen}
@@ -404,6 +427,9 @@ const router = createBrowserRouter([
                 path: "/",
                 element: <MiddleContent activeNav="Dashboard" />,
             },
+            // Dashboard: what each service offers, entry by entry (dashboard sidebar).
+            { path: "/about-services", element: <Navigate to="/about-services/property" replace /> },
+            { path: "/about-services/:serviceId", element: <AboutServicePage /> },
 
             // -----------------------------------------------------------------
             // Properties
@@ -503,6 +529,12 @@ const router = createBrowserRouter([
                 path: "/search",
                 element: <SearchPage />,
             },
+            // Requests ("I am looking for..."), property.
+            { path: "/requests/new", element: <PropertyRequestFormPage /> },
+            // My requests are in My Publication > Requests.
+            { path: "/requests/mine", element: <Navigate to="/mypublication?tab=requests" replace /> },
+            { path: "/requests/board", element: <PropertyRequestBoardPage /> },
+            { path: "/requests/:id", element: <PropertyRequestDetailsPage /> },
             {
                 path: "/reviews",
                 element: <ReviewsRankingPage />,
@@ -612,10 +644,42 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                path: "/admin/property/requests",
+                element: (
+                    <AdminRoute section="propertyRequests">
+                        <AdminPropertyRequestsPage />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/vehicles/external-listings",
+                element: (
+                    <AdminRoute section="vehicleExternalListings">
+                        <VehicleExternalListingSources />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/vehicles/requests",
+                element: (
+                    <AdminRoute section="vehicleRequests">
+                        <AdminVehicleRequestsPage />
+                    </AdminRoute>
+                ),
+            },
+            {
                 path: "/admin/vehicles/publications",
                 element: (
                     <AdminRoute section="vehiclePublications">
                         <VehiclePublicationsReview />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/vehicles/portfolio",
+                element: (
+                    <AdminRoute section="vehiclePublications">
+                        <PortfolioReview service="vehicles" api="/vehicles/admin/portfolio" section="vehiclePublications" profilePath={(id) => `/vehicles/profile/${id}`} />
                     </AdminRoute>
                 ),
             },
@@ -644,6 +708,14 @@ const router = createBrowserRouter([
                 element: (
                     <AdminRoute section="propertyPublications">
                         <PublicationsReviewSection />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/portfolio",
+                element: (
+                    <AdminRoute section="propertyPublications">
+                        <PortfolioReview service="property" api="/property/dashboard/portfolio" section="propertyPublications" profilePath={(id) => `/profile/${id}`} />
                     </AdminRoute>
                 ),
             },
@@ -685,6 +757,14 @@ const router = createBrowserRouter([
             { path: "/motos/publish", element: <PublishMotoPage /> },
             { path: "/vehicles/map", element: <VehiclesMapPage /> },
             { path: "/vehicles/search", element: <VehicleSearchPage /> },
+            // Requests ("I am looking for..."), vehicles and spare parts (before /vehicles/:id).
+            { path: "/vehicles/requests/new", element: <VehicleRequestFormPage /> },
+            // My requests are in My vehicles > Requests.
+            { path: "/vehicles/requests/mine", element: <Navigate to="/vehicles/mine?section=requests" replace /> },
+            { path: "/vehicles/requests/board", element: <VehicleRequestBoardPage /> },
+            // Listings of other websites (Avito, Moteur.ma...): live search + collected listings.
+            { path: "/vehicles/external", element: <VehicleExternalListingsPage /> },
+            { path: "/vehicles/requests/:id", element: <VehicleRequestDetailsPage /> },
             // Old address of the vehicles publication reviews (now in the admin panel).
             { path: "/vehicles/admin/publications", element: <Navigate to="/admin/vehicles/publications" replace /> },
             { path: "/vehicles/mine", element: <MyVehiclesPage /> },

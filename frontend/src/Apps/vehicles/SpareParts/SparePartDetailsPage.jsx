@@ -41,6 +41,7 @@ import {
 import { STATUS_TONES, formatCity, formatNumber, optionLabel } from "../vehicleFormat";
 import SparePartCard from "./SparePartCard";
 import { PART_CATEGORY_STYLES, compatibilityLabel } from "./sparePartOptions";
+import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
 
 const waLink = (number) => `https://wa.me/${String(number).replace(/\D/g, "")}`;
 const yes = (t, value) => (value ? t("vehiclesApp.details.yes", "Yes") : null);
@@ -320,6 +321,9 @@ function SparePartDetails({ id }) {
                         {t("vehiclesApp.parts.edit", "Edit this part")}
                     </Button>
                 )}
+
+                {/* Vehicles service: the publisher's vehicles profile (publications, reviews) */}
+                <VisitProfileButton service="vehicles" userId={publisherId} tab="parts" sx={{ mt: 1.25 }} />
             </SidebarCard>
 
             {(formatCity(part, language) || part.business?.address || mapsHref) && (

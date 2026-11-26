@@ -8,15 +8,23 @@ import DirectionsCarOutlined from "@mui/icons-material/DirectionsCarOutlined";
 import TwoWheelerOutlined from "@mui/icons-material/TwoWheelerOutlined";
 import BuildOutlined from "@mui/icons-material/BuildOutlined";
 import RateReview from "@mui/icons-material/RateReview";
+import Campaign from "@mui/icons-material/Campaign";
 
 import axiosInstance from "../../../api/axiosInstance";
 import { optionLabel } from "../vehicleFormat";
 
 // Order of the tabs (?tab=reviews opens the reviews).
-export const PROFILE_TABS = ["vehicles", "motos", "parts", "reviews"];
+// "requests" is last: public profiles hide it unless the user shows their requests.
+export const PROFILE_TABS = ["vehicles", "motos", "parts", "reviews", "requests"];
 export const REVIEWS_TAB = PROFILE_TABS.indexOf("reviews");
+export const REQUESTS_TAB = PROFILE_TABS.indexOf("requests");
 
-export const profileTabs = (mine) => [
+export const profileTabs = (mine, showRequests = true) => [
+    ...profileTabsBase(mine),
+    ...(showRequests ? [{ label: mine ? "vehiclesApp.profile.tabs.myRequests" : "vehiclesApp.profile.tabs.requests", icon: <Campaign fontSize="small" /> }] : []),
+];
+
+const profileTabsBase = (mine) => [
     {
         label: mine ? "vehiclesApp.profile.tabs.myVehicles" : "vehiclesApp.profile.tabs.vehicles",
         icon: <DirectionsCarOutlined fontSize="small" />,

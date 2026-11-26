@@ -12,8 +12,11 @@ import VehicleReview from "../models/VehicleReview.js";
 import SavedVehicle from "../models/SavedVehicle.js";
 import SparePart from "../models/SparePart.js";
 import SavedSparePart from "../models/SavedSparePart.js";
+import VehicleRequest from "../models/VehicleRequest.js";
+import VehicleRequestResponse from "../models/VehicleRequestResponse.js";
 import { vehicleImages } from "../controllers/vehicleController.js";
 import { partImages } from "../controllers/sparePartController.js";
+import { portfolio } from "../controllers/portfolio/portfolioController.js";
 
 const toObjectId = (id) => new mongoose.Types.ObjectId(String(id));
 
@@ -37,6 +40,8 @@ export async function getUserDetailStats(id) {
 }
 
 export async function onUserDeleted(userId) {
+    // Portfolio: articles, videos and their photos.
+    await portfolio.deleteUserItems(userId);
     const vehicles = await Vehicle.find({ userId }).select("images").lean();
     // What this user saved, and the saves of this user's vehicles.
     await SavedVehicle.deleteMany({ $or: [{ userId }, { vehicleId: { $in: vehicles.map((vehicle) => vehicle._id) } }] });
@@ -52,4 +57,57 @@ export async function onUserDeleted(userId) {
     await SavedSparePart.deleteMany({ $or: [{ userId }, { partId: { $in: parts.map((part) => part._id) } }] });
     for (const part of parts) await partImages.deleteImages(part.images || []);
     await SparePart.deleteMany({ userId });
+
+    // Requests posted by the user, and replies to them or by them.
+    const requestIds = await VehicleRequest.distinct("_id", { userId });
+    await VehicleRequestResponse.deleteMany({ $or: [{ requesterId: userId }, { responderId: userId }, { requestId: { $in: requestIds } }] });
+    await VehicleRequest.deleteMany({ userId });
+}
+
+/* --------------------------------------------------
+   Requests ("I am looking for...")
+-------------------------------------------------- */
+
+/** Cities and categories of the user's vehicles and spare parts (Settings prefill). */
+export async function getPublishingActivity(userId) {
+    if (!mongoose.Types.ObjectId.isValid(String(userId))) return {};
+    const [vehicles, parts] = await Promise.all([
+        Vehicle.find({ userId: toObjectId(userId) }).select("city category listingType").limit(500).lean(),
+        SparePart.find({ userId: toObjectId(userId) }).select("city").limit(500).lean(),
+    ]);
+    if (!vehicles.length && !parts.length) return {};
+
+    const categories = new Set(vehicles.map((vehicle) => (vehicle.category === "moto" ? "moto" : "car")));
+    if (parts.length) categories.add("part");
+    const transactions = new Set(vehicles.map((vehicle) => (vehicle.listingType === "rent" ? "rent" : "buy")));
+    if (parts.length) transactions.add("buy");
+
+    return {
+        vehicle: {
+            count: vehicles.length + parts.length,
+            cities: [...new Set([...vehicles, ...parts].map((item) => item.city).filter(Boolean))],
+            categories: [...categories],
+            transactions: [...transactions],
+        },
+    };
+}
+
+/** A vehicle or spare part of the replying owner, for "I have a match". */
+export async function getListingSummary({ kind, id, ownerId }) {
+    if (!["vehicle", "part"].includes(kind) || !mongoose.Types.ObjectId.isValid(String(id))) return null;
+    const Model = kind === "part" ? SparePart : Vehicle;
+    const item = await Model.findOne({ _id: id, userId: ownerId }).select("title price city images listingType").lean();
+    if (!item) return null;
+
+    const image = item.images?.[0];
+    return {
+        kind,
+        id: String(item._id),
+        title: item.title || "",
+        image: typeof image === "string" ? image : image?.path || "",
+        price: Number.isFinite(Number(item.price)) ? Number(item.price) : null,
+        priceUnit: kind === "part" ? "each" : item.listingType === "rent" ? "day" : "",
+        city: item.city || "",
+        link: kind === "part" ? `/vehicles/parts/${item._id}` : `/vehicles/${item._id}`,
+    };
 }

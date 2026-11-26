@@ -24,6 +24,8 @@ import VehicleSearchResultCard from "./VehicleSearchResultCard";
 import VehicleSearchResultsMap from "./VehicleSearchResultsMap";
 import { KIND_COLORS, formatCity } from "./vehicleSearchFormat";
 import "./vehicleSearch.css";
+import VehicleRequestCta from "../Requests/VehicleRequestCta";
+import { vehicleRequestQuery } from "../Requests/vehicleRequestOptions";
 
 const PAGE_SIZE = 12;
 const FIELDS = Object.keys(EMPTY_CRITERIA);
@@ -222,6 +224,8 @@ export default function VehicleSearchPage() {
                     <Typography variant="body2">
                         {t("vehiclesApp.search.emptyText", "Try another city, another make, a wider price range or fewer criteria.")}
                     </Typography>
+                    {/* Nothing found: post a request instead */}
+                    <VehicleRequestCta query={vehicleRequestQuery(applied)} />
                 </Stack>
             ) : (
                 <>

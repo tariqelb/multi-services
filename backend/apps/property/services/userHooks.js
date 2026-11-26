@@ -12,8 +12,11 @@ import RoommateListing from "../models/RoommateListing.js";
 import Establishment from "../models/Establishment.js";
 import SavedListing from "../models/SavedListing.js";
 import Feedback from "../models/Feedback.js";
+import PropertyRequest from "../models/PropertyRequest.js";
+import PropertyRequestResponse from "../models/PropertyRequestResponse.js";
 
 import { deletePropertyImages } from "../middleware/propertyUpload.js";
+import { portfolio } from "../controllers/portfolio/portfolioController.js";
 
 const toObjectId = (id) => new mongoose.Types.ObjectId(String(id));
 
@@ -101,6 +104,8 @@ export async function getUserDetailStats(id) {
 
 /** Account deletion: the user's properties, their images, saves and alerts. */
 export async function onUserDeleted(userId) {
+    // Portfolio: articles, videos and their photos.
+    await portfolio.deleteUserItems(userId);
     const properties = await Property.find({ userId }).select("_id images");
     const propertyIds = properties.map((property) => property._id);
 
@@ -132,4 +137,52 @@ export async function onUserDeleted(userId) {
             { listingType: "establishment", listingId: { $in: establishmentIds } },
         ],
     });
+    // Requests posted by the user, and replies to them or by them.
+    const requestIds = await PropertyRequest.distinct("_id", { userId });
+    await PropertyRequestResponse.deleteMany({ $or: [{ requesterId: userId }, { responderId: userId }, { requestId: { $in: requestIds } }] });
+    await PropertyRequest.deleteMany({ userId });
+}
+
+/* --------------------------------------------------
+   Requests ("I am looking for...")
+-------------------------------------------------- */
+
+const TRANSACTION_OF = (property) =>
+    property.listingType === "For Sale" ? "buy" : property.furnishingStatus === "Furnished" || property.rentalPeriod === "Daily" ? "furnished" : "rent";
+
+/** Cities, transactions and types of the user's properties (Settings prefill). */
+export async function getPublishingActivity(userId) {
+    if (!mongoose.Types.ObjectId.isValid(String(userId))) return {};
+    const properties = await Property.find({ userId: toObjectId(userId) })
+        .select("city listingType propertyType furnishingStatus rentalPeriod")
+        .limit(500)
+        .lean();
+    if (!properties.length) return {};
+
+    return {
+        property: {
+            count: properties.length,
+            cities: [...new Set(properties.map((property) => property.city).filter(Boolean))],
+            transactions: [...new Set(properties.map(TRANSACTION_OF))],
+            types: [...new Set(properties.map((property) => property.propertyType).filter(Boolean))],
+        },
+    };
+}
+
+/** A property of the replying owner, for "I have a match". */
+export async function getListingSummary({ kind, id, ownerId }) {
+    if (kind !== "property" || !mongoose.Types.ObjectId.isValid(String(id))) return null;
+    const property = await Property.findOne({ _id: id, userId: ownerId }).select("title price city images listingType rentalPeriod").lean();
+    if (!property) return null;
+
+    return {
+        kind: "property",
+        id: String(property._id),
+        title: property.title || "",
+        image: property.images?.[0]?.path || "",
+        price: Number.isFinite(Number(property.price)) ? Number(property.price) : null,
+        priceUnit: property.listingType === "For Rent" ? (property.rentalPeriod === "Daily" ? "day" : "month") : "",
+        city: property.city || "",
+        link: `/properties/${property._id}`,
+    };
 }

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { isAdminPath, useAdminAccess } from "../Admin/adminSections";
+import { isDashboardPath } from "../Dashboard/dashboardNavigation";
 
 const services = [
     {
@@ -39,6 +40,7 @@ const services = [
             "/search",
             "/reviews",
             "/externalListings",
+            "/requests",
         ],
     },
     {
@@ -92,8 +94,9 @@ export default function MainSideBar() {
     const isServiceActive = (service) => {
         if (adminActive) return false;
 
+        // Dashboard: home, about pages and the pages shared by every service.
         if (service.exact) {
-            return currentPath === "/";
+            return isDashboardPath(currentPath);
         }
 
         return service.paths.some(

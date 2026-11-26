@@ -13,6 +13,8 @@
 //   /api/property/feedback             feedback and reports
 //   /api/property/knowledge            help center
 //   /api/property/dashboard            analytics and admin tools
+//   /api/property/requests             "I am looking for..." requests (see requestRouter.js)
+//   /api/property/portfolio            articles and videos of profiles (see portfolioRouter.js)
 //   /api/property/...                  properties (getlist, :id, saved, alerts, clicks...)
 
 import { Router } from "express";
@@ -31,6 +33,8 @@ import knowledgeRouter from "./knowledgeRouter.js";
 import dashboardRouter from "./dashboardRouter.js";
 import propertyRouter from "./propertyRouter.js";
 import savedListingRouter from "./savedListingRouter.js";
+import requestRouter from "./requestRouter.js";
+import portfolioRouter from "./portfolioRouter.js";
 
 const router = Router();
 
@@ -50,6 +54,8 @@ router.use("/profiles", profileRouter);
 router.use("/feedback", feedbackRouter);
 router.use("/knowledge", knowledgeRouter);
 router.use("/dashboard", dashboardRouter);
+router.use("/requests", requestRouter);
+router.use("/portfolio", portfolioRouter);
 
 // Last: properties (has GET /:id).
 router.use("/", propertyRouter);

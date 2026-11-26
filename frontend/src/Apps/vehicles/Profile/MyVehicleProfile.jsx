@@ -19,11 +19,14 @@ import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import VehicleProfileHeader from "./components/VehicleProfileHeader";
 import VehicleProfileStats from "./components/VehicleProfileStats";
 import VehicleProfileTabs from "./components/VehicleProfileTabs";
+import PortfolioSection from "../../../Components/Profile/Portfolio/PortfolioSection";
 import VehicleReviewsTab from "./components/VehicleReviewsTab";
 import VehiclePersonalInfo from "./components/VehiclePersonalInfo";
+import { MySocialLinksCard } from "../../../Components/Profile/SocialLinks";
 
 import MyVehiclesPage from "../MyVehicles/MyVehiclesPage";
-import { PROFILE_TABS, REVIEWS_TAB, countParts, countVehicles, dealerBadge, profileTabs, useVehicleReviews } from "./vehicleProfileShared";
+import VehicleRequestsList from "../Requests/VehicleRequestsList";
+import { PROFILE_TABS, REQUESTS_TAB, REVIEWS_TAB, countParts, countVehicles, dealerBadge, profileTabs, useVehicleReviews } from "./vehicleProfileShared";
 
 const getUserId = (user) => user?._id || user?.id || user?.userId || null;
 
@@ -115,12 +118,18 @@ export default function MyVehicleProfile() {
 
                 <VehiclePersonalInfo profile={profile} />
 
-                <VehicleProfileTabs activeTab={activeTab} onChange={setActiveTab} tabs={profileTabs(true)} />
+                <MySocialLinksCard links={profile?.socialLinks} />
+
+                <VehicleProfileTabs activeTab={activeTab} onChange={setActiveTab} tabs={profileTabs(true)} showPortfolio />
 
                 <Box role="tabpanel" id={`public-profile-panel-${activeTab}`} aria-labelledby={`public-profile-tab-${activeTab}`}>
                     {activeTab === 0 && <MyVehiclesPage key="vehicles" embedded section="vehicles" onVehiclesChange={onVehiclesChange} />}
                     {activeTab === 1 && <MyVehiclesPage key="motos" embedded section="motos" onVehiclesChange={onVehiclesChange} />}
                     {activeTab === 2 && <MyVehiclesPage key="parts" embedded section="parts" onPartsChange={onPartsChange} />}
+                    {/* My vehicle requests ("I am looking for...") */}
+                    {activeTab === REQUESTS_TAB && <VehicleRequestsList mode="mine" />}
+                    {/* Articles and videos: add, edit, delete */}
+                    {activeTab === "portfolio" && <PortfolioSection api="/vehicles/portfolio" mine />}
                     {activeTab === REVIEWS_TAB && (
                         <VehicleReviewsTab
                             reviews={reviews.reviews}

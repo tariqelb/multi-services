@@ -40,6 +40,7 @@ import {
 import { useTranslation } from "react-i18next";
 import axiosInstance from "../../../../../api/axiosInstance";
 import { UserSuspensionBanner, UserSuspensionButton } from "./UserSuspensionControl";
+import { SocialLinksList } from "../../../../../Components/Profile/SocialLinks";
 
 const tabConfig = [
     { value: "overview", label: "overview", icon: <Person /> },
@@ -593,6 +594,15 @@ export default function UserDetailsPage() {
                                     <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                         {user?.bio || t("userDetails.noBio")}
                                     </Typography>
+
+                                    {user?.socialLinks?.length > 0 && (
+                                        <Box>
+                                            <Typography variant="caption" sx={{ display: "block", color: "text.secondary", fontWeight: 700, mb: 1 }}>
+                                                {t("socialLinks.title", "Social media")}
+                                            </Typography>
+                                            <SocialLinksList links={user.socialLinks} showPrivate />
+                                        </Box>
+                                    )}
 
                                     <InfoItem
                                         label={t("userDetails.accountCreated")}

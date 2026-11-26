@@ -9,6 +9,7 @@
     "job:account-deletion": "node apps/main/scripts/runAccountDeletion.js",
     "job:external-listings": "node apps/property/scripts/runExternalListings.js",
     "migrate:whatsapp": "node apps/main/scripts/migrateWhatsappNumber.js",
+    "migrate:requests": "node apps/main/scripts/migrateRequestsToServices.js",
     "fix:property-status": "node apps/property/scripts/fixPropertyStatuses.js",
     "job:listing-expiry": "node apps/property/scripts/runListingExpiry.js"
   },

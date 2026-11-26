@@ -29,6 +29,55 @@ const userSchema = new mongoose.Schema(
             trim: true,
             required: true,
         },
+        // What visitors see on the public profiles (property and vehicles).
+        // Everything is hidden until the user turns it on in Settings.
+        publicProfileVisibility: {
+            email: { type: Boolean, default: false },
+            phone: { type: Boolean, default: false },
+            whatsapp: { type: Boolean, default: false },
+            address: { type: Boolean, default: false },
+            // Active requests ("I am looking for...") in a "Requests" tab.
+            requests: { type: Boolean, default: false },
+        },
+        // Social media links (Settings > Social media). Each link is shown on
+        // the public profiles only when "public" is on.
+        // url is always a clean https:// address (see utils/socialLinks.js).
+        socialLinks: {
+            type: [
+                {
+                    _id: false,
+                    platform: {
+                        type: String,
+                        enum: ["instagram", "facebook", "tiktok", "youtube", "linkedin", "x", "snapchat", "telegram", "threads", "website"],
+                        required: true,
+                    },
+                    url: { type: String, required: true, trim: true, maxlength: 300 },
+                    public: { type: Boolean, default: false },
+                },
+            ],
+            default: [],
+        },
+        // "Receive requests" (Settings): what an owner / agency / dealer works
+        // on, so they are notified of matching user requests.
+        // Empty lists mean "all" (every type, every transaction).
+        professionalProfile: {
+            receiveRequests: { type: Boolean, default: false },
+            fields: { type: [{ type: String, enum: ["property", "vehicle"] }], default: undefined },
+            businessType: { type: String, enum: ["owner", "agency", "dealer", "rental", "partsShop", "scrapyard", ""], default: "" },
+            businessName: { type: String, trim: true, maxlength: 120, default: "" },
+            propertyTransactions: { type: [{ type: String, enum: ["rent", "furnished", "buy"] }], default: undefined },
+            propertyTypes: { type: [String], default: undefined },
+            vehicleCategories: { type: [{ type: String, enum: ["car", "moto", "part"] }], default: undefined },
+            vehicleTransactions: { type: [{ type: String, enum: ["buy", "rent"] }], default: undefined },
+            allMorocco: { type: Boolean, default: false },
+            cities: { type: [String], default: undefined },
+            channels: {
+                notification: { type: Boolean, default: true },
+                email: { type: Boolean, default: true },
+            },
+            frequency: { type: String, enum: ["instant", "daily"], default: "instant" },
+            updatedAt: { type: Date, default: null },
+        },
         // Admin panel sections of a member: { users: "read", vehiclePublications: "write", ... }
         // (see main/services/adminAccess.js). Admins have every section.
         adminPermissions: {
@@ -210,6 +259,9 @@ userSchema.index(
 // Reuse the existing model during development.
 // If an old model is cached, ensure the active schema is correct.
 let User;
+
+// Professionals who receive requests (matching a new request).
+userSchema.index({ "professionalProfile.receiveRequests": 1, "professionalProfile.fields": 1 });
 
 if (mongoose.models.User) {
     const existingUser = mongoose.models.User;

@@ -19,11 +19,22 @@ import {
     BuildOutlined,
     LibraryBooksOutlined,
     TwoWheelerOutlined,
-    MapOutlined,
+    TravelExplore,
     NotificationsActiveOutlined,
     ReviewsOutlined,
     BookmarksOutlined,
+    PostAddOutlined,
+    CampaignOutlined,
+    ListAltOutlined,
     ManageSearch,
+    Public,
+    DashboardOutlined,
+    HomeWorkOutlined,
+    BusinessCenterOutlined,
+    EngineeringOutlined,
+    LocalShippingOutlined,
+    LocalTaxiOutlined,
+    ManageAccountsOutlined,
 } from "@mui/icons-material";
 
 // Icons for the service items (items[].icon).
@@ -36,10 +47,24 @@ const ITEM_ICONS = {
     publishMoto: CloudUpload,
     parts: BuildOutlined,
     search: ManageSearch,
-    map: MapOutlined,
+    // Same icon as the property "Find by map".
+    map: TravelExplore,
     alerts: NotificationsActiveOutlined,
     reviews: ReviewsOutlined,
     saved: BookmarksOutlined,
+    postRequest: PostAddOutlined,
+    requestBoard: CampaignOutlined,
+    myRequests: ListAltOutlined,
+    // Same icon as the property "External listing".
+    external: Public,
+    // Dashboard sidebar
+    dashboard: DashboardOutlined,
+    aboutProperty: HomeWorkOutlined,
+    aboutCompanies: BusinessCenterOutlined,
+    aboutWorker: EngineeringOutlined,
+    aboutDelivery: LocalShippingOutlined,
+    aboutDriver: LocalTaxiOutlined,
+    aboutAccount: ManageAccountsOutlined,
 };
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -104,9 +129,11 @@ export default function ServiceSidebar({
         { defaultValue: "Description" }
     );
 
+    // No description entry when descriptionPath is empty (dashboard sidebar).
     const isActive =
-        location.pathname === descriptionPath ||
-        location.pathname.startsWith(`${descriptionPath}/`);
+        Boolean(descriptionPath) &&
+        (location.pathname === descriptionPath ||
+            location.pathname.startsWith(`${descriptionPath}/`));
 
     const goTo = (path) => {
         navigate(path);
@@ -271,6 +298,7 @@ export default function ServiceSidebar({
                 <List sx={{ px: 0, py: 0 }}>
                     {itemsFirst && serviceItems}
 
+                    {descriptionPath && (
                     <ListItem disablePadding sx={{ mb: 1 }}>
                         <ListItemButton
                             onClick={handleNavigation}
@@ -315,6 +343,7 @@ export default function ServiceSidebar({
                             />
                         </ListItemButton>
                     </ListItem>
+                    )}
 
                     {!itemsFirst && serviceItems}
                 </List>

@@ -95,7 +95,7 @@ export const trackExternalListingClick = async (req, res) => {
                     $setOnInsert: { firstClickedAt: clickedAt },
                 },
                 {
-                    new: true,
+                    returnDocument: "after",
                     upsert: true,
                     runValidators: true,
                     setDefaultsOnInsert: true,

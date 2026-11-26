@@ -10,6 +10,7 @@
 // Only active accounts have a profile. A review can only be left to someone
 // who has published at least one vehicle, moto or bike, never to oneself.
 
+import { PUBLIC_CONTACT_FIELDS, publicContactOf, publicSocialLinksOf, visibilityOf } from "../../main/utils/publicProfile.js";
 import mongoose from "mongoose";
 
 import User from "../../main/models/User.js";
@@ -103,7 +104,7 @@ export const getVehiclePublicProfile = async (req, res) => {
         const { userId } = req.params;
         if (!isId(userId)) return res.status(400).json({ success: false, message: "Invalid user ID." });
 
-        const user = await findVisibleUser(userId, "firstName lastName bio profileImage createdAt role emailVerified phoneVerified");
+        const user = await findVisibleUser(userId, `firstName lastName bio profileImage createdAt role ${PUBLIC_CONTACT_FIELDS}`);
         if (!user) return res.status(404).json({ success: false, message: "Publisher not found." });
 
         const [statistics, rating, dealer] = await Promise.all([
@@ -127,6 +128,11 @@ export const getVehiclePublicProfile = async (req, res) => {
                 phoneVerified: Boolean(user.phoneVerified),
             },
             dealer: dealer ? { type: dealer.type, name: dealer.name, city: dealer.city || "" } : null,
+            // Only what the user chose to show (Settings > Public profile).
+            contact: publicContactOf(user),
+            // Links the user made public in Settings > Social media.
+            socialLinks: publicSocialLinksOf(user),
+            showRequests: visibilityOf(user).requests,
             statistics: { ...statistics, totalReviews: rating.totalReviews },
             rating,
         });

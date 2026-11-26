@@ -745,3 +745,196 @@ export const sendListingExpiryEmail = async ({ to, language = "en", kind, title 
         html,
     });
 };
+
+/* --------------------------------------------------
+   Requests ("I am looking for...")
+-------------------------------------------------- */
+
+const requestTexts = {
+    en: {
+        matchSubject: "New request in your area: {{title}}",
+        matchHeading: "Someone is looking for this",
+        matchIntro: "A user posted a request that matches what you work on. Do you have something that matches?",
+        digestSubject: "{{count}} new request(s) matching your work",
+        digestHeading: "Today's requests",
+        digestIntro: "New requests that match the cities and fields in your settings.",
+        viewRequest: "See the request",
+        viewRequests: "See the requests",
+        responseSubject: "New reply to your request: {{title}}",
+        responseHeading: "A professional has a match for you",
+        responseIntro: "{{name}} replied to your request.",
+        seeReplies: "See the replies",
+        contactSubject: "{{name}} shared their contact details",
+        contactHeading: "You can contact them now",
+        contactIntro: "{{name}} accepted your reply and shared their contact details:",
+        phone: "Phone",
+        whatsapp: "WhatsApp",
+        email: "Email",
+        settings: "Change what requests you receive",
+    },
+    fr: {
+        matchSubject: "Nouvelle demande dans votre zone : {{title}}",
+        matchHeading: "Quelqu'un cherche ceci",
+        matchIntro: "Un utilisateur a publié une demande qui correspond à votre activité. Avez-vous quelque chose qui correspond ?",
+        digestSubject: "{{count}} nouvelle(s) demande(s) pour votre activité",
+        digestHeading: "Les demandes du jour",
+        digestIntro: "Nouvelles demandes correspondant aux villes et domaines de vos paramètres.",
+        viewRequest: "Voir la demande",
+        viewRequests: "Voir les demandes",
+        responseSubject: "Nouvelle réponse à votre demande : {{title}}",
+        responseHeading: "Un professionnel a quelque chose pour vous",
+        responseIntro: "{{name}} a répondu à votre demande.",
+        seeReplies: "Voir les réponses",
+        contactSubject: "{{name}} a partagé ses coordonnées",
+        contactHeading: "Vous pouvez le contacter",
+        contactIntro: "{{name}} a accepté votre réponse et partagé ses coordonnées :",
+        phone: "Téléphone",
+        whatsapp: "WhatsApp",
+        email: "E-mail",
+        settings: "Modifier les demandes que vous recevez",
+    },
+    ar: {
+        matchSubject: "طلب جديد في منطقتك: {{title}}",
+        matchHeading: "شخص ما يبحث عن هذا",
+        matchIntro: "نشر مستخدم طلباً يطابق مجال عملك. هل لديك ما يناسبه؟",
+        digestSubject: "{{count}} طلب جديد يطابق عملك",
+        digestHeading: "طلبات اليوم",
+        digestIntro: "طلبات جديدة تطابق المدن والمجالات في إعداداتك.",
+        viewRequest: "عرض الطلب",
+        viewRequests: "عرض الطلبات",
+        responseSubject: "رد جديد على طلبك: {{title}}",
+        responseHeading: "لدى مهني ما يناسبك",
+        responseIntro: "ردّ {{name}} على طلبك.",
+        seeReplies: "عرض الردود",
+        contactSubject: "شارك {{name}} معلومات الاتصال",
+        contactHeading: "يمكنك التواصل معه الآن",
+        contactIntro: "قبِل {{name}} ردّك وشارك معلومات الاتصال:",
+        phone: "الهاتف",
+        whatsapp: "واتساب",
+        email: "البريد الإلكتروني",
+        settings: "تغيير الطلبات التي تتلقاها",
+    },
+};
+
+const fill = (text, values = {}) => Object.entries(values).reduce((result, [key, value]) => result.replaceAll(`{{${key}}}`, value), text);
+
+const sendMail = async ({ to, subject, text, html }) => {
+    const transporter = createTransporter();
+    await transporter.sendMail({ from: process.env.EMAIL_FROM || process.env.SMTP_USER, to, subject, text, html });
+};
+
+/** A new request matches the professional's settings. */
+export const sendRequestMatchEmail = async ({ to, language = "en", requestId, path, title, budget = "", message = "" }) => {
+    if (!to || !requestId) throw new Error("A recipient email and request are required.");
+    const lang = normalizeLanguage(language);
+    const t = requestTexts[lang];
+    const url = `${getFrontendUrl()}${path || `/requests/${requestId}`}`;
+    const settingsUrl = `${getFrontendUrl()}/setting`;
+
+    await sendMail({
+        to,
+        subject: fill(t.matchSubject, { title }),
+        text: [t.matchHeading, "", title, budget, message, "", `${t.viewRequest}: ${url}`, `${t.settings}: ${settingsUrl}`].filter((line) => line !== undefined).join("\n"),
+        html: makeEmailLayout({
+            language: lang,
+            heading: t.matchHeading,
+            intro: t.matchIntro,
+            content: `
+                <p style="font-size:16px"><strong>${escapeHtml(title)}</strong></p>
+                ${budget ? `<p>${escapeHtml(budget)}</p>` : ""}
+                ${message ? `<p style="color:#475569">“${escapeHtml(message)}”</p>` : ""}
+                <p style="font-size:13px;color:#64748b"><a href="${escapeHtml(settingsUrl)}">${escapeHtml(t.settings)}</a></p>
+            `,
+            buttonText: t.viewRequest,
+            buttonUrl: url,
+        }),
+    });
+};
+
+/** Daily summary: several requests in one email. requests: [{ id, path, title, budget }], boardPath: the service's requests board */
+export const sendRequestDigestEmail = async ({ to, language = "en", requests = [], boardPath = "" }) => {
+    if (!to || !requests.length) throw new Error("A recipient email and requests are required.");
+    const lang = normalizeLanguage(language);
+    const t = requestTexts[lang];
+    const boardUrl = `${getFrontendUrl()}${boardPath || (requests.every((request) => String(request.path || "").startsWith("/vehicles")) ? "/vehicles/requests/board" : "/requests/board")}`;
+    const settingsUrl = `${getFrontendUrl()}/setting`;
+    const lines = requests.map((request) => ({ ...request, url: `${getFrontendUrl()}${request.path || `/requests/${request.id}`}` }));
+
+    await sendMail({
+        to,
+        subject: fill(t.digestSubject, { count: String(requests.length) }),
+        text: [t.digestHeading, "", ...lines.map((line) => `- ${line.title}${line.budget ? ` (${line.budget})` : ""}: ${line.url}`), "", `${t.settings}: ${settingsUrl}`].join("\n"),
+        html: makeEmailLayout({
+            language: lang,
+            heading: t.digestHeading,
+            intro: t.digestIntro,
+            content: `
+                <ul style="padding-inline-start:18px">
+                    ${lines
+                        .map(
+                            (line) =>
+                                `<li style="margin-bottom:8px"><a href="${escapeHtml(line.url)}"><strong>${escapeHtml(line.title)}</strong></a>${
+                                    line.budget ? `<br><span style="color:#475569">${escapeHtml(line.budget)}</span>` : ""
+                                }</li>`
+                        )
+                        .join("")}
+                </ul>
+                <p style="font-size:13px;color:#64748b"><a href="${escapeHtml(settingsUrl)}">${escapeHtml(t.settings)}</a></p>
+            `,
+            buttonText: t.viewRequests,
+            buttonUrl: boardUrl,
+        }),
+    });
+};
+
+/** A professional replied to the seeker's request. */
+export const sendRequestResponseEmail = async ({ to, language = "en", requestId, path, title, responderName, message = "" }) => {
+    if (!to || !requestId) throw new Error("A recipient email and request are required.");
+    const lang = normalizeLanguage(language);
+    const t = requestTexts[lang];
+    const url = `${getFrontendUrl()}${path || `/requests/${requestId}`}`;
+
+    await sendMail({
+        to,
+        subject: fill(t.responseSubject, { title }),
+        text: [t.responseHeading, "", fill(t.responseIntro, { name: responderName }), message, "", `${t.seeReplies}: ${url}`].join("\n"),
+        html: makeEmailLayout({
+            language: lang,
+            heading: t.responseHeading,
+            intro: fill(t.responseIntro, { name: responderName }),
+            content: `
+                <p><strong>${escapeHtml(title)}</strong></p>
+                ${message ? `<p style="color:#475569">“${escapeHtml(message)}”</p>` : ""}
+            `,
+            buttonText: t.seeReplies,
+            buttonUrl: url,
+        }),
+    });
+};
+
+/** The seeker shared their contact details with a professional. */
+export const sendRequestContactEmail = async ({ to, language = "en", requestId, path, seekerName, contact = {} }) => {
+    if (!to || !requestId) throw new Error("A recipient email and request are required.");
+    const lang = normalizeLanguage(language);
+    const t = requestTexts[lang];
+    const url = `${getFrontendUrl()}${path || `/requests/${requestId}`}`;
+    const rows = [
+        contact.phone && [t.phone, contact.phone],
+        contact.whatsappNumber && [t.whatsapp, contact.whatsappNumber],
+        contact.email && [t.email, contact.email],
+    ].filter(Boolean);
+
+    await sendMail({
+        to,
+        subject: fill(t.contactSubject, { name: seekerName }),
+        text: [t.contactHeading, "", fill(t.contactIntro, { name: seekerName }), ...rows.map(([label, value]) => `${label}: ${value}`), "", url].join("\n"),
+        html: makeEmailLayout({
+            language: lang,
+            heading: t.contactHeading,
+            intro: fill(t.contactIntro, { name: seekerName }),
+            content: rows.map(([label, value]) => `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</p>`).join(""),
+            buttonText: t.viewRequest,
+            buttonUrl: url,
+        }),
+    });
+};

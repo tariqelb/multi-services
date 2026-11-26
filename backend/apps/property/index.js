@@ -5,13 +5,21 @@
 
 import router from "./routes/index.js";
 import { registerService } from "../main/services/serviceRegistry.js";
-import { getUserDetailStats, getUserListStats, onUserDeleted, userListDefaults } from "./services/userHooks.js";
+import {
+    getListingSummary,
+    getPublishingActivity,
+    getUserDetailStats,
+    getUserListStats,
+    onUserDeleted,
+    userListDefaults,
+} from "./services/userHooks.js";
 
 import { startExternalListingsCollectionJob } from "./jobs/externalListingsCollectionJob.js";
 import { startExternalListingsAvailabilityJob } from "./jobs/externalListingsAvailabilityJob.js";
 import { startListingExpiryJob } from "./jobs/listingExpiryJob.js";
+import { startRequestJobs } from "./jobs/requestJobs.js";
 
-registerService("property", { userListDefaults, getUserListStats, getUserDetailStats, onUserDeleted });
+registerService("property", { userListDefaults, getUserListStats, getUserDetailStats, onUserDeleted, getPublishingActivity, getListingSummary });
 
 export default {
     name: "property",
@@ -32,6 +40,11 @@ export default {
         // 60-day listing expiry: on unless LISTING_EXPIRY_ENABLED=false.
         if (process.env.LISTING_EXPIRY_ENABLED !== "false") {
             startListingExpiryJob(io);
+        }
+
+        // Requests: daily summary and expiry (on unless REQUESTS_JOBS_ENABLED=false).
+        if (process.env.REQUESTS_JOBS_ENABLED !== "false") {
+            startRequestJobs(io);
         }
     },
 };

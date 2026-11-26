@@ -1,0 +1,26 @@
+Unused files in /home/tariq/multi-services/app/backend
+Scanned 226 files, 8 starting files, 208 used.
+
+UNUSED (15) — nothing imports them:
+  apps/main/controllers/requests/requestController.js   (copy? the app uses apps/vehicles/controllers/requests/requestController.js)
+  apps/main/jobs/requestJobs.js   (copy? the app uses apps/vehicles/jobs/requestJobs.js)
+  apps/main/models/ServiceRequest.js
+  apps/main/routes/requestRouter.js   (copy? the app uses apps/vehicles/routes/requestRouter.js)
+  apps/main/scripts/migrateMissingUserFields.js
+  apps/main/scripts/migrateUserRoles.js
+  apps/main/scripts/test-Sms.js
+  apps/main/scripts/test-whatsapp.js
+  apps/main/services/requests/requestNotifier.js   (copy? the app uses apps/vehicles/services/requests/requestNotifier.js)
+  apps/main/services/requests/requestRules.js   (copy? the app uses apps/vehicles/services/requests/requestRules.js)
+  apps/main/services/requests/requestText.js   (copy? the app uses apps/vehicles/services/requests/requestText.js)
+  apps/main/utils/requestOptions.js   (copy? the app uses apps/vehicles/utils/requestOptions.js)
+  apps/property/scripts/addRandomPropertyLocations.js
+  apps/property/scripts/migratePropertyImagesToCloudinary.js
+  apps/property/scripts/migratePropertyRentalFields.js
+
+MAYBE USED (3) — not imported, but their name appears in the code. Check by hand:
+  apps/main/models/RequestResponse.js   <- named in apps/vehicles/services/userHooks.js
+  apps/property/data/externalListingSources.json   <- named in apps/property/services/externalListings/listingSourcesStore.js
+  apps/property/services/externalListings/sources/supportedSources.json   <- named in apps/property/services/externalListings/sources/externalListingSource.js
+
+MANUAL SCRIPTS (0) — run by hand, kept:

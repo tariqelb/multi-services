@@ -1,0 +1,285 @@
+[
+    {
+        "sourceName": "Avito",
+        "hostnames": [
+            "avito.ma",
+            "www.avito.ma"
+        ],
+        "pathPrefix": "/fr/",
+        "linkPattern": "^/(fr|ar)/[^/]+/(voitures_d_occasion|motos|location_de_voiture|pieces_et_accessoires_pour_vehicules)/[^/]+_\\d+\\.htm$",
+        "search": {
+            "note": "Listing pages: /fr/<area>/voitures_d_occasion/<title>_<id>.htm, /fr/<area>/motos/... Results pages: /fr/<city>/voitures_d_occasion-à_vendre. Check with Test before relying on it.",
+            "offers": [
+                "sale"
+            ],
+            "categories": [
+                "car",
+                "moto"
+            ],
+            "allCities": "maroc",
+            "templates": [
+                {
+                    "url": "/fr/{city}/voitures_d_occasion-à_vendre",
+                    "category": "car",
+                    "listingType": "sale"
+                },
+                {
+                    "url": "/fr/{city}/motos-à_vendre",
+                    "category": "moto",
+                    "listingType": "sale"
+                }
+            ],
+            "maps": {
+                "city": {
+                    "Marrakesh": "marrakech",
+                    "Fes": "fes",
+                    "Tanger": "tanger",
+                    "Sale": "sale"
+                }
+            },
+            "resultLinkPattern": "^/(fr|ar)/[^/]+/[^/]+/[^/]+_\\d+\\.htm$"
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-26T01:00:00.011Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:00:07.454Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Moteur.ma",
+        "hostnames": [
+            "moteur.ma",
+            "www.moteur.ma"
+        ],
+        "pathPrefix": "/fr/voiture/achat-voiture-occasion/detail-annonce/",
+        "search": {
+            "note": "Listing pages: /fr/voiture/achat-voiture-occasion/detail-annonce/<id>/<make-model>.html. Results: /fr/voiture/achat-voiture-occasion/ (all cities, filtered here).",
+            "offers": [
+                "sale"
+            ],
+            "categories": [
+                "car"
+            ],
+            "templates": [
+                {
+                    "url": "/fr/voiture/achat-voiture-occasion/",
+                    "category": "car",
+                    "listingType": "sale"
+                }
+            ],
+            "resultLinkPattern": "/detail-annonce/\\d+/"
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-26T01:00:07.524Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:00:42.268Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 10,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Wandaloo",
+        "hostnames": [
+            "wandaloo.com",
+            "www.wandaloo.com"
+        ],
+        "pathPrefix": "/occasion/",
+        "linkPattern": "^/occasion/[a-z0-9-]+/\\d+\\.html$",
+        "search": {
+            "note": "Listing pages: /occasion/<make-model-fuel-occasion-city-maroc>/<id>.html. City and make filters use numeric ids (?ville=1, ?marque=3), not mapped yet.",
+            "offers": [
+                "sale"
+            ],
+            "categories": [
+                "car"
+            ],
+            "templates": [
+                {
+                    "url": "/occasion/voiture-occasion-maroc-annonce.html",
+                    "category": "car",
+                    "listingType": "sale"
+                }
+            ],
+            "resultLinkPattern": "^/occasion/[a-z0-9-]+/\\d+\\.html$"
+        },
+        "robots": {
+            "allowed": true,
+            "reason": "no-robots",
+            "checkedAt": "2026-11-26T01:00:42.692Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:01:13.705Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 10,
+            "alreadyInDb": 10,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Kifal Auto",
+        "hostnames": [
+            "kifal-auto.ma",
+            "www.kifal-auto.ma"
+        ],
+        "pathPrefix": "/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-26T01:01:13.712Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:01:15.206Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "AUTO24",
+        "hostnames": [
+            "auto24.ma",
+            "www.auto24.ma"
+        ],
+        "pathPrefix": "/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-26T01:01:15.213Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:01:16.622Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Autocaz",
+        "hostnames": [
+            "autocaz.ma",
+            "www.autocaz.ma"
+        ],
+        "pathPrefix": "/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-26T01:01:16.715Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:01:18.289Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 0,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Wafa VO",
+        "hostnames": [
+            "wafa-vo.ma",
+            "www.wafa-vo.ma"
+        ],
+        "pathPrefix": "/vehicles/",
+        "robots": {
+            "allowed": true,
+            "reason": "robots-allow",
+            "checkedAt": "2026-11-26T01:01:18.716Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:01:34.992Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 4,
+            "failed": 0,
+            "status": "completed"
+        }
+    },
+    {
+        "sourceName": "Maroc Annonces",
+        "hostnames": [
+            "marocannonces.com",
+            "www.marocannonces.com"
+        ],
+        "pathPrefix": "/",
+        "robots": {
+            "allowed": false,
+            "reason": "robots-disallow-all",
+            "checkedAt": "2026-11-26T01:01:35.231Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:01:36.282Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 0,
+            "failed": 0,
+            "status": "skipped"
+        },
+        "useSitemap": false
+    },
+    {
+        "sourceName": "Maroc Annuaire",
+        "hostnames": [
+            "marocannuaire.org",
+            "www.marocannuaire.org"
+        ],
+        "pathPrefix": "/an/",
+        "robots": {
+            "allowed": true,
+            "reason": "no-robots",
+            "checkedAt": "2026-11-26T01:01:36.733Z"
+        },
+        "lastCollectedAt": "2026-11-26T01:03:39.592Z",
+        "lastCollectSummary": {
+            "requested": 10,
+            "saved": 0,
+            "alreadyInDb": 0,
+            "skippedNoImage": 0,
+            "skippedNotVehicle": 50,
+            "failed": 0,
+            "status": "completed"
+        },
+        "linkPattern": "^/an/an_det\\.php\\?i=\\d+$",
+        "useSitemap": false,
+        "listPageUrls": [
+            "https://www.marocannuaire.org/an/an_cate.php?c=voitures_occasion",
+            "https://www.marocannuaire.org/an/an_cate.php?c=motos",
+            "https://www.marocannuaire.org/an/an_cate.php?c=autres_vehicules"
+        ]
+    }
+]

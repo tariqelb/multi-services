@@ -10,14 +10,19 @@ import services from "./apps/index.js";
 
 const PORT = process.env.PORT || 3000;
 
+// Outbound IP of the hosting (to allow it in MongoDB Atlas "Network Access").
+// Only on the server (production) or when SHOW_OUTBOUND_IP=true, and never
+// longer than 3 seconds: it must not slow down or clutter local starts.
 const showOutboundIP = async () => {
+    if (process.env.NODE_ENV !== "production" && process.env.SHOW_OUTBOUND_IP !== "true") return;
+
     try {
-        const response = await fetch("https://api.ipify.org?format=json");
+        const response = await fetch("https://api.ipify.org?format=json", { signal: AbortSignal.timeout(3000) });
         const data = await response.json();
 
-        console.log("BACK4APP_OUTBOUND_IP:", data.ip);
+        console.log("[STARTUP] Outbound IP:", data.ip);
     } catch (error) {
-        console.error("Could not detect outbound IP:", error.message);
+        console.warn("[STARTUP] Outbound IP unknown:", error.message);
     }
 };
 
