@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 import User from "../../models/User.js";
 
-import { getUserDetailStats, getUserListStats } from "../../services/serviceRegistry.js";
+import { getUserActivityKeys, getUserDetailStats, getUserListStats } from "../../services/serviceRegistry.js";
 import { forgetAccountStatus } from "../../services/accountStatus.js";
 import { sendAccountStatusEmail } from "../../services/emailService.js";
 
@@ -98,7 +98,27 @@ export const getAdminUserDetails = async (req, res) => {
 // Users list + user statistics
 // -----------------------------------------------------------------------------
 
-const buildUsersSummary = (users) => {
+// What each user does, per service, from the counters the services give
+// (see userActivity in each service's userHooks.js):
+//   activity: { publisher: true, saver: false, ... }
+//   services: { property: { publisher: true, ... }, vehicles: {...} }
+const ACTIVITY_KINDS = ["publisher", "activePublisher", "saver", "alerts", "requests", "portfolio", "reporter"];
+
+export const userActivityOf = (user, activityKeys) => {
+    const activity = Object.fromEntries(ACTIVITY_KINDS.map((kind) => [kind, false]));
+    const services = {};
+    for (const [service, kinds] of Object.entries(activityKeys || {})) {
+        services[service] = {};
+        for (const [kind, keys] of Object.entries(kinds)) {
+            const value = (keys || []).some((key) => Number(user[key]) > 0);
+            services[service][kind] = value;
+            if (value) activity[kind] = true;
+        }
+    }
+    return { activity, services };
+};
+
+export const buildUsersSummary = (users) => {
     const now = Date.now();
     const signupWindow = getRangeWindow("30d");
 
@@ -108,6 +128,7 @@ const buildUsersSummary = (users) => {
 
     const roles = new Map();
     const statuses = new Map();
+    const byService = new Map();
     const signupsByDay = new Map();
 
     const summary = {
@@ -121,6 +142,9 @@ const buildUsersSummary = (users) => {
         publishers: 0,
         activePublishers: 0,
         savers: 0,
+        alertUsers: 0,
+        requestUsers: 0,
+        portfolioUsers: 0,
         reporters: 0,
         newLast7Days: 0,
         newLast30Days: 0,
@@ -142,10 +166,27 @@ const buildUsersSummary = (users) => {
             summary.whatsappVerified += 1;
         }
         if (user.deletionRequestedAt) summary.pendingDeletion += 1;
-        if (user.publishedProperties > 0) summary.publishers += 1;
-        if (user.activeProperties > 0) summary.activePublishers += 1;
-        if (user.savedProperties > 0) summary.savers += 1;
-        if (user.reports > 0) summary.reporters += 1;
+        const activity = user.activity || {};
+        if (activity.publisher) summary.publishers += 1;
+        if (activity.activePublisher) summary.activePublishers += 1;
+        if (activity.saver) summary.savers += 1;
+        if (activity.alerts) summary.alertUsers += 1;
+        if (activity.requests) summary.requestUsers += 1;
+        if (activity.portfolio) summary.portfolioUsers += 1;
+        if (activity.reporter) summary.reporters += 1;
+
+        // Per service: how many users publish, save, follow alerts...
+        for (const [service, kinds] of Object.entries(user.services || {})) {
+            const entry = byService.get(service) || { name: service, users: 0 };
+            let used = false;
+            for (const [kind, value] of Object.entries(kinds)) {
+                if (!value) continue;
+                entry[kind] = (entry[kind] || 0) + 1;
+                used = true;
+            }
+            if (used) entry.users += 1;
+            byService.set(service, entry);
+        }
 
         const createdAt = user.createdAt
             ? new Date(user.createdAt).getTime()
@@ -183,6 +224,11 @@ const buildUsersSummary = (users) => {
             summary.newLast30Days,
             summary.newPrevious30Days
         ),
+        alertRate: rate(summary.alertUsers, summary.totalUsers),
+        requestRate: rate(summary.requestUsers, summary.totalUsers),
+        portfolioRate: rate(summary.portfolioUsers, summary.totalUsers),
+        // [{ name: "property", users, publisher, saver, alerts, requests, portfolio }, ...]
+        services: Array.from(byService.values()),
         roles: toList(roles),
         statuses: toList(statuses),
         signupTrend: fillSeries(
@@ -210,7 +256,11 @@ export const getAdminUsers = async (req, res) => {
 
         // Each service adds per-user counters (publishedProperties, savedProperties, reports...).
         const stats = await getUserListStats(accounts.map((user) => user._id));
-        const users = accounts.map((user) => ({ ...stats.defaults, ...user, ...stats.byUser.get(String(user._id)) }));
+        const activityKeys = getUserActivityKeys();
+        const users = accounts.map((account) => {
+            const user = { ...stats.defaults, ...account, ...stats.byUser.get(String(account._id)) };
+            return { ...user, ...userActivityOf(user, activityKeys) };
+        });
 
         return res.status(200).json({
             success: true,

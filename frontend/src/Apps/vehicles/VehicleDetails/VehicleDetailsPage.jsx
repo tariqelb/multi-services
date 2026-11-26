@@ -46,6 +46,7 @@ import SimilarVehicles from "./SimilarVehicles";
 import SaveVehicleButton from "../Saved/SaveVehicleButton";
 import { STATUS_TONES, formatVehiclePrice, formatCity, formatDate, formatNumber, getYoutubeVideoId, optionLabel } from "../vehicleFormat";
 import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
+import { trackVehicleContact, trackVehicleView } from "../statsTracking";
 
 const yesNo = (t, value) => (value ? t("vehiclesApp.details.yes", "Yes") : null);
 const waLink = (number) => `https://wa.me/${String(number).replace(/\D/g, "")}`;
@@ -70,6 +71,11 @@ function VehicleDetails({ id }) {
 
     const [vehicle, setVehicle] = useState(null);
     const [error, setError] = useState("");
+
+    // One view per page opening (Vehicles › Statistics; owners are not counted).
+    useEffect(() => {
+        trackVehicleView("vehicle", id);
+    }, [id]);
 
     useEffect(() => {
         let cancelled = false;
@@ -285,7 +291,7 @@ function VehicleDetails({ id }) {
                 ) : contact ? (
                     <Stack spacing={1.25}>
                         {contact.phone && (
-                            <Button variant="contained" size="large" component="a" href={`tel:${contact.phone}`} startIcon={<PhoneRoundedIcon />} endIcon={<Verified show={contact.contactVerified?.phone} color="inherit" />}>
+                            <Button variant="contained" size="large" component="a" href={`tel:${contact.phone}`} onClick={() => trackVehicleContact("vehicle", vehicle._id, "phone")} startIcon={<PhoneRoundedIcon />} endIcon={<Verified show={contact.contactVerified?.phone} color="inherit" />}>
                                 <span dir="ltr">{contact.phone}</span>
                             </Button>
                         )}
@@ -296,6 +302,7 @@ function VehicleDetails({ id }) {
                                 size="large"
                                 component="a"
                                 href={waLink(contact.whatsappNumber)}
+                                onClick={() => trackVehicleContact("vehicle", vehicle._id, "whatsapp")}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 startIcon={<WhatsAppIcon />}
@@ -307,7 +314,7 @@ function VehicleDetails({ id }) {
                         {/* Save: right under WhatsApp, like the other details pages */}
                         {!vehicle.isOwner && <SaveVehicleButton vehicle={vehicle} />}
                         {contact.email && (
-                            <Button variant="text" component="a" href={`mailto:${contact.email}`} startIcon={<MailOutlineRoundedIcon />} endIcon={<Verified show={contact.contactVerified?.email} />}>
+                            <Button variant="text" component="a" href={`mailto:${contact.email}`} onClick={() => trackVehicleContact("vehicle", vehicle._id, "email")} startIcon={<MailOutlineRoundedIcon />} endIcon={<Verified show={contact.contactVerified?.email} />}>
                                 {contact.email}
                             </Button>
                         )}

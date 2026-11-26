@@ -28,7 +28,6 @@ import {
     TrendingUpOutlined,
 } from "@mui/icons-material";
 
-import SavedPropertyDemandSection from "./SavedPropertyDemandSection";
 
 import {
     BarChartView,
@@ -432,12 +431,48 @@ export default function PropertyDemandSection() {
                 </CardContent>
             </Card>
 
-            <Divider />
-
-            <SavedPropertyDemandSection
-                range={range}
-                alertCities={data?.topCities || []}
-            />
+            {/* Roommate alerts: people looking for a roommate. */}
+            <ChartGrid template="1fr 1fr">
+                <Card elevation={0} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 3 }}>
+                    <CardContent>
+                        <Typography sx={{ fontWeight: 800, mb: 2 }}>
+                            {t("propertyDemand.roommateAlerts", "Roommate alerts")}
+                        </Typography>
+                        <KpiGrid columns={3}>
+                            <StatCard
+                                title={t("propertyDemand.roommateAlertsCreated", "Created")}
+                                value={formatNumber(data?.roommateAlerts?.created?.value, locale)}
+                                change={data?.roommateAlerts?.created?.change}
+                                icon={<NotificationsActiveOutlined />}
+                                color="#9333EA"
+                                locale={locale}
+                            />
+                            <StatCard
+                                title={t("propertyDemand.roommateAlertsActive", "Active")}
+                                value={formatNumber(data?.roommateAlerts?.active, locale)}
+                                icon={<TrendingUpOutlined />}
+                                color="#16A34A"
+                                locale={locale}
+                            />
+                            <StatCard
+                                title={t("propertyDemand.openRoommates", "Open announcements")}
+                                value={formatNumber(data?.roommateAlerts?.openAnnouncements, locale)}
+                                icon={<PeopleAltOutlined />}
+                                color="#0891B2"
+                                locale={locale}
+                            />
+                        </KpiGrid>
+                    </CardContent>
+                </Card>
+                <ChartCard title={t("propertyDemand.roommateCities", "Roommate alerts by city")} height={260}>
+                    <BarChartView
+                        data={data?.roommateAlerts?.cities || []}
+                        bars={[{ key: "alerts", name: t("propertyDemand.alerts", "Alerts"), color: "#9333EA" }]}
+                        layout="vertical"
+                        locale={locale}
+                    />
+                </ChartCard>
+            </ChartGrid>
         </Stack>
     );
 }

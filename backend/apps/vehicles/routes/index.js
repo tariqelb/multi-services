@@ -34,6 +34,18 @@ import sparePartRouter from "./sparePartRouter.js";
 import requestRouter from "./requestRouter.js";
 import externalListingRouter from "./externalListingRouter.js";
 import portfolioRouter from "./portfolioRouter.js";
+import { getAdminUserVehicleActivity } from "../controllers/admin/adminUserActivityController.js";
+import {
+    getVehicleActivity,
+    getVehicleAlertDemand,
+    getVehicleContacts,
+    getVehicleExternalClicks,
+    getVehicleOverview,
+    getVehicleSavedDemand,
+    getVehicleViews,
+} from "../controllers/admin/vehicleStatisticsController.js";
+import { trackContact, trackView } from "../controllers/statsTrackingController.js";
+import optionalAuthMiddleware from "../../main/middleware/optionalAuthMiddleware.js";
 import { portfolio } from "../controllers/portfolio/portfolioController.js";
 import { searchVehicles } from "../controllers/vehicleSearchController.js";
 import { searchLimiter } from "../../main/middleware/rateLimit.js";
@@ -53,6 +65,22 @@ router.get("/search", searchLimiter, searchVehicles);
 // Admin panel (before the vehicle router: /admin is not a vehicle id).
 router.get("/admin/publications", authMiddleware, adminAccess("vehiclePublications"), getVehiclePublications);
 router.delete("/admin/publications/:kind/:id", authMiddleware, adminAccess("vehiclePublications"), deleteVehiclePublication);
+// Statistics: what visitors do (details pages opened, contact buttons pressed).
+router.post("/stats/view", optionalAuthMiddleware, trackView);
+router.post("/stats/contact", optionalAuthMiddleware, trackContact);
+
+// Vehicles › Statistics (admin), one endpoint per tab.
+const statistics = [authMiddleware, adminAccess("vehicleStatistics")];
+router.get("/admin/statistics/overview", ...statistics, getVehicleOverview);
+router.get("/admin/statistics/activity", ...statistics, getVehicleActivity);
+router.get("/admin/statistics/views", ...statistics, getVehicleViews);
+router.get("/admin/statistics/external-clicks", ...statistics, getVehicleExternalClicks);
+router.get("/admin/statistics/alert-demand", ...statistics, getVehicleAlertDemand);
+router.get("/admin/statistics/saved-demand", ...statistics, getVehicleSavedDemand);
+router.get("/admin/statistics/contacts", ...statistics, getVehicleContacts);
+
+// Admin user page, "Vehicles" tab: everything of this service, one kind at a time.
+router.get("/admin/users/:userId/activity", authMiddleware, adminAccess("users"), getAdminUserVehicleActivity);
 // Portfolio review: articles and videos of profiles (same reviewers as publications).
 router.get("/admin/portfolio", authMiddleware, adminAccess("vehiclePublications"), portfolio.adminList);
 router.delete("/admin/portfolio/:id", authMiddleware, adminAccess("vehiclePublications"), portfolio.adminDelete);

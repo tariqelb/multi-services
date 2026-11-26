@@ -15,9 +15,10 @@ import {
     getUserListStats,
     onUserDeleted,
     userListDefaults,
+    userActivity,
 } from "./services/userHooks.js";
 
-registerService("vehicles", { userListDefaults, getUserListStats, getUserDetailStats, onUserDeleted, getPublishingActivity, getListingSummary });
+registerService("vehicles", { userListDefaults, userActivity, getUserListStats, getUserDetailStats, onUserDeleted, getPublishingActivity, getListingSummary });
 
 export default {
     name: "vehicles",

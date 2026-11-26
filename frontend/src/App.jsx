@@ -35,6 +35,7 @@ import VehicleAlertsPage from "./Apps/vehicles/VehicleAlerts/VehicleAlertsPage";
 import MyVehicleProfile from "./Apps/vehicles/Profile/MyVehicleProfile";
 import VehiclePublicProfile from "./Apps/vehicles/Profile/VehiclePublicProfile";
 import PortfolioReview from "./Components/Admin/PortfolioReview";
+import VehicleStatisticsPage from "./Apps/vehicles/Admin/Statistics/VehicleStatisticsPage";
 import VehicleReviewsPage from "./Apps/vehicles/Reviews/VehicleReviewsPage";
 import SavedVehiclesPage from "./Apps/vehicles/Saved/SavedVehiclesPage";
 import SparePartsPage from "./Apps/vehicles/SpareParts/SparePartsPage";
@@ -214,7 +215,8 @@ function DashboardLayout() {
             // Motos are part of the vehicles service.
             prefixes: ["/vehicles", "/motos"],
             title: "Vehicles",
-            descriptionPath: "/vehicles/description",
+            // No "Description" entry: the vehicles About page is in the dashboard sidebar.
+            descriptionPath: "",
             translationKey: "vehicles",
             items: VEHICLE_NAV,
             itemsFirst: true,
@@ -672,6 +674,14 @@ const router = createBrowserRouter([
                 element: (
                     <AdminRoute section="vehiclePublications">
                         <VehiclePublicationsReview />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/vehicles/statistics",
+                element: (
+                    <AdminRoute section="vehicleStatistics">
+                        <VehicleStatisticsPage />
                     </AdminRoute>
                 ),
             },

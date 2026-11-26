@@ -7,8 +7,11 @@ import { useTranslation } from "react-i18next";
 import { Box, Card, CardContent, Stack, Typography } from "@mui/material";
 
 import {
+    AutoStoriesOutlined,
     BookmarkBorderOutlined,
+    CampaignOutlined,
     DashboardOutlined,
+    ForumOutlined,
     HomeWorkOutlined,
     MouseOutlined,
     NotificationsActiveOutlined,
@@ -46,11 +49,16 @@ const KPI_CONFIG = [
     { key: "uniqueVisitors", label: "Unique visitors", icon: <PeopleAltOutlined />, color: "#2563EB" },
     { key: "sessions", label: "Sessions", icon: <VisibilityOutlined />, color: "#0891B2" },
     { key: "newUsers", label: "New accounts", icon: <PersonAddAltOutlined />, color: "#16A34A" },
-    { key: "newListings", label: "New listings", icon: <HomeWorkOutlined />, color: "#9333EA" },
+    // Properties, roommate announcements, hotels & riads.
+    { key: "newListings", label: "New listings (all types)", icon: <HomeWorkOutlined />, color: "#9333EA" },
     { key: "propertyClicks", label: "Property views", icon: <MouseOutlined />, color: "#2563EB" },
     { key: "externalClicks", label: "External clicks", icon: <OpenInNewOutlined />, color: "#EA580C" },
-    { key: "saves", label: "Saved properties", icon: <BookmarkBorderOutlined />, color: "#EC4899" },
+    { key: "saves", label: "Saved listings", icon: <BookmarkBorderOutlined />, color: "#EC4899" },
     { key: "contacts", label: "Contacts", icon: <PhoneInTalkOutlined />, color: "#16A34A" },
+    { key: "newAlerts", label: "New alerts", icon: <NotificationsActiveOutlined />, color: "#F59E0B" },
+    { key: "newRequests", label: "Requests posted", icon: <CampaignOutlined />, color: "#0891B2" },
+    { key: "newReplies", label: "Replies to requests", icon: <ForumOutlined />, color: "#16A34A" },
+    { key: "newPortfolio", label: "Portfolio items", icon: <AutoStoriesOutlined />, color: "#9333EA" },
 ];
 
 const FUNNEL_LABELS = {
@@ -310,11 +318,17 @@ export default function OverviewSection() {
 
             <ChartGrid template="1fr 1fr">
                 <ChartCard
-                    title={t("overview.inventory", "Listing inventory")}
-                    subtitle={t("overview.inventoryDescription", "All properties by status")}
+                    title={t("overview.inventoryByType", "Listings online")}
+                    subtitle={t("overview.inventoryByTypeDescription", "Available properties, open roommate announcements, hotels & riads")}
                     height={300}
                 >
-                    <DonutChart data={data?.inventory || []} locale={locale} />
+                    <DonutChart
+                        data={(data?.availableByType || []).map((item) => ({
+                            ...item,
+                            name: t(`overview.listingTypes.${item.name}`, item.name),
+                        }))}
+                        locale={locale}
+                    />
                 </ChartCard>
 
                 <ChartCard

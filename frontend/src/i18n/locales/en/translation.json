@@ -1621,8 +1621,10 @@
         "publications": "Publications Review",
         "feedback": "Feedback",
         "client call action": "Client Contact Actions",
-        "property demand": "Property Demand",
-        "overview": "Overview"
+        "property demand": "Alert demand",
+        "overview": "Overview",
+        "activity": "Publications & community",
+        "saved demand": "Saved demand"
     },
     "propertyDemand": {
         "title": "Property Demand Analytics",
@@ -1679,7 +1681,13 @@
             "high": "Under-supplied",
             "balanced": "Balanced",
             "low": "Over-supplied"
-        }
+        },
+        "alerts": "Alerts",
+        "openRoommates": "Open announcements",
+        "roommateAlerts": "Roommate alerts",
+        "roommateAlertsActive": "Active",
+        "roommateAlertsCreated": "Created",
+        "roommateCities": "Roommate alerts by city"
     },
     "visitsSection": {
         "title": "Website Visits",
@@ -2006,7 +2014,7 @@
         "reporters": "Sent feedback",
         "roles": "Roles",
         "saverRate": "Saved at least one property",
-        "savers": "Saved properties",
+        "savers": "Saved listings",
         "signupTrend": "New accounts",
         "signupTrendDescription": "Daily sign-ups over the last 30 days",
         "statuses": "Account status",
@@ -2019,6 +2027,32 @@
         "statusNames": {
             "active": "Active",
             "suspended": "Suspended"
+        },
+        "alertRate": "Follow at least one alert",
+        "alertUsers": "{{count}} with alerts",
+        "alertsFilter": "Follow alerts",
+        "byService": "Activity per service",
+        "byServiceDescription": "Users who publish, save, follow alerts, post requests or have a portfolio in each service",
+        "mostSavedAll": "Most saved listings",
+        "portfolioFilter": "Have a portfolio",
+        "portfolioUsers": "{{count}} with a portfolio",
+        "propertyPublishers": "Property publishers",
+        "publisherRateAll": "Published at least one listing",
+        "requestRate": "Posted at least one request",
+        "requestUsers": "Posted requests",
+        "requestsFilter": "Posted requests",
+        "saverRateAll": "Saved at least one listing",
+        "vehiclePublishers": "Vehicle publishers",
+        "activityKinds": {
+            "publisher": "Publish",
+            "saver": "Save",
+            "alerts": "Alerts",
+            "requests": "Requests",
+            "portfolio": "Portfolio"
+        },
+        "serviceNames": {
+            "property": "Property",
+            "vehicles": "Vehicles"
         }
     },
     "userCard": {
@@ -2043,6 +2077,18 @@
         "statuses": {
             "active": "Active",
             "suspended": "Suspended"
+        },
+        "alerts": "Alerts",
+        "portfolio": "Portfolio items",
+        "publishedParts": "Spare parts",
+        "publishedVehicles": "Vehicles",
+        "requests": "Requests",
+        "roommatesAndHotels": "Roommates, hotels & riads",
+        "savedListings": "Saved",
+        "services": {
+            "property": "Property",
+            "vehicles": "Vehicles",
+            "other": "Requests, portfolio & feedback"
         }
     },
     "userDetails": {
@@ -2077,7 +2123,9 @@
             "publications": "Publications",
             "alerts": "Alerts",
             "savedProperties": "Saved properties",
-            "feedback": "Feedback"
+            "feedback": "Feedback",
+            "property": "Property",
+            "vehicles": "Vehicles"
         },
         "feedbackStatuses": {
             "open": "Open",
@@ -2085,7 +2133,49 @@
             "resolved": "Resolved",
             "closed": "Closed"
         },
-        "whatsapp": "WhatsApp number"
+        "whatsapp": "WhatsApp number",
+        "availableVehicles": "Available vehicles",
+        "carsMotos": "Cars / motos",
+        "establishments": "Hotels & riads",
+        "noDetails": "No additional details",
+        "parts": "Spare parts",
+        "portfolioItems": "Portfolio (articles / videos)",
+        "repliesSent": "Replies to requests",
+        "requests": "Requests posted",
+        "reviews": "Reviews received",
+        "roommates": "Roommate announcements",
+        "savedListings": "Saved listings",
+        "services": {
+            "account": "Feedback",
+            "property": "Property",
+            "vehicles": "Vehicles"
+        },
+        "vehicles": "Vehicles",
+        "kinds": {
+            "publications": "Publications",
+            "alerts": "Alerts",
+            "saved": "Saved",
+            "requests": "Requests",
+            "portfolio": "Portfolio"
+        },
+        "types": {
+            "property": "Property",
+            "roommate": "Roommate",
+            "establishment": "Hotel / riad",
+            "vehicle": "Car",
+            "moto": "Moto",
+            "part": "Spare part",
+            "propertyAlert": "Property alert",
+            "roommateAlert": "Roommate alert",
+            "vehicleAlert": "Vehicle alert",
+            "request": "Request",
+            "article": "Article",
+            "video": "Video"
+        },
+        "statusNames": {
+            "active": "Active",
+            "archived": "Archived"
+        }
     },
     "knowledge": "Legal & Property Guide",
     "knowledgeManagement": "Knowledge Management",
@@ -3262,13 +3352,16 @@
         "kpis": {
             "contacts": "Owner contacts",
             "externalClicks": "External clicks",
-            "newAlerts": "New property alerts",
+            "newAlerts": "New alerts",
             "propertyClicks": "Property views",
-            "saves": "Saved properties",
+            "saves": "Saved listings",
             "sessions": "Sessions",
             "uniqueVisitors": "Unique visitors",
             "newUsers": "New accounts",
-            "newListings": "New listings"
+            "newListings": "New listings (all types)",
+            "newRequests": "Requests posted",
+            "newReplies": "Replies to requests",
+            "newPortfolio": "Portfolio items"
         },
         "leadsTrend": "Interest & leads",
         "leadsTrendDescription": "Saved properties and owner contacts over time",
@@ -3295,6 +3388,13 @@
             "roommates_other": "{{value}} roommate announcements",
             "establishments_one": "{{value}} establishment",
             "establishments_other": "{{value}} establishments"
+        },
+        "inventoryByType": "Listings online",
+        "inventoryByTypeDescription": "Available properties, open roommate announcements, hotels & riads",
+        "listingTypes": {
+            "properties": "Properties",
+            "roommates": "Roommates",
+            "establishments": "Hotels & riads"
         }
     },
     "profileRoommate": {
@@ -4452,7 +4552,8 @@
         "usersSubtitle": "Every account: activity, verification, publications, suspension.",
         "visitsSubtitle": "Visitors and sessions across the platform.",
         "statisticsTitle": "Property statistics",
-        "statisticsSubtitle": "Clicks, demand and contacts on the property listings."
+        "statisticsSubtitle": "Clicks, demand and contacts on the property listings.",
+        "statisticsSubtitleAll": "Properties, roommates, hotels & riads: publications, clicks, alerts, saves, contacts, requests and portfolios."
     },
     "adminRoles": {
         "title": "Roles & access",
@@ -5252,5 +5353,179 @@
         "deleteError": "Unable to delete this item.",
         "loadError": "Unable to load the portfolio items.",
         "unknownUser": "Deleted account"
+    },
+    "activityStats": {
+        "answeredRate": "Requests with at least one reply",
+        "communityTrend": "Requests, replies and portfolio",
+        "listingTrend": "New listings",
+        "noPublishers": "No new listings in this period.",
+        "online": "Listings online",
+        "portfolio": "Portfolio articles / videos",
+        "portfolioAuthors": "{{count}} authors",
+        "portfolioItems": "Portfolio items",
+        "propertyTitle": "Publications & community",
+        "propertySubtitle": "New listings of every kind, requests, portfolios and reviews.",
+        "vehicleTitle": "Publications & community",
+        "vehicleSubtitle": "New cars, motos & bikes and spare parts, requests, portfolios and reviews.",
+        "publishers": "Most active publishers",
+        "replies": "Replies to requests",
+        "repliesPerRequest": "{{value}} per request",
+        "requestCities": "Requests by city",
+        "requestQuality": "Requests",
+        "requests": "Requests posted",
+        "reviews": "Reviews",
+        "types": {
+            "properties": "Properties",
+            "roommates": "Roommate announcements",
+            "establishments": "Hotels & riads"
+        },
+        "extra": {
+            "roommateCities": "New roommate announcements by city",
+            "establishmentTypes": "New hotels & riads by type",
+            "vehicleMakes": "New vehicles by make",
+            "partMakes": "New spare parts by make"
+        }
+    },
+    "savedStats": {
+        "title": "Saved demand",
+        "subtitle": "What people save, by kind of listing.",
+        "saves": "Saves",
+        "uniqueUsers": "People who saved",
+        "activeSaved": "Still saved",
+        "activeSavedDescription": "Listings in someone's saved list now",
+        "keepRate": "Kept",
+        "unsaves": "{{count}} removed again",
+        "trend": "Saves over time",
+        "topListings": "Most saved",
+        "cities": "Cities of the saved listings",
+        "empty": "Nothing saved in this period.",
+        "types": {
+            "properties": "Properties",
+            "roommate": "Roommate announcements",
+            "establishment": "Hotels & riads"
+        }
+    },
+    "vehicleStats": {
+        "title": "Vehicle statistics",
+        "subtitle": "Cars, motos & bikes, spare parts and external listings: publications, views, alerts, saves, contacts, requests and portfolios.",
+        "empty": "Nothing in this period.",
+        "tabs": {
+            "overview": "Overview",
+            "activity": "Publications & community",
+            "views": "Listing views",
+            "external": "External listings clicks",
+            "alerts": "Alert demand",
+            "saved": "Saved demand",
+            "contacts": "Client call actions"
+        },
+        "kpis": {
+            "uniqueVisitors": "Unique visitors",
+            "views": "Listing views",
+            "contacts": "Contacts",
+            "externalClicks": "External clicks",
+            "newListings": "New listings",
+            "saves": "Saves",
+            "newAlerts": "New alerts",
+            "newRequests": "Requests posted",
+            "newReplies": "Replies to requests",
+            "newPortfolio": "Portfolio items"
+        },
+        "overview": {
+            "title": "Vehicles overview",
+            "subtitle": "Cars, motos & bikes, spare parts and external listings.",
+            "trend": "Views, contacts, external clicks and saves",
+            "funnel": "Visitor journey",
+            "contactRate": "Views that led to a contact",
+            "saveRate": "Saves per view",
+            "online": "Listings online",
+            "channels": "Contacts by channel",
+            "note": "Views, contacts and external clicks are counted from now on; the contact rate is {{rate}} in this period."
+        },
+        "funnel": {
+            "visitors": "Unique visitors",
+            "viewers": "Viewed a listing",
+            "savers": "Saved a listing",
+            "contacters": "Contacted a seller"
+        },
+        "events": {
+            "total": "Total",
+            "unique": "Unique visitors",
+            "perVisitor": "{{value}} per visitor",
+            "items": "Listings concerned",
+            "trend": "Over time",
+            "hours": "Hours of the day",
+            "topItems": "Top listings",
+            "makes": "By make",
+            "cities": "By city"
+        },
+        "breakdown": {
+            "listingTypes": "Sale or rent",
+            "sources": "By website",
+            "channels": "By channel"
+        },
+        "views": {
+            "title": "Listing views",
+            "subtitle": "Details pages opened by visitors (owners and bots are not counted).",
+            "contactRate": "Views that led to a contact"
+        },
+        "external": {
+            "title": "External listings clicks",
+            "subtitle": "Listings of other websites (Avito, Moteur.ma...) opened from the application."
+        },
+        "contacts": {
+            "title": "Client call actions",
+            "subtitle": "Call, WhatsApp and email buttons pressed on vehicles and spare parts.",
+            "rate": "Contacts per view"
+        },
+        "saved": {
+            "title": "Saved demand",
+            "subtitle": "What people save: vehicles and motos, spare parts."
+        },
+        "alerts": {
+            "title": "Alert demand",
+            "subtitle": "What users ask to be alerted about, compared with the vehicles you have.",
+            "created": "Alerts created",
+            "active": "Active alerts",
+            "perUser": "{{value}} per user",
+            "users": "Searching users",
+            "archived": "Archived alerts",
+            "archiveRate": "{{rate}} archive rate",
+            "trend": "Alerts created over time",
+            "makes": "Most wanted makes",
+            "alerts": "Alerts",
+            "categories": "Cars or motos",
+            "listingTypes": "Sale or rent",
+            "budget": "Maximum budget",
+            "supply": "Demand vs supply by city",
+            "supplyHelp": "Active alerts compared with the vehicles available in each city",
+            "city": "City",
+            "available": "Vehicles available",
+            "gap": "Gap"
+        },
+        "gaps": {
+            "noSupply": "No supply",
+            "high": "Under-supplied",
+            "balanced": "Balanced",
+            "low": "Over-supplied"
+        },
+        "values": {
+            "all": "All",
+            "cars": "Cars",
+            "motos": "Motos & bikes",
+            "parts": "Spare parts",
+            "vehicles": "Vehicles & motos",
+            "external": "External listings",
+            "vehicle": "Car",
+            "moto": "Moto",
+            "part": "Spare part",
+            "car": "Cars",
+            "sale": "Sale",
+            "rent": "Rent",
+            "unknown": "Unknown",
+            "phone": "Phone",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "message": "Message"
+        }
     }
 }

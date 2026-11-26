@@ -12,13 +12,18 @@ import ExternalClicksSection from "./components/ExternalListingsClicks/ExternalC
 import PropertyClicksSection from "./components/PropertyClicks/PropertyClicksSection";
 import PropertyDemandSection from "./components/PropertyDemand/PropertyDemandSection";
 import ClientContactActionsSection from "./components/ClientContactActions/ClientContactActionsSection";
+import SavedDemandSection from "./components/SavedDemand/SavedDemandSection";
+import ActivitySection from "./components/Activity/ActivitySection";
 
 // Users and Visits moved to Admin panel > Account.
 const SECTIONS = {
     overview: OverviewSection,
+    activity: ActivitySection,
     "internal property clicks": PropertyClicksSection,
     "external listings clicks": ExternalClicksSection,
+    // Alerts and saves in two tabs.
     "property demand": PropertyDemandSection,
+    "saved demand": SavedDemandSection,
     "client call action": ClientContactActionsSection,
 };
 
@@ -32,7 +37,7 @@ export default function Dashboard() {
         <PageLayout
             icon={<InsightsOutlinedIcon />}
             title={t("adminPanel.statisticsTitle", "Property statistics")}
-            subtitle={t("adminPanel.statisticsSubtitle", "Clicks, demand and contacts on the property listings.")}
+            subtitle={t("adminPanel.statisticsSubtitleAll", "Properties, roommates, hotels & riads: publications, clicks, alerts, saves, contacts, requests and portfolios.")}
         >
             <DashboardNavigation
                 activeTab={activeTab}

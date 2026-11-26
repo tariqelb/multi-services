@@ -33,6 +33,10 @@ import {
     NotificationsActiveOutlined,
     BookmarkBorderOutlined,
     FeedbackOutlined,
+    HomeWorkOutlined,
+    DirectionsCarOutlined,
+    CampaignOutlined,
+    AutoStoriesOutlined,
     EmailOutlined,
     PhoneOutlined,
 } from "@mui/icons-material";
@@ -42,20 +46,25 @@ import axiosInstance from "../../../../../api/axiosInstance";
 import { UserSuspensionBanner, UserSuspensionButton } from "./UserSuspensionControl";
 import { SocialLinksList } from "../../../../../Components/Profile/SocialLinks";
 
+// Overview, then one tab per service (each with its own kinds), then feedback.
 const tabConfig = [
     { value: "overview", label: "overview", icon: <Person /> },
-    { value: "publications", label: "publications", icon: <ArticleOutlined /> },
-    { value: "alerts", label: "alerts", icon: <NotificationsActiveOutlined /> },
-    { value: "saved-properties", label: "savedProperties", icon: <BookmarkBorderOutlined /> },
+    { value: "property", label: "property", icon: <HomeWorkOutlined /> },
+    { value: "vehicles", label: "vehicles", icon: <DirectionsCarOutlined /> },
     { value: "feedback", label: "feedback", icon: <FeedbackOutlined /> },
 ];
 
-const endpointByTab = {
-    publications: "publications",
-    alerts: "alerts",
-    "saved-properties": "saved-properties",
-    feedback: "feedback",
+const SERVICE_TABS = {
+    property: (userId, kind) => `/property/dashboard/users/${userId}/activity?kind=${kind}`,
+    vehicles: (userId, kind) => `/vehicles/admin/users/${userId}/activity?kind=${kind}`,
 };
+const KINDS = [
+    { value: "publications", icon: <ArticleOutlined fontSize="small" /> },
+    { value: "alerts", icon: <NotificationsActiveOutlined fontSize="small" /> },
+    { value: "saved", icon: <BookmarkBorderOutlined fontSize="small" /> },
+    { value: "requests", icon: <CampaignOutlined fontSize="small" /> },
+    { value: "portfolio", icon: <AutoStoriesOutlined fontSize="small" /> },
+];
 
 function getFullName(user) {
     return `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Unknown user";
@@ -82,60 +91,18 @@ function formatDate(value) {
     });
 }
 
-function getRecords(response, tab) {
-    const data = response.data;
-
-    const possibleKeys = {
-        publications: ["properties", "publications"],
-        alerts: ["alerts"],
-        "saved-properties": ["savedProperties", "savedPropertiesList", "properties"],
-        feedback: ["feedback", "reports"],
-    };
-
-    for (const key of possibleKeys[tab] || []) {
-        if (Array.isArray(data?.[key])) return data[key];
-    }
-
-    if (Array.isArray(data)) return data;
-
-    return [];
-}
-
-function getRecordTitle(record, tab) {
-    if (tab === "alerts") {
-        return record.title || record.city || "Property alert";
-    }
-
-    if (tab === "feedback") {
-        return record.subject || record.type || "Feedback";
-    }
-
-    const property = record.propertyId || record.propertyInfo || record;
-
-    return property.title || property.name || "Untitled property";
-}
-
-function getRecordDescription(record, tab) {
-    if (tab === "alerts") {
-        const cities = record.city || "Any city";
-        const types = record.propertyTypes?.join(", ") || "Any property type";
-        const listings = record.listingTypes?.join(", ") || "Any listing type";
-
-        return `${cities} · ${types} · ${listings}`;
-    }
-
-    if (tab === "feedback") {
-        return record.description || "No description provided";
-    }
-
-    const property = record.propertyId || record.propertyInfo || record;
-
-    return [
-        property.city,
-        property.neighborhood,
-        property.listingType,
-        property.propertyType,
-    ].filter(Boolean).join(" · ") || "No additional details";
+// Every tab shows the same simple rows: { id, type, title, description, status, createdAt, link }.
+function feedbackRows(response) {
+    const list = response.data?.feedback || response.data?.reports || (Array.isArray(response.data) ? response.data : []);
+    return list.map((record) => ({
+        id: record._id || record.id,
+        type: "feedback",
+        title: record.subject || record.type || "Feedback",
+        description: record.description || "",
+        status: record.status || "",
+        priority: record.priority || "",
+        createdAt: record.createdAt,
+    }));
 }
 
 function InfoItem({ label, value }) {
@@ -169,6 +136,32 @@ function StatCard({ label, value }) {
     );
 }
 
+function StatGroup({ title, icon, items }) {
+    return (
+        <Box sx={{ mb: 2.5 }}>
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
+                {icon}
+                <Typography sx={{ fontWeight: 800 }}>{title}</Typography>
+            </Stack>
+            <Box
+                sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "repeat(2, minmax(0, 1fr))",
+                        sm: "repeat(3, minmax(0, 1fr))",
+                        lg: "repeat(5, minmax(0, 1fr))",
+                    },
+                    gap: 1.5,
+                }}
+            >
+                {items.map((item) => (
+                    <StatCard key={item.label} label={item.label} value={item.value} />
+                ))}
+            </Box>
+        </Box>
+    );
+}
+
 export default function UserDetailsPage() {
     const { t, i18n } = useTranslation();
     const { userId } = useParams();
@@ -180,6 +173,7 @@ export default function UserDetailsPage() {
     const [user, setUser] = useState(location.state?.user || null);
     const [statistics, setStatistics] = useState({});
     const [activeTab, setActiveTab] = useState("overview");
+    const [kind, setKind] = useState("publications");
 
     const [loadingOverview, setLoadingOverview] = useState(true);
     const [overviewError, setOverviewError] = useState("");
@@ -226,10 +220,12 @@ export default function UserDetailsPage() {
         };
     }, [userId, isAdmin, t]);
 
-    useEffect(() => {
-        if (activeTab === "overview" || !endpointByTab[activeTab]) return;
+    // Rows of the open tab ("property:saved", "vehicles:alerts", "feedback"...).
+    const recordKey = SERVICE_TABS[activeTab] ? `${activeTab}:${kind}` : activeTab;
 
-        if (records[activeTab]) return;
+    useEffect(() => {
+        if (activeTab === "overview") return;
+        if (records[recordKey]) return;
 
         let cancelled = false;
 
@@ -238,15 +234,16 @@ export default function UserDetailsPage() {
                 setLoadingTab(true);
                 setTabError("");
 
-                const response = await axiosInstance.get(
-                    `/property/dashboard/users/${userId}/${endpointByTab[activeTab]}`
-                );
+                const url = SERVICE_TABS[activeTab]
+                    ? SERVICE_TABS[activeTab](userId, kind)
+                    : `/property/dashboard/users/${userId}/feedback`;
+                const response = await axiosInstance.get(url);
 
                 if (cancelled) return;
 
                 setRecords((previous) => ({
                     ...previous,
-                    [activeTab]: getRecords(response, activeTab),
+                    [recordKey]: SERVICE_TABS[activeTab] ? response.data?.items || [] : feedbackRows(response),
                 }));
             } catch (error) {
                 if (cancelled) return;
@@ -265,18 +262,22 @@ export default function UserDetailsPage() {
         return () => {
             cancelled = true;
         };
-    }, [activeTab, userId, records, t]);
+    }, [activeTab, kind, recordKey, userId, records, t]);
 
     if (!isAdmin) {
         return <Navigate to="/" replace />;
     }
+
+    const propertyStats = statistics.property || {};
+    const vehicleStats = statistics.vehicles || {};
+    const reviewText = (stats) => (stats.reviewsReceived ? `${stats.reviewsReceived} · ${stats.averageRating}★` : 0);
 
     const handleTabChange = (_, nextTab) => {
         setActiveTab(nextTab);
     };
 
     const renderRecords = () => {
-        const items = records[activeTab] || [];
+        const items = records[recordKey] || [];
 
         if (loadingTab) {
             return (
@@ -303,8 +304,8 @@ export default function UserDetailsPage() {
         return (
             <Stack spacing={2}>
                 {items.map((record, index) => {
-                    const title = getRecordTitle(record, activeTab);
-                    const description = getRecordDescription(record, activeTab);
+                    const title = record.title;
+                    const description = record.description || t("userDetails.noDetails", "No additional details");
 
                     return (
                         <Card
@@ -318,9 +319,24 @@ export default function UserDetailsPage() {
                                     spacing={1} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" } }}
                                 >
                                     <Box sx={{ minWidth: 0 }}>
-                                        <Typography sx={{ fontWeight: 700 }}>
-                                            {title}
-                                        </Typography>
+                                        <Stack direction="row" spacing={1} sx={{ alignItems: "center", flexWrap: "wrap", rowGap: 0.5 }}>
+                                            {record.type && record.type !== "feedback" && (
+                                                <Chip size="small" label={t(`userDetails.types.${record.type}`, record.type)} />
+                                            )}
+                                            {record.link ? (
+                                                <Typography
+                                                    component="a"
+                                                    href={record.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    sx={{ fontWeight: 700, color: "text.primary", textDecoration: "none", "&:hover": { color: "primary.main", textDecoration: "underline" } }}
+                                                >
+                                                    {title}
+                                                </Typography>
+                                            ) : (
+                                                <Typography sx={{ fontWeight: 700 }}>{title}</Typography>
+                                            )}
+                                        </Stack>
 
                                         <Typography
                                             variant="body2"
@@ -330,16 +346,13 @@ export default function UserDetailsPage() {
                                         </Typography>
                                     </Box>
 
-                                    <Chip
-                                        size="small"
-                                        label={
-                                            record.status ||
-                                            (record.isArchived
-                                                ? t("userDetails.archived")
-                                                : t("userDetails.active"))
-                                        }
-                                        variant="outlined"
-                                    />
+                                    {record.status && (
+                                        <Chip
+                                            size="small"
+                                            label={t(`userDetails.statusNames.${record.status}`, record.status)}
+                                            variant="outlined"
+                                        />
+                                    )}
                                 </Stack>
 
                                 <Divider sx={{ my: 1.5 }} />
@@ -518,49 +531,52 @@ export default function UserDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Statistics */}
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: {
-                                xs: "repeat(2, minmax(0, 1fr))",
-                                sm: "repeat(3, minmax(0, 1fr))",
-                                lg: "repeat(4, minmax(0, 1fr))",
-                            },
-                            gap: 1.5,
-                            mb: 3,
-                        }}
-                    >
-                        <StatCard
-                            label={t("userDetails.totalPublications")}
-                            value={statistics.totalPublications}
-                        />
-
-                        <StatCard
-                            label={t("userDetails.availablePublications")}
-                            value={statistics.availablePublications}
-                        />
-
-                        <StatCard
-                            label={t("userDetails.activeAlerts")}
-                            value={statistics.activeAlerts}
-                        />
-
-                        <StatCard
-                            label={t("userDetails.archivedAlerts")}
-                            value={statistics.archivedAlerts}
-                        />
-
-                        <StatCard
-                            label={t("userDetails.savedProperties")}
-                            value={statistics.savedProperties}
-                        />
-
-                        <StatCard
-                            label={t("userDetails.totalFeedback")}
-                            value={statistics.totalFeedback}
-                        />
-                    </Box>
+                    {/* Statistics, per service */}
+                    <Card variant="outlined" sx={{ borderRadius: 3, mb: 3 }}>
+                        <CardContent>
+                            <StatGroup
+                                title={t("userDetails.services.property", "Property")}
+                                icon={<HomeWorkOutlined color="primary" />}
+                                items={[
+                                    { label: t("userDetails.totalPublications"), value: propertyStats.properties ?? statistics.totalPublications },
+                                    { label: t("userDetails.availablePublications"), value: propertyStats.availableProperties ?? statistics.availablePublications },
+                                    { label: t("userDetails.roommates", "Roommate announcements"), value: propertyStats.roommates },
+                                    { label: t("userDetails.establishments", "Hotels & riads"), value: propertyStats.establishments },
+                                    { label: t("userDetails.savedListings", "Saved listings"), value: propertyStats.saved ?? statistics.savedProperties },
+                                    { label: t("userDetails.activeAlerts"), value: propertyStats.activeAlerts ?? statistics.activeAlerts },
+                                    { label: t("userDetails.requests", "Requests posted"), value: propertyStats.requests },
+                                    { label: t("userDetails.repliesSent", "Replies to requests"), value: propertyStats.repliesSent },
+                                    { label: t("userDetails.portfolioItems", "Portfolio (articles / videos)"), value: `${propertyStats.portfolioArticles ?? 0} / ${propertyStats.portfolioVideos ?? 0}` },
+                                    { label: t("userDetails.reviews", "Reviews received"), value: reviewText(propertyStats) },
+                                ]}
+                            />
+                            <StatGroup
+                                title={t("userDetails.services.vehicles", "Vehicles")}
+                                icon={<DirectionsCarOutlined sx={{ color: "#F97316" }} />}
+                                items={[
+                                    { label: t("userDetails.vehicles", "Vehicles"), value: vehicleStats.vehicles ?? statistics.totalVehicles },
+                                    { label: t("userDetails.availableVehicles", "Available vehicles"), value: vehicleStats.availableVehicles ?? statistics.availableVehicles },
+                                    { label: t("userDetails.carsMotos", "Cars / motos"), value: `${vehicleStats.cars ?? 0} / ${vehicleStats.motos ?? 0}` },
+                                    { label: t("userDetails.parts", "Spare parts"), value: vehicleStats.parts },
+                                    { label: t("userDetails.savedListings", "Saved listings"), value: vehicleStats.saved },
+                                    { label: t("userDetails.activeAlerts"), value: vehicleStats.activeAlerts },
+                                    { label: t("userDetails.requests", "Requests posted"), value: vehicleStats.requests },
+                                    { label: t("userDetails.repliesSent", "Replies to requests"), value: vehicleStats.repliesSent },
+                                    { label: t("userDetails.portfolioItems", "Portfolio (articles / videos)"), value: `${vehicleStats.portfolioArticles ?? 0} / ${vehicleStats.portfolioVideos ?? 0}` },
+                                    { label: t("userDetails.reviews", "Reviews received"), value: reviewText(vehicleStats) },
+                                ]}
+                            />
+                            <StatGroup
+                                title={t("userDetails.services.account", "Feedback")}
+                                icon={<FeedbackOutlined color="action" />}
+                                items={[
+                                    { label: t("userDetails.totalFeedback"), value: statistics.totalFeedback },
+                                    { label: t("userDetails.feedbackStatuses.open"), value: statistics.feedbackByStatus?.open },
+                                    { label: t("userDetails.feedbackStatuses.resolved"), value: statistics.feedbackByStatus?.resolved },
+                                ]}
+                            />
+                        </CardContent>
+                    </Card>
 
                     {/* Tabs */}
                     <Card variant="outlined" sx={{ borderRadius: 3 }}>
@@ -636,7 +652,23 @@ export default function UserDetailsPage() {
                                     )}
                                 </Stack>
                             ) : (
-                                renderRecords()
+                                <Stack spacing={2}>
+                                    {SERVICE_TABS[activeTab] && (
+                                        <Stack direction="row" useFlexGap sx={{ flexWrap: "wrap", gap: 1 }}>
+                                            {KINDS.map((option) => (
+                                                <Chip
+                                                    key={option.value}
+                                                    icon={option.icon}
+                                                    label={t(`userDetails.kinds.${option.value}`, option.value)}
+                                                    color={kind === option.value ? "primary" : "default"}
+                                                    variant={kind === option.value ? "filled" : "outlined"}
+                                                    onClick={() => setKind(option.value)}
+                                                />
+                                            ))}
+                                        </Stack>
+                                    )}
+                                    {renderRecords()}
+                                </Stack>
                             )}
                         </Box>
                     </Card>

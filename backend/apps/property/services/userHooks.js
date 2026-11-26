@@ -14,6 +14,9 @@ import SavedListing from "../models/SavedListing.js";
 import Feedback from "../models/Feedback.js";
 import PropertyRequest from "../models/PropertyRequest.js";
 import PropertyRequestResponse from "../models/PropertyRequestResponse.js";
+import RoommateAlert from "../models/RoommateAlert.js";
+import Review from "../models/Review.js";
+import PropertyPortfolioItem from "../models/PropertyPortfolioItem.js";
 
 import { deletePropertyImages } from "../middleware/propertyUpload.js";
 import { portfolio } from "../controllers/portfolio/portfolioController.js";
@@ -31,34 +34,75 @@ const countByUser = async (Model, field, userIds, extraMatch = {}) => {
 export const userListDefaults = {
     publishedProperties: 0,
     activeProperties: 0,
+    publishedRoommates: 0,
+    publishedEstablishments: 0,
     savedProperties: 0,
+    propertyAlerts: 0,
+    propertyRequests: 0,
+    propertyPortfolio: 0,
     reports: 0,
+};
+
+// How the admin users list reads these counters (summary and filters).
+// Each key is a counter above; a user counts when one of them is above 0.
+export const userActivity = {
+    publisher: ["publishedProperties", "publishedRoommates", "publishedEstablishments"],
+    activePublisher: ["activeProperties"],
+    saver: ["savedProperties"],
+    alerts: ["propertyAlerts"],
+    requests: ["propertyRequests"],
+    portfolio: ["propertyPortfolio"],
+    reporter: ["reports"],
 };
 
 /** Admin users list: counters for many users in a few grouped queries. */
 export async function getUserListStats(userIds) {
     const ids = userIds.map(toObjectId);
 
-    const [published, active, saved, reports] = await Promise.all([
-        countByUser(Property, "userId", ids),
-        countByUser(Property, "userId", ids, { status: "Available" }),
-        countByUser(SavedProperty, "userId", ids, { isSaved: true }),
-        countByUser(Feedback, "userId", ids),
-    ]);
+    const [published, active, roommates, establishments, saved, savedListings, alerts, roommateAlerts, requests, portfolioItems, reports] =
+        await Promise.all([
+            countByUser(Property, "userId", ids),
+            countByUser(Property, "userId", ids, { status: "Available" }),
+            countByUser(RoommateListing, "userId", ids),
+            countByUser(Establishment, "userId", ids),
+            countByUser(SavedProperty, "userId", ids, { isSaved: true }),
+            countByUser(SavedListing, "userId", ids, { isSaved: true }),
+            countByUser(PropertyAlert, "user", ids, { isArchived: false }),
+            countByUser(RoommateAlert, "user", ids, { isArchived: false }),
+            countByUser(PropertyRequest, "userId", ids),
+            countByUser(PropertyPortfolioItem, "userId", ids),
+            countByUser(Feedback, "userId", ids),
+        ]);
 
     const stats = new Map();
     for (const id of ids.map(String)) {
         stats.set(id, {
             publishedProperties: published.get(id) || 0,
             activeProperties: active.get(id) || 0,
-            savedProperties: saved.get(id) || 0,
+            publishedRoommates: roommates.get(id) || 0,
+            publishedEstablishments: establishments.get(id) || 0,
+            // Properties, roommate announcements, hotels & riads.
+            savedProperties: (saved.get(id) || 0) + (savedListings.get(id) || 0),
+            propertyAlerts: (alerts.get(id) || 0) + (roommateAlerts.get(id) || 0),
+            propertyRequests: requests.get(id) || 0,
+            propertyPortfolio: portfolioItems.get(id) || 0,
             reports: reports.get(id) || 0,
         });
     }
     return stats;
 }
 
-/** Admin user page: same numbers as before the split. */
+const countKinds = async (Model, field, userId, kinds) =>
+    Object.fromEntries(
+        await Promise.all(
+            Object.entries(kinds).map(async ([key, match]) => [key, await Model.countDocuments({ [field]: userId, ...match })])
+        )
+    );
+
+/**
+ * Admin user page. The first keys are the ones the page always had; the
+ * "property" block groups everything of the property service.
+ */
 export async function getUserDetailStats(id) {
     const userId = toObjectId(id);
 
@@ -73,6 +117,14 @@ export async function getUserDetailStats(id) {
         inProgressFeedback,
         resolvedFeedback,
         closedFeedback,
+        roommates,
+        establishments,
+        savedByType,
+        roommateAlerts,
+        requests,
+        repliesSent,
+        portfolioItems,
+        reviews,
     ] = await Promise.all([
         Property.countDocuments({ userId }),
         Property.countDocuments({ userId, status: "Available" }),
@@ -84,6 +136,20 @@ export async function getUserDetailStats(id) {
         Feedback.countDocuments({ userId, status: "in_progress" }),
         Feedback.countDocuments({ userId, status: "resolved" }),
         Feedback.countDocuments({ userId, status: "closed" }),
+        countKinds(RoommateListing, "userId", userId, { total: {}, open: { status: "Open" } }),
+        countKinds(Establishment, "userId", userId, { total: {} }),
+        countKinds(SavedListing, "userId", userId, {
+            roommate: { isSaved: true, listingType: "roommate" },
+            establishment: { isSaved: true, listingType: "establishment" },
+        }),
+        countKinds(RoommateAlert, "user", userId, { active: { isArchived: false }, archived: { isArchived: true } }),
+        countKinds(PropertyRequest, "userId", userId, { total: {}, active: { status: "active" } }),
+        PropertyRequestResponse.countDocuments({ responderId: userId }),
+        countKinds(PropertyPortfolioItem, "userId", userId, { articles: { type: "article" }, videos: { type: "video" } }),
+        Review.aggregate([
+            { $match: { reviewedUser: userId } },
+            { $group: { _id: null, count: { $sum: 1 }, average: { $avg: "$rating" } } },
+        ]),
     ]);
 
     return {
@@ -98,6 +164,24 @@ export async function getUserDetailStats(id) {
             inProgress: inProgressFeedback,
             resolved: resolvedFeedback,
             closed: closedFeedback,
+        },
+        property: {
+            properties: totalPublications,
+            availableProperties: availablePublications,
+            roommates: roommates.total,
+            openRoommates: roommates.open,
+            establishments: establishments.total,
+            saved: savedProperties + savedByType.roommate + savedByType.establishment,
+            savedByType: { properties: savedProperties, roommates: savedByType.roommate, establishments: savedByType.establishment },
+            activeAlerts: activeAlerts + roommateAlerts.active,
+            archivedAlerts: archivedAlerts + roommateAlerts.archived,
+            requests: requests.total,
+            activeRequests: requests.active,
+            repliesSent,
+            portfolioArticles: portfolioItems.articles,
+            portfolioVideos: portfolioItems.videos,
+            reviewsReceived: reviews[0]?.count || 0,
+            averageRating: reviews[0] ? Math.round(reviews[0].average * 10) / 10 : 0,
         },
     };
 }

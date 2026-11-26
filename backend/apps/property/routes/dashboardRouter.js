@@ -45,6 +45,8 @@ import {
     getListingContactAnalytics,
 } from "../controllers/dashboard/listingContactsController.js";
 import { portfolio } from "../controllers/portfolio/portfolioController.js";
+import { getAdminUserPropertyActivity } from "../controllers/dashboard/adminUserActivityController.js";
+import { getPropertyActivityAnalytics, getSavedListingDemandAnalytics } from "../controllers/dashboard/propertyActivityController.js";
 
 const router = express.Router();
 
@@ -86,6 +88,9 @@ router.get(
     getAdminUserSavedProperties
 );
 
+// Everything of the property service, one kind at a time (admin user page, "Property" tab).
+router.get("/users/:userId/activity", authMiddleware, adminAccess("users"), getAdminUserPropertyActivity);
+
 router.get(
     "/users/:userId/feedback",
     authMiddleware,
@@ -125,6 +130,11 @@ router.get(
     adminAccess("propertyStatistics"),
     getPropertyDemandAnalytics
 );
+
+// Publications & community (listings of every type, requests, portfolio, reviews).
+router.get("/activity", authMiddleware, adminAccess("propertyStatistics"), getPropertyActivityAnalytics);
+// Saved demand of roommate announcements and hotels & riads (?type=roommate|establishment).
+router.get("/saved-listing-demand", authMiddleware, adminAccess("propertyStatistics"), getSavedListingDemandAnalytics);
 
 router.get(
     "/saved-property-demand",

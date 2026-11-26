@@ -12,6 +12,7 @@ import {
     getUserListStats,
     onUserDeleted,
     userListDefaults,
+    userActivity,
 } from "./services/userHooks.js";
 
 import { startExternalListingsCollectionJob } from "./jobs/externalListingsCollectionJob.js";
@@ -19,7 +20,7 @@ import { startExternalListingsAvailabilityJob } from "./jobs/externalListingsAva
 import { startListingExpiryJob } from "./jobs/listingExpiryJob.js";
 import { startRequestJobs } from "./jobs/requestJobs.js";
 
-registerService("property", { userListDefaults, getUserListStats, getUserDetailStats, onUserDeleted, getPublishingActivity, getListingSummary });
+registerService("property", { userListDefaults, userActivity, getUserListStats, getUserDetailStats, onUserDeleted, getPublishingActivity, getListingSummary });
 
 export default {
     name: "property",

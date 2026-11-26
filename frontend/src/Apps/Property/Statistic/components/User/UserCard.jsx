@@ -26,6 +26,11 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { CheckCircle } from "lucide-react";
 
 import UserStatistic from "./UserStatistic";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
+import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
+import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
+import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
+import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 
 export default function UserCard({ user, onViewDetails }) {
     const { t } = useTranslation();
@@ -240,41 +245,73 @@ export default function UserCard({ user, onViewDetails }) {
                     {t("userCard.activity")}
                 </Typography>
 
-                <Box
-                    sx={{
-                        display: "grid",
-                        gridTemplateColumns: {
-                            xs: "1fr",
-                            sm: "repeat(2, minmax(0, 1fr))",
-                            md: "repeat(4, minmax(0, 1fr))",
+                {/* Per service: property (properties, roommates, hotels & riads)
+                    and vehicles (vehicles, motos, spare parts). */}
+                <Stack spacing={1.5}>
+                    {[
+                        {
+                            key: "property",
+                            title: t("userCard.services.property", "Property"),
+                            items: [
+                                { icon: <HomeWorkOutlinedIcon />, label: t("userCard.publishedProperties"), value: user?.publishedProperties },
+                                {
+                                    icon: <CheckCircle />,
+                                    label: t("userCard.roommatesAndHotels", "Roommates, hotels & riads"),
+                                    value: (user?.publishedRoommates || 0) + (user?.publishedEstablishments || 0),
+                                },
+                                { icon: <BookmarkBorderOutlinedIcon />, label: t("userCard.savedListings", "Saved"), value: user?.savedProperties },
+                                { icon: <NotificationsNoneOutlinedIcon />, label: t("userCard.alerts", "Alerts"), value: user?.propertyAlerts },
+                            ],
                         },
-                        gap: 1.5,
-                    }}
-                >
-                    <UserStatistic
-                        icon={<HomeWorkOutlinedIcon />}
-                        label={t("userCard.publishedProperties")}
-                        value={user?.publishedProperties ?? 0}
-                    />
-
-                    <UserStatistic
-                        icon={<CheckCircle />}
-                        label={t("userCard.availableProperties", "Available listings")}
-                        value={user?.activeProperties ?? 0}
-                    />
-
-                    <UserStatistic
-                        icon={<BookmarkBorderOutlinedIcon />}
-                        label={t("userCard.savedProperties")}
-                        value={user?.savedProperties ?? 0}
-                    />
-
-                    <UserStatistic
-                        icon={<ReportProblemOutlinedIcon />}
-                        label={t("userCard.submittedFeedback")}
-                        value={user?.reports ?? 0}
-                    />
-                </Box>
+                        {
+                            key: "vehicles",
+                            title: t("userCard.services.vehicles", "Vehicles"),
+                            items: [
+                                { icon: <DirectionsCarOutlinedIcon />, label: t("userCard.publishedVehicles", "Vehicles"), value: user?.publishedVehicles },
+                                { icon: <BuildOutlinedIcon />, label: t("userCard.publishedParts", "Spare parts"), value: user?.publishedParts },
+                                { icon: <BookmarkBorderOutlinedIcon />, label: t("userCard.savedListings", "Saved"), value: user?.savedVehicles },
+                                { icon: <NotificationsNoneOutlinedIcon />, label: t("userCard.alerts", "Alerts"), value: user?.vehicleAlerts },
+                            ],
+                        },
+                        {
+                            key: "other",
+                            title: t("userCard.services.other", "Requests, portfolio & feedback"),
+                            items: [
+                                {
+                                    icon: <CampaignOutlinedIcon />,
+                                    label: t("userCard.requests", "Requests"),
+                                    value: (user?.propertyRequests || 0) + (user?.vehicleRequests || 0),
+                                },
+                                {
+                                    icon: <AutoStoriesOutlinedIcon />,
+                                    label: t("userCard.portfolio", "Portfolio items"),
+                                    value: (user?.propertyPortfolio || 0) + (user?.vehiclePortfolio || 0),
+                                },
+                                { icon: <ReportProblemOutlinedIcon />, label: t("userCard.submittedFeedback"), value: user?.reports },
+                            ],
+                        },
+                    ].map((group) => (
+                        <Box key={group.key}>
+                            <Typography variant="caption" sx={{ display: "block", color: "text.secondary", fontWeight: 700, mb: 0.75 }}>
+                                {group.title}
+                            </Typography>
+                            <Box
+                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: {
+                                        xs: "repeat(2, minmax(0, 1fr))",
+                                        md: "repeat(4, minmax(0, 1fr))",
+                                    },
+                                    gap: 1.5,
+                                }}
+                            >
+                                {group.items.map((item) => (
+                                    <UserStatistic key={item.label} icon={item.icon} label={item.label} value={item.value ?? 0} />
+                                ))}
+                            </Box>
+                        </Box>
+                    ))}
+                </Stack>
             </CardContent>
         </Card>
     );

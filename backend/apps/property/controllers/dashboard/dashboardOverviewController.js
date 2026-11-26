@@ -9,6 +9,14 @@ import ListingContact from "../../models/ListingContact.js";
 import VisitSession from "../../models/VisitSession.js";
 import PropertyClickEvent from "../../models/PropertyClickEvent.js";
 import ExternalListingClickEvent from "../../models/ExternalListingClickEvent.js";
+import RoommateListing from "../../models/RoommateListing.js";
+import Establishment from "../../models/Establishment.js";
+import SavedListing from "../../models/SavedListing.js";
+import PropertyRequest from "../../models/PropertyRequest.js";
+import PropertyRequestResponse from "../../models/PropertyRequestResponse.js";
+import PropertyPortfolioItem from "../../models/PropertyPortfolioItem.js";
+import RoommateAlert from "../../models/RoommateAlert.js";
+import { countPair as countPairOf, saveStats, saveTrend as saveTrendOf } from "../../../main/utils/statsKit.js";
 
 import {
     getSaveEventStats,
@@ -179,10 +187,53 @@ export const getDashboardOverview = async (req, res) => {
             { name: "establishments", value: listingContactsByType.establishment || 0 },
         ];
 
+        // Everything else of the property service: roommates, hotels & riads,
+        // their saves, roommate alerts, requests and replies, portfolio.
+        const [
+            newRoommates,
+            newEstablishments,
+            newRoommateAlerts,
+            newRequests,
+            newReplies,
+            newPortfolio,
+            listingSavesCurrent,
+            listingSavesPrevious,
+            listingSaveTrend,
+            openRoommates,
+            establishmentCount,
+        ] = await Promise.all([
+            countPairOf(RoommateListing, window, "createdAt"),
+            countPairOf(Establishment, window, "createdAt"),
+            countPairOf(RoommateAlert, window, "createdAt"),
+            countPairOf(PropertyRequest, window, "createdAt"),
+            countPairOf(PropertyRequestResponse, window, "createdAt"),
+            countPairOf(PropertyPortfolioItem, window, "createdAt"),
+            saveStats(SavedListing, window.start, null),
+            window.start ? saveStats(SavedListing, window.previousStart, window.previousEnd) : Promise.resolve({ saves: 0 }),
+            saveTrendOf(SavedListing, window.start, window.unit),
+            RoommateListing.countDocuments({ status: "Open" }),
+            Establishment.countDocuments({}),
+        ]);
+        saveTrend.push(...listingSaveTrend);
+
+        const allSavesNow = savesCurrent.saves + listingSavesCurrent.saves;
+        const allSavesBefore = savesPrevious.saves + listingSavesPrevious.saves;
         const saves = {
-            value: savesCurrent.saves,
-            previous: savesPrevious.saves,
-            change: changeFor(window, savesCurrent.saves, savesPrevious.saves),
+            value: allSavesNow,
+            previous: allSavesBefore,
+            change: changeFor(window, allSavesNow, allSavesBefore),
+        };
+        const allNewListings = newListings.value + newRoommates.value + newEstablishments.value;
+        const allNewListingsBefore = newListings.previous + newRoommates.previous + newEstablishments.previous;
+        const listings = {
+            value: allNewListings,
+            previous: allNewListingsBefore,
+            change: changeFor(window, allNewListings, allNewListingsBefore),
+        };
+        const alerts = {
+            value: newAlerts.value + newRoommateAlerts.value,
+            previous: newAlerts.previous + newRoommateAlerts.previous,
+            change: changeFor(window, newAlerts.value + newRoommateAlerts.value, newAlerts.previous + newRoommateAlerts.previous),
         };
 
         // Merge every daily series into one row per date.
@@ -242,13 +293,32 @@ export const getDashboardOverview = async (req, res) => {
                 uniqueVisitors,
                 sessions,
                 newUsers,
-                newListings,
+                // All types: properties, roommates, hotels & riads (newProperties: properties only).
+                newListings: listings,
+                newProperties: newListings,
+                newRoommates,
+                newEstablishments,
                 propertyClicks,
                 externalClicks,
                 saves,
                 contacts,
-                newAlerts,
+                // Property and roommate alerts.
+                newAlerts: alerts,
+                newRequests,
+                newReplies,
+                newPortfolio,
             },
+
+            listingsByType: [
+                { name: "properties", value: newListings.value },
+                { name: "roommates", value: newRoommates.value },
+                { name: "establishments", value: newEstablishments.value },
+            ],
+            availableByType: [
+                { name: "properties", value: inventoryRows.find((row) => row.name === "Available")?.value || 0 },
+                { name: "roommates", value: openRoommates },
+                { name: "establishments", value: establishmentCount },
+            ],
 
             ratios: {
                 contactRate: rate(propertyContacts.value, propertyClicks.value),

@@ -8,12 +8,19 @@ import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import QueryStatsOutlinedIcon from "@mui/icons-material/QueryStatsOutlined";
 import PhoneInTalkOutlinedIcon from "@mui/icons-material/PhoneInTalkOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 
 const navigationItems = [
     {
         label: "Overview",
         value: "overview",
         icon: <DashboardOutlinedIcon />,
+    },
+    {
+        label: "Publications & community",
+        value: "activity",
+        icon: <GroupsOutlinedIcon />,
     },
     {
         label: "External Listings Clicks",
@@ -26,9 +33,14 @@ const navigationItems = [
         icon: <HomeWorkOutlinedIcon />,
     },
     {
-        label: "Property Demand",
+        label: "Alert demand",
         value: "property demand",
         icon: <QueryStatsOutlinedIcon />,
+    },
+    {
+        label: "Saved demand",
+        value: "saved demand",
+        icon: <BookmarkBorderOutlinedIcon />,
     },
     {
         label: "Client Call Actions",

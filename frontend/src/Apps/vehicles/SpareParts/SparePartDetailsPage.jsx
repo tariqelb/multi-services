@@ -42,6 +42,7 @@ import { STATUS_TONES, formatCity, formatNumber, optionLabel } from "../vehicleF
 import SparePartCard from "./SparePartCard";
 import { PART_CATEGORY_STYLES, compatibilityLabel } from "./sparePartOptions";
 import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
+import { trackVehicleContact, trackVehicleView } from "../statsTracking";
 
 const waLink = (number) => `https://wa.me/${String(number).replace(/\D/g, "")}`;
 const yes = (t, value) => (value ? t("vehiclesApp.details.yes", "Yes") : null);
@@ -151,6 +152,11 @@ function SparePartDetails({ id }) {
     const language = i18n.language;
     const [part, setPart] = useState(null);
     const [error, setError] = useState("");
+
+    // One view per page opening (Vehicles › Statistics; owners are not counted).
+    useEffect(() => {
+        trackVehicleView("part", id);
+    }, [id]);
 
     useEffect(() => {
         let cancelled = false;
@@ -285,7 +291,7 @@ function SparePartDetails({ id }) {
                 ) : contact ? (
                     <Stack spacing={1.25}>
                         {contact.phone && (
-                            <Button variant="contained" size="large" component="a" href={`tel:${contact.phone}`} startIcon={<PhoneRoundedIcon />} endIcon={<Verified show={contact.contactVerified?.phone} color="inherit" />}>
+                            <Button variant="contained" size="large" component="a" href={`tel:${contact.phone}`} onClick={() => trackVehicleContact("part", part._id, "phone")} startIcon={<PhoneRoundedIcon />} endIcon={<Verified show={contact.contactVerified?.phone} color="inherit" />}>
                                 <span dir="ltr">{contact.phone}</span>
                             </Button>
                         )}
@@ -296,6 +302,7 @@ function SparePartDetails({ id }) {
                                 size="large"
                                 component="a"
                                 href={waLink(contact.whatsappNumber)}
+                                onClick={() => trackVehicleContact("part", part._id, "whatsapp")}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 startIcon={<WhatsAppIcon />}
@@ -307,7 +314,7 @@ function SparePartDetails({ id }) {
                         {/* Save: right under WhatsApp, like every details page */}
                         {!part.isOwner && <SavePartButton part={part} />}
                         {contact.email && (
-                            <Button variant="text" component="a" href={`mailto:${contact.email}`} startIcon={<MailOutlineRoundedIcon />} endIcon={<Verified show={contact.contactVerified?.email} />}>
+                            <Button variant="text" component="a" href={`mailto:${contact.email}`} onClick={() => trackVehicleContact("part", part._id, "email")} startIcon={<MailOutlineRoundedIcon />} endIcon={<Verified show={contact.contactVerified?.email} />}>
                                 {contact.email}
                             </Button>
                         )}

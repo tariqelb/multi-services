@@ -19,6 +19,7 @@ import { runExternalListingsJob } from "../../jobs/externalListingsRefreshJob.js
 import { isBotRequest } from "../../../main/utils/analytics.js";
 import { checkVehicleListing, REJECT_REASONS } from "../../services/externalListings/vehicleCheck.js";
 import { removeListings } from "../../services/externalListings/removedListings.js";
+import { recordEvent } from "../statsTrackingController.js";
 
 const CATEGORIES = ["car", "moto", "part"];
 const LISTING_TYPES = ["sale", "rent"];
@@ -138,9 +139,31 @@ export async function trackExternalListingClick(req, res) {
             { $inc: { clicks: 1 }, $set: { lastClickedAt: new Date() } },
             { returnDocument: "after" },
         )
-            .select("clicks")
+            .select("clicks title category listingType make model city price sourceDomain")
             .lean();
         if (!listing) return res.status(404).json({ success: false, message: "External listing not found." });
+
+        // Dated event for Vehicles › Statistics (the counter above is the lifetime total).
+        try {
+            await recordEvent(req, {
+                kind: "external",
+                itemId: listing._id,
+                details: {
+                    itemType: "external",
+                    title: listing.title || "",
+                    category: listing.category || "",
+                    listingType: listing.listingType || "",
+                    make: listing.make || "",
+                    model: listing.model || "",
+                    city: listing.city || "",
+                    price: listing.price || 0,
+                    sourceDomain: listing.sourceDomain || "",
+                },
+            });
+        } catch (eventError) {
+            console.error("[VehicleExternalListings] click event", eventError.message);
+        }
+
         return res.status(200).json({ success: true, counted: true, clicks: listing.clicks });
     } catch (error) {
         return res.status(500).json({ success: false, message: errorMessage(error) });

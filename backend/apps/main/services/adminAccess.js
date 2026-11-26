@@ -24,6 +24,7 @@ export const ADMIN_SECTIONS = [
     { id: "feedback", group: "property" },
     { id: "propertyRequests", group: "property" },
     // Vehicles
+    { id: "vehicleStatistics", group: "vehicles" },
     { id: "vehiclePublications", group: "vehicles" },
     { id: "vehicleRequests", group: "vehicles" },
     { id: "vehicleExternalListings", group: "vehicles" },

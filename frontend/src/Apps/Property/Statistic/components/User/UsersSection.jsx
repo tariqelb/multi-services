@@ -21,6 +21,8 @@ import {
 
 import {
     BlockOutlined,
+    BookmarkBorderOutlined,
+    CampaignOutlined,
     HomeWorkOutlined,
     PeopleAltOutlined,
     PersonAddAltOutlined,
@@ -31,6 +33,7 @@ import {
 import UserCard from "./UserCard";
 
 import {
+    BarChartView,
     ChartCard,
     ChartGrid,
     DonutChart,
@@ -59,15 +62,39 @@ const getUserStatus = (user) =>
 
 const getUserRole = (user) => String(user.role || "user").toLowerCase();
 
+// Counters from every service (see the services' userHooks.js).
+const totalPublications = (user) =>
+    (user.publishedProperties || 0) +
+    (user.publishedRoommates || 0) +
+    (user.publishedEstablishments || 0) +
+    (user.publishedVehicles || 0) +
+    (user.publishedParts || 0);
+const totalSaved = (user) => (user.savedProperties || 0) + (user.savedVehicles || 0);
+
 const SORTERS = {
     newest: (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
     oldest: (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0),
     name: (a, b) => getFullName(a).localeCompare(getFullName(b)),
-    publications: (a, b) =>
-        (b.publishedProperties || 0) - (a.publishedProperties || 0),
-    saved: (a, b) => (b.savedProperties || 0) - (a.savedProperties || 0),
+    publications: (a, b) => totalPublications(b) - totalPublications(a),
+    saved: (a, b) => totalSaved(b) - totalSaved(a),
     reports: (a, b) => (b.reports || 0) - (a.reports || 0),
 };
+
+// activity / services come from the server (what each user does, per service).
+const ACTIVITY_FILTERS = {
+    publishers: (user) => user.activity?.publisher,
+    propertyPublishers: (user) => user.services?.property?.publisher,
+    vehiclePublishers: (user) => user.services?.vehicles?.publisher,
+    savers: (user) => user.activity?.saver,
+    alerts: (user) => user.activity?.alerts,
+    requests: (user) => user.activity?.requests,
+    portfolio: (user) => user.activity?.portfolio,
+    reporters: (user) => user.activity?.reporter,
+    inactive: (user) => !Object.values(user.activity || {}).some(Boolean),
+};
+
+const SERVICE_COLORS = { property: "#2563EB", vehicles: "#F97316" };
+const ACTIVITY_ROWS = ["publisher", "saver", "alerts", "requests", "portfolio"];
 
 const capitalize = (value = "") =>
     value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, " ");
@@ -129,13 +156,7 @@ export default function UsersSection() {
                 (verificationFilter === "pendingDeletion" && user.deletionRequestedAt);
 
             const matchesActivity =
-                activityFilter === "all" ||
-                (activityFilter === "publishers" && user.publishedProperties > 0) ||
-                (activityFilter === "savers" && user.savedProperties > 0) ||
-                (activityFilter === "reporters" && user.reports > 0) ||
-                (activityFilter === "inactive" &&
-                    !user.publishedProperties &&
-                    !user.savedProperties);
+                activityFilter === "all" || Boolean(ACTIVITY_FILTERS[activityFilter]?.(user));
 
             return (
                 matchesSearch &&
@@ -211,7 +232,7 @@ export default function UsersSection() {
             <ErrorBanner error={error} />
 
             {/* KPIs */}
-            <KpiGrid>
+            <KpiGrid columns={3}>
                 <StatCard
                     title={t("usersSection.totalUsers", "Total users")}
                     value={formatNumber(summary.totalUsers, locale)}
@@ -244,6 +265,28 @@ export default function UsersSection() {
                     )}
                     icon={<HomeWorkOutlined />}
                     color="#9333EA"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("usersSection.savers", "Saved listings")}
+                    value={formatNumber(summary.savers, locale)}
+                    description={t("usersSection.alertUsers", "{{count}} with alerts", {
+                        count: formatNumber(summary.alertUsers, locale),
+                    })}
+                    icon={<BookmarkBorderOutlined />}
+                    color="#EC4899"
+                    locale={locale}
+                />
+
+                <StatCard
+                    title={t("usersSection.requestUsers", "Posted requests")}
+                    value={formatNumber(summary.requestUsers, locale)}
+                    description={t("usersSection.portfolioUsers", "{{count}} with a portfolio", {
+                        count: formatNumber(summary.portfolioUsers, locale),
+                    })}
+                    icon={<CampaignOutlined />}
+                    color="#0891B2"
                     locale={locale}
                 />
 
@@ -306,20 +349,53 @@ export default function UsersSection() {
                             locale={locale}
                         />
                         <RateBar
-                            label={t("usersSection.publisherRate", "Published at least one property")}
+                            label={t("usersSection.publisherRateAll", "Published at least one listing")}
                             value={summary.publisherRate}
                             color="#9333EA"
                             locale={locale}
                         />
                         <RateBar
-                            label={t("usersSection.saverRate", "Saved at least one property")}
+                            label={t("usersSection.saverRateAll", "Saved at least one listing")}
                             value={summary.saverRate}
                             color="#EC4899"
+                            locale={locale}
+                        />
+                        <RateBar
+                            label={t("usersSection.alertRate", "Follow at least one alert")}
+                            value={summary.alertRate}
+                            color="#F59E0B"
+                            locale={locale}
+                        />
+                        <RateBar
+                            label={t("usersSection.requestRate", "Posted at least one request")}
+                            value={summary.requestRate}
+                            color="#0891B2"
                             locale={locale}
                         />
                     </Stack>
                 </ChartCard>
             </ChartGrid>
+
+            {/* Activity per service: property and vehicles side by side */}
+            <ChartCard
+                title={t("usersSection.byService", "Activity per service")}
+                subtitle={t("usersSection.byServiceDescription", "Users who publish, save, follow alerts, post requests or have a portfolio in each service")}
+                height={300}
+            >
+                <BarChartView
+                    data={ACTIVITY_ROWS.map((kind) => ({
+                        name: t(`usersSection.activityKinds.${kind}`, kind),
+                        ...Object.fromEntries((summary.services || []).map((service) => [service.name, service[kind] || 0])),
+                    }))}
+                    nameKey="name"
+                    locale={locale}
+                    bars={(summary.services || []).map((service) => ({
+                        key: service.name,
+                        name: t(`usersSection.serviceNames.${service.name}`, service.name),
+                        color: SERVICE_COLORS[service.name],
+                    }))}
+                />
+            </ChartCard>
 
             <ChartGrid>
                 <ChartCard
@@ -408,7 +484,12 @@ export default function UsersSection() {
                         [
                             { value: "all", label: t("usersSection.anyActivity", "Any activity") },
                             { value: "publishers", label: t("usersSection.publishers", "Publishers") },
-                            { value: "savers", label: t("usersSection.savers", "Saved properties") },
+                            { value: "propertyPublishers", label: t("usersSection.propertyPublishers", "Property publishers") },
+                            { value: "vehiclePublishers", label: t("usersSection.vehiclePublishers", "Vehicle publishers") },
+                            { value: "savers", label: t("usersSection.savers", "Saved listings") },
+                            { value: "alerts", label: t("usersSection.alertsFilter", "Follow alerts") },
+                            { value: "requests", label: t("usersSection.requestsFilter", "Posted requests") },
+                            { value: "portfolio", label: t("usersSection.portfolioFilter", "Have a portfolio") },
                             { value: "reporters", label: t("usersSection.reporters", "Sent feedback") },
                             { value: "inactive", label: t("usersSection.noActivity", "No activity") },
                         ]
@@ -419,7 +500,7 @@ export default function UsersSection() {
                         { value: "oldest", label: t("usersSection.oldestFirst", "Oldest first") },
                         { value: "name", label: t("usersSection.name", "Name") },
                         { value: "publications", label: t("usersSection.mostPublications", "Most publications") },
-                        { value: "saved", label: t("usersSection.mostSaved", "Most saved properties") },
+                        { value: "saved", label: t("usersSection.mostSavedAll", "Most saved listings") },
                         { value: "reports", label: t("usersSection.mostFeedback", "Most feedback") },
                     ])}
                 </FilterGrid>

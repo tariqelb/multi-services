@@ -1621,8 +1621,10 @@
         "publications": "Examen des publications",
         "feedback": "Commentaires",
         "client call action": "Actions de contact des clients",
-        "property demand": "Demande immobilière",
-        "overview": "Vue d'ensemble"
+        "property demand": "Demande (alertes)",
+        "overview": "Vue d'ensemble",
+        "activity": "Publications & communauté",
+        "saved demand": "Demande (sauvegardes)"
     },
     "propertyDemand": {
         "title": "Analyse de la demande immobilière",
@@ -1679,7 +1681,13 @@
             "high": "Offre insuffisante",
             "balanced": "Équilibré",
             "low": "Offre excédentaire"
-        }
+        },
+        "alerts": "Alertes",
+        "openRoommates": "Annonces ouvertes",
+        "roommateAlerts": "Alertes colocation",
+        "roommateAlertsActive": "Actives",
+        "roommateAlertsCreated": "Créées",
+        "roommateCities": "Alertes colocation par ville"
     },
     "usersSection": {
         "title": "Utilisateurs",
@@ -1732,7 +1740,7 @@
         "reporters": "Ont envoyé un retour",
         "roles": "Rôles",
         "saverRate": "Ont enregistré au moins un bien",
-        "savers": "Biens enregistrés",
+        "savers": "Annonces sauvegardées",
         "signupTrend": "Nouveaux comptes",
         "signupTrendDescription": "Inscriptions quotidiennes sur les 30 derniers jours",
         "statuses": "Statut des comptes",
@@ -1745,6 +1753,32 @@
         "statusNames": {
             "active": "Actif",
             "suspended": "Suspendu"
+        },
+        "alertRate": "Suivent au moins une alerte",
+        "alertUsers": "{{count}} avec alertes",
+        "alertsFilter": "Suivent des alertes",
+        "byService": "Activité par service",
+        "byServiceDescription": "Utilisateurs qui publient, sauvegardent, suivent des alertes, publient des demandes ou ont un portfolio dans chaque service",
+        "mostSavedAll": "Plus d'annonces sauvegardées",
+        "portfolioFilter": "Ont un portfolio",
+        "portfolioUsers": "{{count}} avec un portfolio",
+        "propertyPublishers": "Annonceurs immobilier",
+        "publisherRateAll": "Ont publié au moins une annonce",
+        "requestRate": "Ont publié au moins une demande",
+        "requestUsers": "Ont publié des demandes",
+        "requestsFilter": "Ont publié des demandes",
+        "saverRateAll": "Ont sauvegardé au moins une annonce",
+        "vehiclePublishers": "Annonceurs véhicules",
+        "activityKinds": {
+            "publisher": "Publient",
+            "saver": "Sauvegardent",
+            "alerts": "Alertes",
+            "requests": "Demandes",
+            "portfolio": "Portfolio"
+        },
+        "serviceNames": {
+            "property": "Immobilier",
+            "vehicles": "Véhicules"
         }
     },
     "visitsSection": {
@@ -2043,6 +2077,18 @@
         "statuses": {
             "active": "Actif",
             "suspended": "Suspendu"
+        },
+        "alerts": "Alertes",
+        "portfolio": "Portfolio",
+        "publishedParts": "Pièces",
+        "publishedVehicles": "Véhicules",
+        "requests": "Demandes",
+        "roommatesAndHotels": "Colocations, hôtels & riads",
+        "savedListings": "Sauvegardées",
+        "services": {
+            "property": "Immobilier",
+            "vehicles": "Véhicules",
+            "other": "Demandes, portfolio & retours"
         }
     },
     "userDetails": {
@@ -2077,7 +2123,9 @@
             "publications": "Publications",
             "alerts": "Alertes",
             "savedProperties": "Biens enregistrés",
-            "feedback": "Commentaires"
+            "feedback": "Commentaires",
+            "property": "Immobilier",
+            "vehicles": "Véhicules"
         },
         "feedbackStatuses": {
             "open": "Ouvert",
@@ -2085,7 +2133,49 @@
             "resolved": "Résolu",
             "closed": "Fermé"
         },
-        "whatsapp": "Numéro WhatsApp"
+        "whatsapp": "Numéro WhatsApp",
+        "availableVehicles": "Véhicules disponibles",
+        "carsMotos": "Voitures / motos",
+        "establishments": "Hôtels & riads",
+        "noDetails": "Aucun détail",
+        "parts": "Pièces",
+        "portfolioItems": "Portfolio (articles / vidéos)",
+        "repliesSent": "Réponses aux demandes",
+        "requests": "Demandes publiées",
+        "reviews": "Avis reçus",
+        "roommates": "Annonces colocation",
+        "savedListings": "Annonces sauvegardées",
+        "services": {
+            "account": "Retours",
+            "property": "Immobilier",
+            "vehicles": "Véhicules"
+        },
+        "vehicles": "Véhicules",
+        "kinds": {
+            "publications": "Publications",
+            "alerts": "Alertes",
+            "saved": "Sauvegardes",
+            "requests": "Demandes",
+            "portfolio": "Portfolio"
+        },
+        "types": {
+            "property": "Bien",
+            "roommate": "Colocation",
+            "establishment": "Hôtel / riad",
+            "vehicle": "Voiture",
+            "moto": "Moto",
+            "part": "Pièce",
+            "propertyAlert": "Alerte bien",
+            "roommateAlert": "Alerte colocation",
+            "vehicleAlert": "Alerte véhicule",
+            "request": "Demande",
+            "article": "Article",
+            "video": "Vidéo"
+        },
+        "statusNames": {
+            "active": "Active",
+            "archived": "Archivée"
+        }
     },
     "knowledgeCenter": {
         "title": "Centre de connaissances juridiques et immobilières",
@@ -3260,13 +3350,16 @@
         "kpis": {
             "contacts": "Contacts propriétaires",
             "externalClicks": "Clics externes",
-            "newAlerts": "Nouvelles alertes immobilières",
+            "newAlerts": "Nouvelles alertes",
             "propertyClicks": "Vues des biens",
-            "saves": "Biens enregistrés",
+            "saves": "Annonces sauvegardées",
             "sessions": "Sessions",
             "uniqueVisitors": "Visiteurs uniques",
             "newUsers": "Nouveaux comptes",
-            "newListings": "Nouvelles annonces"
+            "newListings": "Nouvelles annonces (tous types)",
+            "newRequests": "Demandes publiées",
+            "newReplies": "Réponses aux demandes",
+            "newPortfolio": "Éléments du portfolio"
         },
         "leadsTrend": "Intérêt et contacts",
         "leadsTrendDescription": "Biens enregistrés et contacts propriétaires dans le temps",
@@ -3293,6 +3386,13 @@
             "roommates_other": "{{value}} annonces de colocation",
             "establishments_one": "{{value}} établissement",
             "establishments_other": "{{value}} établissements"
+        },
+        "inventoryByType": "Annonces en ligne",
+        "inventoryByTypeDescription": "Biens disponibles, colocations ouvertes, hôtels & riads",
+        "listingTypes": {
+            "properties": "Biens",
+            "roommates": "Colocations",
+            "establishments": "Hôtels & riads"
         }
     },
     "profileRoommate": {
@@ -4452,7 +4552,8 @@
         "usersSubtitle": "Tous les comptes : activité, vérification, publications, suspension.",
         "visitsSubtitle": "Visiteurs et sessions sur toute la plateforme.",
         "statisticsTitle": "Statistiques immobilier",
-        "statisticsSubtitle": "Clics, demande et contacts sur les annonces immobilières."
+        "statisticsSubtitle": "Clics, demande et contacts sur les annonces immobilières.",
+        "statisticsSubtitleAll": "Biens, colocations, hôtels & riads : publications, clics, alertes, sauvegardes, contacts, demandes et portfolios."
     },
     "adminRoles": {
         "title": "Rôles & accès",
@@ -5257,5 +5358,179 @@
         "deleteError": "Impossible de supprimer cet élément.",
         "loadError": "Impossible de charger les éléments.",
         "unknownUser": "Compte supprimé"
+    },
+    "activityStats": {
+        "answeredRate": "Demandes avec au moins une réponse",
+        "communityTrend": "Demandes, réponses et portfolio",
+        "listingTrend": "Nouvelles annonces",
+        "noPublishers": "Aucune nouvelle annonce sur cette période.",
+        "online": "Annonces en ligne",
+        "portfolio": "Portfolio articles / vidéos",
+        "portfolioAuthors": "{{count}} auteurs",
+        "portfolioItems": "Éléments du portfolio",
+        "propertyTitle": "Publications & communauté",
+        "propertySubtitle": "Nouvelles annonces de tous types, demandes, portfolios et avis.",
+        "vehicleTitle": "Publications & communauté",
+        "vehicleSubtitle": "Nouvelles voitures, motos et pièces, demandes, portfolios et avis.",
+        "publishers": "Annonceurs les plus actifs",
+        "replies": "Réponses aux demandes",
+        "repliesPerRequest": "{{value}} par demande",
+        "requestCities": "Demandes par ville",
+        "requestQuality": "Demandes",
+        "requests": "Demandes publiées",
+        "reviews": "Avis",
+        "types": {
+            "properties": "Biens",
+            "roommates": "Annonces colocation",
+            "establishments": "Hôtels & riads"
+        },
+        "extra": {
+            "roommateCities": "Nouvelles colocations par ville",
+            "establishmentTypes": "Nouveaux hôtels & riads par type",
+            "vehicleMakes": "Nouveaux véhicules par marque",
+            "partMakes": "Nouvelles pièces par marque"
+        }
+    },
+    "savedStats": {
+        "title": "Demande (sauvegardes)",
+        "subtitle": "Ce que les gens sauvegardent, par type d'annonce.",
+        "saves": "Sauvegardes",
+        "uniqueUsers": "Personnes qui ont sauvegardé",
+        "activeSaved": "Toujours sauvegardées",
+        "activeSavedDescription": "Annonces dans une liste de sauvegardes en ce moment",
+        "keepRate": "Conservées",
+        "unsaves": "{{count}} retirées ensuite",
+        "trend": "Sauvegardes dans le temps",
+        "topListings": "Les plus sauvegardées",
+        "cities": "Villes des annonces sauvegardées",
+        "empty": "Rien de sauvegardé sur cette période.",
+        "types": {
+            "properties": "Biens",
+            "roommate": "Annonces colocation",
+            "establishment": "Hôtels & riads"
+        }
+    },
+    "vehicleStats": {
+        "title": "Statistiques véhicules",
+        "subtitle": "Voitures, motos, pièces et annonces externes : publications, vues, alertes, sauvegardes, contacts, demandes et portfolios.",
+        "empty": "Rien sur cette période.",
+        "tabs": {
+            "overview": "Vue d'ensemble",
+            "activity": "Publications & communauté",
+            "views": "Vues des annonces",
+            "external": "Clics annonces externes",
+            "alerts": "Demande (alertes)",
+            "saved": "Demande (sauvegardes)",
+            "contacts": "Actions de contact"
+        },
+        "kpis": {
+            "uniqueVisitors": "Visiteurs uniques",
+            "views": "Vues des annonces",
+            "contacts": "Contacts",
+            "externalClicks": "Clics externes",
+            "newListings": "Nouvelles annonces",
+            "saves": "Sauvegardes",
+            "newAlerts": "Nouvelles alertes",
+            "newRequests": "Demandes publiées",
+            "newReplies": "Réponses aux demandes",
+            "newPortfolio": "Éléments du portfolio"
+        },
+        "overview": {
+            "title": "Vue d'ensemble véhicules",
+            "subtitle": "Voitures, motos, pièces et annonces externes.",
+            "trend": "Vues, contacts, clics externes et sauvegardes",
+            "funnel": "Parcours des visiteurs",
+            "contactRate": "Vues suivies d'un contact",
+            "saveRate": "Sauvegardes par vue",
+            "online": "Annonces en ligne",
+            "channels": "Contacts par canal",
+            "note": "Les vues, contacts et clics externes sont comptés à partir de maintenant ; le taux de contact est de {{rate}} sur cette période."
+        },
+        "funnel": {
+            "visitors": "Visiteurs uniques",
+            "viewers": "Ont vu une annonce",
+            "savers": "Ont sauvegardé",
+            "contacters": "Ont contacté un vendeur"
+        },
+        "events": {
+            "total": "Total",
+            "unique": "Visiteurs uniques",
+            "perVisitor": "{{value}} par visiteur",
+            "items": "Annonces concernées",
+            "trend": "Dans le temps",
+            "hours": "Heures de la journée",
+            "topItems": "Meilleures annonces",
+            "makes": "Par marque",
+            "cities": "Par ville"
+        },
+        "breakdown": {
+            "listingTypes": "Vente ou location",
+            "sources": "Par site",
+            "channels": "Par canal"
+        },
+        "views": {
+            "title": "Vues des annonces",
+            "subtitle": "Pages de détails ouvertes par les visiteurs (propriétaires et robots exclus).",
+            "contactRate": "Vues suivies d'un contact"
+        },
+        "external": {
+            "title": "Clics annonces externes",
+            "subtitle": "Annonces d'autres sites (Avito, Moteur.ma...) ouvertes depuis l'application."
+        },
+        "contacts": {
+            "title": "Actions de contact",
+            "subtitle": "Boutons appel, WhatsApp et e-mail utilisés sur les véhicules et pièces.",
+            "rate": "Contacts par vue"
+        },
+        "saved": {
+            "title": "Demande (sauvegardes)",
+            "subtitle": "Ce que les gens sauvegardent : véhicules et motos, pièces."
+        },
+        "alerts": {
+            "title": "Demande (alertes)",
+            "subtitle": "Ce que les utilisateurs veulent recevoir, comparé aux véhicules disponibles.",
+            "created": "Alertes créées",
+            "active": "Alertes actives",
+            "perUser": "{{value}} par utilisateur",
+            "users": "Utilisateurs en recherche",
+            "archived": "Alertes archivées",
+            "archiveRate": "{{rate}} archivées",
+            "trend": "Alertes créées dans le temps",
+            "makes": "Marques les plus demandées",
+            "alerts": "Alertes",
+            "categories": "Voitures ou motos",
+            "listingTypes": "Vente ou location",
+            "budget": "Budget maximum",
+            "supply": "Demande et offre par ville",
+            "supplyHelp": "Alertes actives comparées aux véhicules disponibles dans chaque ville",
+            "city": "Ville",
+            "available": "Véhicules disponibles",
+            "gap": "Écart"
+        },
+        "gaps": {
+            "noSupply": "Aucune offre",
+            "high": "Offre insuffisante",
+            "balanced": "Équilibré",
+            "low": "Offre abondante"
+        },
+        "values": {
+            "all": "Tout",
+            "cars": "Voitures",
+            "motos": "Motos & vélos",
+            "parts": "Pièces",
+            "vehicles": "Véhicules & motos",
+            "external": "Annonces externes",
+            "vehicle": "Voiture",
+            "moto": "Moto",
+            "part": "Pièce",
+            "car": "Voitures",
+            "sale": "Vente",
+            "rent": "Location",
+            "unknown": "Inconnu",
+            "phone": "Téléphone",
+            "whatsapp": "WhatsApp",
+            "email": "E-mail",
+            "message": "Message"
+        }
     }
 }

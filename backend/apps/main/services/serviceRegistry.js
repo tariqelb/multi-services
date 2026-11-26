@@ -5,6 +5,7 @@
 //
 //   registerService("property", {
 //       userListDefaults: { publishedProperties: 0, ... },  // counters for the admin users list
+//       userActivity: { publisher: ["publishedProperties"], saver: [...], ... },  // how to read them
 //       getUserListStats: async (userIds) => Map(userId -> { publishedProperties, ... }),
 //       getUserDetailStats: async (userId) => ({ totalPublications, ... }),
 //       onUserDeleted: async (userId) => { ... },          // remove the user's data in this service
@@ -38,6 +39,15 @@ export async function getUserListStats(userIds) {
     }
 
     return { defaults, byUser };
+}
+
+/** { property: { publisher: [...keys], saver: [...] }, vehicles: {...} } */
+export function getUserActivityKeys() {
+    const result = {};
+    for (const [name, hooks] of services.entries()) {
+        if (hooks.userActivity) result[name] = hooks.userActivity;
+    }
+    return result;
 }
 
 /** Statistics for the admin user page, merged from every service. */

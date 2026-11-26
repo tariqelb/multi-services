@@ -28,9 +28,8 @@ export const VEHICLE_NAV = [
     // Requests: "I am looking for..." (post one / board for dealers and owners).
     { path: "/vehicles/requests/new", exact: true, labelKey: "requests.nav.post", label: "Post a request", icon: "postRequest" },
     { path: "/vehicles/requests/board", exact: true, labelKey: "requests.nav.board", label: "Requests board", icon: "requestBoard" },
-    // Vehicles, motos & bikes and spare parts together (tabs on the page), like the property "My publications".
-    { path: "/vehicles/mine", exact: true, labelKey: "topbar.myPublication", label: "My Publication", icon: "mine" },
-    // Saved and Alerts are in the profile menu of the top bar; my requests are a tab of My Publication.
+    // My Publication, Saved and Alerts are in the profile menu of the top bar
+    // (My Publication: vehicles, motos & bikes, spare parts and my requests).
     { path: "/vehicles/reviews", exact: true, labelKey: "vehiclesApp.sidebar.reviews", label: "Reviews", icon: "reviews" },
 ];
 

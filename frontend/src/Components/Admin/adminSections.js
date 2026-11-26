@@ -43,6 +43,7 @@ export const ADMIN_GROUPS = [
         label: "Vehicles",
         icon: "vehicles",
         items: [
+            { section: "vehicleStatistics", path: "/admin/vehicles/statistics", labelKey: "sidebar.statistics", label: "Statistics", icon: "statistics" },
             { section: "vehiclePublications", path: "/admin/vehicles/publications", labelKey: "sidebar.publicationReviews", label: "Publication Reviews", icon: "publications" },
             { section: "vehiclePublications", path: "/admin/vehicles/portfolio", labelKey: "portfolioReview.navItem", label: "Portfolio Reviews", icon: "portfolio" },
             { section: "vehicleRequests", path: "/admin/vehicles/requests", labelKey: "requests.admin.navItem", label: "Requests", icon: "requests" },

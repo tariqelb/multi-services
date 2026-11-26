@@ -1637,8 +1637,10 @@
         "publications": "مراجعة المنشورات",
         "feedback": "الملاحظات",
         "client call action": "إجراءات تواصل العملاء",
-        "property demand": "الطلب العقاري",
-        "overview": "نظرة عامة"
+        "property demand": "الطلب (التنبيهات)",
+        "overview": "نظرة عامة",
+        "activity": "المنشورات والمجتمع",
+        "saved demand": "الطلب (المحفوظات)"
     },
     "propertyDemand": {
         "title": "تحليلات الطلب العقاري",
@@ -1695,7 +1697,13 @@
             "high": "عرض غير كافٍ",
             "balanced": "متوازن",
             "low": "عرض زائد"
-        }
+        },
+        "alerts": "التنبيهات",
+        "openRoommates": "إعلانات مفتوحة",
+        "roommateAlerts": "تنبيهات السكن المشترك",
+        "roommateAlertsActive": "نشطة",
+        "roommateAlertsCreated": "أُنشئت",
+        "roommateCities": "تنبيهات السكن المشترك حسب المدينة"
     },
     "usersSection": {
         "title": "المستخدمون",
@@ -1748,7 +1756,7 @@
         "reporters": "أرسلوا ملاحظات",
         "roles": "الأدوار",
         "saverRate": "حفظوا عقارًا واحدًا على الأقل",
-        "savers": "حفظوا عقارات",
+        "savers": "حفظوا إعلانات",
         "signupTrend": "حسابات جديدة",
         "signupTrendDescription": "التسجيلات اليومية خلال آخر 30 يومًا",
         "statuses": "حالة الحسابات",
@@ -1761,6 +1769,32 @@
         "statusNames": {
             "active": "نشط",
             "suspended": "موقوف"
+        },
+        "alertRate": "يتابعون تنبيهاً واحداً على الأقل",
+        "alertUsers": "{{count}} لديهم تنبيهات",
+        "alertsFilter": "يتابعون تنبيهات",
+        "byService": "النشاط حسب الخدمة",
+        "byServiceDescription": "المستخدمون الذين ينشرون أو يحفظون أو يتابعون تنبيهات أو ينشرون طلبات أو لديهم أعمال في كل خدمة",
+        "mostSavedAll": "الأكثر حفظاً للإعلانات",
+        "portfolioFilter": "لديهم أعمال",
+        "portfolioUsers": "{{count}} لديهم أعمال",
+        "propertyPublishers": "ناشرو العقارات",
+        "publisherRateAll": "نشروا إعلاناً واحداً على الأقل",
+        "requestRate": "نشروا طلباً واحداً على الأقل",
+        "requestUsers": "نشروا طلبات",
+        "requestsFilter": "نشروا طلبات",
+        "saverRateAll": "حفظوا إعلاناً واحداً على الأقل",
+        "vehiclePublishers": "ناشرو المركبات",
+        "activityKinds": {
+            "publisher": "ينشرون",
+            "saver": "يحفظون",
+            "alerts": "تنبيهات",
+            "requests": "طلبات",
+            "portfolio": "أعمال"
+        },
+        "serviceNames": {
+            "property": "العقار",
+            "vehicles": "المركبات"
         }
     },
     "visitsSection": {
@@ -2076,6 +2110,18 @@
         "statuses": {
             "active": "نشط",
             "suspended": "معلّق"
+        },
+        "alerts": "التنبيهات",
+        "portfolio": "الأعمال",
+        "publishedParts": "قطع الغيار",
+        "publishedVehicles": "المركبات",
+        "requests": "الطلبات",
+        "roommatesAndHotels": "السكن المشترك، الفنادق والرياضات",
+        "savedListings": "المحفوظة",
+        "services": {
+            "property": "العقار",
+            "vehicles": "المركبات",
+            "other": "الطلبات، الأعمال والملاحظات"
         }
     },
     "userDetails": {
@@ -2110,7 +2156,9 @@
             "publications": "المنشورات",
             "alerts": "التنبيهات",
             "savedProperties": "العقارات المحفوظة",
-            "feedback": "التعليقات"
+            "feedback": "التعليقات",
+            "property": "العقار",
+            "vehicles": "المركبات"
         },
         "feedbackStatuses": {
             "open": "مفتوح",
@@ -2118,7 +2166,49 @@
             "resolved": "تم الحل",
             "closed": "مغلق"
         },
-        "whatsapp": "رقم واتساب"
+        "whatsapp": "رقم واتساب",
+        "availableVehicles": "المركبات المتاحة",
+        "carsMotos": "سيارات / دراجات",
+        "establishments": "الفنادق والرياضات",
+        "noDetails": "لا توجد تفاصيل إضافية",
+        "parts": "قطع الغيار",
+        "portfolioItems": "الأعمال (مقالات / فيديوهات)",
+        "repliesSent": "الردود على الطلبات",
+        "requests": "الطلبات المنشورة",
+        "reviews": "التقييمات المستلمة",
+        "roommates": "إعلانات السكن المشترك",
+        "savedListings": "الإعلانات المحفوظة",
+        "services": {
+            "account": "الملاحظات",
+            "property": "العقار",
+            "vehicles": "المركبات"
+        },
+        "vehicles": "المركبات",
+        "kinds": {
+            "publications": "المنشورات",
+            "alerts": "التنبيهات",
+            "saved": "المحفوظات",
+            "requests": "الطلبات",
+            "portfolio": "الأعمال"
+        },
+        "types": {
+            "property": "عقار",
+            "roommate": "سكن مشترك",
+            "establishment": "فندق / رياض",
+            "vehicle": "سيارة",
+            "moto": "دراجة",
+            "part": "قطعة غيار",
+            "propertyAlert": "تنبيه عقار",
+            "roommateAlert": "تنبيه سكن مشترك",
+            "vehicleAlert": "تنبيه مركبة",
+            "request": "طلب",
+            "article": "مقال",
+            "video": "فيديو"
+        },
+        "statusNames": {
+            "active": "نشط",
+            "archived": "مؤرشف"
+        }
     },
     "knowledgeCenter": {
         "title": "مركز المعرفة القانونية والعقارية",
@@ -3319,13 +3409,16 @@
         "kpis": {
             "contacts": "التواصل مع المالكين",
             "externalClicks": "النقرات الخارجية",
-            "newAlerts": "تنبيهات عقارية جديدة",
+            "newAlerts": "تنبيهات جديدة",
             "propertyClicks": "مشاهدات العقارات",
-            "saves": "العقارات المحفوظة",
+            "saves": "الإعلانات المحفوظة",
             "sessions": "الجلسات",
             "uniqueVisitors": "الزوار الفريدون",
             "newUsers": "حسابات جديدة",
-            "newListings": "إعلانات جديدة"
+            "newListings": "إعلانات جديدة (كل الأنواع)",
+            "newRequests": "الطلبات المنشورة",
+            "newReplies": "الردود على الطلبات",
+            "newPortfolio": "عناصر الأعمال"
         },
         "leadsTrend": "الاهتمام والتواصل",
         "leadsTrendDescription": "العقارات المحفوظة والتواصل مع المالكين عبر الزمن",
@@ -3364,6 +3457,13 @@
             "establishments_few": "{{value}} مؤسسات",
             "establishments_many": "{{value}} مؤسسة",
             "establishments_other": "{{value}} مؤسسة"
+        },
+        "inventoryByType": "الإعلانات المتاحة",
+        "inventoryByTypeDescription": "العقارات المتاحة، إعلانات السكن المشترك المفتوحة، الفنادق والرياضات",
+        "listingTypes": {
+            "properties": "العقارات",
+            "roommates": "السكن المشترك",
+            "establishments": "الفنادق والرياضات"
         }
     },
     "profileRoommate": {
@@ -4587,7 +4687,8 @@
         "usersSubtitle": "كل الحسابات: النشاط، التحقق، المنشورات، التعليق.",
         "visitsSubtitle": "الزوار والجلسات على المنصة.",
         "statisticsTitle": "إحصائيات العقارات",
-        "statisticsSubtitle": "النقرات والطلب والاتصالات على إعلانات العقارات."
+        "statisticsSubtitle": "النقرات والطلب والاتصالات على إعلانات العقارات.",
+        "statisticsSubtitleAll": "العقارات، السكن المشترك، الفنادق والرياضات: المنشورات، النقرات، التنبيهات، الحفظ، التواصل، الطلبات والأعمال."
     },
     "adminRoles": {
         "title": "الأدوار والصلاحيات",
@@ -5407,5 +5508,179 @@
         "deleteError": "تعذر حذف هذا العنصر.",
         "loadError": "تعذر تحميل العناصر.",
         "unknownUser": "حساب محذوف"
+    },
+    "activityStats": {
+        "answeredRate": "طلبات حصلت على رد واحد على الأقل",
+        "communityTrend": "الطلبات والردود والأعمال",
+        "listingTrend": "إعلانات جديدة",
+        "noPublishers": "لا توجد إعلانات جديدة في هذه الفترة.",
+        "online": "الإعلانات المتاحة",
+        "portfolio": "الأعمال: مقالات / فيديوهات",
+        "portfolioAuthors": "{{count}} ناشر",
+        "portfolioItems": "عناصر الأعمال",
+        "propertyTitle": "المنشورات والمجتمع",
+        "propertySubtitle": "إعلانات جديدة بجميع أنواعها، الطلبات، الأعمال والتقييمات.",
+        "vehicleTitle": "المنشورات والمجتمع",
+        "vehicleSubtitle": "سيارات ودراجات وقطع غيار جديدة، الطلبات، الأعمال والتقييمات.",
+        "publishers": "الناشرون الأكثر نشاطاً",
+        "replies": "الردود على الطلبات",
+        "repliesPerRequest": "{{value}} لكل طلب",
+        "requestCities": "الطلبات حسب المدينة",
+        "requestQuality": "الطلبات",
+        "requests": "الطلبات المنشورة",
+        "reviews": "التقييمات",
+        "types": {
+            "properties": "العقارات",
+            "roommates": "إعلانات السكن المشترك",
+            "establishments": "الفنادق والرياضات"
+        },
+        "extra": {
+            "roommateCities": "إعلانات السكن المشترك الجديدة حسب المدينة",
+            "establishmentTypes": "الفنادق والرياضات الجديدة حسب النوع",
+            "vehicleMakes": "المركبات الجديدة حسب الماركة",
+            "partMakes": "قطع الغيار الجديدة حسب الماركة"
+        }
+    },
+    "savedStats": {
+        "title": "الطلب (المحفوظات)",
+        "subtitle": "ما يحفظه الناس، حسب نوع الإعلان.",
+        "saves": "مرات الحفظ",
+        "uniqueUsers": "الأشخاص الذين حفظوا",
+        "activeSaved": "لا تزال محفوظة",
+        "activeSavedDescription": "إعلانات في قائمة محفوظات شخص ما الآن",
+        "keepRate": "احتُفظ بها",
+        "unsaves": "{{count}} أُزيلت لاحقاً",
+        "trend": "الحفظ عبر الزمن",
+        "topListings": "الأكثر حفظاً",
+        "cities": "مدن الإعلانات المحفوظة",
+        "empty": "لا شيء محفوظ في هذه الفترة.",
+        "types": {
+            "properties": "العقارات",
+            "roommate": "إعلانات السكن المشترك",
+            "establishment": "الفنادق والرياضات"
+        }
+    },
+    "vehicleStats": {
+        "title": "إحصائيات المركبات",
+        "subtitle": "السيارات والدراجات وقطع الغيار والإعلانات الخارجية: المنشورات، المشاهدات، التنبيهات، الحفظ، التواصل، الطلبات والأعمال.",
+        "empty": "لا شيء في هذه الفترة.",
+        "tabs": {
+            "overview": "نظرة عامة",
+            "activity": "المنشورات والمجتمع",
+            "views": "مشاهدات الإعلانات",
+            "external": "نقرات الإعلانات الخارجية",
+            "alerts": "الطلب (التنبيهات)",
+            "saved": "الطلب (المحفوظات)",
+            "contacts": "إجراءات التواصل"
+        },
+        "kpis": {
+            "uniqueVisitors": "زوار فريدون",
+            "views": "مشاهدات الإعلانات",
+            "contacts": "التواصل",
+            "externalClicks": "نقرات خارجية",
+            "newListings": "إعلانات جديدة",
+            "saves": "مرات الحفظ",
+            "newAlerts": "تنبيهات جديدة",
+            "newRequests": "الطلبات المنشورة",
+            "newReplies": "الردود على الطلبات",
+            "newPortfolio": "عناصر الأعمال"
+        },
+        "overview": {
+            "title": "نظرة عامة على المركبات",
+            "subtitle": "السيارات والدراجات وقطع الغيار والإعلانات الخارجية.",
+            "trend": "المشاهدات والتواصل والنقرات الخارجية والحفظ",
+            "funnel": "مسار الزوار",
+            "contactRate": "مشاهدات أدت إلى تواصل",
+            "saveRate": "الحفظ لكل مشاهدة",
+            "online": "الإعلانات المتاحة",
+            "channels": "التواصل حسب القناة",
+            "note": "تُحتسب المشاهدات والتواصل والنقرات الخارجية من الآن؛ نسبة التواصل {{rate}} في هذه الفترة."
+        },
+        "funnel": {
+            "visitors": "زوار فريدون",
+            "viewers": "شاهدوا إعلاناً",
+            "savers": "حفظوا إعلاناً",
+            "contacters": "تواصلوا مع بائع"
+        },
+        "events": {
+            "total": "المجموع",
+            "unique": "زوار فريدون",
+            "perVisitor": "{{value}} لكل زائر",
+            "items": "الإعلانات المعنية",
+            "trend": "عبر الزمن",
+            "hours": "ساعات اليوم",
+            "topItems": "أفضل الإعلانات",
+            "makes": "حسب الماركة",
+            "cities": "حسب المدينة"
+        },
+        "breakdown": {
+            "listingTypes": "بيع أو كراء",
+            "sources": "حسب الموقع",
+            "channels": "حسب القناة"
+        },
+        "views": {
+            "title": "مشاهدات الإعلانات",
+            "subtitle": "صفحات التفاصيل التي فتحها الزوار (لا يُحتسب المالكون والروبوتات).",
+            "contactRate": "مشاهدات أدت إلى تواصل"
+        },
+        "external": {
+            "title": "نقرات الإعلانات الخارجية",
+            "subtitle": "إعلانات مواقع أخرى (أفيتو، Moteur.ma...) فُتحت من التطبيق."
+        },
+        "contacts": {
+            "title": "إجراءات التواصل",
+            "subtitle": "أزرار الاتصال وواتساب والبريد المستعملة في المركبات وقطع الغيار.",
+            "rate": "التواصل لكل مشاهدة"
+        },
+        "saved": {
+            "title": "الطلب (المحفوظات)",
+            "subtitle": "ما يحفظه الناس: المركبات والدراجات، قطع الغيار."
+        },
+        "alerts": {
+            "title": "الطلب (التنبيهات)",
+            "subtitle": "ما يطلب المستخدمون التنبيه به، مقارنة بالمركبات المتاحة.",
+            "created": "التنبيهات المنشأة",
+            "active": "التنبيهات النشطة",
+            "perUser": "{{value}} لكل مستخدم",
+            "users": "المستخدمون الباحثون",
+            "archived": "التنبيهات المؤرشفة",
+            "archiveRate": "{{rate}} نسبة الأرشفة",
+            "trend": "التنبيهات المنشأة عبر الزمن",
+            "makes": "الماركات الأكثر طلباً",
+            "alerts": "التنبيهات",
+            "categories": "سيارات أو دراجات",
+            "listingTypes": "بيع أو كراء",
+            "budget": "الميزانية القصوى",
+            "supply": "الطلب والعرض حسب المدينة",
+            "supplyHelp": "التنبيهات النشطة مقارنة بالمركبات المتاحة في كل مدينة",
+            "city": "المدينة",
+            "available": "المركبات المتاحة",
+            "gap": "الفجوة"
+        },
+        "gaps": {
+            "noSupply": "لا يوجد عرض",
+            "high": "عرض غير كافٍ",
+            "balanced": "متوازن",
+            "low": "عرض وافر"
+        },
+        "values": {
+            "all": "الكل",
+            "cars": "السيارات",
+            "motos": "الدراجات",
+            "parts": "قطع الغيار",
+            "vehicles": "المركبات والدراجات",
+            "external": "الإعلانات الخارجية",
+            "vehicle": "سيارة",
+            "moto": "دراجة",
+            "part": "قطعة غيار",
+            "car": "السيارات",
+            "sale": "بيع",
+            "rent": "كراء",
+            "unknown": "غير معروف",
+            "phone": "الهاتف",
+            "whatsapp": "واتساب",
+            "email": "البريد الإلكتروني",
+            "message": "رسالة"
+        }
     }
 }

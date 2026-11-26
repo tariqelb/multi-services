@@ -4,6 +4,9 @@
 
 import Property from "../../models/Property.js";
 import PropertyAlert from "../../models/PropertyAlert.js";
+import RoommateAlert from "../../models/RoommateAlert.js";
+import RoommateListing from "../../models/RoommateListing.js";
+import { countPair, topValues } from "../../../main/utils/statsKit.js";
 
 import {
     bucketExpression,
@@ -243,9 +246,25 @@ export const getPropertyDemandAnalytics = async (req, res) => {
             };
         });
 
+        // Roommate alerts (people looking for a roommate) next to the property alerts.
+        const roommateMatch = currentMatch(window, "createdAt");
+        const [roommateCreated, roommateActive, roommateCities, openRoommates] = await Promise.all([
+            countPair(RoommateAlert, window, "createdAt"),
+            RoommateAlert.countDocuments({ isArchived: false }),
+            topValues(RoommateAlert, { ...roommateMatch, city: { $nin: [null, ""] } }, "city", 6, "alerts"),
+            RoommateListing.countDocuments({ status: "Open" }),
+        ]);
+
         return res.status(200).json({
             success: true,
             range: window.range,
+
+            roommateAlerts: {
+                created: roommateCreated,
+                active: roommateActive,
+                openAnnouncements: openRoommates,
+                cities: roommateCities,
+            },
 
             summary: {
                 ...summaryRow,
