@@ -29,6 +29,7 @@ import VideoLibraryOutlinedIcon from "@mui/icons-material/VideoLibraryOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import { CirclePlay } from "lucide-react";
 import StarIcon from "@mui/icons-material/Star";
+import { useGoBack } from "../../../Components/navigation/navHistory";
 
 const categories = [
     { value: "Buying", key: "buying" },
@@ -186,6 +187,7 @@ function RelatedContentCard({ item, onClick, t }) {
 export default function KnowledgeDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const goBack = useGoBack("/knowledge");
 
     const { t: translate, i18n } = useTranslation();
 
@@ -277,10 +279,10 @@ export default function KnowledgeDetails() {
                 <Stack spacing={2}>
                     <Button
                         startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate("/knowledge")}
+                        onClick={() => goBack()}
                         sx={{ alignSelf: "flex-start" }}
                     >
-                        {t("backToKnowledge")}
+                        {t("back")}
                     </Button>
 
                     <Alert severity="error">
@@ -314,7 +316,7 @@ export default function KnowledgeDetails() {
             action={
                 <Button
                     startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate("/knowledge")}
+                    onClick={() => goBack()}
                     variant="outlined"
                 >
                     {t("back")}

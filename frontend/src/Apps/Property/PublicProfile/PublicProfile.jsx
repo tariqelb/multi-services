@@ -28,6 +28,7 @@ import ReviewsTab from "./components/ReviewsTab";
 import PublicContactCard from "../../../Components/Profile/PublicContactCard";
 import PropertyRequestsList from "../Requests/PropertyRequestsList";
 import PortfolioSection from "../../../Components/Profile/Portfolio/PortfolioSection";
+import { useGoBack } from "../../../Components/navigation/navHistory";
 
 // Order of the tabs in PublicProfileTabs.
 const PROFILE_TABS = ["properties", "roommates", "establishments", "reviews", "requests"];
@@ -50,6 +51,7 @@ export default function PublicProfile() {
     const [searchParams] = useSearchParams();
     const requestedTab = Math.max(0, PROFILE_TABS.indexOf(searchParams.get("tab")));
     const navigate = useNavigate();
+    const goBack = useGoBack("/properties");
     const { t } = useTranslation();
 
     // Every hook runs on every render (no short-circuit between hooks).
@@ -623,7 +625,7 @@ export default function PublicProfile() {
 
                 <Button
                     startIcon={<ArrowBack />}
-                    onClick={() => navigate(-1)}
+                    onClick={() => goBack()}
                 >
                     {t("publicProfile.back")}
                 </Button>
@@ -643,7 +645,7 @@ export default function PublicProfile() {
                 <Box>
                     <Button
                         startIcon={<ArrowBack />}
-                        onClick={() => navigate(-1)}
+                        onClick={() => goBack()}
                         sx={{ textTransform: "none" }}
                     >
                         {t("publicProfile.back")}

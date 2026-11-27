@@ -2,7 +2,7 @@
 // /vehicles/:id — one vehicle: photos, characteristics, price conditions, contact.
 
 import { useEffect, useState } from "react";
-import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Alert, Avatar, Box, Button, CircularProgress, Rating, Stack, Typography } from "@mui/material";
 
@@ -47,6 +47,7 @@ import SaveVehicleButton from "../Saved/SaveVehicleButton";
 import { STATUS_TONES, formatVehiclePrice, formatCity, formatDate, formatNumber, getYoutubeVideoId, optionLabel } from "../vehicleFormat";
 import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
 import { trackVehicleContact, trackVehicleView } from "../statsTracking";
+import { useFlashState, useGoBack } from "../../../Components/navigation/navHistory";
 
 const yesNo = (t, value) => (value ? t("vehiclesApp.details.yes", "Yes") : null);
 const waLink = (number) => `https://wa.me/${String(number).replace(/\D/g, "")}`;
@@ -65,7 +66,9 @@ export default function VehicleDetailsPage() {
 
 function VehicleDetails({ id }) {
     const navigate = useNavigate();
-    const location = useLocation();
+    const goBack = useGoBack("/vehicles");
+    // "published" / "updated" message, also after returning from the edit form.
+    const flashState = useFlashState();
     const { t, i18n } = useTranslation();
     const language = i18n.language;
 
@@ -95,7 +98,7 @@ function VehicleDetails({ id }) {
     if (error) {
         return (
             <DetailsContainer>
-                <DetailsBackButton onClick={() => navigate("/vehicles")} label={t("vehiclesApp.details.back", "Back to vehicles")} />
+                <DetailsBackButton onClick={() => goBack()} label={t("vehiclesApp.details.backShort", "Back")} />
                 <Alert severity="error">{error}</Alert>
             </DetailsContainer>
         );
@@ -351,16 +354,16 @@ function VehicleDetails({ id }) {
     return (
         <DetailsContainer>
             <DetailsBackButton
-                onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate(listPath))}
-                label={isMoto ? t("vehiclesApp.details.backMotos", "Back to motos") : t("vehiclesApp.details.back", "Back to vehicles")}
+                onClick={() => goBack(listPath)}
+                label={t("vehiclesApp.details.backShort", "Back")}
             />
 
-            {location.state?.published && (
+            {flashState?.published && (
                 <Alert severity="success" sx={{ mb: 2 }}>
                     {t("vehiclesApp.details.published", "Your vehicle is published.")}
                 </Alert>
             )}
-            {location.state?.updated && (
+            {flashState?.updated && (
                 <Alert severity="success" sx={{ mb: 2 }}>
                     {t("vehiclesApp.details.updated", "Your changes are saved.")}
                 </Alert>

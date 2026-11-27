@@ -86,9 +86,13 @@ export const extractGoogleMapsLocation = async (mapLink) => {
         throw new Error("Please provide a valid Google Maps link.");
     }
 
-    let finalUrl = "";
+    // A link that already holds coordinates (e.g. https://www.google.com/maps?q=lat,lng
+    // from the form's map picker) is read directly, with no request to Google.
+    let finalUrl = parseGoogleMapsCoordinates(currentUrl.toString())
+        ? currentUrl.toString()
+        : "";
 
-    for (let attempt = 0; attempt < 10; attempt++) {
+    for (let attempt = 0; !finalUrl && attempt < 10; attempt++) {
         if (!isAllowedGoogleMapsHost(currentUrl.hostname)) {
             throw new Error(
                 "The Google Maps link redirected to an invalid domain."

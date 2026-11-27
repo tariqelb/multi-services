@@ -62,6 +62,9 @@ const ITEM_ICONS = {
     aboutProperty: HomeWorkOutlined,
     aboutCompanies: BusinessCenterOutlined,
     aboutWorker: EngineeringOutlined,
+    // Daily worker
+    worker: EngineeringOutlined,
+    workerProfile: ManageAccountsOutlined,
     aboutDelivery: LocalShippingOutlined,
     aboutDriver: LocalTaxiOutlined,
     aboutAccount: ManageAccountsOutlined,

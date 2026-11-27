@@ -2175,7 +2175,8 @@
         "statusNames": {
             "active": "Active",
             "archived": "Archived"
-        }
+        },
+        "back": "Back"
     },
     "knowledge": "Legal & Property Guide",
     "knowledgeManagement": "Knowledge Management",
@@ -2634,7 +2635,8 @@
             "saveDescription": "Your announcement is updated right away.",
             "saved": "Your announcement has been updated.",
             "saveError": "Unable to save your changes. Please try again.",
-            "loadError": "Unable to load this announcement."
+            "loadError": "Unable to load this announcement.",
+            "cancel": "Cancel"
         }
     },
     "establishmentForm": {
@@ -2702,7 +2704,8 @@
             "publishing": "Publishing...",
             "create": "Create establishment",
             "save": "Save changes",
-            "saving": "Saving..."
+            "saving": "Saving...",
+            "cancel": "Cancel"
         },
         "helpers": {
             "googleMaps": "Add a Google Maps share link so the location coordinates can be extracted automatically.",
@@ -2865,7 +2868,9 @@
             "whatsappShort": "WhatsApp",
             "publishedBy": "Published by",
             "publisher": "Publisher"
-        }
+        },
+        "publishFab": "Add establishment",
+        "publishFabTooltip": "Publish a new hotel, riad or guesthouse"
     },
     "profileEstablishment": {
         "myEstablishments": "My Establishments",
@@ -3449,7 +3454,8 @@
             "readyTitle": "Ready to publish?",
             "remove": "Remove",
             "requiredNote": "Fields marked with * are required.",
-            "reset": "Reset"
+            "reset": "Reset",
+            "cancel": "Cancel"
         },
         "filters": {
             "title": "Filters",
@@ -3701,7 +3707,8 @@
             "rentCaption": "Rental",
             "backMotos": "Back to motos & bikes",
             "ratingCount": "{{value}} · {{count}} reviews",
-            "noReviews": "No reviews yet"
+            "noReviews": "No reviews yet",
+            "backShort": "Back"
         },
         "form": {
             "vehicle": {
@@ -5526,6 +5533,376 @@
             "whatsapp": "WhatsApp",
             "email": "Email",
             "message": "Message"
+        }
+    },
+    "mapPicker": {
+        "pickButton": "Pick on map",
+        "openGoogleMaps": "Open Google Maps",
+        "title": "Find the place on the map",
+        "subtitle": "Search for the place or use your location, then press “Use this location”.",
+        "subtitleInteractive": "Search, then click on the map or drag the pin to the exact place.",
+        "searchPlaceholder": "Address, neighborhood, place name or city",
+        "search": "Search",
+        "useMyLocation": "My location",
+        "myLocation": "My location",
+        "results": "Results",
+        "noResults": "No place found. Try another name, a neighborhood or a city.",
+        "searchFailed": "Search is not available right now. Try again later.",
+        "noGeolocation": "Your browser cannot share your location.",
+        "locationDenied": "We could not get your location. Allow location access or search instead.",
+        "loadError": "Google Maps could not be loaded.",
+        "copy": "Copy link",
+        "copied": "Copied",
+        "openInGoogle": "Open in Google Maps",
+        "noPlace": "No place selected yet.",
+        "exactHint": "Need the exact spot? Open Google Maps, press Share → Copy link, and paste it into the field.",
+        "useLocation": "Use this location",
+        "cancel": "Cancel",
+        "close": "Close"
+    },
+    "workersApp": {
+        "price": {
+            "currency": "MAD",
+            "perDay": "{{amount}} / day",
+            "perHour": "{{amount}} / hour",
+            "perM2": "{{amount}} / m²",
+            "taskFrom": "From {{amount}} per job",
+            "task": "Price per job",
+            "quote": "On quote"
+        },
+        "coverage": {
+            "morocco": "All of Morocco"
+        },
+        "days": {
+            "everyDay": "Every day",
+            "mon": "Mon",
+            "tue": "Tue",
+            "wed": "Wed",
+            "thu": "Thu",
+            "fri": "Fri",
+            "sat": "Sat",
+            "sun": "Sun"
+        },
+        "availability": {
+            "available": "Available",
+            "busyUntil": "Busy until {{date}}",
+            "busy": "Busy"
+        },
+        "payment": {
+            "daily": "Paid at the end of each day",
+            "end": "Paid when the job is finished",
+            "agreed": "Payment as agreed"
+        },
+        "materials": {
+            "client": "Client buys the materials",
+            "included": "Materials included",
+            "either": "Materials: either way"
+        },
+        "languages": {
+            "ar": "Arabic",
+            "fr": "French",
+            "en": "English"
+        },
+        "experience": {
+            "years": "{{count}} years of experience",
+            "beginner": "Starting out",
+            "years_one": "{{count}} year of experience"
+        },
+        "workplace": {
+            "workshop": "Workshop",
+            "shop": "Shop",
+            "garage": "Garage",
+            "place": "Workplace"
+        },
+        "gender": {
+            "male": "Man",
+            "female": "Woman"
+        },
+        "admin": {
+            "error": "Unable to load worker profiles.",
+            "deleteError": "Unable to delete this profile.",
+            "title": "Worker profiles",
+            "subtitle": "Review what daily workers publish and remove inappropriate profiles.",
+            "filters": "Filters",
+            "searchPlaceholder": "Name, trade, city…",
+            "countAll": "{{count}} profiles",
+            "countOnline": "{{count}} online",
+            "countHidden": "{{count}} hidden",
+            "empty": "No worker profile in this period.",
+            "updated": "Updated {{date}}",
+            "open": "Open",
+            "delete": "Delete",
+            "deleteTitle": "Delete this worker profile?",
+            "deleteText": "The profile of {{name}} and its portfolio will be deleted. The account stays.",
+            "periods": {
+                "today": "Today",
+                "week": "7 days",
+                "month": "30 days",
+                "year": "12 months",
+                "all": "All"
+            },
+            "countAll_one": "{{count}} profile"
+        },
+        "details": {
+            "hidden": "Hidden",
+            "edit": "Edit my profile",
+            "offers": "Trades & prices",
+            "portfolio": "Work & videos",
+            "noContact": "No contact number yet.",
+            "call": "Call",
+            "error": "Unable to load this worker.",
+            "back": "Back",
+            "notFound": "Worker not found.",
+            "base": "Lives in",
+            "worksIn": "Works in",
+            "days": "Working days",
+            "hours": "Hours",
+            "break": "Lunch break",
+            "languages": "Languages",
+            "team": "Works",
+            "alone": "Alone",
+            "hasTools": "Has his own tools",
+            "hasVehicle": "Has a vehicle",
+            "urgent": "Accepts urgent jobs",
+            "night": "Works at night",
+            "when": "Where & when",
+            "openMap": "Open in Google Maps",
+            "offersCount": "{{count}} trades",
+            "portfolioHint": "Photos of finished jobs and videos published by the worker.",
+            "portfolioEmpty": "No photos or videos yet.",
+            "contact": "Contact the worker",
+            "safety": "Agree on the price, the deposit and the work before starting. Never pay the full amount in advance.",
+            "manage": "Manage availability & portfolio",
+            "offersCount_one": "{{count}} trade"
+        },
+        "mine": {
+            "online": "Online",
+            "cancel": "Cancel",
+            "published": "Your worker profile is published. Add photos of your work below.",
+            "actionError": "Something went wrong. Try again.",
+            "availabilitySaved": "Availability updated.",
+            "hiddenNotice": "Your profile is hidden from clients.",
+            "onlineNotice": "Your profile is online again.",
+            "deleted": "Your worker profile is deleted.",
+            "title": "My worker profile",
+            "subtitle": "Your availability, your trades and the photos of your work.",
+            "emptyTitle": "You have no worker profile yet",
+            "emptyText": "Publish your trades, your cities and your prices, and let clients call you directly.",
+            "hiddenBanner": "Your profile is hidden: clients cannot find it.",
+            "views": "{{count}} visits",
+            "viewPublic": "See my public page",
+            "portfolioHint": "Show finished jobs: before / after photos, or a YouTube video. Clients trust what they can see.",
+            "availabilityTitle": "Availability",
+            "availabilityHint": "Clients filter on \"Available now\". Tell them when you are busy.",
+            "setAvailable": "I am available",
+            "busyUntil": "Busy until",
+            "setBusy": "Set busy",
+            "manageTitle": "Profile",
+            "show": "Put my profile online",
+            "hide": "Hide my profile",
+            "delete": "Delete my worker profile",
+            "deleteTitle": "Delete your worker profile?",
+            "deleteText": "Your trades and your portfolio (photos and videos) will be deleted. This cannot be undone.",
+            "confirmDelete": "Delete",
+            "views_one": "{{count}} visit"
+        },
+        "list": {
+            "error": "Unable to load workers.",
+            "pageTitle": "Find a worker",
+            "pageSubtitle": "Artisans and day workers across Morocco: plumbers, electricians, painters, cleaners and more.",
+            "title": "Workers",
+            "count": "{{count}} offers",
+            "empty": "No worker matches these filters",
+            "emptyHint": "Try another trade or city, or remove some filters.",
+            "count_one": "{{count}} offer"
+        },
+        "trade": {
+            "otherTrades": "Other trades",
+            "otherGroup": "Other",
+            "other": "Other"
+        },
+        "filters": {
+            "title": "Find a worker",
+            "clear": "Clear",
+            "search": "Search",
+            "searchPlaceholder": "Trade, specialty, name… e.g. plombier, zellige",
+            "trade": "Trade",
+            "city": "City",
+            "priceType": "Price",
+            "any": "Any",
+            "maxPrice": "Max price (MAD)",
+            "available": "Available now",
+            "urgent": "Urgent jobs",
+            "night": "Works at night",
+            "noDeposit": "No deposit",
+            "team": "Works with a team",
+            "workplace": "Has a workshop or shop",
+            "minExperience": "Min. years of experience",
+            "language": "Language",
+            "gender": "Worker",
+            "specialty": "Specialty",
+            "all": "All",
+            "less": "Fewer filters",
+            "more": "More filters",
+            "apply": "Show results"
+        },
+        "priceTypes": {
+            "day": "Per day",
+            "task": "Per job",
+            "hour": "Per hour",
+            "m2": "Per m²",
+            "quote": "On quote"
+        },
+        "sort": {
+            "label": "Sort by",
+            "newest": "Newest",
+            "available": "Available first",
+            "experience": "Most experienced",
+            "priceAsc": "Price: low to high",
+            "priceDesc": "Price: high to low"
+        },
+        "card": {
+            "urgent": "Urgent jobs",
+            "night": "Night work",
+            "team": "Team of {{count}}",
+            "depositPercent": "Deposit {{percent}}%",
+            "deposit": "Deposit asked",
+            "noDeposit": "No deposit",
+            "moreTrades": "+{{count}} other trades",
+            "moreTrades_one": "+{{count}} other trade"
+        },
+        "form": {
+            "saved": "Your changes are saved.",
+            "loadError": "Unable to load your worker profile.",
+            "photoRejected": "Some photos were skipped: JPG, PNG or WEBP up to 5 MB.",
+            "saveError": "Unable to save your worker profile.",
+            "optionsError": "Unable to load the list of trades.",
+            "editBadge": "Edit",
+            "badge": "Daily worker",
+            "editTitle": "Edit your worker profile",
+            "title": "Publish your worker profile",
+            "subtitle": "One profile, up to {{count}} trades. Clients find you by trade and city, then call you or write on WhatsApp.",
+            "openSettings": "Settings",
+            "verifyContact": "Verify your phone or WhatsApp number in Settings before publishing: clients need a way to reach you.",
+            "whoTitle": "About you",
+            "whoSubtitle": "Your name and a few words for clients.",
+            "photoHint": "Your account photo is shown on your profile.",
+            "photoDefault": "No photo yet: a default picture is shown.",
+            "changePhoto": "Change it in Settings",
+            "portfolioHint": "Photos of your work go in your portfolio, after publishing.",
+            "gender": "You are",
+            "firstName": "First name",
+            "lastName": "Last name",
+            "bio": "Short presentation (optional)",
+            "bioPlaceholder": "e.g. Serious and on time, I have worked in Agadir and nearby for 10 years.",
+            "whereTitle": "Where you work",
+            "whereSubtitle": "Your city, and the cities where you accept jobs.",
+            "baseCity": "City where you live",
+            "coverageCities": "Chosen cities",
+            "otherCities": "Other cities where you work (optional)",
+            "citiesHelp": "Up to {{count}} cities, your city included.",
+            "hasWorkplace": "I have a workshop, a shop or a garage where clients can come",
+            "workplaceName": "Name (optional)",
+            "workplaceNamePlaceholder": "e.g. Garage Atlas",
+            "workplaceAddress": "Address (optional)",
+            "workplaceAddressPlaceholder": "Street, neighborhood",
+            "workplaceMap": "Google Maps link of your place",
+            "workplaceMapHelp": "Pick it on the map, or in Google Maps: Share → Copy link.",
+            "workplacePhotos": "Photos of your place (optional)",
+            "workplacePhotosTitle": "Add photos of your workshop, shop or garage",
+            "workplacePhotosHint": "Up to {{max}} photos · JPG, PNG or WEBP · 5 MB max",
+            "browse": "Choose photos",
+            "mainPhoto": "Main",
+            "removePhoto": "Remove",
+            "whenTitle": "When you work",
+            "whenSubtitle": "Your working days and hours.",
+            "days": "Working days",
+            "hoursStart": "From",
+            "hoursEnd": "To",
+            "hasBreak": "I take a lunch break",
+            "breakStart": "Break from",
+            "breakEnd": "Break to",
+            "worksAtNight": "I also work at night (night jobs, hours after midnight)",
+            "howTitle": "How you work",
+            "howSubtitle": "Languages, team, tools and how clients contact you.",
+            "languages": "Languages you speak",
+            "team": "You work",
+            "withTeam": "With a team",
+            "teamSize": "People in the team",
+            "hasTools": "I have my own tools",
+            "hasVehicle": "I have a vehicle",
+            "urgent": "I accept urgent jobs",
+            "contactPreference": "Clients can contact you by",
+            "contactBoth": "Call and WhatsApp",
+            "contactCall": "Call only",
+            "contactWhatsapp": "WhatsApp only",
+            "contactHint": "We show the numbers of your account: {{numbers}}.",
+            "noNumber": "none yet",
+            "tradesTitle": "Your trades and prices",
+            "tradesSubtitle": "One card per trade, up to {{count}}. Each one has its own price and conditions.",
+            "maxOffers": "Maximum {{count}} trades",
+            "addOffer": "Add another trade ({{count}} / {{max}})",
+            "saveTitle": "Save your changes",
+            "publishTitle": "Ready to publish?",
+            "saveSubtitle": "Clients see the new details right away.",
+            "publishSubtitle": "You can change your profile or hide it at any time.",
+            "save": "Save changes",
+            "publish": "Publish my profile",
+            "saving": "Saving...",
+            "otherTrade": "Other (type my trade)",
+            "priceDay": "Price per day (MAD)",
+            "priceHour": "Price per hour (MAD)",
+            "priceM2": "Price per m² (MAD)",
+            "priceTask": "Starting price per job (MAD, optional)",
+            "offerTitle": "Trade {{number}}",
+            "removeOffer": "Remove this trade",
+            "trade": "Trade",
+            "tradeHelp": "Type to search: plombier, zellige, peintre…",
+            "customTrade": "Your trade",
+            "customTradeHelp": "Not in the list? Write it as clients would search it.",
+            "experience": "Years of experience in this trade",
+            "specialties": "What you do in this trade",
+            "customSpecialty": "Add a specialty that is not in the list",
+            "customSpecialtyHelp": "Up to {{count}}. Press Enter to add.",
+            "add": "Add",
+            "priceTitle": "How do you charge?",
+            "paymentTiming": "When are you paid?",
+            "deposit": "I ask for a deposit before starting",
+            "depositPercent": "Deposit (% of the price, optional)",
+            "visitFree": "Visit and quote are free",
+            "visitFee": "Visit fee (MAD, optional)",
+            "materials": "Materials",
+            "guarantee": "Guarantee (optional)",
+            "guaranteePlaceholder": "e.g. 6 months on the work",
+            "diploma": "Diploma or training (optional)",
+            "diplomaPlaceholder": "e.g. OFPPT – plumbing",
+            "offerDescription": "Describe your work in this trade (optional)"
+        },
+        "fab": {
+            "label": "Publish my profile",
+            "tooltip": "Publish your worker profile"
+        },
+        "offer": {
+            "depositPercent": "{{percent}}% before starting",
+            "depositYes": "Asked before starting",
+            "depositNo": "No deposit",
+            "visitFree": "Free visit / quote",
+            "visitFee": "Visit: {{amount}}",
+            "visitPaid": "Paid visit",
+            "payment": "Payment",
+            "deposit": "Deposit",
+            "materials": "Materials",
+            "visit": "Visit / quote",
+            "guarantee": "Guarantee",
+            "diploma": "Diploma / training"
+        },
+        "sidebar": {
+            "browse": "Find a worker",
+            "publish": "Publish my profile",
+            "mine": "My worker profile"
+        },
+        "topbar": {
+            "title": "Daily worker"
         }
     }
 }

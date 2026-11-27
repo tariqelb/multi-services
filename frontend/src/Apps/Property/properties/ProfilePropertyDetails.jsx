@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -28,6 +28,7 @@ import {
 import axiosInstance from "../../../api/axiosInstance";
 import PropertyDetails from "./PropertyDetails";
 import getImageUrl from "../../../utils/getImageUrl";
+import { useGoBack } from "../../../Components/navigation/navHistory";
 
 function InfoItem({ label, value }) {
     if (value === undefined || value === null || value === "") {
@@ -174,7 +175,6 @@ export default function ProfilePropertyDetails() {
 
     const { id } = useParams();
     const location = useLocation();
-    const navigate = useNavigate();
 
     const state = location.state;
 
@@ -183,11 +183,9 @@ export default function ProfilePropertyDetails() {
     const [loading, setLoading] = useState(!state?.property);
     const [error, setError] = useState("");
 
-    const handleBack = () => {
-        navigate(state?.from || "/mypublication", {
-            replace: true,
-        });
-    };
+    // One step back (to where the user came from); "My publications" when opened directly.
+    const goBack = useGoBack(state?.from || "/mypublication");
+    const handleBack = () => goBack();
 
     useEffect(() => {
         window.scrollTo({
@@ -385,7 +383,7 @@ export default function ProfilePropertyDetails() {
                         fontWeight: 700,
                     }}
                 >
-                    {t("properties.details.backToMyPublications")}
+                    {t("properties.details.back")}
                 </Button>
 
                 <Alert severity="error">
@@ -401,7 +399,7 @@ export default function ProfilePropertyDetails() {
             showContact={false}
             showSave={false}
             backAction={handleBack}
-            backLabel={t("properties.details.backToMyPublications")}
+            backLabel={t("properties.details.back")}
         />
     );
 }

@@ -181,7 +181,7 @@ export default function FurnishedPropertyDetailsPage() {
             <FurnishedPropertyDetails
                 property={property}
                 onSelectSimilar={handleSelectSimilar}
-                onBack={() => navigate("/furnishedproperties")}
+                backFallback="/furnishedproperties"
             />
 
             {similarProperties.length > 0 && (

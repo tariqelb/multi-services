@@ -14,12 +14,14 @@ import {
 import axiosInstance from "../../../api/axiosInstance";
 import RoommateDetails from "./RoommateDetails";
 import { DetailsBackButton, DetailsContainer } from "../../../Components/ui/DetailsKit";
+import { useGoBack } from "../../../Components/navigation/navHistory";
 
 export default function RoommateDetailsPage({
     DetailsComponent = RoommateDetails,
 }) {
     const { id } = useParams();
     const navigate = useNavigate();
+    const goBack = useGoBack("/roommates");
     const { t } = useTranslation();
 
     const [listing, setListing] = useState(null);
@@ -91,7 +93,7 @@ export default function RoommateDetailsPage({
     return (
         <DetailsContainer withMobileBar={Boolean(listing)}>
             <DetailsBackButton
-                onClick={() => navigate(-1)}
+                onClick={() => goBack()}
                 label={t("roommates.details.back", { defaultValue: "Back" })}
             />
 

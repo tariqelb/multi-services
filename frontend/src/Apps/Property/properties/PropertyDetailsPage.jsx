@@ -116,7 +116,7 @@ export default function PropertyDetailsPage() {
         <Box component="main" sx={{ flex: 1, minWidth: 0 }}>
             <PropertyDetails
                 property={property}
-                onBack={() => navigate("/properties")}
+                backFallback="/properties"
             />
 
             {/* Render Similar Properties below details if available */}

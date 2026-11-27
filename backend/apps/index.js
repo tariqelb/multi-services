@@ -6,8 +6,9 @@
 
 import property from "./property/index.js";
 import vehicles from "./vehicles/index.js";
+import workers from "./workers/index.js";
 import main from "./main/index.js";
 
-export const services = [property, vehicles, main];
+export const services = [property, vehicles, workers, main];
 
 export default services;

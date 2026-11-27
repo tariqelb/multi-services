@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
@@ -386,6 +387,8 @@ export function FormSubmitBar({
     resetLabel,
     submitIcon,
     sticky = true,
+    onCancel,
+    cancelLabel,
 }) {
     const { t } = useTranslation();
 
@@ -420,6 +423,19 @@ export function FormSubmitBar({
                 </Box>
 
                 <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+                    {onCancel && (
+                        <Button
+                            variant="outlined"
+                            color="inherit"
+                            size="large"
+                            onClick={onCancel}
+                            disabled={loading}
+                            startIcon={<CloseRoundedIcon />}
+                            sx={{ flex: { xs: 1, sm: "0 0 auto" } }}
+                        >
+                            {cancelLabel || t("ui.form.cancel", "Cancel")}
+                        </Button>
+                    )}
                     {onReset && (
                         <Button
                             variant="outlined"

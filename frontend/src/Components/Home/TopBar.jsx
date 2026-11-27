@@ -365,7 +365,8 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
         { label: t("topbar.feedback", "Feedback"), path: "/feedback", icon: MessageSquare },
         { label: t("topbar.alert", "Alert"), path: menu.alert, icon: BellRing },
         { label: t("topbar.settings"), path: "/setting", icon: Settings },
-    ];
+        // A service can hide an entry it does not have (path null).
+    ].filter((item) => item.path);
 
 
     return (

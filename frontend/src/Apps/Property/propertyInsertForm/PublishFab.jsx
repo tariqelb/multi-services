@@ -4,17 +4,19 @@ import { Fab, Tooltip } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-export default function PublishFab() {
+// Floating "publish" button, bottom right. Defaults to properties; pass
+// `to`, `label` and `tooltip` to reuse it (e.g. hotels & riads).
+export default function PublishFab({ to = "/properties/publish", label, tooltip }) {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
     return (
-        <Tooltip title={t("publishFab.tooltip", "Publish a new property listing")} placement="left">
+        <Tooltip title={tooltip || t("publishFab.tooltip", "Publish a new property listing")} placement="left">
             <Fab
                 variant="extended"
                 color="primary"
-                aria-label={t("publishFab.label", "Add property")}
-                onClick={() => navigate('/properties/publish')}
+                aria-label={label || t("publishFab.label", "Add property")}
+                onClick={() => navigate(to)}
                 sx={{
                     position: 'fixed !important',
                     bottom: { xs: 16, md: 32 },
@@ -33,8 +35,8 @@ export default function PublishFab() {
                     },
                 }}
             >
-                <AddIcon sx={{ mr: 1, fontSize: 24 }} />
-                {t("publishFab.label", "Add property")}
+                <AddIcon sx={{ marginInlineEnd: 1, fontSize: 24 }} />
+                {label || t("publishFab.label", "Add property")}
             </Fab>
         </Tooltip>
     );

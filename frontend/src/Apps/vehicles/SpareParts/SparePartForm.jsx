@@ -53,6 +53,9 @@ import {
     PART_SELLER_TYPES,
     partToForm,
 } from "./sparePartOptions";
+import MapLinkAdornment from "../../../Components/MapPicker/MapLinkAdornment";
+import { joinHint } from "../../../Components/MapPicker/mapLinkUtils";
+import { useGoBack, useReturnAfterSave } from "../../../Components/navigation/navHistory";
 
 // -----------------------------------------------------------------------------
 // Small pieces (same look as the vehicle form)
@@ -98,7 +101,7 @@ function Toggles({ value, options, onChange, label }) {
     );
 }
 
-function Field({ name, label, values, set, errors, type = "text", unit, helper, ...rest }) {
+function Field({ name, label, values, set, errors, type = "text", unit, adornment, helper, ...rest }) {
     return (
         <TextField
             fullWidth
@@ -111,7 +114,11 @@ function Field({ name, label, values, set, errors, type = "text", unit, helper, 
             helperText={errors[name] || helper || ""}
             slotProps={{
                 htmlInput: type === "number" ? { min: 0, inputMode: "decimal" } : undefined,
-                input: unit ? { endAdornment: <InputAdornment position="end">{unit}</InputAdornment> } : undefined,
+                input: adornment
+                    ? { endAdornment: adornment }
+                    : unit
+                      ? { endAdornment: <InputAdornment position="end">{unit}</InputAdornment> }
+                      : undefined,
             }}
             {...rest}
         />
@@ -169,6 +176,10 @@ export function EditSparePartPage() {
 export default function SparePartForm({ partId = null }) {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    // Edit mode: Cancel goes one step back; Save opens the details page
+    // without leaving the edit page in the history.
+    const goBack = useGoBack(`/vehicles/parts/${partId}`);
+    const returnAfterSave = useReturnAfterSave();
     const fileInputRef = useRef(null);
     const isEdit = Boolean(partId);
     const isArabic = String(i18n.language).startsWith("ar");
@@ -254,7 +265,8 @@ export default function SparePartForm({ partId = null }) {
         try {
             const body = toFormData(values, images.filter((image) => image.file).map((image) => image.file), removedImages);
             const { data } = isEdit ? await axiosInstance.put(`/vehicles/parts/${partId}`, body) : await axiosInstance.post("/vehicles/parts", body);
-            navigate(`/vehicles/parts/${data.part._id}`, { state: { published: !isEdit, updated: isEdit } });
+            if (isEdit) returnAfterSave(`/vehicles/parts/${data.part._id}`, { updated: true });
+            else navigate(`/vehicles/parts/${data.part._id}`, { state: { published: true } });
         } catch (error) {
             const response = error.response?.data;
             if (response?.errors) setErrors(response.errors);
@@ -473,6 +485,13 @@ export default function SparePartForm({ partId = null }) {
                                         {...sectionProps}
                                         name="mapLink"
                                         label={t("vehiclesApp.parts.form.mapLink", "Google Maps link (optional)")}
+                                        adornment={
+                                            <MapLinkAdornment
+                                                value={values.mapLink}
+                                                onChange={(link) => set("mapLink", link)}
+                                                searchHint={joinHint(values.neighborhood, values.city)}
+                                            />
+                                        }
                                         helper={t("vehiclesApp.parts.form.mapLinkHelp", "Where buyers can come and see the part.")}
                                     />
                                 </Grid>
@@ -545,6 +564,7 @@ export default function SparePartForm({ partId = null }) {
                             submitLabel={isEdit ? t("vehiclesApp.form.save", "Save changes") : t("vehiclesApp.parts.form.publish", "Publish Spare Part")}
                             loadingLabel={t("vehiclesApp.form.saving", "Saving...")}
                             submitIcon={<CheckCircleRoundedIcon />}
+                            onCancel={isEdit ? () => goBack() : undefined}
                         />
                     </Box>
                 )}

@@ -47,6 +47,7 @@ import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import VehicleRequestCard from "./VehicleRequestCard";
 import { CLOSE_REASONS, MY_REQUESTS_PATH, REQUEST_API, listingPrice } from "./vehicleRequestOptions";
 import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
+import { useGoBack } from "../../../Components/navigation/navHistory";
 
 const waLink = (number) => `https://wa.me/${String(number || "").replace(/\D/g, "")}`;
 
@@ -104,7 +105,7 @@ export default function VehicleRequestDetailsPage() {
     const { t, i18n } = useTranslation();
     const isRTL = (i18n.resolvedLanguage || i18n.language || "").startsWith("ar");
     const { id } = useParams();
-    const navigate = useNavigate();
+    const goBack = useGoBack("/vehicles/requests/board");
     const location = useLocation();
 
     const [data, setData] = useState(null);
@@ -142,7 +143,7 @@ export default function VehicleRequestDetailsPage() {
 
     return (
         <Box sx={pagePaddingSx}>
-            <Button startIcon={<ArrowBackRoundedIcon sx={{ transform: isRTL ? "scaleX(-1)" : "none" }} />} onClick={() => navigate(-1)} sx={{ textTransform: "none", mb: 2 }}>
+            <Button startIcon={<ArrowBackRoundedIcon sx={{ transform: isRTL ? "scaleX(-1)" : "none" }} />} onClick={() => goBack()} sx={{ textTransform: "none", mb: 2 }}>
                 {t("requests.details.back", "Back")}
             </Button>
 

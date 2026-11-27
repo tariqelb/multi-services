@@ -129,7 +129,7 @@ function listingToFormData(listing) {
 // listingId: edit an existing announcement (PUT) instead of publishing one.
 // -----------------------------------------------------------------------------
 
-export default function RoommateInsertForm({ onAddListing, listingId = null, onSaved }) {
+export default function RoommateInsertForm({ onAddListing, listingId = null, onSaved, onCancel }) {
     const { t } = useTranslation();
     const isEdit = Boolean(listingId);
 
@@ -1178,6 +1178,7 @@ export default function RoommateInsertForm({ onAddListing, listingId = null, onS
                             profile={profile}
                             onSubmit={handleSubmit}
                             onReset={resetForm}
+                            onCancel={isEdit ? onCancel : undefined}
                             isEdit={isEdit}
                             t={t}
                         />

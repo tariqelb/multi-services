@@ -53,7 +53,7 @@ const services = [
     {
         id: "daily-worker",
         label: "Daily Worker",
-        path: "/daily-worker/description",
+        path: "/daily-worker",
         icon: HardHat,
         paths: ["/daily-worker"],
     },

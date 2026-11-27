@@ -1,5 +1,4 @@
 
-import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import ReportListingLink from "../listings/ReportListingLink";
@@ -46,6 +45,7 @@ import PropertyContactOwner from "./PropertyContactOwner";
 import axiosInstance from "../../../api/axiosInstance";
 import getImageUrl from "../../../utils/getImageUrl";
 import { getFurnishingStatus } from "../../../utils/furnishing";
+import { useGoBack } from "../../../Components/navigation/navHistory";
 
 
 
@@ -206,7 +206,7 @@ function getTranslatedPropertyValue(value, t, namespace) {
 
 export default function PropertyDetails({
     property: initialProperty,
-    onBack,
+    backFallback = "/properties",
     similarProperties = [],
     onSelectSimilar,
     showContact = true,
@@ -217,13 +217,13 @@ export default function PropertyDetails({
     isSaved = false,
 }) {
     const { t, i18n } = useTranslation();
+    const goBack = useGoBack(backFallback);
 
     const [property, setProperty] = useState(initialProperty || {});
     const [activeImage, setActiveImage] = useState(0);
     const [saved, setSaved] = useState(Boolean(isSaved));
     const [saving, setSaving] = useState(false);
 
-    const navigate = useNavigate();
 
     const [feedback, setFeedback] = useState({
         open: false,
@@ -537,7 +537,7 @@ export default function PropertyDetails({
 
     return (
         <DetailsContainer withMobileBar={showOwnerContact}>
-            <DetailsBackButton onClick={backAction || (() => navigate(-1))} label={backLabel || t("properties.details.back")} />
+            <DetailsBackButton onClick={backAction || (() => goBack())} label={backLabel || t("properties.details.back")} />
 
             <DetailsHeader
                 badges={

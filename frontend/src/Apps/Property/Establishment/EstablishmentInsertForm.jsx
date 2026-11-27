@@ -138,7 +138,7 @@ function establishmentToForm(establishment) {
 }
 
 // establishmentId: edit an existing establishment (PUT) instead of creating one.
-export default function EstablishmentInsertForm({ onAddEstablishment, establishmentId = null, onSaved }) {
+export default function EstablishmentInsertForm({ onAddEstablishment, establishmentId = null, onSaved, onCancel }) {
     const isEdit = Boolean(establishmentId);
     const [pageLoading, setPageLoading] = useState(isEdit);
     const [loadError, setLoadError] = useState("");
@@ -631,6 +631,7 @@ export default function EstablishmentInsertForm({ onAddEstablishment, establishm
     return (
         <EstablishmentForm
             isEdit={isEdit}
+            onCancel={isEdit ? onCancel : undefined}
             formData={formData}
             errors={errors}
             loading={loading}

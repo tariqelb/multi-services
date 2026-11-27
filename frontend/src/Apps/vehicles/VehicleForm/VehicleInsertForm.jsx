@@ -27,6 +27,7 @@ import {
     PublisherSection,
     VehicleDetailsSection,
 } from "./VehicleFormSections";
+import { useGoBack, useReturnAfterSave } from "../../../Components/navigation/navHistory";
 
 /** Same required fields as the backend, so errors show before sending. */
 function validate(values, imageCount, t) {
@@ -97,6 +98,10 @@ function toFormData(values, newFiles, removedImages) {
 export default function VehicleInsertForm({ vehicleId = null, category = "car" }) {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    // Edit mode: Cancel goes one step back; Save opens the details page
+    // without leaving the edit page in the history.
+    const goBack = useGoBack(`/vehicles/${vehicleId}`);
+    const returnAfterSave = useReturnAfterSave();
     const fileInputRef = useRef(null);
 
     const isEdit = Boolean(vehicleId);
@@ -233,7 +238,8 @@ export default function VehicleInsertForm({ vehicleId = null, category = "car" }
         try {
             const body = toFormData(values, images.filter((image) => image.file).map((image) => image.file), removedImages);
             const { data } = isEdit ? await axiosInstance.put(`/vehicles/${vehicleId}`, body) : await axiosInstance.post("/vehicles", body);
-            navigate(`/vehicles/${data.vehicle._id}`, { state: { published: !isEdit, updated: isEdit } });
+            if (isEdit) returnAfterSave(`/vehicles/${data.vehicle._id}`, { updated: true });
+            else navigate(`/vehicles/${data.vehicle._id}`, { state: { published: true } });
         } catch (error) {
             const response = error.response?.data;
             if (response?.errors) setErrors(response.errors);
@@ -310,6 +316,7 @@ export default function VehicleInsertForm({ vehicleId = null, category = "car" }
                             }
                             loadingLabel={t("vehiclesApp.form.saving", "Saving...")}
                             submitIcon={<CheckCircleRoundedIcon />}
+                            onCancel={isEdit ? () => goBack() : undefined}
                         />
                     </Box>
                 )}

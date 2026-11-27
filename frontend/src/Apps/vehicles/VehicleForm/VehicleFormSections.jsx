@@ -69,6 +69,8 @@ import {
     newCustomRow,
 } from "../vehicleOptions";
 import { optionList } from "../vehicleFormat";
+import MapLinkAdornment from "../../../Components/MapPicker/MapLinkAdornment";
+import { joinHint } from "../../../Components/MapPicker/mapLinkUtils";
 
 // -----------------------------------------------------------------------------
 // Shared pieces (same look as the property form)
@@ -146,7 +148,7 @@ function SubSection({ emoji, title, subtitle, first }) {
     );
 }
 
-function Field({ name, label, values, set, errors, type = "text", unit, helper, ...rest }) {
+function Field({ name, label, values, set, errors, type = "text", unit, adornment, helper, ...rest }) {
     return (
         <TextField
             fullWidth
@@ -160,7 +162,11 @@ function Field({ name, label, values, set, errors, type = "text", unit, helper, 
             helperText={errors[name] || helper || ""}
             slotProps={{
                 htmlInput: type === "number" ? { min: 0, inputMode: "decimal" } : undefined,
-                input: unit ? { endAdornment: <InputAdornment position="end">{unit}</InputAdornment> } : undefined,
+                input: adornment
+                    ? { endAdornment: adornment }
+                    : unit
+                      ? { endAdornment: <InputAdornment position="end">{unit}</InputAdornment> }
+                      : undefined,
                 inputLabel: type === "date" ? { shrink: true } : undefined,
             }}
             {...rest}
@@ -253,6 +259,13 @@ export function PublisherSection({ values, set, errors, profile, dealerLoaded })
                                 label={t("vehiclesApp.form.publisher.mapLink", "Google Maps link of the business")}
                                 required
                                 placeholder="https://maps.app.goo.gl/..."
+                                adornment={
+                                    <MapLinkAdornment
+                                        value={values.mapLink}
+                                        onChange={(link) => set("mapLink", link)}
+                                        searchHint={joinHint(values.businessName, values.businessAddress, values.city)}
+                                    />
+                                }
                                 helper={t("vehiclesApp.form.publisher.mapLinkHelp", "In Google Maps: Share → Copy link. We read the location from it.")}
                                 {...props}
                             />
@@ -647,6 +660,13 @@ export function VehicleDetailsSection({ values, set, errors, language }) {
                             name="mapLink"
                             label={t("vehiclesApp.form.location.mapLink", "Google Maps Location Link")}
                             placeholder="https://maps.app.goo.gl/..."
+                            adornment={
+                                <MapLinkAdornment
+                                    value={values.mapLink}
+                                    onChange={(link) => set("mapLink", link)}
+                                    searchHint={joinHint(values.neighborhood, values.city)}
+                                />
+                            }
                             {...props}
                         />
                     </Grid>

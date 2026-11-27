@@ -36,6 +36,13 @@ import MyVehicleProfile from "./Apps/vehicles/Profile/MyVehicleProfile";
 import VehiclePublicProfile from "./Apps/vehicles/Profile/VehiclePublicProfile";
 import PortfolioReview from "./Components/Admin/PortfolioReview";
 import VehicleStatisticsPage from "./Apps/vehicles/Admin/Statistics/VehicleStatisticsPage";
+// Daily worker service
+import WorkersPage from "./Apps/DailyWorker/List/WorkersPage";
+import WorkerDetailsPage from "./Apps/DailyWorker/Details/WorkerDetailsPage";
+import WorkerByUserRedirect from "./Apps/DailyWorker/Details/WorkerByUserRedirect";
+import WorkerProfileForm from "./Apps/DailyWorker/Form/WorkerProfileForm";
+import MyWorkerProfile from "./Apps/DailyWorker/MyProfile/MyWorkerProfile";
+import WorkerPublicationsReview from "./Apps/DailyWorker/Admin/WorkerPublicationsReview";
 import VehicleReviewsPage from "./Apps/vehicles/Reviews/VehicleReviewsPage";
 import SavedVehiclesPage from "./Apps/vehicles/Saved/SavedVehiclesPage";
 import SparePartsPage from "./Apps/vehicles/SpareParts/SparePartsPage";
@@ -125,7 +132,7 @@ import PublicationsReviewSection from "./Apps/Property/PublicationReviews/Public
 import FeedbackSection from "./Apps/Property/FeedbackReviews/FeedbackSection";
 
 import ServiceSidebar from "./Components/Home/ServiceSidebar";
-import { VEHICLE_NAV } from "./Components/Home/serviceNavigation";
+import { VEHICLE_NAV, WORKER_NAV } from "./Components/Home/serviceNavigation";
 import { DASHBOARD_NAV, isDashboardPath } from "./Components/Dashboard/dashboardNavigation";
 import AboutServicePage from "./Components/Dashboard/About/AboutServicePage";
 import AdminSidebar from "./Components/Admin/AdminSidebar";
@@ -133,6 +140,7 @@ import AdminRoute, { AdminHome } from "./Components/Admin/AdminRoute";
 import AdminRolesPage from "./Components/Admin/AdminRolesPage";
 import { AdminUsersPage, AdminVisitsPage } from "./Components/Admin/AdminSectionPages";
 import { isAdminPath } from "./Components/Admin/adminSections";
+import { useTrackNavigation } from "./Components/navigation/navHistory";
 
 // -----------------------------------------------------------------------------
 // Authentication loader
@@ -175,6 +183,8 @@ async function requireAuth() {
 // (shared with the vehicles top bar).
 
 function DashboardLayout() {
+    // Remember the page at each history step (used by Back / Cancel / Save).
+    useTrackNavigation();
     const user = useLoaderData();
     const dispatch = useDispatch();
     const location = useLocation();
@@ -209,6 +219,8 @@ function DashboardLayout() {
             title: "Daily Worker",
             descriptionPath: "/daily-worker/description",
             translationKey: "dailyWorker",
+            items: WORKER_NAV,
+            itemsFirst: true,
         },
         {
             prefix: "/vehicles",
@@ -686,6 +698,22 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                path: "/admin/daily-worker/publications",
+                element: (
+                    <AdminRoute section="workerPublications">
+                        <WorkerPublicationsReview />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "/admin/daily-worker/portfolio",
+                element: (
+                    <AdminRoute section="workerPublications">
+                        <PortfolioReview service="workers" api="/workers/admin/portfolio" section="workerPublications" profilePath={(id) => `/daily-worker/user/${id}`} />
+                    </AdminRoute>
+                ),
+            },
+            {
                 path: "/admin/vehicles/portfolio",
                 element: (
                     <AdminRoute section="vehiclePublications">
@@ -794,6 +822,12 @@ const router = createBrowserRouter([
                 path: "/daily-worker/description",
                 element: <DailyWorkerDescription />,
             },
+            // Daily worker: find a worker, publish / manage my worker profile.
+            { path: "/daily-worker", element: <WorkersPage /> },
+            { path: "/daily-worker/publish", element: <WorkerProfileForm /> },
+            { path: "/daily-worker/me", element: <MyWorkerProfile /> },
+            { path: "/daily-worker/user/:userId", element: <WorkerByUserRedirect /> },
+            { path: "/daily-worker/:id", element: <WorkerDetailsPage /> },
             {
                 path: "/delivery-man/description",
                 element: <DeliveryManDescription />,

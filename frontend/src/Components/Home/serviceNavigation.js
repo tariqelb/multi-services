@@ -33,6 +33,13 @@ export const VEHICLE_NAV = [
     { path: "/vehicles/reviews", exact: true, labelKey: "vehiclesApp.sidebar.reviews", label: "Reviews", icon: "reviews" },
 ];
 
+// Daily worker: find a worker, publish / manage my (one) worker profile.
+export const WORKER_NAV = [
+    { path: "/daily-worker", exact: true, labelKey: "workersApp.sidebar.browse", label: "Find a worker", icon: "worker" },
+    { path: "/daily-worker/publish", exact: true, labelKey: "workersApp.sidebar.publish", label: "Publish my profile", icon: "publish" },
+    { path: "/daily-worker/me", exact: true, labelKey: "workersApp.sidebar.mine", label: "My worker profile", icon: "workerProfile" },
+];
+
 export const SERVICE_NAVIGATION = [
     {
         id: "vehicles",
@@ -49,6 +56,23 @@ export const SERVICE_NAVIGATION = [
             publication: "/vehicles/mine",
             saved: "/vehicles/saved",
             alert: "/vehicles/alerts",
+        },
+    },
+    {
+        id: "workers",
+        prefixes: ["/daily-worker"],
+        titleKey: "workersApp.topbar.title",
+        title: "Daily worker",
+        icon: "worker",
+        home: "/daily-worker",
+        nav: WORKER_NAV,
+        descriptionPath: "/daily-worker/description",
+        // No saved workers or alerts yet: those entries are hidden (null).
+        menu: {
+            profile: "/daily-worker/me",
+            publication: "/daily-worker/me",
+            saved: null,
+            alert: null,
         },
     },
 ];

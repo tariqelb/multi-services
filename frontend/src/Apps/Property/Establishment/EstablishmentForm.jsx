@@ -44,6 +44,8 @@ import {
     SectionHeader,
     SectionPaper,
 } from "../../../Components/ui/FormKit";
+import MapLinkAdornment from "../../../Components/MapPicker/MapLinkAdornment";
+import { joinHint } from "../../../Components/MapPicker/mapLinkUtils";
 
 /* --------------------------------------------------
    CONSTANTS
@@ -375,6 +377,7 @@ function ImageGalleryViewer({
 -------------------------------------------------- */
 
 export default function EstablishmentForm({
+    onCancel,
     formData,
     errors = {},
     loading,
@@ -743,6 +746,17 @@ export default function EstablishmentForm({
                                 {
                                     type: "url",
                                     placeholder: "https://maps.google.com/...",
+                                    slotProps: {
+                                        input: {
+                                            endAdornment: (
+                                                <MapLinkAdornment
+                                                    value={formData.location?.googleMapsLink}
+                                                    onChange={(link) => updateNestedField("location", "googleMapsLink", link)}
+                                                    searchHint={joinHint(formData.name, formData.location?.neighborhood, formData.location?.city)}
+                                                />
+                                            ),
+                                        },
+                                    },
                                     helperText: tr(
                                         "helpers.googleMaps",
                                         "Add a Google Maps share link so the location coordinates can be extracted automatically."
@@ -1453,6 +1467,8 @@ export default function EstablishmentForm({
                     loadingLabel={isEdit ? tr("actions.saving", "Saving...") : tr("actions.publishing", "Publishing...")}
                     resetLabel={tr("actions.reset", "Reset")}
                     onReset={resetForm}
+                    onCancel={onCancel}
+                    cancelLabel={tr("actions.cancel", "Cancel")}
                 />
             </Box>
 

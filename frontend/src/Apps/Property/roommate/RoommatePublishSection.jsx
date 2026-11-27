@@ -11,6 +11,7 @@ export default function RoommatePublishSection({
     profile,
     onSubmit,
     onReset,
+    onCancel,
     isEdit = false,
     t,
 }) {
@@ -61,6 +62,8 @@ export default function RoommatePublishSection({
                 submitIcon={<RocketLaunchOutlinedIcon />}
                 onSubmit={onSubmit}
                 onReset={onReset}
+                onCancel={onCancel}
+                cancelLabel={translate("roommates.edit.cancel", "Cancel")}
             />
         </Stack>
     );

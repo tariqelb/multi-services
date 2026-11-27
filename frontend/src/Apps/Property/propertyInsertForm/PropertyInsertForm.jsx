@@ -2,7 +2,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../api/axiosInstance";
 import getImageUrl from "../../../utils/getImageUrl";
 
@@ -30,6 +29,7 @@ import PropertyInsertFormImages from "./PropertyInsertFormImages";
 import PropertyInsertFormPublish from "./PropertyInsertFormPublish";
 import { isFurnishableType } from "../../../utils/furnishing";
 import PropertyInsertFormDescription from "./PropertyInsertFormDescription";
+import { useGoBack, useReturnAfterSave } from "../../../Components/navigation/navHistory";
 
 // Fields copied from a saved property into the form (edit mode).
 const EDITABLE_FIELDS = [
@@ -65,7 +65,11 @@ const EDITABLE_FIELDS = [
 export default function PropertyInsertForm({ onAddProperty, propertyId = null }) {
     const { t } = useTranslation();
     const dispatch = useDispatch();
-    const navigate = useNavigate();
+    // Edit mode: Cancel goes one step back; Save opens the details page
+    // without leaving the edit page in the history.
+    const detailsPaths = [`/property/${propertyId}`, `/properties/${propertyId}`, `/furnishedproperties/${propertyId}`];
+    const goBack = useGoBack(detailsPaths[0]);
+    const returnAfterSave = useReturnAfterSave();
 
     const isEdit = Boolean(propertyId);
     const [editLoading, setEditLoading] = useState(isEdit);
@@ -724,7 +728,7 @@ export default function PropertyInsertForm({ onAddProperty, propertyId = null })
                     severity: "success",
                 });
 
-                setTimeout(() => navigate(`/property/${propertyId}`), 900);
+                setTimeout(() => returnAfterSave(detailsPaths), 900);
             } catch (error) {
                 setNotification({
                     open: true,
@@ -859,6 +863,7 @@ export default function PropertyInsertForm({ onAddProperty, propertyId = null })
                     <PropertyInsertFormPublish
                         loading={loading || profileLoading}
                         isEdit={isEdit}
+                        onCancel={isEdit ? () => goBack() : undefined}
                     />
                 </Box>
                 )}

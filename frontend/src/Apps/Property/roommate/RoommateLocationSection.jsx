@@ -9,6 +9,8 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 import { SectionHeader, SectionPaper } from "./RoommateFormUI";
 import RoommateCityField from "./RoommateCityField";
+import MapLinkAdornment from "../../../Components/MapPicker/MapLinkAdornment";
+import { joinHint } from "../../../Components/MapPicker/mapLinkUtils";
 
 export default function RoommateLocationSection({
     formData,
@@ -87,6 +89,17 @@ export default function RoommateLocationSection({
                     error={Boolean(errors.mapLink)}
                     helperText={errors.mapLink}
                     placeholder="https://maps.google.com/..."
+                    slotProps={{
+                        input: {
+                            endAdornment: (
+                                <MapLinkAdornment
+                                    value={formData.mapLink}
+                                    onChange={(link) => onChange({ target: { name: "mapLink", value: link } })}
+                                    searchHint={joinHint(formData.neighborhood, formData.city)}
+                                />
+                            ),
+                        },
+                    }}
                 />
 
                 <TextField

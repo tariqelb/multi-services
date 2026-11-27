@@ -3,7 +3,7 @@
 // vehicles, price, seller with contact (Save under WhatsApp), similar parts.
 
 import { useEffect, useState } from "react";
-import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Alert, Avatar, Box, Button, CircularProgress, Pagination, Rating, Snackbar, Stack, Typography } from "@mui/material";
@@ -43,6 +43,7 @@ import SparePartCard from "./SparePartCard";
 import { PART_CATEGORY_STYLES, compatibilityLabel } from "./sparePartOptions";
 import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
 import { trackVehicleContact, trackVehicleView } from "../statsTracking";
+import { useFlashState, useGoBack } from "../../../Components/navigation/navHistory";
 
 const waLink = (number) => `https://wa.me/${String(number).replace(/\D/g, "")}`;
 const yes = (t, value) => (value ? t("vehiclesApp.details.yes", "Yes") : null);
@@ -147,7 +148,9 @@ export default function SparePartDetailsPage() {
 
 function SparePartDetails({ id }) {
     const navigate = useNavigate();
-    const location = useLocation();
+    const goBack = useGoBack("/vehicles/parts");
+    // "published" / "updated" message, also after returning from the edit form.
+    const flashState = useFlashState();
     const { t, i18n } = useTranslation();
     const language = i18n.language;
     const [part, setPart] = useState(null);
@@ -172,7 +175,7 @@ function SparePartDetails({ id }) {
     if (error) {
         return (
             <DetailsContainer>
-                <DetailsBackButton onClick={() => navigate("/vehicles/parts")} label={t("vehiclesApp.parts.back", "Back to spare parts")} />
+                <DetailsBackButton onClick={() => goBack()} label={t("vehiclesApp.details.backShort", "Back")} />
                 <Alert severity="error">{error}</Alert>
             </DetailsContainer>
         );
@@ -352,15 +355,15 @@ function SparePartDetails({ id }) {
     return (
         <DetailsContainer>
             <DetailsBackButton
-                onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/vehicles/parts"))}
-                label={t("vehiclesApp.parts.back", "Back to spare parts")}
+                onClick={() => goBack()}
+                label={t("vehiclesApp.details.backShort", "Back")}
             />
-            {location.state?.published && (
+            {flashState?.published && (
                 <Alert severity="success" sx={{ mb: 2 }}>
                     {t("vehiclesApp.parts.published", "Your spare part is published.")}
                 </Alert>
             )}
-            {location.state?.updated && (
+            {flashState?.updated && (
                 <Alert severity="success" sx={{ mb: 2 }}>
                     {t("vehiclesApp.details.updated", "Your changes are saved.")}
                 </Alert>

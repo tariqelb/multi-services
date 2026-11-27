@@ -2175,7 +2175,8 @@
         "statusNames": {
             "active": "Active",
             "archived": "Archivée"
-        }
+        },
+        "back": "Retour"
     },
     "knowledgeCenter": {
         "title": "Centre de connaissances juridiques et immobilières",
@@ -2632,7 +2633,8 @@
             "saveDescription": "Votre annonce est mise à jour immédiatement.",
             "saved": "Votre annonce a été mise à jour.",
             "saveError": "Impossible d'enregistrer vos modifications. Veuillez réessayer.",
-            "loadError": "Impossible de charger cette annonce."
+            "loadError": "Impossible de charger cette annonce.",
+            "cancel": "Annuler"
         }
     },
     "establishmentForm": {
@@ -2700,7 +2702,8 @@
             "publishing": "Publication...",
             "create": "Créer l'établissement",
             "save": "Enregistrer",
-            "saving": "Enregistrement..."
+            "saving": "Enregistrement...",
+            "cancel": "Annuler"
         },
         "helpers": {
             "googleMaps": "Ajoutez un lien Google Maps pour extraire automatiquement les coordonnées.",
@@ -2863,7 +2866,9 @@
             "whatsappShort": "WhatsApp",
             "publishedBy": "Publié par",
             "publisher": "Annonceur"
-        }
+        },
+        "publishFab": "Ajouter un établissement",
+        "publishFabTooltip": "Publier un nouvel hôtel, riad ou maison d’hôtes"
     },
     "profileEstablishment": {
         "myEstablishments": "Mes établissements",
@@ -3447,7 +3452,8 @@
             "readyTitle": "Prêt à publier ?",
             "remove": "Retirer",
             "requiredNote": "Les champs marqués d'un * sont obligatoires.",
-            "reset": "Réinitialiser"
+            "reset": "Réinitialiser",
+            "cancel": "Annuler"
         },
         "filters": {
             "title": "Filtres",
@@ -3721,7 +3727,8 @@
             "yes": "Oui",
             "backMotos": "Retour aux motos & vélos",
             "ratingCount": "{{value}} · {{count}} avis",
-            "noReviews": "Pas encore d'avis"
+            "noReviews": "Pas encore d'avis",
+            "backShort": "Retour"
         },
         "fab": {
             "label": "Ajouter un véhicule",
@@ -5531,6 +5538,377 @@
             "whatsapp": "WhatsApp",
             "email": "E-mail",
             "message": "Message"
+        }
+    },
+    "mapPicker": {
+        "pickButton": "Choisir sur la carte",
+        "openGoogleMaps": "Ouvrir Google Maps",
+        "title": "Trouver le lieu sur la carte",
+        "subtitle": "Recherchez le lieu ou utilisez votre position, puis appuyez sur « Utiliser ce lieu ».",
+        "subtitleInteractive": "Recherchez, puis cliquez sur la carte ou déplacez le repère à l’endroit exact.",
+        "searchPlaceholder": "Adresse, quartier, nom du lieu ou ville",
+        "search": "Rechercher",
+        "useMyLocation": "Ma position",
+        "myLocation": "Ma position",
+        "results": "Résultats",
+        "noResults": "Aucun lieu trouvé. Essayez un autre nom, un quartier ou une ville.",
+        "searchFailed": "La recherche n’est pas disponible pour le moment. Réessayez plus tard.",
+        "noGeolocation": "Votre navigateur ne peut pas partager votre position.",
+        "locationDenied": "Impossible d’obtenir votre position. Autorisez l’accès à la localisation ou faites une recherche.",
+        "loadError": "Google Maps n’a pas pu être chargé.",
+        "copy": "Copier le lien",
+        "copied": "Copié",
+        "openInGoogle": "Ouvrir dans Google Maps",
+        "noPlace": "Aucun lieu sélectionné.",
+        "exactHint": "Besoin de l’endroit exact ? Ouvrez Google Maps, appuyez sur Partager → Copier le lien, puis collez-le dans le champ.",
+        "useLocation": "Utiliser ce lieu",
+        "cancel": "Annuler",
+        "close": "Fermer"
+    },
+    "workersApp": {
+        "card": {
+            "night": "Travail de nuit",
+            "deposit": "Acompte demandé",
+            "depositPercent": "Acompte {{percent}} %",
+            "moreTrades": "+{{count}} autres métiers",
+            "noDeposit": "Sans acompte",
+            "team": "Équipe de {{count}}",
+            "urgent": "Urgences acceptées",
+            "moreTrades_one": "+{{count}} autre métier"
+        },
+        "details": {
+            "break": "Pause déjeuner",
+            "night": "Travaille de nuit",
+            "openMap": "Ouvrir dans Google Maps",
+            "alone": "Seul",
+            "back": "Retour",
+            "base": "Habite à",
+            "call": "Appeler",
+            "contact": "Contacter l'artisan",
+            "days": "Jours de travail",
+            "edit": "Modifier mon profil",
+            "error": "Impossible de charger cet artisan.",
+            "hasTools": "A ses propres outils",
+            "hasVehicle": "A un véhicule",
+            "hidden": "Masqué",
+            "hours": "Horaires",
+            "languages": "Langues",
+            "manage": "Gérer disponibilité et portfolio",
+            "noContact": "Pas encore de numéro de contact.",
+            "notFound": "Artisan introuvable.",
+            "offers": "Métiers et tarifs",
+            "offersCount": "{{count}} métiers",
+            "portfolio": "Réalisations et vidéos",
+            "portfolioEmpty": "Pas encore de photos ni de vidéos.",
+            "portfolioHint": "Photos de chantiers terminés et vidéos publiées par l'artisan.",
+            "safety": "Mettez-vous d'accord sur le prix, l'acompte et le travail avant de commencer. Ne payez jamais tout à l'avance.",
+            "team": "Travaille",
+            "urgent": "Accepte les urgences",
+            "when": "Où et quand",
+            "worksIn": "Travaille à",
+            "offersCount_one": "{{count}} métier"
+        },
+        "filters": {
+            "night": "Travaille de nuit",
+            "gender": "Artisan",
+            "workplace": "A un atelier ou une boutique",
+            "all": "Tous",
+            "any": "Tous",
+            "apply": "Voir les résultats",
+            "available": "Disponible maintenant",
+            "city": "Ville",
+            "clear": "Effacer",
+            "language": "Langue",
+            "less": "Moins de filtres",
+            "maxPrice": "Prix max (MAD)",
+            "minExperience": "Années d'expérience min.",
+            "more": "Plus de filtres",
+            "noDeposit": "Sans acompte",
+            "priceType": "Tarif",
+            "search": "Rechercher",
+            "searchPlaceholder": "Métier, spécialité, nom… ex. plombier, zellige",
+            "specialty": "Spécialité",
+            "team": "Travaille en équipe",
+            "title": "Trouver un artisan",
+            "trade": "Métier",
+            "urgent": "Urgences acceptées"
+        },
+        "form": {
+            "breakEnd": "Pause jusqu'à",
+            "breakStart": "Pause de",
+            "browse": "Choisir des photos",
+            "hasBreak": "Je prends une pause déjeuner",
+            "mainPhoto": "Principale",
+            "photoRejected": "Certaines photos ont été ignorées : JPG, PNG ou WEBP jusqu'à 5 Mo.",
+            "removePhoto": "Retirer",
+            "workplacePhotos": "Photos de votre local (facultatif)",
+            "workplacePhotosHint": "Jusqu'à {{max}} photos · JPG, PNG ou WEBP · 5 Mo max",
+            "workplacePhotosTitle": "Ajoutez des photos de votre atelier, boutique ou garage",
+            "worksAtNight": "Je travaille aussi la nuit (travaux de nuit, horaires après minuit)",
+            "gender": "Vous êtes",
+            "hasWorkplace": "J'ai un atelier, une boutique ou un garage où les clients peuvent venir",
+            "workplaceAddress": "Adresse (facultatif)",
+            "workplaceAddressPlaceholder": "Rue, quartier",
+            "workplaceMap": "Lien Google Maps de votre local",
+            "workplaceMapHelp": "Choisissez-le sur la carte, ou dans Google Maps : Partager → Copier le lien.",
+            "workplaceName": "Nom (facultatif)",
+            "workplaceNamePlaceholder": "ex. Garage Atlas",
+            "add": "Ajouter",
+            "addOffer": "Ajouter un autre métier ({{count}} / {{max}})",
+            "badge": "Artisan",
+            "baseCity": "Ville où vous habitez",
+            "bio": "Courte présentation (facultatif)",
+            "bioPlaceholder": "ex. Sérieux et ponctuel, je travaille à Agadir et ses environs depuis 10 ans.",
+            "changePhoto": "La changer dans les Paramètres",
+            "citiesHelp": "Jusqu'à {{count}} villes, la vôtre comprise.",
+            "contactBoth": "Appel et WhatsApp",
+            "contactCall": "Appel uniquement",
+            "contactHint": "Nous affichons les numéros de votre compte : {{numbers}}.",
+            "contactPreference": "Les clients peuvent vous contacter par",
+            "contactWhatsapp": "WhatsApp uniquement",
+            "coverageCities": "Villes choisies",
+            "customSpecialty": "Ajouter une spécialité absente de la liste",
+            "customSpecialtyHelp": "Jusqu'à {{count}}. Appuyez sur Entrée pour ajouter.",
+            "customTrade": "Votre métier",
+            "customTradeHelp": "Pas dans la liste ? Écrivez-le comme les clients le chercheraient.",
+            "days": "Jours de travail",
+            "deposit": "Je demande un acompte avant de commencer",
+            "depositPercent": "Acompte (% du prix, facultatif)",
+            "diploma": "Diplôme ou formation (facultatif)",
+            "diplomaPlaceholder": "ex. OFPPT – plomberie",
+            "editBadge": "Modifier",
+            "editTitle": "Modifier votre profil d'artisan",
+            "experience": "Années d'expérience dans ce métier",
+            "firstName": "Prénom",
+            "guarantee": "Garantie (facultatif)",
+            "guaranteePlaceholder": "ex. 6 mois sur les travaux",
+            "hasTools": "J'ai mes propres outils",
+            "hasVehicle": "J'ai un véhicule",
+            "hoursEnd": "À",
+            "hoursStart": "De",
+            "howSubtitle": "Langues, équipe, outils et moyens de contact.",
+            "howTitle": "Comment vous travaillez",
+            "languages": "Langues parlées",
+            "lastName": "Nom",
+            "loadError": "Impossible de charger votre profil d'artisan.",
+            "materials": "Matériaux",
+            "maxOffers": "Maximum {{count}} métiers",
+            "noNumber": "aucun pour le moment",
+            "offerDescription": "Décrivez votre travail dans ce métier (facultatif)",
+            "offerTitle": "Métier {{number}}",
+            "openSettings": "Paramètres",
+            "optionsError": "Impossible de charger la liste des métiers.",
+            "otherCities": "Autres villes où vous travaillez (facultatif)",
+            "otherTrade": "Autre (je saisis mon métier)",
+            "paymentTiming": "Quand êtes-vous payé ?",
+            "photoDefault": "Pas encore de photo : une image par défaut est affichée.",
+            "photoHint": "La photo de votre compte est affichée sur votre profil.",
+            "portfolioHint": "Les photos de vos travaux vont dans votre portfolio, après la publication.",
+            "priceDay": "Prix par jour (MAD)",
+            "priceHour": "Prix par heure (MAD)",
+            "priceM2": "Prix par m² (MAD)",
+            "priceTask": "Prix de départ par travail (MAD, facultatif)",
+            "priceTitle": "Comment facturez-vous ?",
+            "publish": "Publier mon profil",
+            "publishSubtitle": "Vous pouvez modifier ou masquer votre profil à tout moment.",
+            "publishTitle": "Prêt à publier ?",
+            "removeOffer": "Retirer ce métier",
+            "save": "Enregistrer",
+            "saveError": "Impossible d'enregistrer votre profil d'artisan.",
+            "saveSubtitle": "Les clients voient les nouvelles informations tout de suite.",
+            "saveTitle": "Enregistrer vos modifications",
+            "saved": "Vos modifications sont enregistrées.",
+            "saving": "Enregistrement...",
+            "specialties": "Ce que vous faites dans ce métier",
+            "subtitle": "Un profil, jusqu'à {{count}} métiers. Les clients vous trouvent par métier et par ville, puis vous appellent ou vous écrivent sur WhatsApp.",
+            "team": "Vous travaillez",
+            "teamSize": "Personnes dans l'équipe",
+            "title": "Publiez votre profil d'artisan",
+            "trade": "Métier",
+            "tradeHelp": "Tapez pour chercher : plombier, zellige, peintre…",
+            "tradesSubtitle": "Une fiche par métier, jusqu'à {{count}}. Chacune a son prix et ses conditions.",
+            "tradesTitle": "Vos métiers et tarifs",
+            "urgent": "J'accepte les urgences",
+            "verifyContact": "Vérifiez votre numéro de téléphone ou WhatsApp dans les Paramètres avant de publier : les clients doivent pouvoir vous joindre.",
+            "visitFee": "Frais de visite (MAD, facultatif)",
+            "visitFree": "Visite et devis gratuits",
+            "whenSubtitle": "Vos jours et horaires de travail.",
+            "whenTitle": "Quand vous travaillez",
+            "whereSubtitle": "Votre ville et les villes où vous acceptez des travaux.",
+            "whereTitle": "Où vous travaillez",
+            "whoSubtitle": "Votre nom et quelques mots pour les clients.",
+            "whoTitle": "À propos de vous",
+            "withTeam": "En équipe"
+        },
+        "gender": {
+            "female": "Femme",
+            "male": "Homme"
+        },
+        "workplace": {
+            "garage": "Garage",
+            "place": "Local",
+            "shop": "Boutique",
+            "workshop": "Atelier"
+        },
+        "admin": {
+            "countAll": "{{count}} profils",
+            "countHidden": "{{count}} masqués",
+            "countOnline": "{{count}} en ligne",
+            "delete": "Supprimer",
+            "deleteError": "Impossible de supprimer ce profil.",
+            "deleteText": "Le profil de {{name}} et son portfolio seront supprimés. Le compte reste.",
+            "deleteTitle": "Supprimer ce profil d'artisan ?",
+            "empty": "Aucun profil d'artisan sur cette période.",
+            "error": "Impossible de charger les profils d'artisans.",
+            "filters": "Filtres",
+            "open": "Ouvrir",
+            "periods": {
+                "all": "Tout",
+                "month": "30 jours",
+                "today": "Aujourd'hui",
+                "week": "7 jours",
+                "year": "12 mois"
+            },
+            "searchPlaceholder": "Nom, métier, ville…",
+            "subtitle": "Vérifiez ce que publient les artisans et supprimez les profils inappropriés.",
+            "title": "Profils d'artisans",
+            "updated": "Mis à jour le {{date}}",
+            "countAll_one": "{{count}} profil",
+            "countHidden_one": "{{count}} masqué"
+        },
+        "availability": {
+            "available": "Disponible",
+            "busy": "Occupé",
+            "busyUntil": "Occupé jusqu'au {{date}}"
+        },
+        "coverage": {
+            "morocco": "Tout le Maroc"
+        },
+        "days": {
+            "everyDay": "Tous les jours",
+            "fri": "Ven",
+            "mon": "Lun",
+            "sat": "Sam",
+            "sun": "Dim",
+            "thu": "Jeu",
+            "tue": "Mar",
+            "wed": "Mer"
+        },
+        "experience": {
+            "beginner": "Débutant",
+            "years": "{{count}} ans d'expérience",
+            "years_one": "{{count}} an d'expérience"
+        },
+        "fab": {
+            "label": "Publier mon profil",
+            "tooltip": "Publiez votre profil d'artisan"
+        },
+        "languages": {
+            "ar": "Arabe",
+            "en": "Anglais",
+            "fr": "Français"
+        },
+        "list": {
+            "count": "{{count}} offres",
+            "empty": "Aucun artisan ne correspond à ces filtres",
+            "emptyHint": "Essayez un autre métier ou une autre ville, ou retirez des filtres.",
+            "error": "Impossible de charger les artisans.",
+            "pageSubtitle": "Artisans et ouvriers journaliers partout au Maroc : plombiers, électriciens, peintres, ménage et plus.",
+            "pageTitle": "Trouver un artisan",
+            "title": "Artisans",
+            "count_one": "{{count}} offre"
+        },
+        "materials": {
+            "client": "Le client achète les matériaux",
+            "either": "Matériaux : au choix",
+            "included": "Matériaux inclus"
+        },
+        "mine": {
+            "actionError": "Une erreur est survenue. Réessayez.",
+            "availabilityHint": "Les clients filtrent sur « Disponible maintenant ». Indiquez quand vous êtes occupé.",
+            "availabilitySaved": "Disponibilité mise à jour.",
+            "availabilityTitle": "Disponibilité",
+            "busyUntil": "Occupé jusqu'au",
+            "cancel": "Annuler",
+            "confirmDelete": "Supprimer",
+            "delete": "Supprimer mon profil d'artisan",
+            "deleteText": "Vos métiers et votre portfolio (photos et vidéos) seront supprimés. Cette action est définitive.",
+            "deleteTitle": "Supprimer votre profil d'artisan ?",
+            "deleted": "Votre profil d'artisan est supprimé.",
+            "emptyText": "Publiez vos métiers, vos villes et vos tarifs, et laissez les clients vous appeler directement.",
+            "emptyTitle": "Vous n'avez pas encore de profil d'artisan",
+            "hiddenBanner": "Votre profil est masqué : les clients ne peuvent pas le trouver.",
+            "hiddenNotice": "Votre profil est masqué aux clients.",
+            "hide": "Masquer mon profil",
+            "manageTitle": "Profil",
+            "online": "En ligne",
+            "onlineNotice": "Votre profil est de nouveau en ligne.",
+            "portfolioHint": "Montrez vos travaux terminés : photos avant / après ou vidéo YouTube. Les clients font confiance à ce qu'ils voient.",
+            "published": "Votre profil d'artisan est publié. Ajoutez des photos de vos travaux ci-dessous.",
+            "setAvailable": "Je suis disponible",
+            "setBusy": "Indiquer occupé",
+            "show": "Remettre mon profil en ligne",
+            "subtitle": "Votre disponibilité, vos métiers et les photos de vos travaux.",
+            "title": "Mon profil d'artisan",
+            "viewPublic": "Voir ma page publique",
+            "views": "{{count}} visites",
+            "views_one": "{{count}} visite"
+        },
+        "offer": {
+            "deposit": "Acompte",
+            "depositNo": "Sans acompte",
+            "depositPercent": "{{percent}} % avant de commencer",
+            "depositYes": "Demandé avant de commencer",
+            "diploma": "Diplôme / formation",
+            "guarantee": "Garantie",
+            "materials": "Matériaux",
+            "payment": "Paiement",
+            "visit": "Visite / devis",
+            "visitFee": "Visite : {{amount}}",
+            "visitFree": "Visite / devis gratuits",
+            "visitPaid": "Visite payante"
+        },
+        "payment": {
+            "agreed": "Paiement selon accord",
+            "daily": "Payé à la fin de chaque journée",
+            "end": "Payé à la fin du travail"
+        },
+        "price": {
+            "currency": "MAD",
+            "perDay": "{{amount}} / jour",
+            "perHour": "{{amount}} / heure",
+            "perM2": "{{amount}} / m²",
+            "quote": "Sur devis",
+            "task": "Prix par travail",
+            "taskFrom": "À partir de {{amount}} par travail"
+        },
+        "priceTypes": {
+            "day": "Par jour",
+            "hour": "Par heure",
+            "m2": "Par m²",
+            "quote": "Sur devis",
+            "task": "Par travail"
+        },
+        "sidebar": {
+            "browse": "Trouver un artisan",
+            "mine": "Mon profil d'artisan",
+            "publish": "Publier mon profil"
+        },
+        "sort": {
+            "available": "Disponibles d'abord",
+            "experience": "Les plus expérimentés",
+            "label": "Trier par",
+            "newest": "Plus récents",
+            "priceAsc": "Prix croissant",
+            "priceDesc": "Prix décroissant"
+        },
+        "topbar": {
+            "title": "Artisans"
+        },
+        "trade": {
+            "other": "Autre",
+            "otherGroup": "Autre",
+            "otherTrades": "Autres métiers"
         }
     }
 }

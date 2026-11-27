@@ -50,8 +50,17 @@ export const ADMIN_GROUPS = [
             { section: "vehicleExternalListings", path: "/admin/vehicles/external-listings", labelKey: "vehicleExternal.admin.navItem", label: "External listings", icon: "externalListings" },
         ],
     },
+    {
+        id: "dailyWorker",
+        labelKey: "adminPanel.groups.dailyWorker",
+        label: "Daily Worker",
+        icon: "dailyWorker",
+        items: [
+            { section: "workerPublications", path: "/admin/daily-worker/publications", labelKey: "sidebar.publicationReviews", label: "Publication Reviews", icon: "publications" },
+            { section: "workerPublications", path: "/admin/daily-worker/portfolio", labelKey: "portfolioReview.navItem", label: "Portfolio Reviews", icon: "portfolio" },
+        ],
+    },
     // Other services: no admin pages yet.
-    { id: "dailyWorker", labelKey: "adminPanel.groups.dailyWorker", label: "Daily Worker", icon: "dailyWorker", items: [] },
     { id: "deliveryMan", labelKey: "adminPanel.groups.deliveryMan", label: "Delivery Man", icon: "deliveryMan", items: [] },
     { id: "driver", labelKey: "adminPanel.groups.driver", label: "Driver", icon: "driver", items: [] },
     { id: "servicesCompanies", labelKey: "adminPanel.groups.servicesCompanies", label: "Services & Companies", icon: "servicesCompanies", items: [] },

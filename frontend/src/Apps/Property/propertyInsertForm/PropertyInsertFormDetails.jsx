@@ -19,6 +19,8 @@ import {
 
 import cities from "../../../data/moroccanCities";
 import { isFurnishableType } from "../../../utils/furnishing";
+import MapLinkAdornment from "../../../Components/MapPicker/MapLinkAdornment";
+import { joinHint } from "../../../Components/MapPicker/mapLinkUtils";
 
 const moroccanCities = cities;
 
@@ -320,6 +322,17 @@ export default function PropertyInsertFormDetails({
                         {
                             placeholder: "https://maps.google.com/...",
                             type: "url",
+                            slotProps: {
+                                input: {
+                                    endAdornment: (
+                                        <MapLinkAdornment
+                                            value={formData.mapLink}
+                                            onChange={(link) => handleChange({ target: { name: "mapLink", value: link } })}
+                                            searchHint={joinHint(formData.neighborhood, formData.city)}
+                                        />
+                                    ),
+                                },
+                            },
                         }
                     )}
                 </Grid>

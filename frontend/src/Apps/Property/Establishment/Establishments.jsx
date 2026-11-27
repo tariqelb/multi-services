@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { pagePaddingSx } from "../../../Components/ui/PageContainer";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import PublishFab from "../propertyInsertForm/PublishFab";
 
 import {
     Alert,
@@ -25,7 +26,6 @@ import {
 } from "@mui/material";
 
 import {
-    Add,
     Hotel,
     LocationOn,
     Search,
@@ -164,15 +164,12 @@ export default function Establishments() {
                 icon={<Hotel />}
                 title={t("establishments.title")}
                 subtitle={t("establishments.subtitle")}
-                action={
-                    <Button
-                        variant="contained"
-                        startIcon={<Add />}
-                        onClick={() => navigate("/establishments/publish")}
-                    >
-                        {t("establishments.publish")}
-                    </Button>
-                }
+            />
+
+            <PublishFab
+                to="/establishments/publish"
+                label={t("establishments.publishFab", "Add establishment")}
+                tooltip={t("establishments.publishFabTooltip", "Publish a new hotel, riad or guesthouse")}
             />
 
             {/* Filters */}

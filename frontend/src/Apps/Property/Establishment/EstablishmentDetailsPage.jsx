@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SaveListingButton from "../saved/SaveListingButton";
 import ReportListingLink from "../listings/ReportListingLink";
@@ -56,6 +56,7 @@ import axiosInstance from "../../../api/axiosInstance";
 import { trackListingContact } from "../../../api/trackContact";
 import VisitProfileButton from "../../../Components/Profile/VisitProfileButton";
 import { ownerIdOf } from "../../../Components/Profile/profilePaths";
+import { useGoBack } from "../../../Components/navigation/navHistory";
 
 const API_BASE_URL =
     import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -139,7 +140,7 @@ function getStarRating(classification) {
 
 export default function EstablishmentDetailsPage() {
     const { id } = useParams();
-    const navigate = useNavigate();
+    const goBack = useGoBack("/establishments");
     const { t } = useTranslation();
 
     const tr = (key, fallback) =>
@@ -227,7 +228,7 @@ export default function EstablishmentDetailsPage() {
     if (error || !establishment) {
         return (
             <DetailsContainer>
-                <DetailsBackButton onClick={() => navigate(-1)} label={tr("back", "Back")} />
+                <DetailsBackButton onClick={() => goBack()} label={tr("back", "Back")} />
                 <Alert severity="error">{error || tr("notFound", "Establishment not found.")}</Alert>
             </DetailsContainer>
         );
@@ -646,7 +647,7 @@ export default function EstablishmentDetailsPage() {
 
     return (
         <DetailsContainer withMobileBar={Boolean(phone || whatsapp)}>
-            <DetailsBackButton onClick={() => navigate(-1)} label={tr("back", "Back")} />
+            <DetailsBackButton onClick={() => goBack()} label={tr("back", "Back")} />
 
             <DetailsHeader
                 badges={

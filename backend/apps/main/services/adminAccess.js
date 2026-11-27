@@ -28,6 +28,8 @@ export const ADMIN_SECTIONS = [
     { id: "vehiclePublications", group: "vehicles" },
     { id: "vehicleRequests", group: "vehicles" },
     { id: "vehicleExternalListings", group: "vehicles" },
+    // Daily worker
+    { id: "workerPublications", group: "dailyWorker" },
 ];
 
 export const ROLES = ["client", "member", "admin"];

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import {
     Navigate,
     useLocation,
-    useNavigate,
     useParams,
     useRouteLoaderData,
 } from "react-router-dom";
@@ -45,6 +44,7 @@ import { useTranslation } from "react-i18next";
 import axiosInstance from "../../../../../api/axiosInstance";
 import { UserSuspensionBanner, UserSuspensionButton } from "./UserSuspensionControl";
 import { SocialLinksList } from "../../../../../Components/Profile/SocialLinks";
+import { useGoBack } from "../../../../../Components/navigation/navHistory";
 
 // Overview, then one tab per service (each with its own kinds), then feedback.
 const tabConfig = [
@@ -165,7 +165,7 @@ function StatGroup({ title, icon, items }) {
 export default function UserDetailsPage() {
     const { t, i18n } = useTranslation();
     const { userId } = useParams();
-    const navigate = useNavigate();
+    const goBack = useGoBack("/admin/users");
     const location = useLocation();
 
     const authenticatedUser = useRouteLoaderData("dashboard-layout");
@@ -385,10 +385,10 @@ export default function UserDetailsPage() {
         <Box sx={pagePaddingSx}>
             <Button
                 startIcon={<ArrowBack />}
-                onClick={() => navigate("/dashboard")}
+                onClick={() => goBack()}
                 sx={{ mb: 2 }}
             >
-                {t("userDetails.backToDashboard")}
+                {t("userDetails.back", "Back")}
             </Button>
 
             {loadingOverview && !user ? (

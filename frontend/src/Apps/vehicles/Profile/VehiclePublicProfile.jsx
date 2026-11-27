@@ -5,7 +5,7 @@
 // ?tab=reviews opens the reviews (from the Reviews page and the vehicle page).
 
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Alert, Box, Button, CircularProgress, Container, Stack } from "@mui/material";
@@ -23,6 +23,7 @@ import PublicContactCard from "../../../Components/Profile/PublicContactCard";
 import VehicleRequestsList from "../Requests/VehicleRequestsList";
 import PortfolioSection from "../../../Components/Profile/Portfolio/PortfolioSection";
 import { PROFILE_TABS, REQUESTS_TAB, REVIEWS_TAB, dealerBadge, profileTabs, useVehicleReviews } from "./vehicleProfileShared";
+import { useGoBack } from "../../../Components/navigation/navHistory";
 
 const EMPTY_FORM = { rating: 0, comment: "" };
 
@@ -30,7 +31,7 @@ export default function VehiclePublicProfile() {
     const { userId } = useParams();
     const [searchParams] = useSearchParams();
     const requestedTab = Math.max(0, PROFILE_TABS.indexOf(searchParams.get("tab")));
-    const navigate = useNavigate();
+    const goBack = useGoBack("/vehicles");
     const { t } = useTranslation();
 
     const profileUser = useSelector((state) => state.profile?.user);
@@ -145,7 +146,7 @@ export default function VehiclePublicProfile() {
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}
                 </Alert>
-                <Button startIcon={<ArrowBack />} onClick={() => navigate(-1)}>
+                <Button startIcon={<ArrowBack />} onClick={() => goBack()}>
                     {t("publicProfile.back")}
                 </Button>
             </Container>
@@ -164,7 +165,7 @@ export default function VehiclePublicProfile() {
         <Container maxWidth={false} disableGutters sx={pagePaddingSx}>
             <Stack spacing={3}>
                 <Box>
-                    <Button startIcon={<ArrowBack />} onClick={() => navigate(-1)} sx={{ textTransform: "none" }}>
+                    <Button startIcon={<ArrowBack />} onClick={() => goBack()} sx={{ textTransform: "none" }}>
                         {t("publicProfile.back")}
                     </Button>
                 </Box>
